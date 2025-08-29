@@ -1,0 +1,73 @@
+:root{
+  --toast-radius:12px;
+  --toast-shadow:0 10px 30px rgba(0,0,0,.15);
+  --toast-z:1080;
+
+  --toast-success-bg:linear-gradient(135deg,#20c997,#009926);
+  --toast-success-fg:#fff;
+  --toast-error-bg:linear-gradient(135deg,#ff6b6b,#f03e3e);
+  --toast-error-fg:#fff;
+  --toast-info-bg:linear-gradient(135deg,#4dabf7,#228be6);
+  --toast-info-fg:#fff;
+  --toast-warning-bg:linear-gradient(135deg,#ffd43b,#fab005);
+  --toast-warning-fg:#1f2937;
+
+  --toast-progress-bg:rgba(255,255,255,.35);
+  --toast-progress-bar:#5757f0;
+}
+
+/* Container */
+.toast-container{ z-index:var(--toast-z); }
+
+/* Base card */
+.toast.toast-base{
+  min-width:300px;border:0;border-radius:var(--toast-radius);
+  box-shadow:var(--toast-shadow);overflow:hidden;
+  backdrop-filter:saturate(160%) blur(10px);
+  background:var(--_bg,#111);color:var(--_fg,#fff);opacity:.98;
+  will-change:transform,opacity;
+}
+
+/* Variants */
+.toast--success{--_bg:var(--toast-success-bg);--_fg:var(--toast-success-fg);}
+.toast--error  {--_bg:var(--toast-error-bg);  --_fg:var(--toast-error-fg);}
+.toast--info   {--_bg:var(--toast-info-bg);   --_fg:var(--toast-info-fg);}
+.toast--warning{--_bg:var(--toast-warning-bg);--_fg:var(--toast-warning-fg);}
+
+/* Header row */
+.toast-base .toast-row{
+  display:flex;align-items:center;gap:.5rem;padding:.85rem 1rem .75rem;
+}
+
+/* Icon & text */
+.toast-icon{display:inline-flex;align-items:center;justify-content:center;font-size:1.15rem;opacity:.95;}
+.toast-body{font-weight:500;line-height:1.35;padding:0;}
+.toast .btn-close{filter:invert(1) grayscale(1) contrast(120%);opacity:.7;}
+.toast .btn-close:hover{opacity:1;}
+
+/* Progress */
+.toast-progress{position:relative;background:var(--toast-progress-bg);height:3px;width:100%;}
+.toast-progress__bar{position:absolute;inset:0 auto 0 0;width:100%;background:var(--toast-progress-bar);opacity:.9;transition:width .05s linear;}
+.toast-countdown{margin-left:.5rem;opacity:.85;font-size:.8rem;}
+
+/* === Animations === */
+/* Start state */
+.toast.toast-base.fade{
+  transform:translateX(-24px);
+  opacity:0;
+  transition:transform .45s cubic-bezier(.20,.70,.20,1),opacity .35s ease;
+}
+/* Visible */
+.toast.toast-base.fade.is-in{
+  transform:translateX(0);
+  opacity:1;
+}
+/* Leaving (custom hide) */
+.toast.toast-base.leaving{
+  animation:toastLeave .48s ease-in forwards;
+}
+@keyframes toastLeave{
+  0%{transform:translateX(0);opacity:1}
+  35%{transform:translateX(-10px)}
+  100%{transform:translateX(60px);opacity:0}
+}

@@ -1,0 +1,9 @@
+.custom-form-login-shadow{
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+}
+
+.text-justify {
+  text-align: justify;
+}

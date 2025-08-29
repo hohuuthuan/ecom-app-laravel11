@@ -1,7 +1,10 @@
-@extends('layouts.admin.admin')
-@section('title','Admin')
+@extends('layouts.admin')
+
+@section('title','Admin Dashboard')
+
 @section('content')
-<div class="p-4 bg-white border rounded">
-  <h5 class="mb-0">Admin Dashboard</h5>
+<div class="p-5 bg-white border rounded shadow-sm text-center">
+  <h1 class="fw-bold">Xin chào Admin</h1>
+  <p class="text-muted">Đây là giao diện quản trị.</p>
 </div>
 @endsection

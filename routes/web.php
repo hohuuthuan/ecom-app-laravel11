@@ -9,9 +9,7 @@ Route::view('/', 'user.home')->name('home');
 // === GUEST ===
 Route::middleware('guest')->group(function () {
   Route::view('/login', 'auth.login')->name('login.form');
-  Route::post('/login', [AuthController::class, 'login'])
-    ->name('login')
-    ->middleware('throttle:10,1');
+  Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('throttle:10,1');
 
   Route::view('/register', 'auth.register')->name('register.form');
   Route::post('/register', [AuthController::class, 'register'])->name('register');
@@ -26,4 +24,4 @@ Route::middleware(['auth'])->group(function () {
   });
 });
 
-Route::fallback(fn () => response()->view('errors.404', [], 404));
+Route::fallback(fn() => response()->view('errors.404', [], 404));

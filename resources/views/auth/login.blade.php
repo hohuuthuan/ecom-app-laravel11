@@ -47,12 +47,20 @@
                 @enderror
               </div>
 
-              <div class="mb-3">
+              <div class="mb-3 position-relative">
                 <input type="password"
                   name="password"
-                  class="form-control @error('password') is-invalid @enderror"
+                  id="password"
+                  class="form-control pe-5 @error('password') is-invalid @enderror"
                   placeholder="Mật khẩu"
                   autocomplete="current-password">
+
+                <button type="button"
+                  class="toggle-password btn btn-link p-0 border-0 position-absolute top-50 end-0 translate-middle-y me-3"
+                  aria-label="Hiện/ẩn mật khẩu">
+                  <i class="icon-eye fa fa-eye-slash" id="togglePasswordIcon"></i>
+                </button>
+
                 @error('password')
                 <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -96,3 +104,22 @@
   </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const btn = document.querySelector(".toggle-password");
+    const input = document.querySelector("#password");
+    const icon = document.querySelector("#togglePasswordIcon");
+
+    if (!btn || !input || !icon) return;
+
+    btn.addEventListener("click", function() {
+      const isPwd = input.getAttribute("type") === "password";
+      input.setAttribute("type", isPwd ? "text" : "password");
+      icon.classList.toggle("fa-eye", isPwd);
+      icon.classList.toggle("fa-eye-slash", !isPwd);
+    });
+  });
+</script>
+@endpush

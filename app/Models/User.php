@@ -35,6 +35,11 @@ class User extends Authenticatable
     return $this->roles()->where('name', $roleName)->exists();
   }
 
+  public function hasAnyRole(string ...$names): bool
+  {
+    return $this->roles()->whereIn('name', $names)->exists();
+  }
+
   public function getAuthIdentifierName()
   {
     return 'id';

@@ -44,7 +44,6 @@ class AuthService implements AuthServiceInterface
     $key          = 'login:' . sha1($sessionId . '|' . request()->ip());
     $maxAttempts  = 6;
     $decaySeconds = 15 * 60;
-
     if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
       $seconds = RateLimiter::availableIn($key);
       session()->flash('toast_error', "Bạn thử quá nhiều lần. Vui lòng thử lại sau {$seconds}s.");
@@ -57,7 +56,6 @@ class AuthService implements AuthServiceInterface
       session()->flash('toast_error', 'Email hoặc mật khẩu không đúng');
       return back()->withInput()->withErrors(['email' => 'Email hoặc mật khẩu không đúng']);
     }
-
     if ($user->status !== 'ACTIVE') {
       session()->flash('toast_error', 'Tài khoản đã bị khóa.');
       return back()->withInput()->withErrors(['email' => 'Tài khoản đã bị khóa']);
@@ -68,10 +66,10 @@ class AuthService implements AuthServiceInterface
     Auth::login($user, $remember);
     session()->regenerate();
 
-    return redirect()->intended(route('home'))
+    return redirect()
+      ->intended(route('home'))
       ->with('toast_success', 'Đăng nhập thành công.');
   }
-
 
   public function logout(): void
   {

@@ -26,7 +26,16 @@
   backdrop-filter:saturate(160%) blur(10px);
   background:var(--_bg,#111);color:var(--_fg,#fff);opacity:.98;
   will-change:transform,opacity;
+  cursor:pointer; /* click to dismiss */
 }
+
+/* Giữ con trỏ bình thường trên vùng tương tác */
+.toast.toast-base .btn-close,
+.toast.toast-base a,
+.toast.toast-base input,
+.toast.toast-base textarea,
+.toast.toast-base select,
+.toast.toast-base label { cursor:auto; }
 
 /* Variants */
 .toast--success{--_bg:var(--toast-success-bg);--_fg:var(--toast-success-fg);}

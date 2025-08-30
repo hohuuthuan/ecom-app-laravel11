@@ -1,49 +1,74 @@
 .custom-form-login-shadow {
-  background: #fff;
-  border-radius: 0rem;
+    background: #fff;
+    border-radius: 0rem;
 
-  box-shadow: 
-    0 8px 20px rgba(0, 0, 0, 0.15),
-    0 16px 40px rgba(0, 0, 0, 0.18),
-    0 24px 80px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15), 0 16px 40px rgba(0, 0, 0, 0.18),
+        0 24px 80px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .custom-form-login-shadow:hover {
-  /* Khi hover form nổi hơn một chút */
-  box-shadow: 
-    0 10px 25px rgba(0, 0, 0, 0.18),
-    0 20px 50px rgba(0, 0, 0, 0.22),
-    0 30px 90px rgba(0, 0, 0, 0.15);
-  transform: translateY(-3px);
+    /* Khi hover form nổi hơn một chút */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18), 0 20px 50px rgba(0, 0, 0, 0.22),
+        0 30px 90px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
 }
 
 .text-justify {
-  text-align: justify;
+    text-align: justify;
 }
 
 .auth-page .form-control,
 .auth-page .btn {
-  border-radius: 0 !important;
+    border-radius: 0 !important;
 }
 
 .auth-page .form-control:focus {
-  border-color: #0b99c4 !important;
-  box-shadow: 0 0 0 0.2rem rgba(159, 249, 248, 0.922) !important;
+    border-color: #0b99c4 !important;
+    box-shadow: 0 0 0 0.2rem rgba(159, 249, 248, 0.922) !important;
 }
 
 .btn-login {
-  background-color: #22b1dc !important;
-  border-color: #22b1dc !important;
+    background-color: #22b1dc !important;
+    border-color: #22b1dc !important;
 }
 
 .btn-login:hover,
 .btn-login:focus {
-  background-color: #0189b2 !important;
-  border-color: #0189b2 !important;
+    background-color: #0189b2 !important;
+    border-color: #0189b2 !important;
 }
 
 .icon-eye {
-  font-size: 25px;
+    font-size: 20px;
+    color: #0b99c4;
+}
+
+.auth-page .has-toggle .form-control.is-invalid,
+.auth-page .has-toggle .form-control.is-valid {
+    background-image: none !important;
+}
+
+/* Chừa chỗ icon */
+.auth-page .has-toggle .form-control {
+    padding-right: 2.75rem;
+}
+
+.auth-page .toggle-wrap {
+    height: auto;
+}
+.auth-page .toggle-wrap .toggle-password {
+    top: 50%;
+    transform: translateY(-50%);
+    height: calc(
+        1.5em + 0.75rem + 2px
+    );
+    display: flex;
+    align-items: center;
+    z-index: 3;
+}
+
+.auth-page .has-toggle .invalid-feedback {
+    display: block;
 }

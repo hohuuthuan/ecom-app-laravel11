@@ -32,66 +32,59 @@
             @csrf
 
             <div class="mb-3">
-              <input type="text"
-                name="full_name"
-                value="{{ old('full_name') }}"
+              <input type="text" name="full_name" value="{{ old('full_name') }}"
                 class="form-control @error('full_name') is-invalid @enderror"
-                placeholder="Họ và tên"
-                autocomplete="name">
-              @error('full_name')
-              <div class="invalid-feedback">{{ $message }}</div>
-              @enderror
+                placeholder="Họ và tên" autocomplete="name">
+              @error('full_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
             <div class="mb-3">
-              <input type="text"
-                name="phone"
-                value="{{ old('phone') }}"
+              <input type="text" name="phone" value="{{ old('phone') }}"
                 class="form-control @error('phone') is-invalid @enderror"
-                placeholder="Số điện thoại"
-                inputmode="tel" autocomplete="tel">
-              @error('phone')
-              <div class="invalid-feedback">{{ $message }}</div>
-              @enderror
+                placeholder="Số điện thoại" inputmode="tel" autocomplete="tel">
+              @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
             <div class="mb-3">
-              <input type="email"
-                name="email"
-                value="{{ old('email') }}"
+              <input type="email" name="email" value="{{ old('email') }}"
                 class="form-control @error('email') is-invalid @enderror"
-                placeholder="Email"
-                autocomplete="email">
-              @error('email')
-              <div class="invalid-feedback">{{ $message }}</div>
-              @enderror
+                placeholder="Email" autocomplete="email">
+              @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
-            <div class="mb-3">
-              <input type="password"
-                name="password"
-                class="form-control @error('password') is-invalid @enderror"
-                placeholder="Mật khẩu"
-                autocomplete="new-password">
-              @error('password')
-              <div class="invalid-feedback">{{ $message }}</div>
-              @enderror
+            {{-- Password --}}
+            <div class="mb-3 has-toggle">
+              <div class="toggle-wrap position-relative">
+                <input type="password" name="password" id="password"
+                  class="form-control pe-5 @error('password') is-invalid @enderror"
+                  placeholder="Mật khẩu" autocomplete="new-password">
+                <button type="button"
+                  class="toggle-password btn p-0 border-0 position-absolute end-0 me-3"
+                  aria-label="Hiện/ẩn mật khẩu">
+                  <i class="icon-eye fa fa-eye-slash"></i>
+                </button>
+              </div>
+              @error('password') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
             </div>
 
-            <div class="mb-3">
-              <input type="password"
-                name="password_confirmation"
-                class="form-control"
-                placeholder="Xác nhận mật khẩu"
-                autocomplete="new-password">
+            {{-- Password confirmation --}}
+            <div class="mb-3 has-toggle">
+              <div class="toggle-wrap position-relative">
+                <input type="password" name="password_confirmation" id="password_confirmation"
+                  class="form-control pe-5"
+                  placeholder="Xác nhận mật khẩu" autocomplete="new-password">
+                <button type="button"
+                  class="toggle-password btn p-0 border-0 position-absolute end-0 me-3"
+                  aria-label="Hiện/ẩn mật khẩu">
+                  <i class="icon-eye fa fa-eye-slash"></i>
+                </button>
+              </div>
             </div>
 
             <button type="submit" class="btn btn-primary btn-login w-100 mb-3">Đăng ký</button>
 
             <p class="text-center mb-0"><small>Đã có tài khoản?</small></p>
-            <a class="btn btn-outline-secondary w-100 mt-2" href="{{ route('login.form') }}">
-              Đăng nhập
-            </a>
+            <a class="btn btn-outline-secondary w-100 mt-2" href="{{ route('login.form') }}">Đăng nhập</a>
           </form>
         </div>
       </div>
@@ -99,3 +92,23 @@
   </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".toggle-password").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        const wrap = this.closest(".toggle-wrap");
+        const input = wrap ? wrap.querySelector("input") : null;
+        const icon = this.querySelector("i");
+        if (!input || !icon) return;
+
+        const isPwd = input.type === "password";
+        input.type = isPwd ? "text" : "password";
+        icon.classList.toggle("fa-eye", isPwd);
+        icon.classList.toggle("fa-eye-slash", !isPwd);
+      });
+    });
+  });
+</script>
+@endpush

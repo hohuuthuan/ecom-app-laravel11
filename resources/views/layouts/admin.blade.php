@@ -22,5 +22,6 @@
 </div>
 
 @include('partials.admin.offcanvas-mobile')
+@include('partials.ui.confirm-modal')
 @include('partials.admin.script')
 @endsection

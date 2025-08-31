@@ -72,3 +72,120 @@
 .auth-page .has-toggle .invalid-feedback {
     display: block;
 }
+
+
+/* SELECT 2 */
+/* .select2-container--default .select2-selection--single {
+	border-radius: 5px !important;
+}
+.select2-container .select2-selection--single {
+	height: 32px !important;
+	-webkit-transition: all 0.2s ease-out;
+	transition: all 0.2s ease-out;
+	-webkit-transition-property: color, -webkit-box-shadow;
+	transition-property: color, -webkit-box-shadow;
+	transition-property: box-shadow, color;
+	transition-property: box-shadow, color, -webkit-box-shadow;
+	-webkit-box-shadow: inset 0 1px 0 0 rgba(63, 63, 68, 0.05);
+	box-shadow: inset 0 1px 0 0 rgba(63, 63, 68, 0.05);
+	border: 1px solid #c4cdd5;
+	outline: none;
+	background: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		from(#fff),
+		to(#f9fafb)
+	);
+	background: linear-gradient(to bottom, #fff, #f9fafb);
+	border-color: #c4cdd5;
+}
+.select2-container--default
+	.select2-selection--single
+	.select2-selection__rendered {
+	line-height: 31px !important;
+	font-size: 13px;
+} */
+
+/* ===============================
+   Select2 - Custom Style (#0189b2)
+   =============================== */
+
+.select2-container .select2-selection--single {
+  height: 32px !important;
+  display: flex;
+  align-items: center;
+  border: 1px solid #ced4da;
+  border-radius: 5px !important;
+  background-color: #fff;
+  background-image: linear-gradient(to bottom, #fff, #f9fafb);
+  box-shadow: inset 0 1px 0 rgba(63, 63, 68, 0.05);
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+/* Text trong ô chọn */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 30px !important;
+  font-size: 13px;
+  color: #212529;
+  padding-left: 8px;
+}
+
+/* Icon mũi tên */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 100%;
+  right: 6px;
+}
+
+/* ===============================
+   Dropdown menu
+   =============================== */
+
+/* Khung dropdown */
+.select2-container--default .select2-dropdown {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  box-shadow: 0 .25rem .5rem rgba(0,0,0,.1);
+  font-size: 13px;
+}
+
+/* Option mặc định */
+.select2-container--default .select2-results__option {
+  padding: 6px 10px;
+  color: #212529;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+/* Option hover */
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: #0189b2;
+  color: #fff;
+}
+
+.select2-container--default .select2-results__option[aria-selected="true"] {
+  background-color: #0189b2;
+  color: #fff;
+}
+
+/* ===============================
+   Ô search trong dropdown
+   =============================== */
+.select2-container--default .select2-search--dropdown .select2-search__field {
+  width: 100%;
+  padding: 4px 8px;
+  font-size: 13px;
+  color: #212529;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Focus vào ô search */
+.select2-container--default .select2-search--dropdown .select2-search__field:focus {
+  border-color: #0189b2;
+  box-shadow: 0 0 0 0.2rem rgba(1,137,178,.25);
+}

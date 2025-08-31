@@ -32,14 +32,14 @@
         <input type="text" class="form-control" placeholder="Tìm tên / email / SĐT">
       </div>
       <div class="col-md-2">
-        <select class="form-select">
+        <select class="form-select setupSelect2">
           <option value="">-- Vai trò --</option>
           <option>Admin</option>
           <option>User</option>
         </select>
       </div>
       <div class="col-md-2">
-        <select class="form-select">
+        <select class="form-select setupSelect2">
           <option value="">-- Trạng thái --</option>
           <option value="1">Bình thường</option>
           <option value="0">Bị khoá</option>
@@ -59,13 +59,13 @@
     {{-- Bulk update --}}
     <div class="d-flex justify-content-between mb-2">
       <div class="d-flex gap-2">
-  <select class="form-select form-select-sm w-auto" id="bulk_status">
-    <option>-- Cập nhật trạng thái --</option>
-    <option value="1">Kích hoạt</option>
-    <option value="0">Khoá</option>
-  </select>
-  <button type="button" class="btn btn-sm btn-primary" id="btnBulkOpen">Cập nhật</button>
-</div>
+        <select class="form-select form-select-sm w-auto setupSelect2" id="bulk_status">
+          <option>-- Cập nhật trạng thái --</option>
+          <option value="1">Kích hoạt</option>
+          <option value="0">Khoá</option>
+        </select>
+        <button type="button" class="btn btn-sm btn-primary" id="btnBulkOpen">Cập nhật</button>
+      </div>
 
     </div>
 
@@ -130,65 +130,65 @@
 
 @push('scripts')
 <script>
-(function(){
-  const btnOpen = document.getElementById('btnBulkOpen');
-  const select  = document.getElementById('bulk_status');
-  const table   = document.querySelector('table');
+  (function() {
+    const btnOpen = document.getElementById('btnBulkOpen');
+    const select = document.getElementById('bulk_status');
+    const table = document.querySelector('table');
 
-  function getCheckedCount(){
-    return table ? table.querySelectorAll('tbody .row-checkbox:checked').length : 0;
-  }
-
-  function statusText(val){
-    if (val === '1') return 'Kích hoạt';
-    if (val === '0') return 'Khoá';
-    return '—';
-  }
-
-  btnOpen?.addEventListener('click', async () => {
-    const count = getCheckedCount();
-    const val   = select.value;
-
-    if (!count){
-      return UIConfirm({
-        title: 'Thiếu lựa chọn',
-        message: 'Vui lòng chọn ít nhất <b>1</b> tài khoản trước khi cập nhật.',
-        confirmText: 'Đã hiểu',
-        cancelText: 'Đóng',
-        size: 'sm'
-      });
-    }
-    if (val !== '1' && val !== '0'){
-      return UIConfirm({
-        title: 'Chưa chọn trạng thái',
-        message: 'Vui lòng chọn trạng thái đích cần cập nhật.',
-        confirmText: 'Đã hiểu',
-        cancelText: 'Đóng',
-        size: 'sm'
-      });
+    function getCheckedCount() {
+      return table ? table.querySelectorAll('tbody .row-checkbox:checked').length : 0;
     }
 
-    const target = statusText(val);
-    const html = `
+    function statusText(val) {
+      if (val === '1') return 'Kích hoạt';
+      if (val === '0') return 'Khoá';
+      return '—';
+    }
+
+    btnOpen?.addEventListener('click', async () => {
+      const count = getCheckedCount();
+      const val = select.value;
+
+      if (!count) {
+        return UIConfirm({
+          title: 'Thiếu lựa chọn',
+          message: 'Vui lòng chọn ít nhất <b>1</b> tài khoản trước khi cập nhật.',
+          confirmText: 'Đã hiểu',
+          cancelText: 'Đóng',
+          size: 'sm'
+        });
+      }
+      if (val !== '1' && val !== '0') {
+        return UIConfirm({
+          title: 'Chưa chọn trạng thái',
+          message: 'Vui lòng chọn trạng thái đích cần cập nhật.',
+          confirmText: 'Đã hiểu',
+          cancelText: 'Đóng',
+          size: 'sm'
+        });
+      }
+
+      const target = statusText(val);
+      const html = `
       Bạn sắp cập nhật trạng thái cho <b>${count}</b> tài khoản.<br>
       Trạng thái mới: <span class="badge ${val==='1'?'bg-success':'bg-danger'}">${target}</span>
     `;
 
-    const ok = await UIConfirm({
-      title: 'Xác nhận cập nhật',
-      message: html,
-      confirmText: 'Xác nhận',
-      cancelText: 'Huỷ',
-      size: 'md'
-    });
+      const ok = await UIConfirm({
+        title: 'Xác nhận cập nhật',
+        message: html,
+        confirmText: 'Xác nhận',
+        cancelText: 'Huỷ',
+        size: 'md'
+      });
 
-    if (ok) {
-      // TODO: sau này submit form thật
-      // ví dụ:
-      // document.getElementById('bulkForm').submit();
-      console.log('User confirmed bulk update to:', val);
-    }
-  });
-})();
+      if (ok) {
+        // TODO: sau này submit form thật
+        // ví dụ:
+        // document.getElementById('bulkForm').submit();
+        console.log('User confirmed bulk update to:', val);
+      }
+    });
+  })();
 </script>
 @endpush

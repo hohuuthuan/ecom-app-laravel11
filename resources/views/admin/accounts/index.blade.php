@@ -129,21 +129,18 @@
 @push('scripts')
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    // ====== DOM refs ======
     const table = document.querySelector('.table.table-bordered.table-striped') || document.querySelector('table');
     const master = document.getElementById('check_all');
     const btnOpen = document.getElementById('btnBulkOpen');
     const select = document.getElementById('bulk_status');
 
-    // ====== Helpers ======
+
     const getRowCheckboxes = () => table ? table.querySelectorAll('tbody .row-checkbox') : [];
 
-    // Thay vì 'table-active' -> dùng 'row-checked' đúng với CSS bạn đã viết
     const markRow = (cb) => {
       const tr = cb.closest('tr');
       if (!tr) return;
       tr.classList.toggle('row-checked', cb.checked);
-      // đề phòng có class cũ, loại bỏ màu xám của bootstrap nếu có
       tr.classList.remove('table-active');
     };
 
@@ -158,8 +155,9 @@
         master.indeterminate = false;
         return;
       }
-      master.checked = checked === total;
-      master.indeterminate = checked > 0 && checked < total;
+
+      master.checked = (checked > 0 && checked === total);
+      master.indeterminate = false;
     };
 
     const getCheckedCount = () => {
@@ -173,7 +171,6 @@
       return '—';
     };
 
-    // ====== 1) Change trên từng checkbox dòng ======
     if (table) {
       table.addEventListener('change', (e) => {
         const t = e.target;
@@ -183,16 +180,13 @@
       });
     }
 
-    // ====== 2) Click nguyên TD đầu tiên để toggle checkbox ======
     if (table) {
       table.addEventListener('click', (e) => {
         const td = e.target.closest('td');
         if (!td) return;
 
-        // chỉ áp dụng cho cột đầu tiên (cột checkbox)
         if (td.cellIndex !== 0) return;
 
-        // nếu click trực tiếp vào input thì đã handle ở (1)
         if (e.target.tagName === 'INPUT') return;
 
         const cb = td.querySelector('.row-checkbox');
@@ -203,8 +197,6 @@
         refreshMaster();
       });
     }
-
-    // ====== 3) Master check/uncheck tất cả ======
     if (master) {
       master.addEventListener('change', () => {
         const cbs = getRowCheckboxes();
@@ -216,7 +208,6 @@
       });
     }
 
-    // ====== 4) Khởi tạo nếu có sẵn item checked ======
     getRowCheckboxes().forEach(markRow);
     refreshMaster();
 

@@ -20,7 +20,7 @@
 
 .loading {
     z-index: 2000;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .spinner-custom {

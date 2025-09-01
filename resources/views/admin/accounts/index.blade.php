@@ -3,7 +3,6 @@
 @section('title','Quản lý tài khoản')
 
 @section('content')
-{{-- Breadcrumb --}}
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb mb-0">
     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>
@@ -11,120 +10,378 @@
   </ol>
 </nav>
 
-<div class="card shadow-sm  table-in">
-  <div class="card-header bg-white d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">Danh sách tài khoản</h5>
-    {{-- Filter per page UI --}}
-    <div class="d-flex align-items-center">
-      <label class="me-2 mb-0">Hiển thị</label>
-      <select class="form-select form-select-sm w-auto setupSelect2">
-        <option>10</option>
-        <option>20</option>
-        <option>50</option>
-      </select>
+{{-- Tabs Bootstrap --}}
+<ul class="nav nav-tabs mb-3" id="accountTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="accounts-tab" data-bs-toggle="tab" data-bs-target="#accounts-pane" type="button" role="tab">
+      Tài khoản
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles-pane" type="button" role="tab">
+      Vai trò
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats-pane" type="button" role="tab">
+      Thống kê
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content" id="accountTabsContent">
+  {{-- ================== TAB 1 ================== --}}
+  <div class="tab-pane fade show active" id="accounts-pane" role="tabpanel" aria-labelledby="accounts-tab">
+    <div class="table-in-clip">
+      <div class="card shadow-sm table-in">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Danh sách tài khoản</h5>
+          <form method="GET" class="d-flex align-items-center">
+            <label class="me-2 mb-0">Hiển thị</label>
+            <select class="form-select form-select-sm w-auto setupSelect2" name="per_page" onchange="this.form.submit()">
+              <option value="10" {{ request('per_page')==10?'selected':'' }}>10</option>
+              <option value="20" {{ request('per_page')==20?'selected':'' }}>20</option>
+              <option value="50" {{ request('per_page')==50?'selected':'' }}>50</option>
+            </select>
+          </form>
+        </div>
+
+        <div class="card-body">
+          {{-- Filters --}}
+          <form method="GET" class="row g-2 mb-3 filter-form">
+            <div class="col-md-3">
+              <input type="text" name="keyword" class="form-control" placeholder="Tìm tên / email / SĐT" value="{{ request('keyword') }}">
+            </div>
+            <div class="col-md-2">
+              <select name="role_id" class="form-select setupSelect2">
+                <option value="">-- Tất cả vai trò --</option>
+                @foreach($rolesForSelect as $role)
+                <option value="{{ $role->id }}" {{ request('role_id') == $role->id ? 'selected' : '' }}>
+                  {{ $role->name }}
+                </option>
+                @endforeach
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select name="status" class="form-select setupSelect2">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="ACTIVE" {{ request('status')==='ACTIVE'?'selected':'' }}>Bình thường</option>
+                <option value="BAN" {{ request('status')==='BAN'?'selected':'' }}>Bị khoá</option>
+              </select>
+            </div>
+            <div class="col-md-1 d-grid">
+              <button type="submit" class="btn btn-primary">Lọc</button>
+            </div>
+          </form>
+
+          {{-- Bulk update --}}
+          <div class="d-flex justify-content-between mb-2">
+            <div class="d-flex gap-2">
+              <select class="form-select form-select-sm w-auto setupSelect2" id="bulk_status">
+                <option>-- Cập nhật trạng thái --</option>
+                <option value="ACTIVE">Kích hoạt</option>
+                <option value="BAN">Khoá</option>
+              </select>
+              <button type="button" class="btn btn-sm btn-primary" id="btnBulkOpen">Cập nhật</button>
+            </div>
+          </div>
+
+          {{-- Table --}}
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th><input type="checkbox" id="check_all"></th>
+                  <th>#</th>
+                  <th>Tên</th>
+                  <th>Email</th>
+                  <th>SĐT</th>
+                  <th>Vai trò</th>
+                  <th>Trạng thái</th>
+                  <th class="text-center user-action">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                @forelse ($users as $index => $user)
+                <tr>
+                  <td><input type="checkbox" class="row-checkbox" value="{{ $user->id }}"></td>
+                  <td>{{ $users->firstItem() + $index }}</td>
+                  <td>{{ $user->full_name }}</td>
+                  <td>{{ $user->email }}</td>
+                  <td>{{ $user->phone ?? '-' }}</td>
+                  <td>
+                    @if($user->roles->isNotEmpty())
+                    {{ $user->roles->pluck('name')->join(', ') }}
+                    @else
+                    <span class="text-muted">—</span>
+                    @endif
+                  </td>
+
+                  <td>
+                    @if($user->status == 'ACTIVE')
+                    <span class="badge bg-success">Bình thường</span>
+                    @else
+                    <span class="badge bg-danger">Bị khoá</span>
+                    @endif
+                  </td>
+                  <td class="text-center">
+                    <a href="#" class="btn btn-sm btn-success"><i class="fa fa-edit"></i></a>
+                  </td>
+                </tr>
+                @empty
+                <tr>
+                  <td colspan="8" class="text-center text-muted">Không có dữ liệu</td>
+                </tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-3">
+            {{ $users->links('pagination::bootstrap-5') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  {{-- ================== TAB 2 ================== --}}
+  <div class="tab-pane fade" id="roles-pane" role="tabpanel" aria-labelledby="roles-tab">
+    <div class="table-in-clip">
+      <div class="card shadow-sm table-in">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Danh sách vai trò</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th style="width:70px">#</th>
+                  <th>Tên vai trò</th>
+                  <th>Mô tả</th>
+                  <th class="text-center" style="width:180px">Số lượng tài khoản</th>
+                </tr>
+              </thead>
+              <tbody>
+                @forelse($rolesSummary as $i => $role)
+                <tr>
+                  <td>{{ $i + 1 }}</td>
+                  <td>{{ $role->name }}</td>
+                  <td>{{ $role->description ?? '-' }}</td>
+                  <td class="text-center">
+                    <span class="badge bg-secondary">{{ $role->users_count }}</span>
+                  </td>
+                </tr>
+                @empty
+                <tr>
+                  <td colspan="4" class="text-center text-muted">Không có dữ liệu</td>
+                </tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="card-body">
-    {{-- Filters --}}
-    <form class="row g-2 mb-3">
-      <div class="col-md-3">
-        <input type="text" class="form-control" placeholder="Tìm tên / email / SĐT">
-      </div>
-      <div class="col-md-2">
-        <select class="form-select setupSelect2">
-          <option value="">-- Vai trò --</option>
-          <option>Admin</option>
-          <option>User</option>
-        </select>
-      </div>
-      <div class="col-md-2">
-        <select class="form-select setupSelect2">
-          <option value="">-- Trạng thái --</option>
-          <option value="1">Bình thường</option>
-          <option value="0">Bị khoá</option>
-        </select>
-      </div>
-      <div class="col-md-2">
-        <input type="number" class="form-control" placeholder="Chi tiêu từ">
-      </div>
-      <div class="col-md-2">
-        <input type="number" class="form-control" placeholder="Chi tiêu đến">
-      </div>
-      <div class="col-md-1 d-grid">
-        <button type="button" class="btn btn-primary">Lọc</button>
-      </div>
-    </form>
+  {{-- ================== TAB 3: THỐNG KÊ (HTML tĩnh) ================== --}}
+  <div class="tab-pane fade" id="stats-pane" role="tabpanel" aria-labelledby="stats-tab">
+    <div class="table-in-clip">
+      <div class="card shadow-sm table-in">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Thống kê</h5>
+        </div>
 
-    {{-- Bulk update --}}
-    <div class="d-flex justify-content-between mb-2">
-      <div class="d-flex gap-2">
-        <select class="form-select form-select-sm w-auto setupSelect2" id="bulk_status">
-          <option>-- Cập nhật trạng thái --</option>
-          <option value="1">Kích hoạt</option>
-          <option value="0">Khoá</option>
-        </select>
-        <button type="button" class="btn btn-sm btn-primary" id="btnBulkOpen">Cập nhật</button>
-      </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {{-- Cột trái: Bảng Top 10 tài khoản chi tiêu nhiều nhất (tĩnh) --}}
+            <div class="col-lg-8">
+              <div class="card h-100">
+                <div class="card-header bg-white">
+                  <strong>Top 10 tài khoản chi tiêu nhiều nhất</strong>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                      <thead class="table-light">
+                        <tr>
+                          <th style="width:60px">#</th>
+                          <th>Họ tên</th>
+                          <th>Email</th>
+                          <th class="text-end" style="width:160px">Tổng chi tiêu</th>
+                          <th class="text-center" style="width:100px">Số đơn</th>
+                          <th style="width:160px">Lần cuối mua</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {{-- DỮ LIỆU TĨNH MẪU – sau này fill thật bằng server/JS --}}
+                        <tr>
+                          <td>1</td>
+                          <td>Nguyễn Văn A</td>
+                          <td>a.nguyen@example.com</td>
+                          <td class="text-end">125.000.000₫</td>
+                          <td class="text-center">18</td>
+                          <td>01/09/2025</td>
+                        </tr>
+                        <tr>
+                          <td>2</td>
+                          <td>Trần Thị B</td>
+                          <td>b.tran@example.com</td>
+                          <td class="text-end">98.500.000₫</td>
+                          <td class="text-center">12</td>
+                          <td>30/08/2025</td>
+                        </tr>
+                        <tr>
+                          <td>3</td>
+                          <td>Lê Minh C</td>
+                          <td>c.le@example.com</td>
+                          <td class="text-end">87.300.000₫</td>
+                          <td class="text-center">10</td>
+                          <td>28/08/2025</td>
+                        </tr>
+                        <tr>
+                          <td>4</td>
+                          <td>Phạm D</td>
+                          <td>d.pham@example.com</td>
+                          <td class="text-end">76.900.000₫</td>
+                          <td class="text-center">9</td>
+                          <td>27/08/2025</td>
+                        </tr>
+                        <tr>
+                          <td>5</td>
+                          <td>Võ E</td>
+                          <td>e.vo@example.com</td>
+                          <td class="text-end">71.200.000₫</td>
+                          <td class="text-center">11</td>
+                          <td>25/08/2025</td>
+                        </tr>
+                        <tr>
+                          <td>6</td>
+                          <td>Đỗ F</td>
+                          <td>f.do@example.com</td>
+                          <td class="text-end">66.800.000₫</td>
+                          <td class="text-center">8</td>
+                          <td>24/08/2025</td>
+                        </tr>
+                        <tr>
+                          <td>7</td>
+                          <td>Bùi G</td>
+                          <td>g.bui@example.com</td>
+                          <td class="text-end">59.400.000₫</td>
+                          <td class="text-center">7</td>
+                          <td>23/08/2025</td>
+                        </tr>
+                        <tr>
+                          <td>8</td>
+                          <td>Huỳnh H</td>
+                          <td>h.huynh@example.com</td>
+                          <td class="text-end">52.000.000₫</td>
+                          <td class="text-center">6</td>
+                          <td>22/08/2025</td>
+                        </tr>
+                        <tr>
+                          <td>9</td>
+                          <td>Đặng I</td>
+                          <td>i.dang@example.com</td>
+                          <td class="text-end">47.600.000₫</td>
+                          <td class="text-center">6</td>
+                          <td>20/08/2025</td>
+                        </tr>
+                        <tr>
+                          <td>10</td>
+                          <td>Trịnh K</td>
+                          <td>k.trinh@example.com</td>
+                          <td class="text-end">41.300.000₫</td>
+                          <td class="text-center">5</td>
+                          <td>18/08/2025</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="small text-muted">* Dữ liệu mẫu, chỉ để minh hoạ giao diện.</div>
+                </div>
+              </div>
+            </div>
 
+            {{-- Cột phải: “Sơ đồ” – thuần HTML/CSS (không JS) --}}
+            <div class="col-lg-4">
+              {{-- Biểu đồ thanh “giả lập” bằng progress bar --}}
+              <div class="card mb-3">
+                <div class="card-header bg-white">
+                  <strong>Top chi tiêu (minh hoạ)</strong>
+                </div>
+                <div class="card-body">
+                  <ul class="list-unstyled mb-0 stats-bars">
+                    <li class="mb-3">
+                      <div class="d-flex justify-content-between small mb-1">
+                        <span>Nguyễn Văn A</span><span>125tr</span>
+                      </div>
+                      <div class="progress" style="height:8px;">
+                        <div class="progress-bar" role="progressbar" style="width: 100%"></div>
+                      </div>
+                    </li>
+                    <li class="mb-3">
+                      <div class="d-flex justify-content-between small mb-1">
+                        <span>Trần Thị B</span><span>98.5tr</span>
+                      </div>
+                      <div class="progress" style="height:8px;">
+                        <div class="progress-bar" role="progressbar" style="width: 79%"></div>
+                      </div>
+                    </li>
+                    <li class="mb-3">
+                      <div class="d-flex justify-content-between small mb-1">
+                        <span>Lê Minh C</span><span>87.3tr</span>
+                      </div>
+                      <div class="progress" style="height:8px;">
+                        <div class="progress-bar" role="progressbar" style="width: 70%"></div>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="d-flex justify-content-between small mb-1">
+                        <span>Phạm D</span><span>76.9tr</span>
+                      </div>
+                      <div class="progress" style="height:8px;">
+                        <div class="progress-bar" role="progressbar" style="width: 61%"></div>
+                      </div>
+                    </li>
+                  </ul>
+                  <div class="small text-muted mt-2">* Tỉ lệ thanh dựa trên người cao nhất (=100%).</div>
+                </div>
+              </div>
+
+              {{-- Donut chart “giả lập” bằng CSS thuần (conic-gradient) --}}
+              <div class="card">
+                <div class="card-header bg-white">
+                  <strong>Tỷ lệ chi tiêu theo vai trò (minh hoạ)</strong>
+                </div>
+                <div class="card-body d-flex flex-column align-items-center">
+                  <div class="stats-donut mb-2"></div>
+                  <ul class="list-unstyled small mb-0">
+                    <li class="d-flex align-items-center gap-2">
+                      <span class="legend-dot legend-admin"></span> Admin ~ 40%
+                    </li>
+                    <li class="d-flex align-items-center gap-2">
+                      <span class="legend-dot legend-customer"></span> Customer ~ 35%
+                    </li>
+                    <li class="d-flex align-items-center gap-2">
+                      <span class="legend-dot legend-editor"></span> Editor ~ 25%
+                    </li>
+                  </ul>
+                  <div class="small text-muted mt-2">* Chỉ là số liệu mẫu.</div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- /.row -->
+        </div> <!-- /.card-body -->
+      </div>
     </div>
-
-    {{-- Table --}}
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped align-middle">
-        <thead class="table-light">
-          <tr>
-            <th><input type="checkbox" id="check_all"></th>
-            <th>STT</th>
-            <th>Ảnh</th>
-            <th>Tên</th>
-            <th>Email</th>
-            <th>SĐT</th>
-            <th>Vai trò</th>
-            <th>Tổng chi tiêu</th>
-            <th>Trạng thái</th>
-            <th class="text-center">Thao tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for ($i = 1; $i <= 10; $i++)
-            <tr>
-            <td><input type="checkbox" class="row-checkbox"></td>
-            <td>{{ $i }}</td>
-            <td><img src="https://via.placeholder.com/60" class="img-thumbnail"></td>
-            <td>Người dùng {{ $i }}</td>
-            <td>user{{ $i }}@mail.com</td>
-            <td>0900{{ 1000 + $i }}</td>
-            <td>{{ $i % 3 ? 'User' : 'Admin' }}</td>
-            <td>{{ number_format($i * 1000000, 0, ',', '.') }} VNĐ</td>
-            <td>
-              @if($i % 2)
-              <span class="badge bg-success">Bình thường</span>
-              @else
-              <span class="badge bg-danger">Bị khoá</span>
-              @endif
-            </td>
-            <td class="text-center">
-              <a href="#" class="btn btn-sm btn-success"><i class="fa fa-edit"></i></a>
-            </td>
-            </tr>
-            @endfor
-        </tbody>
-      </table>
-    </div>
-
-    {{-- Pagination giả lập --}}
-    <nav>
-      <ul class="pagination justify-content-center">
-        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-      </ul>
-    </nav>
   </div>
 </div>
-
 @endsection
+
 
 @push('scripts')
 <script>

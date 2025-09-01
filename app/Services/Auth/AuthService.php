@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Role;
 
-class AuthService implements AuthServiceInterface
+class AuthService
 {
   public function register(array $data): bool
   {
@@ -27,7 +27,7 @@ class AuthService implements AuthServiceInterface
           'status'    => 'ACTIVE',
         ]);
 
-        $customerId = Role::where('name', 'customer')->value('id');
+        $customerId = Role::where('name', 'Customer')->value('id');
         $user->roles()->attach($customerId);
       });
 

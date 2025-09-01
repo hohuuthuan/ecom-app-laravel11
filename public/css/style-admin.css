@@ -209,25 +209,39 @@ a:hover {
     display: none;
 }
 
-/* Animation cho table-in */
-@keyframes slideInTable {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+
+
+
+
+.table-in-clip {
+  overflow-x: clip;
 }
 
-.table-in {
-    animation: slideInTable 0.8s ease-out;
+/* Fallback nếu trình duyệt chưa hỗ trợ overflow: clip */
+@supports not (overflow: clip) {
+  .table-in-clip { overflow-x: hidden; }
 }
+
+/* Giữ animation X như bạn đang dùng */
+@keyframes slideInTable {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.table-in {
+  animation: slideInTable 0.8s ease-out;
+  will-change: transform, opacity;
+}
+
+/* Tôn trọng reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .table-in { animation: none !important; }
+}
+
+
+
+
 
 /* CHECK BOX */
-/* Hàng được check */
-/* Hàng được check (vàng đất nhạt) */
 .row-checked > * {
     background-color: #fdf6e3 !important;
     transition: background-color 0.2s ease;
@@ -254,3 +268,27 @@ table tbody td:first-child {
     cursor: pointer;
 }
 
+.user-action {
+  width: 100px;
+}
+
+.card-body.custom-table-padding {
+  padding: 5px;
+}
+
+/* TAB 3 QUẢN LÝ TÀI KHOẢN */
+.stats-donut {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: conic-gradient(#0d6efd 0 40%, #198754 0 75%, #6c757d 0 100%);
+  -webkit-mask: radial-gradient(circle 56px at 50% 50%, transparent 55px, #000 56px);
+          mask: radial-gradient(circle 56px at 50% 50%, transparent 55px, #000 56px);
+}
+.legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+.legend-admin { background:#0d6efd; }
+.legend-customer { background:#198754; }
+.legend-editor { background:#6c757d; }
+
+/* Giữ animation mượt */
+.table-in { will-change: transform, opacity; }

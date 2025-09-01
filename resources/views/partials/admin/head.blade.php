@@ -11,4 +11,5 @@
 <link rel="stylesheet" href="{{ asset('css/toast.css') }}">
 <link rel="stylesheet" href="{{ asset('css/animate.css') }}">
 <link rel="stylesheet" href="{{ asset('css/style-admin.css') }}">
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
 <link rel="stylesheet" href="{{ asset('css/custom.css') }}">

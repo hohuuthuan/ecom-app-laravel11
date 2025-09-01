@@ -16,7 +16,7 @@
       @auth
       <div class="d-flex align-items-center ms-lg-3 gap-2">
         {{-- Chỉ hiện khi là admin --}}
-        @if(auth()->user()->hasRole('admin'))
+        @if(auth()->user()->hasRole('Admin'))
         <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
           Dashboard
         </a>

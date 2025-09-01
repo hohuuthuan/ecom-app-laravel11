@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\Admin\AccountService;
-use App\Models\Role;
 use Illuminate\Http\Request;
+use App\Http\Requests\Admin\BulkUpdateAccountRequest;
 
 class AccountController extends Controller
 {
@@ -25,7 +25,7 @@ class AccountController extends Controller
       ->select('id', 'name')
       ->orderBy('name')
       ->get();
-      
+
     $rolesSummary = \App\Models\Role::query()
       ->select('name', 'description')
       ->withCount('users')
@@ -33,5 +33,17 @@ class AccountController extends Controller
       ->get();
 
     return view('admin.accounts.index', compact('users', 'rolesForSelect', 'rolesSummary'));
+  }
+
+  public function bulkUpdate(BulkUpdateAccountRequest $request)
+  {
+    $affected = $this->accountService->bulkUpdateStatus(
+      $request->input('ids'),          // UUID[]
+      $request->string('status')->toString() // 'ACTIVE' | 'BAN'
+    );
+
+    return redirect()
+      ->route('admin.accounts.index')
+      ->with('toast_success', "Đã cập nhật trạng thái '{$request->status}' cho {$affected} tài khoản.");
   }
 }

@@ -292,3 +292,11 @@ table tbody td:first-child {
 
 /* Giữ animation mượt */
 .table-in { will-change: transform, opacity; }
+
+
+
+/* MODAL */
+
+.modal-dialog.modal-top {
+  margin-top: 5vh;
+}

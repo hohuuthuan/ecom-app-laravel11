@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\User;
 use App\Helpers\PaginationHelper;
+use Illuminate\Support\Facades\DB;
 
 class AccountService
 {
@@ -33,5 +34,17 @@ class AccountService
     $users = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
     return PaginationHelper::appendQuery($users);
+  }
+
+  public function bulkUpdateStatus(array $ids, string $status): int
+  {
+    return DB::transaction(function () use ($ids, $status) {
+      return User::query()
+        ->whereIn('id', $ids)
+        ->update([
+          'status'     => $status,
+          'updated_at' => now(),
+        ]);
+    });
   }
 }

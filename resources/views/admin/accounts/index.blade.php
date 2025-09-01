@@ -78,7 +78,7 @@
           <div class="d-flex justify-content-between mb-2">
             <div class="d-flex gap-2">
               <select class="form-select form-select-sm w-auto setupSelect2" id="bulk_status">
-                <option>-- Cập nhật trạng thái --</option>
+                <option value="">-- Cập nhật trạng thái --</option>
                 <option value="ACTIVE">Kích hoạt</option>
                 <option value="BAN">Khoá</option>
               </select>
@@ -380,8 +380,13 @@
     </div>
   </div>
 </div>
-@endsection
 
+<form id="bulkForm" method="POST" action="{{ route('admin.accounts.bulk-update') }}" class="d-none">
+  @csrf
+  <input type="hidden" name="status" id="bulk_status_input">
+  <div id="bulk_ids_container"></div>
+</form>
+@endsection
 
 @push('scripts')
 <script>
@@ -391,6 +396,9 @@
     const btnOpen = document.getElementById('btnBulkOpen');
     const select = document.getElementById('bulk_status');
 
+    const bulkForm = document.getElementById('bulkForm'); // <-- POST tới /admin/accounts/bulk-update
+    const bulkStatusInput = document.getElementById('bulk_status_input');
+    const bulkIdsContainer = document.getElementById('bulk_ids_container');
 
     const getRowCheckboxes = () => table ? table.querySelectorAll('tbody .row-checkbox') : [];
 
@@ -401,30 +409,24 @@
       tr.classList.remove('table-active');
     };
 
+    // Không dùng indeterminate
     const refreshMaster = () => {
+      if (!master) return;
       const cbs = getRowCheckboxes();
       const total = cbs.length;
       const checked = [...cbs].filter(cb => cb.checked).length;
-
-      if (!master) return;
-      if (total === 0) {
-        master.checked = false;
-        master.indeterminate = false;
-        return;
-      }
-
-      master.checked = (checked > 0 && checked === total);
       master.indeterminate = false;
+      master.checked = (total > 0 && checked === total);
     };
 
-    const getCheckedCount = () => {
+    const getCheckedIds = () => {
       const cbs = getRowCheckboxes();
-      return [...cbs].filter(cb => cb.checked).length;
+      return [...cbs].filter(cb => cb.checked).map(cb => cb.value); // UUID[]
     };
 
     const statusText = (val) => {
-      if (val === '1') return 'Kích hoạt';
-      if (val === '0') return 'Khoá';
+      if (val === 'ACTIVE') return 'Kích hoạt';
+      if (val === 'BAN') return 'Khoá';
       return '—';
     };
 
@@ -435,15 +437,11 @@
         markRow(t);
         refreshMaster();
       });
-    }
 
-    if (table) {
       table.addEventListener('click', (e) => {
         const td = e.target.closest('td');
         if (!td) return;
-
         if (td.cellIndex !== 0) return;
-
         if (e.target.tagName === 'INPUT') return;
 
         const cb = td.querySelector('.row-checkbox');
@@ -454,6 +452,7 @@
         refreshMaster();
       });
     }
+
     if (master) {
       master.addEventListener('change', () => {
         const cbs = getRowCheckboxes();
@@ -461,6 +460,7 @@
           cb.checked = master.checked;
           markRow(cb);
         });
+        master.indeterminate = false;
         refreshMaster();
       });
     }
@@ -468,13 +468,13 @@
     getRowCheckboxes().forEach(markRow);
     refreshMaster();
 
-    // ====== 5) Bulk update confirm (giữ logic của bạn) ======
+    // Bulk confirm + POST form ẩn
     if (btnOpen) {
       btnOpen.addEventListener('click', async () => {
-        const count = getCheckedCount();
-        const val = select?.value;
+        const ids = getCheckedIds();
+        const val = select?.value || '';
 
-        if (!count) {
+        if (!ids.length) {
           return UIConfirm({
             title: 'Thiếu lựa chọn',
             message: 'Vui lòng chọn ít nhất <b>1</b> tài khoản trước khi cập nhật.',
@@ -483,7 +483,8 @@
             size: 'sm'
           });
         }
-        if (val !== '1' && val !== '0') {
+
+        if (val !== 'ACTIVE' && val !== 'BAN') {
           return UIConfirm({
             title: 'Chưa chọn trạng thái',
             message: 'Vui lòng chọn trạng thái đích cần cập nhật.',
@@ -493,24 +494,31 @@
           });
         }
 
-        const target = statusText(val);
-        const html = `
-        Bạn sắp cập nhật trạng thái cho <b>${count}</b> tài khoản.<br>
-        Trạng thái mới: <span class="badge ${val==='1'?'bg-success':'bg-danger'}">${target}</span>
-      `;
-
         const ok = await UIConfirm({
           title: 'Xác nhận cập nhật',
-          message: html,
+          message: `
+          Bạn sắp cập nhật trạng thái cho <b>${ids.length}</b> tài khoản.<br>
+          Trạng thái mới: <span class="badge ${val==='ACTIVE'?'bg-success':'bg-danger'}">${statusText(val)}</span>
+        `,
           confirmText: 'Xác nhận',
           cancelText: 'Huỷ',
           size: 'md'
         });
+        if (!ok) return;
 
-        if (ok) {
-          // document.getElementById('bulkForm').submit();
-          console.log('User confirmed bulk update to:', val);
-        }
+        // Bơm data vào form POST
+        bulkStatusInput.value = val;
+        bulkIdsContainer.innerHTML = '';
+        ids.forEach(id => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'ids[]';
+          input.value = id;
+          bulkIdsContainer.appendChild(input);
+        });
+
+        // POST – không có query string
+        bulkForm.submit();
       });
     }
   });

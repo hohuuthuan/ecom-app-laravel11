@@ -4,14 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Services\Auth\AuthServiceInterface;
+use App\Services\Auth\AuthService;
 use Illuminate\Http\RedirectResponse;
 use App\Models\User;
 use Throwable;
 
 class AuthController extends Controller
 {
-  public function __construct(private readonly AuthServiceInterface $authService) {}
+  public function __construct(
+    private readonly AuthService $authService // đổi sang concrete class
+  ) {}
 
   public function register(RegisterRequest $request): RedirectResponse
   {
@@ -23,8 +25,8 @@ class AuthController extends Controller
           ->withErrors(['email' => 'Email đã được sử dụng']);
       }
 
-      $newUser = $this->authService->register($request->validated());
-      if (!$newUser) {
+      $ok = $this->authService->register($request->validated());
+      if (!$ok) {
         return back()
           ->withInput()
           ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');

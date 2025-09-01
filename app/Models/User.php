@@ -39,13 +39,4 @@ class User extends Authenticatable
   {
     return $this->roles()->whereIn('name', $names)->exists();
   }
-
-  public function getAuthIdentifierName()
-  {
-    return 'id';
-  }
-  public function getAuthIdentifier()
-  {
-    return (string) $this->getAttribute('id');
-  }
 }

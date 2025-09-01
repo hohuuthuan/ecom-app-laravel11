@@ -37,6 +37,20 @@
       window.addEventListener('pageshow', hide);
     })();
   </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      document.querySelectorAll("form.filter-form").forEach(form => {
+        form.addEventListener("submit", function() {
+          form.querySelectorAll("input, select, textarea").forEach(el => {
+            if (!el.value) {
+              el.removeAttribute("name");
+            }
+          });
+        });
+      });
+    });
+  </script>
 </body>
 
 </html>

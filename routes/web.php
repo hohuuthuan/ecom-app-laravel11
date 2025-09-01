@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\AccountController;
 
 // === PUBLIC ===
 Route::view('/', 'user.home')->name('home');
@@ -19,9 +20,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth'])->group(function () {
   Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-  Route::prefix('admin')->as('admin.')->middleware('role:admin')->group(function () {
-    Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
-    Route::view('/accounts', 'admin.accounts.index')->name('accounts.index');
+  Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
+    Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
+    Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
+    Route::post('/accounts/bulk-update', [AccountController::class, 'bulkUpdate'])->name('accounts.bulk-update');
   });
 });
 

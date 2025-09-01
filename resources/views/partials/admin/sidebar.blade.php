@@ -11,11 +11,7 @@
     <nav class="nav-section">
       <ul class="list-unstyled mb-0">
         <x-sidebar.item route="admin.dashboard" icon="fa-home" label="Dashboard" />
-  
-        {{-- <x-sidebar.submenu icon="fa-users" label="Users" :routes="['admin.users.list', 'admin.users.create']">
-          <x-sidebar.item route="admin.users.list"   icon="fa-list" label="Danh sách người dùng" />
-          <x-sidebar.item route="admin.users.create" icon="fa-plus" label="Tạo người dùng" />
-        </x-sidebar.submenu> --}}
+        <x-sidebar.item route="admin.accounts.index" icon="fa-users" label="Quản lý tài khoản" />
       </ul>
     </nav>
   </div>

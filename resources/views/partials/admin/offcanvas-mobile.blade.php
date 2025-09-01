@@ -9,11 +9,6 @@
           aria-expanded="false">
           <i class="fa fa-th-large me-2"></i> Dashboards
         </a>
-        <!-- <div class="collapse" id="mDashboards_m">
-          <a class="list-group-item list-group-item-action ps-5" href="index.html">Dashboard v.1</a>
-          <a class="list-group-item list-group-item-action ps-5" href="dashboard_2.html">Dashboard v.2</a>
-          <a class="list-group-item list-group-item-action ps-5" href="dashboard_3.html">Dashboard v.3</a>
-        </div> -->
       </div>
     </div>
   </div>

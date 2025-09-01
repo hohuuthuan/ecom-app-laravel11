@@ -21,6 +21,7 @@ Route::middleware(['auth'])->group(function () {
 
   Route::prefix('admin')->as('admin.')->middleware('role:admin')->group(function () {
     Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
+    Route::view('/accounts', 'admin.accounts.index')->name('accounts.index');
   });
 });
 

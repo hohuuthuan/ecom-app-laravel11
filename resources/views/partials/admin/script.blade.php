@@ -1,17 +1,27 @@
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="{{ asset('library/select2-setup.js') }}"></script>
+
+@stack('scripts')
+
+
 <script>
   const btnCollapse = document.getElementById('btnCollapseDesktop');
-  const sidebarCol = document.getElementById('sidebarCol');
-  const contentCol = document.getElementById('contentCol');
-  const mqlLg = window.matchMedia('(min-width: 992px)');
+  const sidebarCol  = document.getElementById('sidebarCol');
+  const contentCol  = document.getElementById('contentCol');
+  const mqlLg       = window.matchMedia('(min-width: 992px)');
+  const LS_KEY      = 'adminSidebarMini'; // '1' = mini, '0' = full
 
-  // Keep tooltip instances to dispose later
   let miniTooltips = [];
 
   function enableMiniTooltips() {
-    // add tooltip to each top-level link using its text label
     const links = sidebarCol.querySelectorAll('.nav-item > .nav-link');
     links.forEach(a => {
-      // get label
       const label = a.querySelector('.nav-label');
       const title = (label?.textContent || a.textContent || '').trim();
       if (!title) return;
@@ -34,36 +44,54 @@
     });
   }
 
-  function toMini() {
+  function toMini({persist = false} = {}) {
     sidebarCol.classList.add('sidebar-mini', 'col-lg-1');
     contentCol.classList.add('col-lg-11');
     sidebarCol.classList.remove('col-lg-2');
     contentCol.classList.remove('col-lg-10');
     enableMiniTooltips();
+    if (persist) localStorage.setItem(LS_KEY, '1');
   }
 
-  function toFull() {
+  function toFull({persist = false} = {}) {
     sidebarCol.classList.remove('sidebar-mini', 'col-lg-1');
     contentCol.classList.remove('col-lg-11');
     sidebarCol.classList.add('col-lg-2');
     contentCol.classList.add('col-lg-10');
     disableMiniTooltips();
+    if (persist) localStorage.setItem(LS_KEY, '0');
   }
 
   function toggleDesktopSidebar() {
     if (!mqlLg.matches) return;
     const mini = sidebarCol.classList.contains('sidebar-mini');
-    mini ? toFull() : toMini();
+    mini ? toFull({persist:true}) : toMini({persist:true});
   }
 
+  // Click nút toggle
   btnCollapse?.addEventListener('click', toggleDesktopSidebar);
 
-  // Reset on breakpoint change
-  mqlLg.addEventListener('change', (e) => {
-    if (e.matches) {
-      toFull();
+  // Áp dụng trạng thái đã lưu khi load trang (giải quyết reset sau khi click link)
+  document.addEventListener('DOMContentLoaded', () => {
+    const pref = localStorage.getItem(LS_KEY);
+    if (mqlLg.matches) {
+      if (pref === '1') toMini(); else toFull();
     } else {
+      // dưới lg: luôn full-width theo layout mobile
       disableMiniTooltips();
+    }
+  });
+
+  // Khi đổi breakpoint
+  mqlLg.addEventListener('change', (e) => {
+    const pref = localStorage.getItem(LS_KEY);
+    if (e.matches) {
+      // quay lại màn to: áp dụng lại preference
+      if (pref === '1') toMini(); else toFull();
+    } else {
+      // xuống màn nhỏ: tắt tooltip, để layout mobile lo phần width
+      disableMiniTooltips();
+      // không đổi localStorage
     }
   });
 </script>

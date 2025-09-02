@@ -92,11 +92,6 @@
   </div>
 </div>
 
-<style>
-  .ac-tags.is-invalid{ border:1px solid #dc3545 !important; border-radius:.5rem; }
-  .select2-container--default .select2-selection--single.select2-invalid{ border-color:#dc3545 !important; }
-</style>
-
 <script>
 // @ts-nocheck
 document.addEventListener('DOMContentLoaded', function () {

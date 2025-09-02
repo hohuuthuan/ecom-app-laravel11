@@ -17,7 +17,7 @@
               <img id="ac_avatar_preview" src="" alt="Avatar">
             </div>
 
-            <label class="form-label mt-2"><b>Chọn hình ảnh</b></label>
+            <label class="form-label mt-2 label-select-image"><b>Chọn hình ảnh</b></label>
 
             <input id="ac_avatar" name="avatar" type="file" accept="image/*" class="visually-hidden">
             <label for="ac_avatar" class="btn btn-primary w-100 input-select-image" id="btnPickAvatar">
@@ -85,8 +85,8 @@
       @endif
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Huỷ</button>
-        <button type="submit" class="btn btn-success">Lưu</button>
+        <button type="button" class="btn btn-outline-secondary btn-cancel-modal-update-account" data-bs-dismiss="modal">Huỷ</button>
+        <button type="submit" class="btn btn-success btn-submit-modal-update-account">Lưu</button>
       </div>
     </form>
   </div>

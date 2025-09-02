@@ -12,6 +12,123 @@ a:hover {
     color: inherit;
 }
 
+.admin-page .form-control:focus {
+    border-color: #0b99c4 !important;
+    box-shadow: 0 0 0 0.2rem rgba(159, 249, 248, 0.922) !important;
+}
+
+.btn-admin {
+    background-color: #22b1dc !important;
+    border-color: #22b1dc !important;
+}
+
+.btn-admin:hover,
+.btn-admin:focus {
+    background-color: #0189b2 !important;
+    border-color: #0189b2 !important;
+}
+
+.btn-submit-modal-update-account {
+    width: 100px;
+}
+
+.btn-cancel-modal-update-account {
+    width: 100px;
+    background-color: rgb(254, 123, 123);
+    color: #ffffff;
+}
+
+textarea#ac_address {
+    height: 100px;
+}
+
+.label-select-image {
+    padding-top: 6px;
+}
+
+.input-select-image {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.75rem;
+    border-radius: 0.5rem;
+}
+
+/* Hộp chips phân quyền */
+.ac-tags {
+    min-height: var(--ctl-h);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 5px !important;
+    background: #cf5e5e;
+}
+.ac-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px !important;
+    background: #f1f3f5;
+    border: 1px solid #e9ecef;
+}
+.ac-tag .ac-x {
+    font-size: 18px !important;
+    border: 0;
+    background: transparent;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.ac-suggest .sg {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px !important;
+    background: #f1f3f5;
+    border: 1px solid #e9ecef;
+}
+
+#btnPickAvatar {
+    background: #0189b2;
+    border: 1px solid #0189b2;
+    color: #fff;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.75rem;
+    border-radius: 8px;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+#btnPickAvatar:hover,
+#btnPickAvatar:focus {
+    background: #01779b;
+    border-color: #01779b;
+    color: #fff;
+}
+#btnPickAvatar:active {
+    background: #016989;
+    border-color: #016989;
+    color: #fff;
+}
+#btnPickAvatar i {
+    color: inherit;
+}
+
+.ac-tags.is-invalid {
+    border: 1px solid #dc3545 !important;
+    border-radius: 0.5rem;
+}
+.select2-container--default .select2-selection--single.select2-invalid {
+    border-color: #dc3545 !important;
+}
+
 .message-avatar {
     width: 42px;
     height: 42px;
@@ -209,37 +326,39 @@ a:hover {
     display: none;
 }
 
-
-
-
-
 .table-in-clip {
-  overflow-x: clip;
+    overflow-x: clip;
 }
 
 /* Fallback nếu trình duyệt chưa hỗ trợ overflow: clip */
 @supports not (overflow: clip) {
-  .table-in-clip { overflow-x: hidden; }
+    .table-in-clip {
+        overflow-x: hidden;
+    }
 }
 
 /* Giữ animation X như bạn đang dùng */
 @keyframes slideInTable {
-  from { opacity: 0; transform: translateX(30px); }
-  to   { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 .table-in {
-  animation: slideInTable 0.8s ease-out;
-  will-change: transform, opacity;
+    animation: slideInTable 0.8s ease-out;
+    will-change: transform, opacity;
 }
 
 /* Tôn trọng reduce motion */
 @media (prefers-reduced-motion: reduce) {
-  .table-in { animation: none !important; }
+    .table-in {
+        animation: none !important;
+    }
 }
-
-
-
-
 
 /* CHECK BOX */
 .row-checked > * {
@@ -269,34 +388,208 @@ table tbody td:first-child {
 }
 
 .user-action {
-  width: 100px;
+    width: 100px;
 }
 
 .card-body.custom-table-padding {
-  padding: 5px;
+    padding: 5px;
 }
 
 /* TAB 3 QUẢN LÝ TÀI KHOẢN */
 .stats-donut {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: conic-gradient(#0d6efd 0 40%, #198754 0 75%, #6c757d 0 100%);
-  -webkit-mask: radial-gradient(circle 56px at 50% 50%, transparent 55px, #000 56px);
-          mask: radial-gradient(circle 56px at 50% 50%, transparent 55px, #000 56px);
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: conic-gradient(#0d6efd 0 40%, #198754 0 75%, #6c757d 0 100%);
+    -webkit-mask: radial-gradient(
+        circle 56px at 50% 50%,
+        transparent 55px,
+        #000 56px
+    );
+    mask: radial-gradient(circle 56px at 50% 50%, transparent 55px, #000 56px);
 }
-.legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
-.legend-admin { background:#0d6efd; }
-.legend-customer { background:#198754; }
-.legend-editor { background:#6c757d; }
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.legend-admin {
+    background: #0d6efd;
+}
+.legend-customer {
+    background: #198754;
+}
+.legend-editor {
+    background: #6c757d;
+}
 
 /* Giữ animation mượt */
-.table-in { will-change: transform, opacity; }
-
-
+.table-in {
+    will-change: transform, opacity;
+}
 
 /* MODAL */
 
 .modal-dialog.modal-top {
-  margin-top: 5vh;
+    margin-top: 5vh;
+}
+
+/* MODAL UPDATE ACCOUNT */
+#uiAccountEditModal .ac-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    cursor: text;
+}
+#uiAccountEditModal .ac-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #ced4da;
+    border-radius: 999px;
+    background: #f1f3f5;
+    font-size: 0.9rem;
+}
+#uiAccountEditModal .ac-x {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 700;
+    line-height: 1;
+}
+#uiAccountEditModal .ac-input {
+    border: 0;
+    outline: 0;
+    min-width: 140px;
+    flex: 1 0 140px;
+    padding: 0.25rem 0.25rem;
+}
+#uiAccountEditModal .ac-suggest {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+#uiAccountEditModal .ac-suggest .sg {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #b6d4fe;
+    border-radius: 999px;
+    background: #e7f1ff;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+#uiAccountEditModal .ac-suggest .plus {
+    font-weight: 700;
+}
+
+/* Modal Account layout */
+#uiAccountEditModal .form-label {
+    display: block;
+    margin-bottom: 0.375rem;
+}
+#uiAccountEditModal .select2-container {
+    width: 100% !important;
+    max-width: 100%;
+}
+#uiAccountEditModal .select2-selection--single {
+    height: 38px;
+    min-height: 38px;
+}
+#uiAccountEditModal .select2-selection__rendered {
+    line-height: 38px;
+}
+#uiAccountEditModal .select2-selection__arrow {
+    height: 38px;
+}
+
+/* Avatar */
+#uiAccountEditModal .ac-avatar {
+    width: 100%;
+    height: 200px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#uiAccountEditModal .ac-avatar img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: cover;
+}
+
+/* Chips (roles) */
+#uiAccountEditModal .ac-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    cursor: text;
+    min-height: 42px;
+    position: relative;
+}
+#uiAccountEditModal .ac-tags.is-empty::before {
+    content: attr(data-placeholder);
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+#uiAccountEditModal .ac-input {
+    border: 0;
+    outline: 0;
+    min-width: 160px;
+    flex: 1 0 160px;
+    padding: 0.25rem;
+}
+#uiAccountEditModal .ac-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #ced4da;
+    border-radius: 999px;
+    background: #f1f3f5;
+    font-size: 0.9rem;
+}
+#uiAccountEditModal .ac-x {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 700;
+    line-height: 1;
+}
+#uiAccountEditModal .ac-suggest {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+#uiAccountEditModal .ac-suggest .sg {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #b6d4fe;
+    border-radius: 999px;
+    background: #e7f1ff;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+#uiAccountEditModal .ac-suggest .plus {
+    font-weight: 700;
 }

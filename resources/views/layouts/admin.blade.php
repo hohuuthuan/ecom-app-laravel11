@@ -23,5 +23,6 @@
 
 @include('partials.admin.offcanvas-mobile')
 @include('partials.ui.confirm-modal')
+@include('partials.ui.account-edit-modal')
 @include('partials.admin.script')
 @endsection

@@ -8,8 +8,6 @@
 <script src="{{ asset('library/select2-setup.js') }}"></script>
 
 @stack('scripts')
-
-
 <script>
   const btnCollapse = document.getElementById('btnCollapseDesktop');
   const sidebarCol  = document.getElementById('sidebarCol');

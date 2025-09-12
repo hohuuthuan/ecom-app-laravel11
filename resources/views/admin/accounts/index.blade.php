@@ -133,7 +133,7 @@
                       data-phone="{{ $user->phone }}"
                       data-address="{{ $user->address }}"
                       data-status="{{ $user->status }}"
-                      data-avatar="{{ $user->avatar ? asset(Storage::url($user->avatar)) : asset('storage/user/base-avatar.jpg') }}"
+                      data-avatar="{{ $user->avatar ? Storage::url($user->avatar) : Storage::url('avatars/base-avatar.jpg') }}"
                       data-role_ids="{{ $user->roles->pluck('id')->join(',') }}">
                       <i class="fa fa-edit"></i>
                     </button>
@@ -399,8 +399,8 @@
   <div id="bulk_ids_container"></div>
 </form>
 
-@include('partials.ui.confirm-modal')
-@include('partials.ui.account-edit-modal')
+@include('partials.ui.account.confirm-modal')
+@include('partials.ui.account.account-edit-modal')
 @endsection
 
 @push('scripts')

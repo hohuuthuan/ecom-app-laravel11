@@ -17,7 +17,7 @@
     <nav class="nav-section">
       <ul class="list-unstyled mb-0">
         <x-sidebar.item route="admin.dashboard" icon="fa-home" label="Dashboard" />
-        <x-sidebar.item route="admin.accounts.index" icon="fa-users" label="Quản lý tài khoản" />
+        <x-sidebar.item route="admin.accounts.index" icon="fa-users" label="Tài khoản" />
       </ul>
     </nav>
   </div>

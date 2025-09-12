@@ -15,7 +15,7 @@
           <div class="intro">
             <h2 class="fw-bold mb-3">Gia nhập Ecom Books</h2>
             <p>Tạo tài khoản để mua sắm nhanh chóng, lưu trữ giỏ hàng và nhận khuyến mãi đặc biệt.</p>
-            <p>Sách chính hãng, giao hàng tận nơi, trải nghiệm tiện lợi cho mọi độc giả.</p>
+            <p>Sách chính hãng, giao hàng tận nơi, trải nghiệm tiện lợi cho mọi đọc giả.</p>
           </div>
           <div class="text-center">
             <img src="{{ asset('storage/logo/e-com-book-logo.png') }}"

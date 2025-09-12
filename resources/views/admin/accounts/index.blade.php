@@ -695,6 +695,47 @@
   });
 </script>
 
+<script>
+function getTabFromURL(){
+  const u = new URL(location.href);
+  const t = u.searchParams.get('tab');
+  return ['accounts','roles','stats'].includes(t) ? t : 'accounts';
+}
+function setTabInURL(tab, replace=false){
+  const u = new URL(location.href);
+  u.searchParams.set('tab', tab);
+  replace ? history.replaceState(null,'',u) : history.pushState(null,'',u);
+}
+function showTab(tab){
+  const trigger = document.querySelector(`[data-bs-target="#${tab}-pane"]`);
+  if (!trigger) return;
+  new bootstrap.Tab(trigger).show();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // mở đúng tab theo URL (mặc định 'accounts')
+  showTab(getTabFromURL());
+
+  // khi đổi tab thì cập nhật ?tab=
+  const tabs = document.getElementById('accountTabs');
+  if (tabs) {
+    tabs.addEventListener('shown.bs.tab', (e) => {
+      const pane = e.target.getAttribute('data-bs-target'); // '#roles-pane' ...
+      let tab = 'accounts';
+      if (pane.includes('roles')) tab = 'roles';
+      else if (pane.includes('stats')) tab = 'stats';
+      setTabInURL(tab);
+    });
+  }
+
+  // hỗ trợ nút Back/Forward
+  window.addEventListener('popstate', () => showTab(getTabFromURL()));
+
+  // lần đầu: nếu chưa có ?tab= thì set theo tab hiện tại (không đẩy history)
+  setTabInURL(getTabFromURL(), true);
+});
+</script>
+
 @endpush
 
 @push('scripts')

@@ -398,6 +398,9 @@
   <input type="hidden" name="status" id="bulk_status_input">
   <div id="bulk_ids_container"></div>
 </form>
+
+@include('partials.ui.confirm-modal')
+@include('partials.ui.account-edit-modal')
 @endsection
 
 @push('scripts')
@@ -405,7 +408,7 @@
   // @ts-nocheck
   document.addEventListener('DOMContentLoaded', function() {
     // ===== Refs
-    const table = document.getElementById('userTable');
+    const table = document.getElementById('accountTable');
     const master = document.getElementById('check_all');
     const btnOpen = document.getElementById('btnBulkOpen');
     const select = document.getElementById('bulk_status');
@@ -428,7 +431,7 @@
       id: String(r.id),
       name: r.name
     })) : [];
-    const AVATAR_PH = typeof window.AVATAR_PLACEHOLDER === 'string' ? window.AVATAR_PLACEHOLDER : '';
+    const AVATAR_PH = typeof window.AVATAR_BASE === 'string' ? window.AVATAR_BASE : '';
 
     // ===== Helpers: table
     function getRowCheckboxes() {

@@ -70,7 +70,7 @@
   <div class="error-card">
     <div class="error-badge">404</div>
     <div class="error-icon my-3">
-      <img class="logo" src="http://127.0.0.1:8000/storage/e-com-book-logo.png" alt="">
+      <img class="logo" src="http://127.0.0.1:8000/storage/logo/e-com-book-logo.png" alt="">
     </div>
     <h1 class="fw-bold mb-2">Không tìm thấy trang</h1>
     <p class="text-muted mb-4">Có vẻ cuốn sách bạn tìm chưa có trên kệ. Hãy thử tìm kiếm hoặc quay lại trang chủ.</p>

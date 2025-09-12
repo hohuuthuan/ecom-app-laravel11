@@ -13,12 +13,12 @@ class RoleSeeder extends Seeder
         $now = now();
         // database/seeders/RoleSeeder.php
         DB::table('roles')->updateOrInsert(
-            ['name' => 'admin'], // điều kiện tìm
+            ['name' => 'Admin'],
             ['id' => Str::uuid(), 'description' => 'Full access', 'updated_at' => now(), 'created_at' => now()]
         );
 
         DB::table('roles')->updateOrInsert(
-            ['name' => 'customer'],
+            ['name' => 'Customer'],
             ['id' => Str::uuid(), 'description' => 'Customer', 'updated_at' => now(), 'created_at' => now()]
         );
     }

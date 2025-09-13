@@ -85,8 +85,8 @@
       @endif
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary btn-cancel-modal-update-account" data-bs-dismiss="modal">Huỷ</button>
-        <button type="submit" class="btn btn-success btn-submit-modal-update-account">Lưu</button>
+        <button type="button" class="btn btn-outline-secondary btn-cancel-modal" data-bs-dismiss="modal">Huỷ</button>
+        <button type="submit" class="btn btn-success btn-submit-modal">Lưu</button>
       </div>
     </form>
   </div>

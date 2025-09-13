@@ -28,11 +28,11 @@ a:hover {
     border-color: #0189b2 !important;
 }
 
-.btn-submit-modal-update-account {
+.btn-submit-modal {
     width: 100px;
 }
 
-.btn-cancel-modal-update-account {
+.btn-cancel-modal {
     width: 100px;
     background-color: rgb(254, 123, 123);
     color: #ffffff;
@@ -67,6 +67,7 @@ textarea#ac_address {
     border-radius: 5px !important;
     background: #cf5e5e;
 }
+
 .ac-tag {
     display: inline-flex;
     align-items: center;
@@ -76,6 +77,7 @@ textarea#ac_address {
     background: #f1f3f5;
     border: 1px solid #e9ecef;
 }
+
 .ac-tag .ac-x {
     font-size: 18px !important;
     border: 0;
@@ -106,17 +108,20 @@ textarea#ac_address {
     border-radius: 8px;
     transition: background-color 0.15s, border-color 0.15s;
 }
+
 #btnPickAvatar:hover,
 #btnPickAvatar:focus {
     background: #01779b;
     border-color: #01779b;
     color: #fff;
 }
+
 #btnPickAvatar:active {
     background: #016989;
     border-color: #016989;
     color: #fff;
 }
+
 #btnPickAvatar i {
     color: inherit;
 }
@@ -125,9 +130,15 @@ textarea#ac_address {
     border: 1px solid #dc3545 !important;
     border-radius: 0.5rem;
 }
+
+.select2-container--default {
+    min-width: 247px !important;
+}
+
 .select2-container--default .select2-selection--single.select2-invalid {
     border-color: #dc3545 !important;
 }
+
 
 .message-avatar {
     width: 42px;
@@ -159,7 +170,7 @@ textarea#ac_address {
     padding: 0.5rem 0.5rem 1rem;
 }
 
-.sidebar-box .nav-item > .nav-link {
+.sidebar-box .nav-item>.nav-link {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -169,11 +180,11 @@ textarea#ac_address {
     transition: background 0.2s ease;
 }
 
-.sidebar-box .nav-item > .nav-link:hover {
+.sidebar-box .nav-item>.nav-link:hover {
     background: rgba(255, 255, 255, 0.06);
 }
 
-.sidebar-box .nav-item.active > .nav-link {
+.sidebar-box .nav-item.active>.nav-link {
     background: #334155;
     color: #fff;
 }
@@ -201,6 +212,7 @@ textarea#ac_address {
 }
 
 @media (min-width: 992px) {
+
     #sidebarCol,
     #contentCol {
         transition: width 0.28s cubic-bezier(0.2, 0.6, 0.2, 1),
@@ -210,6 +222,7 @@ textarea#ac_address {
 
 /* MINI SIDEBAR */
 @media (min-width: 992px) {
+
     #sidebarCol .name-role,
     #sidebarCol .nav-label,
     #sidebarCol .caret {
@@ -223,7 +236,7 @@ textarea#ac_address {
     }
 
     /* when mini */
-    #sidebarCol.sidebar-mini .nav-item > .nav-link {
+    #sidebarCol.sidebar-mini .nav-item>.nav-link {
         justify-content: center;
         gap: 0;
     }
@@ -279,12 +292,15 @@ textarea#ac_address {
     color: #adb5bd;
     text-decoration: none;
     transition: background-color 0.15s, color 0.15s;
-    min-width: 0; /* cho ellipsis hoạt động */
+    min-width: 0;
+    /* cho ellipsis hoạt động */
 }
+
 #sidebarCol .sidebar-link:hover {
     background: rgba(255, 255, 255, 0.08);
     color: #fff;
 }
+
 #sidebarCol .sidebar-link.active {
     background: #0d6efd;
     color: #fff;
@@ -293,7 +309,8 @@ textarea#ac_address {
 /* Icon gọn, căn đều */
 #sidebarCol .sidebar-icon {
     font-size: 0.95rem;
-    width: 1.25rem; /* kết hợp fa-fw -> thẳng hàng */
+    width: 1.25rem;
+    /* kết hợp fa-fw -> thẳng hàng */
     text-align: center;
 }
 
@@ -310,10 +327,14 @@ textarea#ac_address {
 /* ==== MINI MODE (khi bạn đã add class .sidebar-mini vào #sidebarCol) ==== */
 #sidebarCol.sidebar-mini .nav-label {
     display: none;
-} /* ẩn chữ trong mini */
+}
+
+/* ẩn chữ trong mini */
 #sidebarCol.sidebar-mini .sidebar-link {
-    justify-content: center; /* chỉ còn icon, canh giữa */
-    padding: 0.5rem; /* gọn lại khi mini */
+    justify-content: center;
+    /* chỉ còn icon, canh giữa */
+    padding: 0.5rem;
+    /* gọn lại khi mini */
 }
 
 /* (nếu có submenu) ẩn caret khi mini */
@@ -343,11 +364,13 @@ textarea#ac_address {
         opacity: 0;
         transform: translateX(30px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
     }
 }
+
 .table-in {
     animation: slideInTable 0.8s ease-out;
     will-change: transform, opacity;
@@ -361,24 +384,24 @@ textarea#ac_address {
 }
 
 /* CHECK BOX */
-.row-checked > * {
+.row-checked>* {
     background-color: #fdf6e3 !important;
     transition: background-color 0.2s ease;
 }
 
 /* Bỏ ảnh hưởng xen kẽ của table-striped */
-.table-striped tbody tr.row-checked:nth-of-type(odd) > *,
-.table-striped tbody tr.row-checked:nth-of-type(even) > * {
+.table-striped tbody tr.row-checked:nth-of-type(odd)>*,
+.table-striped tbody tr.row-checked:nth-of-type(even)>* {
     background-color: #fdf6e3 !important;
 }
 
 /* Hover vào hàng chưa check → vàng be nhẹ */
-tbody tr:hover > * {
+tbody tr:hover>* {
     background-color: #faedcd !important;
 }
 
 /* Hover + đã check → vàng đất đậm hơn */
-tbody tr.row-checked:hover > * {
+tbody tr.row-checked:hover>* {
     background-color: #f0e68c !important;
 }
 
@@ -401,25 +424,27 @@ table tbody td:first-child {
     height: 140px;
     border-radius: 50%;
     background: conic-gradient(#0d6efd 0 40%, #198754 0 75%, #6c757d 0 100%);
-    -webkit-mask: radial-gradient(
-        circle 56px at 50% 50%,
-        transparent 55px,
-        #000 56px
-    );
+    -webkit-mask: radial-gradient(circle 56px at 50% 50%,
+            transparent 55px,
+            #000 56px);
     mask: radial-gradient(circle 56px at 50% 50%, transparent 55px, #000 56px);
 }
+
 .legend-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
     display: inline-block;
 }
+
 .legend-admin {
     background: #0d6efd;
 }
+
 .legend-customer {
     background: #198754;
 }
+
 .legend-editor {
     background: #6c757d;
 }
@@ -446,6 +471,7 @@ table tbody td:first-child {
     background: #fff;
     cursor: text;
 }
+
 #uiAccountEditModal .ac-tag {
     display: inline-flex;
     align-items: center;
@@ -456,6 +482,7 @@ table tbody td:first-child {
     background: #f1f3f5;
     font-size: 0.9rem;
 }
+
 #uiAccountEditModal .ac-x {
     border: 0;
     background: transparent;
@@ -463,6 +490,7 @@ table tbody td:first-child {
     font-weight: 700;
     line-height: 1;
 }
+
 #uiAccountEditModal .ac-input {
     border: 0;
     outline: 0;
@@ -470,11 +498,13 @@ table tbody td:first-child {
     flex: 1 0 140px;
     padding: 0.25rem 0.25rem;
 }
+
 #uiAccountEditModal .ac-suggest {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
 }
+
 #uiAccountEditModal .ac-suggest .sg {
     display: inline-flex;
     align-items: center;
@@ -486,6 +516,7 @@ table tbody td:first-child {
     cursor: pointer;
     font-size: 0.9rem;
 }
+
 #uiAccountEditModal .ac-suggest .plus {
     font-weight: 700;
 }
@@ -495,17 +526,21 @@ table tbody td:first-child {
     display: block;
     margin-bottom: 0.375rem;
 }
+
 #uiAccountEditModal .select2-container {
     width: 100% !important;
     max-width: 100%;
 }
+
 #uiAccountEditModal .select2-selection--single {
     height: 38px;
     min-height: 38px;
 }
+
 #uiAccountEditModal .select2-selection__rendered {
     line-height: 38px;
 }
+
 #uiAccountEditModal .select2-selection__arrow {
     height: 38px;
 }
@@ -522,6 +557,7 @@ table tbody td:first-child {
     align-items: center;
     justify-content: center;
 }
+
 #uiAccountEditModal .ac-avatar img {
     max-height: 100%;
     max-width: 100%;
@@ -541,6 +577,7 @@ table tbody td:first-child {
     min-height: 42px;
     position: relative;
 }
+
 #uiAccountEditModal .ac-tags.is-empty::before {
     content: attr(data-placeholder);
     position: absolute;
@@ -550,6 +587,7 @@ table tbody td:first-child {
     font-size: 0.9rem;
     pointer-events: none;
 }
+
 #uiAccountEditModal .ac-input {
     border: 0;
     outline: 0;
@@ -557,6 +595,7 @@ table tbody td:first-child {
     flex: 1 0 160px;
     padding: 0.25rem;
 }
+
 #uiAccountEditModal .ac-tag {
     display: inline-flex;
     align-items: center;
@@ -567,6 +606,7 @@ table tbody td:first-child {
     background: #f1f3f5;
     font-size: 0.9rem;
 }
+
 #uiAccountEditModal .ac-x {
     border: 0;
     background: transparent;
@@ -574,11 +614,13 @@ table tbody td:first-child {
     font-weight: 700;
     line-height: 1;
 }
+
 #uiAccountEditModal .ac-suggest {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
 }
+
 #uiAccountEditModal .ac-suggest .sg {
     display: inline-flex;
     align-items: center;
@@ -590,6 +632,48 @@ table tbody td:first-child {
     cursor: pointer;
     font-size: 0.9rem;
 }
+
 #uiAccountEditModal .ac-suggest .plus {
     font-weight: 700;
+}
+
+
+/* ===== MODAL: CATEGORY & BRAND ===== */
+#uiCategoryModal .form-label,
+#uiBrandModal .form-label {
+    display: block;
+    margin-bottom: .375rem;
+}
+
+/* Image picker block */
+#uiCategoryModal .label-select-image,
+#uiBrandModal .label-select-image {
+    display: block;
+    margin-top: .25rem;
+}
+
+#uiCategoryModal .input-select-image,
+#uiBrandModal .input-select-image {
+    cursor: pointer;
+}
+
+/* Avatar preview box */
+#uiCategoryModal .ac-avatar,
+#uiBrandModal .ac-avatar {
+    width: 100%;
+    height: 225px;
+    border: 1px solid #dee2e6;
+    border-radius: .5rem;
+    overflow: hidden;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#uiCategoryModal .ac-avatar img,
+#uiBrandModal .ac-avatar img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: cover;
 }

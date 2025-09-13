@@ -399,7 +399,7 @@
   <div id="bulk_ids_container"></div>
 </form>
 
-@include('partials.ui.account.confirm-modal')
+@include('partials.ui.confirm-modal')
 @include('partials.ui.account.account-edit-modal')
 @endsection
 

@@ -25,23 +25,23 @@
           </div>
 
           <div class="col-lg-10">
-            <div class="row g-3">
+            <div data-slug-scope class="row g-3">
               <div class="col-md-6">
-                <label for="brand_name" class="form-label"><b>Tên</b> <span class="text-danger">*</span></label>
-                <input type="text" id="brand_name" name="name" class="form-control" required>
+                <label for="brand_name" class="form-label"><b>Tên nhà sản xuất</b> <span class="text-danger">*</span></label>
+                <input type="text" id="brand_name" name="name" class="form-control" data-slug-source required>
                 <div class="invalid-feedback d-none" data-err="name"></div>
               </div>
               <div class="col-md-6">
                 <label for="brand_slug" class="form-label"><b>Slug</b> <span class="text-danger">*</span></label>
-                <input type="text" id="brand_slug" name="slug" class="form-control" required>
+                <input type="text" id="brand_slug" name="slug" class="form-control" data-slug-dest required>
                 <div class="invalid-feedback d-none" data-err="slug"></div>
               </div>
               <div class="col-12">
-                <label for="brand_description" class="form-label"><b>Mô tả</b></label>
+                <label for="brand_description" class="form-label"><b>Mô tả</b> <span class="text-danger">*</span></label>
                 <textarea id="brand_description" name="description" class="form-control" rows="4"></textarea>
                 <div class="invalid-feedback d-none" data-err="description"></div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 select2CustomWidth">
                 <label for="brand_status" class="form-label"><b>Trạng thái</b></label>
                 <select id="brand_status" name="status" class="form-select setupSelect2" required>
                   <option value="ACTIVE" selected>Kích hoạt</option>
@@ -55,9 +55,11 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Huỷ</button>
-        <button type="submit" class="btn btn-success">Lưu</button>
+        <button type="button" class="btn btn-outline-secondary btn-cancel-modal" data-bs-dismiss="modal">Huỷ</button>
+        <button type="submit" class="btn btn-success btn-submit-modal">Lưu</button>
       </div>
     </form>
   </div>
 </div>
+
+<script src="{{ asset('library/slugify.js') }}"></script>

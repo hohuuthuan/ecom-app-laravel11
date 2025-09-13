@@ -131,7 +131,7 @@ textarea#ac_address {
     border-radius: 0.5rem;
 }
 
-.select2-container--default {
+.select2CustomWidth .select2-container--default {
     min-width: 247px !important;
 }
 

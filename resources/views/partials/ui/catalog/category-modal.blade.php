@@ -27,7 +27,7 @@
           <div class="col-lg-10">
             <div data-slug-scope class="row g-3">
               <div class="col-md-6">
-                <label for="cat_name" class="form-label"><b>Tên</b> <span class="text-danger">*</span></label>
+                <label for="cat_name" class="form-label"><b>Tên danh mục</b> <span class="text-danger">*</span></label>
                 <input id="cat_name" type="text" name="name"  class="form-control" placeholder="Tên danh mục" data-slug-source required>
                 <div class="invalid-feedback d-none" data-err="name"></div>
               </div>
@@ -37,11 +37,11 @@
                 <div class="invalid-feedback d-none" data-err="slug"></div>
               </div>
               <div class="col-12">
-                <label for="cat_description" class="form-label"><b>Mô tả</b></label>
+                <label for="cat_description" class="form-label"><b>Mô tả</b> <span class="text-danger">*</span></label>
                 <textarea id="cat_description" name="description" class="form-control" rows="4"></textarea>
                 <div class="invalid-feedback d-none" data-err="description"></div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 select2CustomWidth">
                 <label for="cat_status" class="form-label"><b>Trạng thái</b></label>
                 <select id="cat_status" name="status" class="form-select setupSelect2" required>
                   <option value="ACTIVE" selected>Kích hoạt</option>

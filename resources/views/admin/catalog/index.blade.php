@@ -170,7 +170,7 @@
             <div class="col-md-4">
               <input type="text" name="brand_keyword" class="form-control" placeholder="Tìm tên / slug" value="{{ request('brand_keyword') }}">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 select2CustomWidth">
               <select name="brand_status" class="form-select setupSelect2">
                 <option value="">-- Tất cả trạng thái --</option>
                 <option value="ACTIVE"   {{ request('brand_status')==='ACTIVE'?'selected':'' }}>Kích hoạt</option>

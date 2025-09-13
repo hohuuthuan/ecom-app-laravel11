@@ -19,8 +19,8 @@ class CategoryService
     if (!empty($filters['keyword'])) {
       $kw = $filters['keyword'];
       $query->where(function ($q) use ($kw) {
-        $q->where('name','LIKE',"%{$kw}%")
-          ->orWhere('slug','LIKE',"%{$kw}%");
+        $q->where('name', 'LIKE', "%{$kw}%")
+          ->orWhere('slug', 'LIKE', "%{$kw}%");
       });
     }
     if (!empty($filters['status'])) {
@@ -28,7 +28,7 @@ class CategoryService
     }
 
     $perPage   = (int)($filters['per_page'] ?? 10);
-    $categories= $query->orderBy('created_at','desc')->paginate($perPage);
+    $categories = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
     return PaginationHelper::appendQuery($categories);
   }
@@ -36,8 +36,8 @@ class CategoryService
   public function listParents()
   {
     return Category::query()
-      ->select('id','name')
-      ->orderBy('name','asc')
+      ->select('id', 'name')
+      ->orderBy('name', 'asc')
       ->get();
   }
 
@@ -48,14 +48,15 @@ class CategoryService
       DB::beginTransaction();
 
       if ($image instanceof UploadedFile) {
-        $newPath = $image->store('categories', 'public');
-        $data['image'] = $newPath;
+        $filename = $image->hashName();
+        $image->storeAs('categories', $filename, 'public');
+        $data['image'] = $filename;
       }
 
       Category::query()->create([
         'name'        => $data['name'],
         'description' => $data['description'],
-        'image'       => $data['image'],
+        'image'       => $data['image'] ?? NULL,
         'slug'        => $data['slug'],
         'status'      => $data['status'],
       ]);
@@ -67,7 +68,7 @@ class CategoryService
       if ($newPath && Storage::disk('public')->exists($newPath)) {
         Storage::disk('public')->delete($newPath);
       }
-      Log::error('Category create failed', ['msg'=>$e->getMessage()]);
+      Log::error('Category create failed', ['msg' => $e->getMessage()]);
 
       return false;
     }
@@ -107,7 +108,7 @@ class CategoryService
       if ($newPath && Storage::disk('public')->exists($newPath)) {
         Storage::disk('public')->delete($newPath);
       }
-      Log::error('Category update failed', ['id'=>$id,'msg'=>$e->getMessage()]);
+      Log::error('Category update failed', ['id' => $id, 'msg' => $e->getMessage()]);
 
       return false;
     }
@@ -125,11 +126,11 @@ class CategoryService
       if ($img && Storage::disk('public')->exists($img)) {
         Storage::disk('public')->delete($img);
       }
-      
+
       return true;
     } catch (Throwable $e) {
       DB::rollBack();
-      Log::error('Category delete failed', ['id'=>$id,'msg'=>$e->getMessage()]);
+      Log::error('Category delete failed', ['id' => $id, 'msg' => $e->getMessage()]);
 
       return false;
     }

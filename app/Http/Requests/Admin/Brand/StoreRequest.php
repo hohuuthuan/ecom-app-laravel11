@@ -16,7 +16,7 @@ class StoreRequest extends FormRequest
   {
     return [
       'name'        => ['required', 'string', 'max:255'],
-      'description' => ['nullable', 'string'],
+      'description' => ['required', 'string'],
       'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
       'slug'        => ['required', 'string', 'max:255', 'alpha_dash', 'unique:brands,slug'],
       'status'      => ['required', Rule::in(['ACTIVE', 'INACTIVE'])],

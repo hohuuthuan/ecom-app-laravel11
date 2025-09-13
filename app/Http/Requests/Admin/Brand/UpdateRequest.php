@@ -17,7 +17,7 @@ class UpdateRequest extends FormRequest
     $id = $this->route('id');
     return [
       'name'        => ['required', 'string', 'max:255'],
-      'description' => ['nullable', 'string'],
+      'description' => ['required', 'string'],
       'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
       'slug'        => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('brands', 'slug')->ignore($id, 'id')],
       'status'      => ['required', Rule::in(['ACTIVE', 'INACTIVE'])],

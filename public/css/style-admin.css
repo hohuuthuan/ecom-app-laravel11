@@ -12,6 +12,24 @@ a:hover {
     color: inherit;
 }
 
+
+/* CUSTOM TABLE */
+.checkAllWidth {
+    width: 42px;
+}
+.STT_Width {
+    width: 60px;
+}
+.statusWidth {
+width: 140px;
+}
+.createTimeWidth{
+    width: 180px;
+}
+.actionWihdth {
+    width: 140px;
+}
+
 .admin-page .form-control:focus {
     border-color: #0b99c4 !important;
     box-shadow: 0 0 0 0.2rem rgba(159, 249, 248, 0.922) !important;

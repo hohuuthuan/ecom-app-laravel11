@@ -48,7 +48,7 @@ class BrandService
       Brand::query()->create([
         'name'        => $data['name'],
         'description' => $data['description'],
-        'image'       => $data['image'],
+        'image'       => $data['image'] ?? NULL,
         'slug'        => $data['slug'],
         'status'      => $data['status'],
       ]);

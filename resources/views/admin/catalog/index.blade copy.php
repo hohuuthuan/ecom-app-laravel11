@@ -10,6 +10,7 @@
   </ol>
 </nav>
 
+{{-- Tabs Bootstrap --}}
 <ul class="nav nav-tabs mb-3" id="catalogTabs" role="tablist">
   <li class="nav-item" role="presentation">
     <button class="nav-link active" id="category-tab" data-bs-toggle="tab" data-bs-target="#category-pane" type="button" role="tab">
@@ -37,7 +38,9 @@
               <option value="20" {{ request('per_page_cat')==20?'selected':'' }}>20</option>
               <option value="50" {{ request('per_page_cat')==50?'selected':'' }}>50</option>
             </select>
+            {{-- giữ tab khi submit --}}
             <input type="hidden" name="tab" value="category">
+            {{-- bảo toàn bộ lọc brand nếu có --}}
             <input type="hidden" name="brand_keyword" value="{{ request('brand_keyword') }}">
             <input type="hidden" name="brand_status" value="{{ request('brand_status') }}">
             <input type="hidden" name="per_page_brand" value="{{ request('per_page_brand') }}">
@@ -60,6 +63,7 @@
             <div class="col-md-1 d-grid">
               <button type="submit" class="btn btn-primary btn-admin">Lọc</button>
             </div>
+            {{-- giữ tab + bảo toàn filter brand --}}
             <input type="hidden" name="tab" value="category">
             <input type="hidden" name="brand_keyword" value="{{ request('brand_keyword') }}">
             <input type="hidden" name="brand_status" value="{{ request('brand_status') }}">
@@ -87,7 +91,7 @@
                   <th>Slug</th>
                   <th class="statusWidth">Trạng thái</th>
                   <th class="createTimeWidth">Tạo lúc</th>
-                  <th class="actionWihdth text-center">Thao tác</th>
+                  <th class="actionWihdth" class="text-center">Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -235,7 +239,7 @@
                     </button>
                     <form method="POST" action="{{ route('admin.brands.destroy', $brand->id) }}" class="d-inline">
                       @csrf @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xoá category này?')"><i class="fa-solid fa-trash"></i></button>
+                      <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xoá brand này?')">Xoá</button>
                     </form>
                   </td>
                 </tr>
@@ -267,11 +271,6 @@
   <div id="brandBulkIds"></div>
 </form>
 
-<div id="__formState"
-  data-has-errors="{{ $errors->any() ? 1 : 0 }}"
-  data-which="{{ old('__form') }}"
-  style="display:none"></div>
-
 {{-- Modals: Category & Brand --}}
 @include('partials.ui.catalog.category-modal')
 @include('partials.ui.catalog.brand-modal')
@@ -279,6 +278,7 @@
 @endsection
 @push('scripts')
 <script>
+  // Giữ tab qua URL
   function getTabFromURL() {
     const u = new URL(location.href);
     const t = u.searchParams.get('tab');
@@ -298,8 +298,9 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    // đúng tab theo URL
+    // mở đúng tab theo URL (mặc định 'category')
     showTab(getTabFromURL());
+
     const tabs = document.getElementById('catalogTabs');
     if (tabs) {
       tabs.addEventListener('shown.bs.tab', (e) => {
@@ -315,6 +316,7 @@
 
 <script>
   // @ts-nocheck
+  // Helpers chung
   function makeHiddenInputs(container, name, values) {
     container.innerHTML = '';
     values.forEach(v => {
@@ -346,16 +348,15 @@
   function updateBulkButtons() {
     const catAny = getCheckedValues('#categoryTable').length > 0;
     const brandAny = getCheckedValues('#brandTable').length > 0;
-    const catBtn = document.getElementById('catBtnBulkDelete');
-    const brandBtn = document.getElementById('brandBtnBulkDelete');
-    if (catBtn) catBtn.disabled = !catAny;
-    if (brandBtn) brandBtn.disabled = !brandAny;
+    document.getElementById('catBtnBulkDelete').disabled = !catAny;
+    document.getElementById('brandBtnBulkDelete').disabled = !brandAny;
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    // master checkbox
+    // master checkbox binding
     toggleMaster('#cat_check_all', '#categoryTable tbody .cat-row-checkbox');
     toggleMaster('#brand_check_all', '#brandTable tbody .brand-row-checkbox');
+
     document.querySelector('#categoryTable')?.addEventListener('change', (e) => {
       if (e.target.classList?.contains('cat-row-checkbox')) updateBulkButtons();
     });
@@ -399,44 +400,27 @@
     const catForm = document.getElementById('uiCategoryForm');
     const catImg = document.getElementById('cat_image');
     const catPrev = document.getElementById('cat_image_preview');
-    const catPH = document.getElementById('cat_image_placeholder');
-
-    function setCatPreview(src) {
-      if (src) {
-        catPrev.src = src;
-        catPrev.classList.remove('d-none');
-        catPH.classList.add('d-none');
-      } else {
-        catPrev.src = '';
-        catPrev.classList.add('d-none');
-        catPH.classList.remove('d-none');
-      }
-    }
+    const catPick = document.getElementById('btnPickCatImage');
 
     document.querySelectorAll('.btnCateEdit').forEach(btn => {
       btn.addEventListener('click', () => {
-        catForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        catForm.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
-        catForm.querySelector('[name="__mode"]').value = 'edit';
         catForm.action = btn.dataset.updateUrl;
         catForm.querySelector('[name=_method]').value = 'PUT';
-        catForm.querySelector('[name="__form"]').value = 'category';
         catForm.querySelector('#cat_name').value = btn.dataset.name || '';
         catForm.querySelector('#cat_slug').value = btn.dataset.slug || '';
         catForm.querySelector('#cat_description').value = btn.dataset.description || '';
         catForm.querySelector('#cat_status').value = (btn.dataset.status || 'ACTIVE');
         if (window.jQuery && $.fn?.select2) $('#cat_status').trigger('change.select2');
-        setCatPreview(btn.dataset.image || '');
+        if (catPrev) catPrev.src = btn.dataset.image || '';
         try {
           if (catImg) catImg.value = '';
         } catch (_) {}
         bootstrap.Modal.getOrCreateInstance(catModal).show();
       });
     });
-
     catImg?.addEventListener('change', () => {
       const f = catImg.files?.[0];
-      setCatPreview(f ? URL.createObjectURL(f) : '');
+      if (f) catPrev.src = URL.createObjectURL(f);
     });
 
     // ====== BRAND MODAL logic ======
@@ -466,22 +450,6 @@
       const f = brandImg.files?.[0];
       if (f) brandPrev.src = URL.createObjectURL(f);
     });
-
-    // ====== RE-OPEN CATEGORY MODAL ON VALIDATION ERROR ======
-    const __stateEl = document.getElementById('__formState');
-    const __hasErrors = __stateEl?.dataset.hasErrors === '1';
-    const __which = (__stateEl?.dataset.which || null);
-
-    if (__hasErrors && __which === 'category') {
-      catForm.action = "{{ route('admin.categories.store') }}";
-      catForm.querySelector('[name=_method]').value = 'POST';
-      catForm.querySelector('[name="__form"]').value = 'category';
-      setCatPreview('');
-      bootstrap.Modal.getOrCreateInstance(catModal).show();
-
-      const trigger = document.querySelector('[data-bs-target="#category-pane"]');
-      if (trigger) new bootstrap.Tab(trigger).show();
-    }
   });
 </script>
 @endpush

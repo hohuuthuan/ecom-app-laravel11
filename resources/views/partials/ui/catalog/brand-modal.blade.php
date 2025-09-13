@@ -8,11 +8,11 @@
       <input type="hidden" name="__mode" value="create">
       <input type="hidden" name="__update_action" value="{{ old('__update_action','') }}">
       @php
-        $isBrandCreateError = $errors->any() && old('__form')==='brand' && old('__mode','create')==='create';
+      $isBrandCreateError = $errors->any() && old('__form')==='brand' && old('__mode','create')==='create';
       @endphp
 
       <div class="modal-header">
-        <h3 class="modal-title">Brand</h3>
+        <h3 class="modal-title" id="brandModalTitle">Thêm NSX</h3>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
       </div>
 
@@ -30,7 +30,7 @@
               <i class="fa fa-upload me-1"></i>
             </label>
             @if($isBrandCreateError && $errors->has('image'))
-              <div class="invalid-feedback d-block mt-1">{{ $errors->first('image') }}</div>
+            <div class="invalid-feedback d-block mt-1">{{ $errors->first('image') }}</div>
             @endif
           </div>
 
@@ -42,7 +42,7 @@
                   value="{{ $isBrandCreateError ? old('name') : '' }}"
                   class="form-control {{ $isBrandCreateError && $errors->has('name') ? 'is-invalid' : '' }}">
                 @if($isBrandCreateError && $errors->has('name'))
-                  <div class="invalid-feedback">{{ $errors->first('name') }}</div>
+                <div class="invalid-feedback">{{ $errors->first('name') }}</div>
                 @endif
               </div>
 
@@ -52,7 +52,7 @@
                   value="{{ $isBrandCreateError ? old('slug') : '' }}"
                   class="form-control {{ $isBrandCreateError && $errors->has('slug') ? 'is-invalid' : '' }}">
                 @if($isBrandCreateError && $errors->has('slug'))
-                  <div class="invalid-feedback">{{ $errors->first('slug') }}</div>
+                <div class="invalid-feedback">{{ $errors->first('slug') }}</div>
                 @endif
               </div>
 
@@ -61,7 +61,7 @@
                 <textarea id="brand_description" name="description" rows="4"
                   class="form-control {{ $isBrandCreateError && $errors->has('description') ? 'is-invalid' : '' }}">{{ $isBrandCreateError ? old('description') : '' }}</textarea>
                 @if($isBrandCreateError && $errors->has('description'))
-                  <div class="invalid-feedback">{{ $errors->first('description') }}</div>
+                <div class="invalid-feedback">{{ $errors->first('description') }}</div>
                 @endif
               </div>
 
@@ -73,7 +73,7 @@
                   <option value="INACTIVE" {{ $bst==='INACTIVE'?'selected':'' }}>Ngừng hoạt động</option>
                 </select>
                 @if($isBrandCreateError && $errors->has('status'))
-                  <div class="invalid-feedback">{{ $errors->first('status') }}</div>
+                <div class="invalid-feedback">{{ $errors->first('status') }}</div>
                 @endif
               </div>
             </div>

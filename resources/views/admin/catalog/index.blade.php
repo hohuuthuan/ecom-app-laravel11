@@ -276,7 +276,6 @@
 @include('partials.ui.catalog.brand-modal')
 @include('partials.ui.confirm-modal')
 @endsection
-
 @push('scripts')
 <script>
 // Giữ tab qua URL

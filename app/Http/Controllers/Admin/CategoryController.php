@@ -16,20 +16,22 @@ class CategoryController extends Controller
 
   public function index(Request $request)
   {
-    $filters    = $request->only(['keyword','status','per_page']);
+    $filters    = $request->only(['keyword', 'status', 'per_page']);
     $categories = $this->categoryService->getList($filters);
     $parents    = $this->categoryService->listParents();
-    return view('admin.categories', compact('categories','parents'));
+    return view('admin.categories', compact('categories', 'parents'));
   }
 
   public function store(StoreRequest $request): RedirectResponse
   {
     try {
-      $ok = $this->categoryService->create($request->validated(), $request->file('image'));
-      if (!$ok) return back()->withInput()->with('toast_error','Tạo category thất bại.');
-      return back()->with('toast_success','Tạo category thành công.');
+      $newCategory = $this->categoryService->create($request->validated(), $request->file('image'));
+      if (!$newCategory) {
+        return back()->withInput()->with('toast_error', 'Tạo category thất bại.');
+      }
+      return back()->with('toast_success', 'Tạo category thành công.');
     } catch (Throwable $e) {
-      return back()->withInput()->with('toast_error','Có lỗi xảy ra.');
+      return back()->withInput()->with('toast_error', 'Có lỗi xảy ra.');
     }
   }
 
@@ -37,10 +39,10 @@ class CategoryController extends Controller
   {
     try {
       $ok = $this->categoryService->update($id, $request->validated(), $request->file('image'));
-      if (!$ok) return back()->withInput()->with('toast_error','Cập nhật category thất bại.');
-      return back()->with('toast_success','Cập nhật category thành công.');
+      if (!$ok) return back()->withInput()->with('toast_error', 'Cập nhật category thất bại.');
+      return back()->with('toast_success', 'Cập nhật category thành công.');
     } catch (Throwable $e) {
-      return back()->withInput()->with('toast_error','Có lỗi xảy ra.');
+      return back()->withInput()->with('toast_error', 'Có lỗi xảy ra.');
     }
   }
 

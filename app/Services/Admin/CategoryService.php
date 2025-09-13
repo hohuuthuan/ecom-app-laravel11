@@ -47,7 +47,6 @@ class CategoryService
     try {
       DB::beginTransaction();
 
-      $data['slug'] = Str::slug($data['slug']);
       if ($image instanceof UploadedFile) {
         $newPath = $image->store('categories', 'public');
         $data['image'] = $newPath;

@@ -25,15 +25,15 @@
           </div>
 
           <div class="col-lg-10">
-            <div class="row g-3">
+            <div data-slug-scope class="row g-3">
               <div class="col-md-6">
                 <label for="cat_name" class="form-label"><b>Tên</b> <span class="text-danger">*</span></label>
-                <input type="text" id="cat_name" name="name" class="form-control" required>
+                <input id="cat_name" type="text" name="name"  class="form-control" placeholder="Tên danh mục" data-slug-source required>
                 <div class="invalid-feedback d-none" data-err="name"></div>
               </div>
               <div class="col-md-6">
                 <label for="cat_slug" class="form-label"><b>Slug</b> <span class="text-danger">*</span></label>
-                <input type="text" id="cat_slug" name="slug" class="form-control" required>
+                <input id="cat_slug" type="text" name="slug" class="form-control mt-2" placeholder="Slug" data-slug-dest required>
                 <div class="invalid-feedback d-none" data-err="slug"></div>
               </div>
               <div class="col-12">
@@ -61,3 +61,5 @@
     </form>
   </div>
 </div>
+
+<script src="{{ asset('library/slugify.js') }}"></script>

@@ -657,6 +657,17 @@ table tbody td:first-child {
 
 
 /* ===== MODAL: CATEGORY & BRAND ===== */
+
+#brand_image_placeholder {
+    padding: 20px;
+    color: #a50010 !important;
+}
+
+#cat_image_placeholder {
+    padding: 20px;
+    color: #a50010 !important;
+}
+
 #uiCategoryModal .form-label,
 #uiBrandModal .form-label {
     display: block;

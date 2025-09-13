@@ -11,15 +11,13 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $now = now();
-        // database/seeders/RoleSeeder.php
-        DB::table('roles')->updateOrInsert(
-            ['name' => 'Admin'],
-            ['id' => Str::uuid(), 'description' => 'Full access', 'updated_at' => now(), 'created_at' => now()]
-        );
-
-        DB::table('roles')->updateOrInsert(
-            ['name' => 'Customer'],
-            ['id' => Str::uuid(), 'description' => 'Customer', 'updated_at' => now(), 'created_at' => now()]
+        DB::table('roles')->upsert(
+            [
+                ['id' => Str::uuid(), 'name' => 'Admin', 'description' => 'Full access', 'created_at' => now(), 'updated_at' => now()],
+                ['id' => Str::uuid(), 'name' => 'Customer', 'description' => 'Customer', 'created_at' => now(), 'updated_at' => now()],
+            ],
+            ['name'],
+            ['description', 'updated_at']
         );
     }
 }

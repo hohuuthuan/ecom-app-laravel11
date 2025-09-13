@@ -1,28 +1,36 @@
 <?php
+
 namespace App\Http\Requests\Admin\Brand;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateRequest extends FormRequest {
-  public function authorize(): bool { return true; }
+class UpdateRequest extends FormRequest
+{
+  public function authorize(): bool
+  {
+    return true;
+  }
 
-  public function rules(): array {
+  public function rules(): array
+  {
     $id = $this->route('id');
     return [
-      'name'        => ['required','string','max:255'],
-      'description' => ['required','string'],
-      'image'       => ['nullable','image','mimes:jpg,jpeg,png,webp','max:2048'],
-      'slug'        => ['required','string','max:255','alpha_dash', Rule::unique('categories','slug')->ignore($id,'id')],
-      'status'      => ['required', Rule::in(['ACTIVE','INACTIVE'])],
+      'name'        => ['required', 'string', 'max:255'],
+      'description' => ['required', 'string'],
+      'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+      'slug'        => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('brands', 'slug')->ignore($id, 'id')],
+      'status'      => ['required', Rule::in(['ACTIVE', 'INACTIVE'])],
     ];
   }
 
-  public function attributes(): array {
-    return ['name'=>'Tên','description'=>'Mô tả','image'=>'Ảnh','slug'=>'Slug','status'=>'Trạng thái'];
+  public function attributes(): array
+  {
+    return ['name' => 'Tên', 'description' => 'Mô tả', 'image' => 'Ảnh', 'slug' => 'Slug', 'status' => 'Trạng thái'];
   }
 
-  public function messages(): array { 
+  public function messages(): array
+  {
     return [
       'name.required' => 'Vui lòng nhập :attribute.',
       'name.string'   => ':attribute phải là chuỗi.',
@@ -43,5 +51,12 @@ class UpdateRequest extends FormRequest {
       'status.required' => 'Vui lòng chọn :attribute.',
       'status.in'       => ':attribute không hợp lệ.',
     ];
+  }
+
+  protected function prepareForValidation(): void
+  {
+    if ($this->filled('slug')) {
+      $this->merge(['slug' => \Illuminate\Support\Str::slug($this->input('slug'))]);
+    }
   }
 }

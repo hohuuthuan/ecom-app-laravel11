@@ -6,7 +6,7 @@
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb mb-0">
     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>
-    <li class="breadcrumb-item breadcrumb-active" aria-current="page">Catalog</li>
+    <li class="breadcrumb-item breadcrumb-active" aria-current="page">Danh mục & NSX</li>
   </ol>
 </nav>
 
@@ -53,7 +53,7 @@
             <div class="col-md-2">
               <select name="cat_status" class="form-select setupSelect2">
                 <option value="">-- Tất cả trạng thái --</option>
-                <option value="ACTIVE" {{ request('cat_status')==='ACTIVE'?'selected':'' }}>Kích hoạt</option>
+                <option value="ACTIVE" {{ request('cat_status')==='ACTIVE'?'selected':'' }}>Đang hoạt động</option>
                 <option value="INACTIVE" {{ request('cat_status')==='INACTIVE'?'selected':'' }}>Ngừng hoạt động</option>
               </select>
             </div>
@@ -99,7 +99,7 @@
                   <td>{{ $cat->slug }}</td>
                   <td>
                     @if($cat->status == 'ACTIVE')
-                    <span class="badge bg-success">Bình thường</span>
+                    <span class="badge bg-success">Đang hoạt động</span>
                     @else
                     <span class="badge bg-danger">Ngừng hoạt động</span>
                     @endif
@@ -116,10 +116,13 @@
                       data-image="{{ $cat->image ? Storage::url('categories/'.$cat->image) : '' }}">
                       <i class="fa fa-edit"></i>
                     </button>
-                    <form method="POST" action="{{ route('admin.categories.destroy', $cat->id) }}" class="d-inline">
+                    <form method="POST" action="{{ route('admin.categories.destroy', $cat->id) }}" class="d-inline catDeleteForm">
                       @csrf @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xoá category này?')"><i class="fa-solid fa-trash"></i></button>
+                      <button type="submit" class="btn btn-sm btn-danger btnCateDelete">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
                     </form>
+
                   </td>
                 </tr>
                 @empty
@@ -169,7 +172,7 @@
             <div class="col-md-2 select2CustomWidth">
               <select name="brand_status" class="form-select setupSelect2">
                 <option value="">-- Tất cả trạng thái --</option>
-                <option value="ACTIVE" {{ request('brand_status')==='ACTIVE'?'selected':'' }}>Kích hoạt</option>
+                <option value="ACTIVE" {{ request('brand_status')==='ACTIVE'?'selected':'' }}>Đang hoạt động</option>
                 <option value="INACTIVE" {{ request('brand_status')==='INACTIVE'?'selected':'' }}>Ngừng hoạt động</option>
               </select>
             </div>
@@ -198,13 +201,13 @@
             <table id="brandTable" class="table table-bordered table-striped align-middle">
               <thead class="table-light">
                 <tr>
-                  <th style="width:42px"><input type="checkbox" id="brand_check_all"></th>
-                  <th style="width:60px">#</th>
+                  <th class="checkAllWidth"><input type="checkbox" id="brand_check_all"></th>
+                  <th class="STT_Width">#</th>
                   <th>Tên</th>
                   <th>Slug</th>
-                  <th style="width:140px">Trạng thái</th>
-                  <th style="width:180px">Tạo lúc</th>
-                  <th class="text-center" style="width:140px">Thao tác</th>
+                  <th class="statusWidth">Trạng thái</th>
+                  <th class="createTimeWidth">Tạo lúc</th>
+                  <th class="actionWihdth text-center">Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -216,9 +219,9 @@
                   <td>{{ $brand->slug }}</td>
                   <td>
                     @if($brand->status === 'ACTIVE')
-                    <span class="badge bg-success">ACTIVE</span>
+                    <span class="badge bg-success">Đang hoạt động</span>
                     @else
-                    <span class="badge bg-secondary">INACTIVE</span>
+                    <span class="badge bg-secondary">Ngừng hoạt động</span>
                     @endif
                   </td>
                   <td>{{ $brand->created_at?->format('d/m/Y H:i') }}</td>
@@ -233,9 +236,11 @@
                       data-image="{{ $brand->image ? Storage::url($brand->image) : '' }}">
                       <i class="fa fa-edit"></i>
                     </button>
-                    <form method="POST" action="{{ route('admin.brands.destroy', $brand->id) }}" class="d-inline">
+                    <form method="POST" action="{{ route('admin.brands.destroy', $brand->id) }}" class="d-inline brandDeleteForm">
                       @csrf @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xoá brand này?')"><i class="fa-solid fa-trash"></i></button>
+                      <button type="submit" class="btn btn-sm btn-danger btnBrandDelete">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
                     </form>
                   </td>
                 </tr>
@@ -378,6 +383,18 @@
       makeHiddenInputs(box, 'ids[]', ids);
       form.submit();
     });
+    // Xóa category riêng lẻ
+    document.querySelectorAll('.btnCateDelete').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const form = btn.closest('form');
+        const ok = await (window.UIConfirm ? UIConfirm({
+          title: 'Xác nhận xoá',
+          message: 'Bạn có chắc chắn muốn xoá category này?'
+        }) : Promise.resolve(confirm('Xoá category này?')));
+        if (ok) form.submit();
+      });
+    });
 
     // Bulk delete Brand
     document.getElementById('brandBtnBulkDelete')?.addEventListener('click', async () => {
@@ -393,6 +410,19 @@
       makeHiddenInputs(box, 'ids[]', ids);
       form.submit();
     });
+    // Xóa brand riêng lẻ
+    document.querySelectorAll('.btnBrandDelete').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const form = btn.closest('form');
+        const ok = await (window.UIConfirm ? UIConfirm({
+          title: 'Xác nhận xoá',
+          message: 'Bạn có chắc chắn muốn xoá brand này?'
+        }) : Promise.resolve(confirm('Xoá brand này?')));
+        if (ok) form.submit();
+      });
+    });
+
 
     // ====== CATEGORY MODAL logic ======
     const catModal = document.getElementById('uiCategoryModal');
@@ -516,7 +546,7 @@
     // ====== RE-OPEN BRAND MODAL ON VALIDATION ERROR ======
     if (__hasErrors && __which === 'brand') {
       const brandModal = document.getElementById('uiBrandModal');
-      const brandForm  = document.getElementById('uiBrandForm');
+      const brandForm = document.getElementById('uiBrandForm');
 
       brandForm.action = "{{ route('admin.brands.store') }}";
       brandForm.querySelector('[name=_method]').value = 'POST';
@@ -524,7 +554,7 @@
 
       // reset preview về placeholder
       const brandPrev = document.getElementById('brand_image_preview');
-      const brandPH   = document.getElementById('brand_image_placeholder');
+      const brandPH = document.getElementById('brand_image_placeholder');
       if (brandPrev && brandPH) {
         brandPrev.src = '';
         brandPrev.classList.add('d-none');

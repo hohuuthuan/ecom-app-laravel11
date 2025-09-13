@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin\Brand;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class StoreRequest extends FormRequest
 {
@@ -18,7 +19,7 @@ class StoreRequest extends FormRequest
       'name'        => ['required', 'string', 'max:255'],
       'description' => ['required', 'string'],
       'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-      'slug'        => ['required', 'string', 'max:255', 'alpha_dash', 'unique:brands,slug'],
+      'slug'        => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('categories', 'slug')],
       'status'      => ['required', Rule::in(['ACTIVE', 'INACTIVE'])],
     ];
   }
@@ -26,11 +27,11 @@ class StoreRequest extends FormRequest
   public function attributes(): array
   {
     return [
-      'name' => 'Tên',
+      'name'        => 'Tên',
       'description' => 'Mô tả',
-      'image' => 'Ảnh',
-      'slug' => 'Slug',
-      'status' => 'Trạng thái'
+      'image'       => 'Ảnh',
+      'slug'        => 'Slug',
+      'status'      => 'Trạng thái',
     ];
   }
 
@@ -41,20 +42,30 @@ class StoreRequest extends FormRequest
       'name.string'   => ':attribute phải là chuỗi.',
       'name.max'      => ':attribute tối đa 255 ký tự.',
 
-      'description.string' => ':attribute phải là chuỗi.',
+      'description.required' => 'Vui lòng nhập :attribute.',
+      'description.string'   => ':attribute phải là chuỗi.',
 
       'image.image' => ':attribute phải là ảnh.',
       'image.mimes' => ':attribute chỉ chấp nhận: jpg, jpeg, png, webp.',
       'image.max'   => ':attribute tối đa 2MB.',
 
-      'slug.required'   => 'Vui lòng nhập :attribute.',
-      'slug.string'     => ':attribute phải là chuỗi.',
-      'slug.max'        => ':attribute tối đa 255 ký tự.',
-      'slug.alpha_dash' => ':attribute chỉ gồm chữ, số, gạch ngang và gạch dưới.',
-      'slug.unique'     => ':attribute đã tồn tại.',
+      'slug.required' => 'Vui lòng nhập :attribute.',
+      'slug.string'   => ':attribute phải là chuỗi.',
+      'slug.max'      => ':attribute tối đa 255 ký tự.',
+      'slug.regex'    => ':attribute chỉ gồm chữ thường, số và gạch ngang.',
+      'slug.unique'   => ':attribute đã tồn tại.',
 
       'status.required' => 'Vui lòng chọn :attribute.',
       'status.in'       => ':attribute không hợp lệ.',
     ];
+  }
+
+  protected function prepareForValidation(): void
+  {
+    if ($this->filled('slug')) {
+      $this->merge([
+        'slug' => Str::slug($this->input('slug')),
+      ]);
+    }
   }
 }

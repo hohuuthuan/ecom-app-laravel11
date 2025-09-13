@@ -224,18 +224,18 @@
                   <td>{{ $brand->created_at?->format('d/m/Y H:i') }}</td>
                   <td class="text-center">
                     <button type="button"
-                      class="btn btn-sm btn-outline-primary btnBrandEdit"
+                      class="btn btn-sm btn-success btnBrandEdit"
                       data-update-url="{{ route('admin.brands.update', $brand->id) }}"
                       data-name="{{ $brand->name }}"
                       data-slug="{{ $brand->slug }}"
                       data-description="{{ $brand->description }}"
                       data-status="{{ $brand->status }}"
                       data-image="{{ $brand->image ? Storage::url($brand->image) : '' }}">
-                      Sửa
+                      <i class="fa fa-edit"></i>
                     </button>
                     <form method="POST" action="{{ route('admin.brands.destroy', $brand->id) }}" class="d-inline">
                       @csrf @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xoá category này?')"><i class="fa-solid fa-trash"></i></button>
+                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xoá brand này?')"><i class="fa-solid fa-trash"></i></button>
                     </form>
                   </td>
                 </tr>
@@ -440,31 +440,60 @@
     });
 
     // ====== BRAND MODAL logic ======
+    // ====== BRAND MODAL logic ======
     const brandModal = document.getElementById('uiBrandModal');
     const brandForm = document.getElementById('uiBrandForm');
     const brandImg = document.getElementById('brand_image');
     const brandPrev = document.getElementById('brand_image_preview');
-    const brandPick = document.getElementById('btnPickBrandImage');
+    const brandPH = document.getElementById('brand_image_placeholder');
+
+    function setBrandPreview(src) {
+      if (!brandPrev || !brandPH) return;
+      if (src) {
+        brandPrev.src = src;
+        brandPrev.classList.remove('d-none');
+        brandPH.classList.add('d-none');
+      } else {
+        brandPrev.src = '';
+        brandPrev.classList.add('d-none');
+        brandPH.classList.remove('d-none');
+      }
+    }
 
     document.querySelectorAll('.btnBrandEdit').forEach(btn => {
       btn.addEventListener('click', () => {
+        // reset errors UI
+        brandForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        brandForm.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
+
+        // set edit mode
+        brandForm.querySelector('[name="__mode"]').value = 'edit';
         brandForm.action = btn.dataset.updateUrl;
         brandForm.querySelector('[name=_method]').value = 'PUT';
+        brandForm.querySelector('[name="__form"]').value = 'brand';
+
+        // fill fields
         brandForm.querySelector('#brand_name').value = btn.dataset.name || '';
         brandForm.querySelector('#brand_slug').value = btn.dataset.slug || '';
         brandForm.querySelector('#brand_description').value = btn.dataset.description || '';
-        brandForm.querySelector('#brand_status').value = (btn.dataset.status || 'ACTIVE');
+        brandForm.querySelector('#brand_status').value = btn.dataset.status || 'ACTIVE';
         if (window.jQuery && $.fn?.select2) $('#brand_status').trigger('change.select2');
-        if (brandPrev) brandPrev.src = btn.dataset.image || '';
+
+        // image preview
+        setBrandPreview(btn.dataset.image || '');
+
+        // reset file input
         try {
           if (brandImg) brandImg.value = '';
         } catch (_) {}
+
         bootstrap.Modal.getOrCreateInstance(brandModal).show();
       });
     });
+
     brandImg?.addEventListener('change', () => {
       const f = brandImg.files?.[0];
-      if (f) brandPrev.src = URL.createObjectURL(f);
+      setBrandPreview(f ? URL.createObjectURL(f) : '');
     });
 
     // ====== RE-OPEN CATEGORY MODAL ON VALIDATION ERROR ======
@@ -480,6 +509,32 @@
       bootstrap.Modal.getOrCreateInstance(catModal).show();
 
       const trigger = document.querySelector('[data-bs-target="#category-pane"]');
+      if (trigger) new bootstrap.Tab(trigger).show();
+    }
+
+
+    // ====== RE-OPEN BRAND MODAL ON VALIDATION ERROR ======
+    if (__hasErrors && __which === 'brand') {
+      const brandModal = document.getElementById('uiBrandModal');
+      const brandForm  = document.getElementById('uiBrandForm');
+
+      brandForm.action = "{{ route('admin.brands.store') }}";
+      brandForm.querySelector('[name=_method]').value = 'POST';
+      brandForm.querySelector('[name="__form"]').value = 'brand';
+
+      // reset preview về placeholder
+      const brandPrev = document.getElementById('brand_image_preview');
+      const brandPH   = document.getElementById('brand_image_placeholder');
+      if (brandPrev && brandPH) {
+        brandPrev.src = '';
+        brandPrev.classList.add('d-none');
+        brandPH.classList.remove('d-none');
+      }
+
+      bootstrap.Modal.getOrCreateInstance(brandModal).show();
+
+      // bật đúng tab
+      const trigger = document.querySelector('[data-bs-target="#brand-pane"]');
       if (trigger) new bootstrap.Tab(trigger).show();
     }
   });

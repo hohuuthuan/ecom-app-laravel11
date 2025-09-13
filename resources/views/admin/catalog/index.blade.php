@@ -72,7 +72,7 @@
               <button type="button" class="btn btn-sm btn-danger btn-admin" id="catBtnBulkDelete" disabled>Xoá đã chọn</button>
             </div>
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiCategoryModal">Thêm category</button>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiCategoryModal">Thêm danh mục</button>
             </div>
           </div>
 
@@ -192,7 +192,7 @@
               <button type="button" class="btn btn-sm btn-danger btn-admin" id="brandBtnBulkDelete" disabled>Xoá đã chọn</button>
             </div>
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiBrandModal">Thêm brand</button>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiBrandModal">Thêm NSX</button>
             </div>
           </div>
 
@@ -275,6 +275,7 @@
 <div id="__formState"
   data-has-errors="{{ $errors->any() ? 1 : 0 }}"
   data-which="{{ old('__form') }}"
+  data-mode="{{ old('__mode','create') }}"
   style="display:none"></div>
 
 {{-- Modals: Category & Brand --}}
@@ -340,9 +341,7 @@
     const master = document.querySelector(masterSel);
     const rows = document.querySelectorAll(rowSel);
     master?.addEventListener('change', () => {
-      rows.forEach(cb => {
-        cb.checked = master.checked;
-      });
+      rows.forEach(cb => { cb.checked = master.checked; });
       master.indeterminate = false;
       updateBulkButtons();
     });
@@ -358,7 +357,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    // master checkbox
+    // ================== Master & bulk ==================
     toggleMaster('#cat_check_all', '#categoryTable tbody .cat-row-checkbox');
     toggleMaster('#brand_check_all', '#brandTable tbody .brand-row-checkbox');
     document.querySelector('#categoryTable')?.addEventListener('change', (e) => {
@@ -383,7 +382,7 @@
       makeHiddenInputs(box, 'ids[]', ids);
       form.submit();
     });
-    // Xóa category riêng lẻ
+    // Xoá category đơn
     document.querySelectorAll('.btnCateDelete').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -410,7 +409,7 @@
       makeHiddenInputs(box, 'ids[]', ids);
       form.submit();
     });
-    // Xóa brand riêng lẻ
+    // Xoá brand đơn
     document.querySelectorAll('.btnBrandDelete').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -423,13 +422,13 @@
       });
     });
 
-
-    // ====== CATEGORY MODAL logic ======
+    // ================== CATEGORY MODAL ==================
     const catModal = document.getElementById('uiCategoryModal');
-    const catForm = document.getElementById('uiCategoryForm');
-    const catImg = document.getElementById('cat_image');
-    const catPrev = document.getElementById('cat_image_preview');
-    const catPH = document.getElementById('cat_image_placeholder');
+    const catForm  = document.getElementById('uiCategoryForm');
+    const catImg   = document.getElementById('cat_image');
+    const catPrev  = document.getElementById('cat_image_preview');
+    const catPH    = document.getElementById('cat_image_placeholder');
+    const catTitle = document.getElementById('catModalTitle');
 
     function setCatPreview(src) {
       if (src) {
@@ -443,23 +442,38 @@
       }
     }
 
+    // Nút "Thêm category"
+    document.querySelectorAll('[data-bs-target="#uiCategoryModal"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        catForm.querySelector('[name="__mode"]').value = 'create';
+        catForm.action = "{{ route('admin.categories.store') }}";
+        catForm.querySelector('[name=_method]').value = 'POST';
+        if (catTitle) catTitle.textContent = 'Thêm category';
+        setCatPreview('');
+      });
+    });
+
+    // Nút "Sửa category"
     document.querySelectorAll('.btnCateEdit').forEach(btn => {
       btn.addEventListener('click', () => {
         catForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
         catForm.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
+
         catForm.querySelector('[name="__mode"]').value = 'edit';
         catForm.action = btn.dataset.updateUrl;
         catForm.querySelector('[name=_method]').value = 'PUT';
         catForm.querySelector('[name="__form"]').value = 'category';
-        catForm.querySelector('#cat_name').value = btn.dataset.name || '';
-        catForm.querySelector('#cat_slug').value = btn.dataset.slug || '';
+
+        catForm.querySelector('#cat_name').value        = btn.dataset.name || '';
+        catForm.querySelector('#cat_slug').value        = btn.dataset.slug || '';
         catForm.querySelector('#cat_description').value = btn.dataset.description || '';
-        catForm.querySelector('#cat_status').value = (btn.dataset.status || 'ACTIVE');
+        catForm.querySelector('#cat_status').value      = (btn.dataset.status || 'ACTIVE');
         if (window.jQuery && $.fn?.select2) $('#cat_status').trigger('change.select2');
+
         setCatPreview(btn.dataset.image || '');
-        try {
-          if (catImg) catImg.value = '';
-        } catch (_) {}
+        try { if (catImg) catImg.value = ''; } catch(_) {}
+
+        if (catTitle) catTitle.textContent = 'Cập nhật category';
         bootstrap.Modal.getOrCreateInstance(catModal).show();
       });
     });
@@ -469,13 +483,13 @@
       setCatPreview(f ? URL.createObjectURL(f) : '');
     });
 
-    // ====== BRAND MODAL logic ======
-    // ====== BRAND MODAL logic ======
+    // ================== BRAND MODAL ==================
     const brandModal = document.getElementById('uiBrandModal');
-    const brandForm = document.getElementById('uiBrandForm');
-    const brandImg = document.getElementById('brand_image');
-    const brandPrev = document.getElementById('brand_image_preview');
-    const brandPH = document.getElementById('brand_image_placeholder');
+    const brandForm  = document.getElementById('uiBrandForm');
+    const brandImg   = document.getElementById('brand_image');
+    const brandPrev  = document.getElementById('brand_image_preview');
+    const brandPH    = document.getElementById('brand_image_placeholder');
+    const brandTitle = document.getElementById('brandModalTitle');
 
     function setBrandPreview(src) {
       if (!brandPrev || !brandPH) return;
@@ -490,33 +504,38 @@
       }
     }
 
+    // Nút "Thêm brand"
+    document.querySelectorAll('[data-bs-target="#uiBrandModal"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        brandForm.querySelector('[name="__mode"]').value = 'create';
+        brandForm.action = "{{ route('admin.brands.store') }}";
+        brandForm.querySelector('[name=_method]').value = 'POST';
+        if (brandTitle) brandTitle.textContent = 'Thêm brand';
+        setBrandPreview('');
+      });
+    });
+
+    // Nút "Sửa brand"
     document.querySelectorAll('.btnBrandEdit').forEach(btn => {
       btn.addEventListener('click', () => {
-        // reset errors UI
         brandForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
         brandForm.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
 
-        // set edit mode
         brandForm.querySelector('[name="__mode"]').value = 'edit';
         brandForm.action = btn.dataset.updateUrl;
         brandForm.querySelector('[name=_method]').value = 'PUT';
         brandForm.querySelector('[name="__form"]').value = 'brand';
 
-        // fill fields
-        brandForm.querySelector('#brand_name').value = btn.dataset.name || '';
-        brandForm.querySelector('#brand_slug').value = btn.dataset.slug || '';
+        brandForm.querySelector('#brand_name').value        = btn.dataset.name || '';
+        brandForm.querySelector('#brand_slug').value        = btn.dataset.slug || '';
         brandForm.querySelector('#brand_description').value = btn.dataset.description || '';
-        brandForm.querySelector('#brand_status').value = btn.dataset.status || 'ACTIVE';
+        brandForm.querySelector('#brand_status').value      = btn.dataset.status || 'ACTIVE';
         if (window.jQuery && $.fn?.select2) $('#brand_status').trigger('change.select2');
 
-        // image preview
         setBrandPreview(btn.dataset.image || '');
+        try { if (brandImg) brandImg.value = ''; } catch(_) {}
 
-        // reset file input
-        try {
-          if (brandImg) brandImg.value = '';
-        } catch (_) {}
-
+        if (brandTitle) brandTitle.textContent = 'Cập nhật brand';
         bootstrap.Modal.getOrCreateInstance(brandModal).show();
       });
     });
@@ -526,44 +545,32 @@
       setBrandPreview(f ? URL.createObjectURL(f) : '');
     });
 
-    // ====== RE-OPEN CATEGORY MODAL ON VALIDATION ERROR ======
-    const __stateEl = document.getElementById('__formState');
+    // ================== RE-OPEN MODALS WHEN VALIDATION ERROR ==================
+    // Gợi ý: bổ sung data-mode vào #__formState trong Blade:
+    // <div id="__formState" data-has-errors="{{ $errors->any()?1:0 }}" data-which="{{ old('__form') }}" data-mode="{{ old('__mode','create') }}" style="display:none"></div>
+    const __stateEl   = document.getElementById('__formState');
     const __hasErrors = __stateEl?.dataset.hasErrors === '1';
-    const __which = (__stateEl?.dataset.which || null);
+    const __which     = (__stateEl?.dataset.which || null);
+    const __mode      = (__stateEl?.dataset.mode || 'create');
 
     if (__hasErrors && __which === 'category') {
       catForm.action = "{{ route('admin.categories.store') }}";
       catForm.querySelector('[name=_method]').value = 'POST';
       catForm.querySelector('[name="__form"]').value = 'category';
       setCatPreview('');
+      if (catTitle) catTitle.textContent = (__mode === 'edit') ? 'Cập nhật category' : 'Thêm category';
       bootstrap.Modal.getOrCreateInstance(catModal).show();
-
       const trigger = document.querySelector('[data-bs-target="#category-pane"]');
       if (trigger) new bootstrap.Tab(trigger).show();
     }
 
-
-    // ====== RE-OPEN BRAND MODAL ON VALIDATION ERROR ======
     if (__hasErrors && __which === 'brand') {
-      const brandModal = document.getElementById('uiBrandModal');
-      const brandForm = document.getElementById('uiBrandForm');
-
       brandForm.action = "{{ route('admin.brands.store') }}";
       brandForm.querySelector('[name=_method]').value = 'POST';
       brandForm.querySelector('[name="__form"]').value = 'brand';
-
-      // reset preview về placeholder
-      const brandPrev = document.getElementById('brand_image_preview');
-      const brandPH = document.getElementById('brand_image_placeholder');
-      if (brandPrev && brandPH) {
-        brandPrev.src = '';
-        brandPrev.classList.add('d-none');
-        brandPH.classList.remove('d-none');
-      }
-
+      setBrandPreview('');
+      if (brandTitle) brandTitle.textContent = (__mode === 'edit') ? 'Cập nhật brand' : 'Thêm brand';
       bootstrap.Modal.getOrCreateInstance(brandModal).show();
-
-      // bật đúng tab
       const trigger = document.querySelector('[data-bs-target="#brand-pane"]');
       if (trigger) new bootstrap.Tab(trigger).show();
     }

@@ -48,7 +48,7 @@
 
         <div class="card-body">
           {{-- Filters --}}
-          <form method="GET" class="row g-2 mb-3 filter-form">
+          <form method="GET" class="row g-2 mb-3 filter-form select2CustomWidth">
             <div class="col-md-3">
               <input type="text" name="keyword" class="form-control" placeholder="Tìm tên / email / SĐT" value="{{ request('keyword') }}">
             </div>
@@ -62,7 +62,7 @@
                 @endforeach
               </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 ">
               <select name="status" class="form-select setupSelect2">
                 <option value="">-- Tất cả trạng thái --</option>
                 <option value="ACTIVE" {{ request('status')==='ACTIVE'?'selected':'' }}>Bình thường</option>
@@ -75,7 +75,7 @@
           </form>
 
           {{-- Bulk update --}}
-          <div class="d-flex justify-content-between mb-2">
+          <div class="d-flex justify-content-between mb-2 select2CustomWidth">
             <div class="d-flex gap-2">
               <select class="form-select form-select-sm w-auto setupSelect2" id="bulk_status">
                 <option value="">-- Cập nhật trạng thái --</option>
@@ -399,7 +399,7 @@
   <div id="bulk_ids_container"></div>
 </form>
 
-@include('partials.ui.account.confirm-modal')
+@include('partials.ui.confirm-modal')
 @include('partials.ui.account.account-edit-modal')
 @endsection
 

@@ -18,6 +18,7 @@
       <ul class="list-unstyled mb-0">
         <x-sidebar.item route="admin.dashboard" icon="fa-home" label="Dashboard" />
         <x-sidebar.item route="admin.accounts.index" icon="fa-users" label="Tài khoản" />
+        <x-sidebar.item route="admin.catalog.index" icon="fa-tags" label="Danh mục & NSX" />
       </ul>
     </nav>
   </div>

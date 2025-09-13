@@ -53,7 +53,7 @@
                 <div class="invalid-feedback d-none" data-err="address"></div>
               </div>
 
-              <div class="col-md-6">
+              <div class="col-md-6 select2CustomWidth">
                 <label for="ac_status" class="form-label"><b>Trạng thái</b></label>
                 <select id="ac_status" name="status" class="form-select setupSelect2" data-placeholder="Chọn trạng thái" required>
                   <option value="" disabled {{ old('status') ? '' : 'selected' }}>Chọn trạng thái</option>
@@ -85,8 +85,8 @@
       @endif
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary btn-cancel-modal-update-account" data-bs-dismiss="modal">Huỷ</button>
-        <button type="submit" class="btn btn-success btn-submit-modal-update-account">Lưu</button>
+        <button type="button" class="btn btn-outline-secondary btn-cancel-modal" data-bs-dismiss="modal">Huỷ</button>
+        <button type="submit" class="btn btn-success btn-submit-modal">Lưu</button>
       </div>
     </form>
   </div>

@@ -19,7 +19,7 @@ class StoreRequest extends FormRequest
       'name'        => ['required', 'string', 'max:255'],
       'description' => ['required', 'string'],
       'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-      'slug'        => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('categories', 'slug')],
+      'slug'        => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('brands', 'slug')],
       'status'      => ['required', Rule::in(['ACTIVE', 'INACTIVE'])],
     ];
   }

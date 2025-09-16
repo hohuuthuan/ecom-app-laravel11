@@ -2,8 +2,10 @@
   <div class="sidebar-box">
     @php
     $u = auth()->user();
-    $name = $u->full_name ?? 'Admin';
-    $avatar = ($u && $u->avatar) ? Storage::url($u->avatar) : asset('storage/user/base-avatar.jpg');
+    $name = $u->name ?? 'Admin';
+    $file = $u?->avatar ?: 'base-avatar.jpg';
+    $avatar = asset('storage/avatars/'.$file);
+
     @endphp
 
     <div class="px-3 py-3 border-bottom border-secondary-subtle d-flex align-items-center gap-2">

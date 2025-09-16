@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth'  => \App\Http\Middleware\AuthenticateWithToast::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-            'role'  => \App\Http\Middleware\RoleMiddleware::class,
+            'role' => \App\Http\Middleware\EnsureRole::class,
         ]);
         $middleware->web(append: [
             EncryptCookies::class,

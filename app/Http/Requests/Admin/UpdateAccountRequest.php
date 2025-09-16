@@ -17,10 +17,9 @@ class UpdateAccountRequest extends FormRequest
     $id = $this->route('id');
 
     return [
-      'full_name' => ['required', 'string', 'max:255', 'regex:/^[\p{L}\p{N}\s]+$/u', 'not_regex:/^\d+$/'],
+      'name' => ['required', 'string', 'max:255', 'regex:/^[\p{L}\p{N}\s]+$/u', 'not_regex:/^\d+$/'],
       'email'     => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($id, 'id')],
       'phone'     => ['nullable', 'digits:10', 'starts_with:0'],
-      'address'   => ['nullable', 'string', 'max:255'],
       'status'    => ['required', Rule::in(['ACTIVE', 'BAN'])],
       'avatar'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
 
@@ -32,10 +31,9 @@ class UpdateAccountRequest extends FormRequest
   public function attributes(): array
   {
     return [
-      'full_name' => 'Họ tên',
+      'name' => 'Họ tên',
       'email'     => 'Email',
       'phone'     => 'Số điện thoại',
-      'address'   => 'Địa chỉ',
       'status'    => 'Trạng thái',
       'avatar'    => 'Ảnh đại diện',
       'role_ids'  => 'Phân quyền',
@@ -45,11 +43,11 @@ class UpdateAccountRequest extends FormRequest
   public function messages(): array
   {
     return [
-      'full_name.required'   => 'Vui lòng nhập Họ tên.',
-      'full_name.string'     => 'Họ tên phải là chuỗi.',
-      'full_name.max'        => 'Họ tên tối đa 255 ký tự.',
-      'full_name.regex'      => 'Họ tên chỉ gồm chữ, số và khoảng trắng.',
-      'full_name.not_regex'  => 'Họ tên không thể chỉ toàn số.',
+      'name.required'   => 'Vui lòng nhập Họ tên.',
+      'name.string'     => 'Họ tên phải là chuỗi.',
+      'name.max'        => 'Họ tên tối đa 255 ký tự.',
+      'name.regex'      => 'Họ tên chỉ gồm chữ, số và khoảng trắng.',
+      'name.not_regex'  => 'Họ tên không thể chỉ toàn số.',
 
       'email.required' => 'Vui lòng nhập Email.',
       'email.string'   => 'Email phải là chuỗi.',
@@ -59,9 +57,6 @@ class UpdateAccountRequest extends FormRequest
 
       'phone.digits'       => 'Số điện thoại phải gồm 10 chữ số.',
       'phone.starts_with'  => 'Số điện thoại phải bắt đầu bằng 0.',
-
-      'address.string' => 'Địa chỉ phải là chuỗi.',
-      'address.max'    => 'Địa chỉ tối đa 255 ký tự.',
 
       'status.required' => 'Vui lòng chọn Trạng thái.',
       'status.in'       => 'Trạng thái không hợp lệ.',

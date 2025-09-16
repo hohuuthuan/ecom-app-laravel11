@@ -16,7 +16,7 @@ class BulkUpdateAccountRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'status' => ['required', Rule::in(['ACTIVE', 'BAN'])],
+      'status' => ['required', Rule::in(['ACTIVE', 'INACTIVE'])],
       'ids'    => ['required', 'array', 'min:1'],
       'ids.*'  => ['uuid', 'distinct', Rule::exists('users', 'id')],
     ];

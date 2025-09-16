@@ -23,16 +23,18 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth'])->group(function () {
   Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-  Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
+  Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
+
     Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
 
     // Accounts
+    Route::post('/accounts/bulk-status', [AccountController::class, 'bulkStatus'])->name('accounts.bulk-status');
     Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
     Route::post('/accounts/bulk-update', [AccountController::class, 'bulkUpdate'])->name('accounts.bulk-update');
     Route::put('/accounts/{id}', [AccountController::class, 'updateAccount'])->name('accounts.update');
 
     // Catalog
-    Route::get('/catalog', [CatalogPageController::class,'index'])->name('catalog.index');
+    Route::get('/catalog', [CatalogPageController::class, 'index'])->name('catalog.index');
     Route::post('/brands', [BrandController::class, 'store'])->name('brands.store');
     Route::put('/brands/{id}', [BrandController::class, 'update'])->name('brands.update');
     Route::delete('/brands/{id}', [BrandController::class, 'destroy'])->name('brands.destroy');

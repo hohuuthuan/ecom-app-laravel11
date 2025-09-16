@@ -7,6 +7,7 @@ use App\Services\Admin\AccountService;
 use Illuminate\Http\Request;
 use App\Http\Requests\Admin\BulkUpdateAccountRequest;
 use App\Http\Requests\Admin\UpdateAccountRequest;
+use App\Http\Requests\Admin\Account\BulkStatusRequest;
 use Illuminate\Http\RedirectResponse;
 use Throwable;
 
@@ -42,8 +43,8 @@ class AccountController extends Controller
   public function updateAccount(UpdateAccountRequest $request, string $id): RedirectResponse
   {
     try {
-      $ok = $this->accountService->updateAccount($id, $request->validated());
-      if (!$ok) {
+      $updated = $this->accountService->updateAccount($id, $request->validated());
+      if (!$updated) {
         return back()->withInput()->with('toast_error', 'Cập nhật thất bại.');
       }
       return back()->with('toast_success', 'Cập nhật thành công.');
@@ -62,5 +63,17 @@ class AccountController extends Controller
     return redirect()
       ->route('admin.accounts.index')
       ->with('toast_success', "Đã cập nhật trạng thái '{$request->status}' cho {$affected} tài khoản.");
+  }
+
+  public function bulkStatus(BulkStatusRequest $request): RedirectResponse
+  {
+    $status = $request->string('status')->toString();
+    $ids = $request->input('ids', []);
+
+
+    $updated = app(\App\Services\Admin\AccountService::class)->bulkUpdateStatus($ids, $status);
+
+
+    return back()->with('toast_success', "Đã cập nhật trạng thái cho {$updated} tài khoản.");
   }
 }

@@ -11,9 +11,11 @@ class Role extends Model
 
   public $incrementing = false;
   protected $keyType = 'string';
-  protected $fillable = ['name','description'];
 
-  public function users() {
-    return $this->belongsToMany(User::class, 'user_role', 'role_id', 'user_id')->withTimestamps();
+  protected $fillable = ['name', 'description'];
+
+  public function users()
+  {
+    return $this->belongsToMany(User::class, 'role_user', 'role_id', 'user_id');
   }
 }

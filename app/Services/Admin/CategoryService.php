@@ -84,15 +84,15 @@ class CategoryService
       $category = Category::query()->lockForUpdate()->findOrFail($id);
 
       $update = [
-        'name'        => $data['name'],
+        'name' => $data['name'],
         'description' => $data['description'],
-        'slug'        => Str::slug($data['slug']),
-        'status'      => $data['status'],
+        'slug' => $data['slug'],
+        'status' => $data['status'],
       ];
       if ($image instanceof UploadedFile) {
         $oldPath = $category->image;
         $newPath = $image->store('categories', 'public');
-        $update['image'] = $newPath;
+        $update['image'] = basename($newPath);
       }
 
       $category->update($update);
@@ -138,10 +138,34 @@ class CategoryService
 
   public function bulkDelete(array $ids): int
   {
-    $count = 0;
-    foreach ($ids as $id) {
-      $count += $this->delete($id) ? 1 : 0;
+    $ids = array_values(array_filter($ids));
+    if (empty($ids)) {
+      return 0;
     }
-    return $count;
+
+    $images = [];
+    try {
+      DB::beginTransaction();
+      $images = Category::query()
+        ->whereIn('id', $ids)
+        ->lockForUpdate()
+        ->pluck('image')
+        ->filter()
+        ->all();
+
+      $deleted = Category::query()->whereIn('id', $ids)->delete();
+      DB::commit();
+    } catch (\Throwable $e) {
+      DB::rollBack();
+      Log::error('Category bulkDelete failed', ['ids' => $ids, 'msg' => $e->getMessage()]);
+      return 0;
+    }
+    foreach ($images as $img) {
+      if (Storage::disk('public')->exists($img)) {
+        Storage::disk('public')->delete($img);
+      }
+    }
+
+    return $deleted;
   }
 }

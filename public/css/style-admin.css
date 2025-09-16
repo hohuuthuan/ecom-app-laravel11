@@ -12,6 +12,18 @@ a:hover {
     color: inherit;
 }
 
+.customTableAdmin {
+  border-collapse: separate !important;
+  border-spacing: 0;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.customTableAdmin thead th,
+.customTableAdmin tbody td {
+  border: 1px solid #dee2e6;
+}
 
 /* CUSTOM TABLE */
 .checkAllWidth {
@@ -114,6 +126,8 @@ textarea#ac_address {
     border: 1px solid #e9ecef;
 }
 
+
+
 #btnPickAvatar {
     background: #0189b2;
     border: 1px solid #0189b2;
@@ -148,15 +162,6 @@ textarea#ac_address {
     border: 1px solid #dc3545 !important;
     border-radius: 0.5rem;
 }
-
-.select2CustomWidth .select2-container--default {
-    min-width: 247px !important;
-}
-
-.select2-container--default .select2-selection--single.select2-invalid {
-    border-color: #dc3545 !important;
-}
-
 
 .message-avatar {
     width: 42px;
@@ -545,23 +550,6 @@ table tbody td:first-child {
     margin-bottom: 0.375rem;
 }
 
-#uiAccountEditModal .select2-container {
-    width: 100% !important;
-    max-width: 100%;
-}
-
-#uiAccountEditModal .select2-selection--single {
-    height: 38px;
-    min-height: 38px;
-}
-
-#uiAccountEditModal .select2-selection__rendered {
-    line-height: 38px;
-}
-
-#uiAccountEditModal .select2-selection__arrow {
-    height: 38px;
-}
 
 /* Avatar */
 #uiAccountEditModal .ac-avatar {

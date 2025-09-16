@@ -20,8 +20,8 @@ class BrandService
     if (!empty($filters['keyword'])) {
       $kw = $filters['keyword'];
       $query->where(function ($q) use ($kw) {
-        $q->where('name','LIKE',"%{$kw}%")
-          ->orWhere('slug','LIKE',"%{$kw}%");
+        $q->where('name', 'LIKE', "%{$kw}%")
+          ->orWhere('slug', 'LIKE', "%{$kw}%");
       });
     }
     if (!empty($filters['status'])) {
@@ -29,7 +29,7 @@ class BrandService
     }
 
     $perPage = (int)($filters['per_page'] ?? 10);
-    $brands  = $query->orderBy('created_at','desc')->paginate($perPage);
+    $brands  = $query->orderBy('created_at', 'desc')->paginate($perPage);
     return PaginationHelper::appendQuery($brands);
   }
 
@@ -60,7 +60,7 @@ class BrandService
       if ($newPath && Storage::disk('public')->exists($newPath)) {
         Storage::disk('public')->delete($newPath);
       }
-      Log::error('Brand create failed', ['msg'=>$e->getMessage()]);
+      Log::error('Brand create failed', ['msg' => $e->getMessage()]);
       return false;
     }
   }
@@ -75,15 +75,15 @@ class BrandService
       $brand = Brand::query()->lockForUpdate()->findOrFail($id);
 
       $update = [
-        'name'        => $data['name'],
+        'name' => $data['name'],
         'description' => $data['description'] ?? null,
-        'slug'        => Str::slug($data['slug']),
-        'status'      => $data['status'],
+        'slug' => $data['slug'],
+        'status' => $data['status'],
       ];
       if ($image instanceof UploadedFile) {
         $oldPath = $brand->image;
         $newPath = $image->store('brands', 'public');
-        $update['image'] = $newPath;
+        $update['image'] = basename($newPath);
       }
 
       $brand->update($update);
@@ -98,7 +98,7 @@ class BrandService
       if ($newPath && Storage::disk('public')->exists($newPath)) {
         Storage::disk('public')->delete($newPath);
       }
-      Log::error('Brand update failed', ['id'=>$id,'msg'=>$e->getMessage()]);
+      Log::error('Brand update failed', ['id' => $id, 'msg' => $e->getMessage()]);
       return false;
     }
   }
@@ -118,17 +118,40 @@ class BrandService
       return true;
     } catch (Throwable $e) {
       DB::rollBack();
-      Log::error('Brand delete failed', ['id'=>$id,'msg'=>$e->getMessage()]);
+      Log::error('Brand delete failed', ['id' => $id, 'msg' => $e->getMessage()]);
       return false;
     }
   }
 
   public function bulkDelete(array $ids): int
   {
-    $count = 0;
-    foreach ($ids as $id) {
-      $count += $this->delete($id) ? 1 : 0;
+    $ids = array_values(array_filter($ids));
+    if (empty($ids)) {
+      return 0;
     }
-    return $count;
+
+    $images = [];
+    try {
+      DB::beginTransaction();
+      $images = Brand::query()
+        ->whereIn('id', $ids)
+        ->lockForUpdate()
+        ->pluck('image')
+        ->filter()
+        ->all();
+
+      $deleted = Brand::query()->whereIn('id', $ids)->delete();
+      DB::commit();
+    } catch (\Throwable $e) {
+      DB::rollBack();
+      Log::error('Brand bulkDelete failed', ['ids' => $ids, 'msg' => $e->getMessage()]);
+      return 0;
+    }
+    foreach ($images as $img) {
+      if (Storage::disk('public')->exists($img)) {
+        Storage::disk('public')->delete($img);
+      }
+    }
+    return $deleted;
   }
 }

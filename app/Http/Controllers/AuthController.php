@@ -25,8 +25,8 @@ class AuthController extends Controller
           ->withErrors(['email' => 'Email đã được sử dụng']);
       }
 
-      $ok = $this->authService->register($request->validated());
-      if (!$ok) {
+      $newAccount = $this->authService->register($request->validated());
+      if (!$newAccount) {
         return back()
           ->withInput()
           ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');

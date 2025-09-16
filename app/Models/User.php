@@ -2,23 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-  use Notifiable, HasUuids;
-
   public $incrementing = false;
   protected $keyType = 'string';
 
   protected $fillable = [
+    'id',
     'email',
     'password',
-    'full_name',
+    'name',
     'phone',
-    'address',
     'avatar',
     'status'
   ];
@@ -27,7 +23,7 @@ class User extends Authenticatable
 
   public function roles()
   {
-    return $this->belongsToMany(Role::class, 'user_role', 'user_id', 'role_id')->withTimestamps();
+    return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
   }
 
   public function hasRole(string $roleName): bool

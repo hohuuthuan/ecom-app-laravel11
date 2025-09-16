@@ -21,7 +21,7 @@ class AccountService
     if (!empty($filters['keyword'])) {
       $keyword = $filters['keyword'];
       $query->where(function ($q) use ($keyword) {
-        $q->where('full_name', 'LIKE', "%{$keyword}%")
+        $q->where('name', 'LIKE', "%{$keyword}%")
           ->orWhere('email', 'LIKE', "%{$keyword}%")
           ->orWhere('phone', 'LIKE', "%{$keyword}%");
       });
@@ -42,21 +42,20 @@ class AccountService
   }
 
   public function updateAccount(string $id, array $data): bool
-  {
+  { 
     $oldAvatar = null;
     $newAvatar = null;
     try {
       DB::beginTransaction();
       $user = User::query()->lockForUpdate()->findOrFail($id);
-      $user->full_name = $data['full_name'];
+      $user->name      = $data['name'];
       $user->email     = $data['email'];
       $user->phone     = $data['phone'] ?? null;
-      $user->address   = $data['address'] ?? null;
       $user->status    = $data['status'];
       if (isset($data['avatar']) && $data['avatar'] instanceof UploadedFile) {
         $oldAvatar = $user->avatar;
         $newAvatar = $data['avatar']->store('avatars', 'public');
-        $user->avatar = $newAvatar;
+        $user->avatar = basename($newAvatar);;
       }
       $user->save();
 
@@ -79,15 +78,25 @@ class AccountService
     }
   }
 
+  // public function bulkUpdateStatus(array $ids, string $status): int
+  // {
+  //   return DB::transaction(function () use ($ids, $status) {
+  //     return User::query()
+  //       ->whereIn('id', $ids)
+  //       ->update([
+  //         'status'     => $status,
+  //         'updated_at' => now(),
+  //       ]);
+  //   });
+  // }
+
   public function bulkUpdateStatus(array $ids, string $status): int
   {
-    return DB::transaction(function () use ($ids, $status) {
-      return User::query()
-        ->whereIn('id', $ids)
-        ->update([
-          'status'     => $status,
-          'updated_at' => now(),
-        ]);
-    });
+    $ids = array_values(array_filter($ids));
+    if (empty($ids)) {
+      return 0;
+    }
+
+    return User::query()->whereIn('id', $ids)->update(['status' => $status]);
   }
 }

@@ -22,12 +22,12 @@ class AuthService
           'id'        => Str::uuid()->toString(),
           'email'     => $data['email'],
           'password'  => Hash::make($data['password']),
-          'full_name' => $data['full_name'],
+          'name'      => $data['name'],
           'phone'     => $data['phone'],
           'status'    => 'ACTIVE',
         ]);
 
-        $customerId = Role::where('name', 'Customer')->value('id');
+        $customerId = Role::where('name', 'Admin')->value('id');
         $user->roles()->attach($customerId);
       });
 

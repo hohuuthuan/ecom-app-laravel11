@@ -25,6 +25,6 @@ class AuthenticateWithToast
         // Chưa đăng nhập -> chuyển về login + toast
         return redirect()
             ->route('login.form')
-            ->with('toast_error', 'Bạn cần phải đăng nhập.');
+            ->with('error', 'Bạn cần phải đăng nhập.');
     }
 }

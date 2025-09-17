@@ -1,9 +1,9 @@
 @extends('layouts.user')
-
+@section('page_id','auth.register')
 @section('title','Đăng ký')
 @section('body_class','auth-page')
 
-@section('layout')
+@section('content')
 <a href="{{ route('home') }}" class="back-home-btn">
   <i class="fa fa-home me-1"></i> Trang chủ
 </a>
@@ -54,29 +54,30 @@
 
             {{-- Password --}}
             <div class="mb-3 has-toggle">
-              <div class="toggle-wrap position-relative">
-                <input type="password" name="password" id="password"
+              <label for="regPassword" class="form-label">Mật khẩu</label>
+              <div class="input-group toggle-wrap position-relative">
+                <input id="regPassword" type="password" name="password"
                   class="form-control pe-5 @error('password') is-invalid @enderror"
-                  placeholder="Mật khẩu" autocomplete="new-password">
+                  placeholder="Mật khẩu" required autocomplete="new-password">
                 <button type="button"
                   class="toggle-password btn p-0 border-0 position-absolute end-0 me-3"
+                  data-toggle-password data-target="#regPassword"
                   aria-label="Hiện/ẩn mật khẩu">
-                  <i class="icon-eye fa fa-eye-slash"></i>
+                  <i class="icon-eye fa fa-eye-slash" data-eye="off"></i>
                 </button>
               </div>
               @error('password') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
             </div>
 
             {{-- Password confirmation --}}
-            <div class="mb-3 has-toggle">
-              <div class="toggle-wrap position-relative">
-                <input type="password" name="password_confirmation" id="password_confirmation"
-                  class="form-control pe-5"
-                  placeholder="Xác nhận mật khẩu" autocomplete="new-password">
-                <button type="button"
-                  class="toggle-password btn p-0 border-0 position-absolute end-0 me-3"
+            <div class="mb-3">
+              <label for="regPasswordConfirm" class="form-label">Nhập lại mật khẩu</label>
+              <div class="input-group">
+                <input id="regPasswordConfirm" type="password" name="password_confirmation" class="form-control" required autocomplete="new-password">
+                <button type="button" class="btn btn-outline-secondary"
+                  data-toggle-password data-target="#regPasswordConfirm"
                   aria-label="Hiện/ẩn mật khẩu">
-                  <i class="icon-eye fa fa-eye-slash"></i>
+                  <i class="fa fa-eye" data-eye="off" aria-hidden="true"></i>
                 </button>
               </div>
             </div>
@@ -92,23 +93,3 @@
   </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll(".toggle-password").forEach(function(btn) {
-      btn.addEventListener("click", function() {
-        const wrap = this.closest(".toggle-wrap");
-        const input = wrap ? wrap.querySelector("input") : null;
-        const icon = this.querySelector("i");
-        if (!input || !icon) return;
-
-        const isPwd = input.type === "password";
-        input.type = isPwd ? "text" : "password";
-        icon.classList.toggle("fa-eye", isPwd);
-        icon.classList.toggle("fa-eye-slash", !isPwd);
-      });
-    });
-  });
-</script>
-@endpush

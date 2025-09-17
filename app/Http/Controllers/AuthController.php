@@ -21,7 +21,7 @@ class AuthController extends Controller
       if (User::where('email', $request->email)->exists()) {
         return back()
           ->withInput()
-          ->with('toast_warning', 'Email đã được sử dụng')
+          ->with('warning', 'Email đã được sử dụng')
           ->withErrors(['email' => 'Email đã được sử dụng']);
       }
 
@@ -29,12 +29,12 @@ class AuthController extends Controller
       if (!$ok) {
         return back()
           ->withInput()
-          ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
+          ->with('error', 'Có lỗi xảy ra, vui lòng thử lại sau');
       }
     } catch (Throwable $e) {
       return back()
         ->withInput()
-        ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
+        ->with('error', 'Có lỗi xảy ra, vui lòng thử lại sau');
     }
 
     return $this->authService->login($request->email, $request->password, false);
@@ -56,6 +56,6 @@ class AuthController extends Controller
     $this->authService->logout();
     return redirect()
       ->route('home')
-      ->with('toast_success', 'Đăng xuất thành công.');
+      ->with('success', 'Đăng xuất thành công.');
   }
 }

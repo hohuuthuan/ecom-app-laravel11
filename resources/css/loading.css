@@ -1,0 +1,75 @@
+:root{
+  --loading-z:1090;
+  --backdrop-bg:rgba(255,255,255,.65);
+  --box-bg:#ffffff;
+  --box-fg:#111827;           /* gray-900 */
+  --muted:#6b7280;            /* gray-500 */
+  --accent:#0ea5e9;           /* sky-500 */
+  --radius:16px;
+  --shadow:0 18px 40px rgba(2,8,23,.10);
+  --spinner-size:48px;
+  --spinner-width:4px;
+  --gap:14px;
+  --fade:.18s ease;
+  --spin:.85s linear infinite;
+}
+
+/* overlay toàn màn hình */
+.app-loading{
+  position:fixed; inset:0; z-index:var(--loading-z);
+  opacity:0; pointer-events:none; transition:opacity var(--fade);
+}
+.app-loading:not(.hidden){ opacity:1; pointer-events:auto; }
+
+/* nền mờ sáng */
+.app-loading__backdrop{
+  position:absolute; inset:0;
+  background:var(--backdrop-bg);
+  backdrop-filter:saturate(120%) blur(3px);
+}
+
+/* hộp luôn ở tâm viewport */
+.app-loading__box{
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  min-width:240px; max-width:min(90vw,420px);
+  padding:20px 22px;
+  border-radius:var(--radius);
+  background:linear-gradient(180deg,#fff 0%, #f9fafb 100%);
+  color:var(--box-fg);
+  border:1px solid rgba(2,8,23,.06);
+  box-shadow:var(--shadow);
+
+  display:grid; grid-auto-flow:row; justify-items:center; gap:var(--gap);
+  animation:pop .18s ease-out;
+}
+
+/* spinner vòng sáng */
+.app-loading__spinner{
+  position:relative;
+  width:var(--spinner-size); height:var(--spinner-size);
+  border-radius:50%;
+  border:var(--spinner-width) solid rgba(2,8,23,.08);
+  border-top-color:var(--accent);
+  animation:loading-spin var(--spin);
+}
+.app-loading__spinner::after{
+  content:""; position:absolute; inset:-8px; border-radius:inherit;
+  background:radial-gradient(closest-side, rgba(14,165,233,.28), transparent 72%);
+  filter:blur(8px); z-index:-1;
+}
+
+/* nhãn */
+.app-loading__text{
+  font-size:15px; letter-spacing:.2px; text-align:center; user-select:none;
+  color:var(--muted);
+}
+
+/* anim */
+@keyframes loading-spin{ to{ transform:rotate(360deg); } }
+@keyframes pop{ from{ transform:translate(-50%,-48%) scale(.98); opacity:.95 } to{ transform:translate(-50%,-50%) scale(1); opacity:1 } }
+
+/* giảm chuyển động khi user chọn */
+@media (prefers-reduced-motion: reduce){
+  .app-loading__spinner{ animation:none }
+  .app-loading__box{ animation:none }
+}

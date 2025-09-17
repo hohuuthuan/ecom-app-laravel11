@@ -1,0 +1,39 @@
+
+.back-home-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #0b99c4;
+    color: #fff !important;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+    z-index: 1050;
+    transition: all 0.2s ease;
+}
+.back-home-btn:hover {
+    background: #007092;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.loading {
+    z-index: 2000;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.spinner-custom {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #ddd;
+    border-top-color: #0189b2;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

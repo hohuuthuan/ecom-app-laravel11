@@ -16,7 +16,7 @@ class RedirectIfAuthenticated
       if (Auth::guard($guard)->check()) {
         return redirect()
           ->route('home')
-          ->with('toast_info', 'Bạn đã đăng nhập.');
+          ->with('info', 'Bạn đã đăng nhập.');
       }
     }
 

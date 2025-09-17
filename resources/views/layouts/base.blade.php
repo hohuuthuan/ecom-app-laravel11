@@ -1,56 +1,38 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="{{ str_replace('_','-',app()->getLocale()) }}">
 
 <head>
-  @yield('head')
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
+  <title>
+    @hasSection('title')
+    @yield('title') - {{ config('app.name') }}
+    @else
+    {{ config('app.name') }}
+    @endif
+  </title>
+
+  @stack('head')
+
+  {{-- Entry CSS mới (CSS thuần) --}}
+  @vite(['resources/css/app.css'])
+
+  @stack('styles')
 </head>
 
-<body class="@yield('body_class','app-page')">
-  <div id="wrapper">@yield('layout')</div>
+<body class="@yield('body_class','')">
 
-  @include('partials.loading-overlay')
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  @include('partials.flash-toasts')
+  @yield('body')
+
+  {{-- Vendor scripts (được push từ layout con, chạy TRƯỚC app.ts) --}}
+  @stack('vendor_scripts')
+
+  {{-- Entry JS mới (TypeScript) --}}
+  @vite(['resources/js/app.ts'])
+
   @stack('scripts')
-
-  <script>
-    (function() {
-      const overlay = document.getElementById('pageLoading');
-      const show = () => overlay.classList.remove('d-none');
-      const hide = () => overlay.classList.add('d-none');
-
-      document.addEventListener('click', function(e) {
-        const a = e.target.closest('a[href]');
-        if (!a) return;
-        const href = a.getAttribute('href');
-        const newTab = a.target === '_blank' || e.metaKey || e.ctrlKey;
-        const sameHash = href && href.startsWith('#');
-        if (newTab || sameHash || a.dataset.noLoading !== undefined) return;
-        show();
-      });
-
-      document.addEventListener('submit', function(e) {
-        if (e.target.dataset.noLoading !== undefined) return;
-        show();
-      });
-
-      window.addEventListener('pageshow', hide);
-    })();
-  </script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      document.querySelectorAll("form.filter-form").forEach(form => {
-        form.addEventListener("submit", function() {
-          form.querySelectorAll("input, select, textarea").forEach(el => {
-            if (!el.value) {
-              el.removeAttribute("name");
-            }
-          });
-        });
-      });
-    });
-  </script>
 </body>
 
 </html>

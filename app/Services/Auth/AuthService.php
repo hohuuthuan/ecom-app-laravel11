@@ -46,18 +46,18 @@ class AuthService
     $decaySeconds = 15 * 60;
     if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
       $seconds = RateLimiter::availableIn($key);
-      session()->flash('toast_error', "Bạn thử quá nhiều lần. Vui lòng thử lại sau {$seconds}s.");
+      session()->flash('error', "Bạn thử quá nhiều lần. Vui lòng thử lại sau {$seconds}s.");
       return back()->withInput()->withErrors(['email' => 'Tạm khóa do đăng nhập sai nhiều lần.']);
     }
 
     $user = User::where('email', $email)->first();
     if (!$user || !Hash::check($password, $user->password)) {
       RateLimiter::hit($key, $decaySeconds);
-      session()->flash('toast_error', 'Email hoặc mật khẩu không đúng');
+      session()->flash('error', 'Email hoặc mật khẩu không đúng');
       return back()->withInput()->withErrors(['email' => 'Email hoặc mật khẩu không đúng']);
     }
     if ($user->status !== 'ACTIVE') {
-      session()->flash('toast_error', 'Tài khoản đã bị khóa.');
+      session()->flash('error', 'Tài khoản đã bị khóa.');
       return back()->withInput()->withErrors(['email' => 'Tài khoản đã bị khóa']);
     }
 
@@ -68,7 +68,7 @@ class AuthService
 
     return redirect()
       ->intended(route('home'))
-      ->with('toast_success', 'Đăng nhập thành công.');
+      ->with('success', 'Đăng nhập thành công.');
   }
 
   public function logout(): void

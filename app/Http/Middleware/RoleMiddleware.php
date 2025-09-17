@@ -16,7 +16,7 @@ class RoleMiddleware
     $ok = $user->roles()->whereIn('name', $roles)->exists();
 
     if (!$ok) {
-      return redirect()->route('home')->with('toast_error', 'Bạn không có quyền truy cập.');
+      return redirect()->route('home')->with('error', 'Bạn không có quyền truy cập.');
     }
 
     return $next($request);

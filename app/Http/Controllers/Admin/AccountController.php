@@ -23,7 +23,7 @@ class AccountController extends Controller
   public function index(Request $request)
   {
     $filters = $request->only(['keyword', 'role_id', 'status', 'per_page']);
-    $users   = $this->accountService->getList($filters);
+    $accounts   = $this->accountService->getList($filters);
 
     $rolesForSelect = \App\Models\Role::query()
       ->select('id', 'name')
@@ -36,7 +36,7 @@ class AccountController extends Controller
       ->orderBy('name')
       ->get();
 
-    return view('admin.accounts.index', compact('users', 'rolesForSelect', 'rolesSummary'));
+    return view('admin.accounts.index', compact('accounts', 'rolesForSelect', 'rolesSummary'));
   }
 
   public function updateAccount(UpdateAccountRequest $request, string $id): RedirectResponse
@@ -44,11 +44,11 @@ class AccountController extends Controller
     try {
       $ok = $this->accountService->updateAccount($id, $request->validated());
       if (!$ok) {
-        return back()->withInput()->with('toast_error', 'Cập nhật thất bại.');
+        return back()->withInput()->with('error', 'Cập nhật thất bại.');
       }
-      return back()->with('toast_success', 'Cập nhật thành công.');
+      return back()->with('success', 'Cập nhật thành công.');
     } catch (Throwable $e) {
-      return back()->withInput()->with('toast_error', 'Có lỗi xảy ra.');
+      return back()->withInput()->with('error', 'Có lỗi xảy ra.');
     }
   }
 
@@ -61,6 +61,6 @@ class AccountController extends Controller
 
     return redirect()
       ->route('admin.accounts.index')
-      ->with('toast_success', "Đã cập nhật trạng thái '{$request->status}' cho {$affected} tài khoản.");
+      ->with('success', "Đã cập nhật trạng thái '{$request->status}' cho {$affected} tài khoản.");
   }
 }

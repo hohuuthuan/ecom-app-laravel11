@@ -1,15 +1,14 @@
 @extends('layouts.base')
 
-@section('head')
-  @include('partials.user.head')
+@section('body')
+  <div class="user-layout">
+    <main id="app" data-page="@yield('page_id','')">
+      @yield('content')
+    </main>
+
+  </div>
 @endsection
 
-@section('body_class','user-page')
-
-@section('layout')
-  @include('partials.user.header')
-  <main class="container py-4">
-    @yield('content')
-  </main>
-  @include('partials.user.footer')
-@endsection
+@push('vendor_scripts')
+  @vite('resources/js/vendor.ts')
+@endpush

@@ -27,11 +27,11 @@ class CategoryController extends Controller
     try {
       $newCategory = $this->categoryService->create($request->validated(), $request->file('image'));
       if (!$newCategory) {
-        return back()->withInput()->with('toast_error', 'Tạo category thất bại.');
+        return back()->withInput()->with('error', 'Tạo category thất bại.');
       }
-      return back()->with('toast_success', 'Tạo category thành công.');
+      return back()->with('success', 'Tạo category thành công.');
     } catch (Throwable $e) {
-      return back()->withInput()->with('toast_error', 'Có lỗi xảy ra.');
+      return back()->withInput()->with('error', 'Có lỗi xảy ra.');
     }
   }
 
@@ -39,23 +39,23 @@ class CategoryController extends Controller
   {
     try {
       $ok = $this->categoryService->update($id, $request->validated(), $request->file('image'));
-      if (!$ok) return back()->withInput()->with('toast_error', 'Cập nhật category thất bại.');
-      return back()->with('toast_success', 'Cập nhật category thành công.');
+      if (!$ok) return back()->withInput()->with('error', 'Cập nhật category thất bại.');
+      return back()->with('success', 'Cập nhật category thành công.');
     } catch (Throwable $e) {
-      return back()->withInput()->with('toast_error', 'Có lỗi xảy ra.');
+      return back()->withInput()->with('error', 'Có lỗi xảy ra.');
     }
   }
 
   public function destroy(string $id): RedirectResponse
   {
     $ok = $this->categoryService->delete($id);
-    return back()->with($ok ? 'toast_success' : 'toast_error', $ok ? 'Đã xoá category.' : 'Xoá category thất bại.');
+    return back()->with($ok ? 'success' : 'error', $ok ? 'Đã xoá category.' : 'Xoá category thất bại.');
   }
 
   public function bulkDelete(Request $request): RedirectResponse
   {
     $ids = (array) $request->input('ids', []);
     $deleted = $this->categoryService->bulkDelete($ids);
-    return back()->with('toast_success', "Đã xoá {$deleted} category.");
+    return back()->with('success', "Đã xoá {$deleted} category.");
   }
 }

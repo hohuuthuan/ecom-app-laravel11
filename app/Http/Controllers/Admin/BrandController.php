@@ -26,11 +26,11 @@ class BrandController extends Controller
     try {
       $newBrand = $this->brandService->create($request->validated(), $request->file('image'));
       if (!$newBrand) {
-        return back()->withInput()->with('toast_error', 'Tạo brand thất bại.');
+        return back()->withInput()->with('error', 'Tạo brand thất bại.');
       }
-      return back()->with('toast_success', 'Tạo brand thành công.');
+      return back()->with('success', 'Tạo brand thành công.');
     } catch (Throwable $e) {
-      return back()->withInput()->with('toast_error', 'Có lỗi xảy ra.');
+      return back()->withInput()->with('error', 'Có lỗi xảy ra.');
     }
   }
 
@@ -39,25 +39,25 @@ class BrandController extends Controller
     try {
       $updatedBrand = $this->brandService->update($id, $request->validated(), $request->file('image'));
       if (!$updatedBrand) {
-        return back()->withInput()->with('toast_error', 'Cập nhật brand thất bại.');
+        return back()->withInput()->with('error', 'Cập nhật brand thất bại.');
       }
-      return back()->with('toast_success', 'Cập nhật brand thành công.');
+      return back()->with('success', 'Cập nhật brand thành công.');
     } catch (Throwable $e) {
 
-      return back()->withInput()->with('toast_error', 'Có lỗi xảy ra.');
+      return back()->withInput()->with('error', 'Có lỗi xảy ra.');
     }
   }
 
   public function destroy(string $id): RedirectResponse
   {
     $ok = $this->brandService->delete($id);
-    return back()->with($ok ? 'toast_success' : 'toast_error', $ok ? 'Đã xoá brand.' : 'Xoá brand thất bại.');
+    return back()->with($ok ? 'success' : 'error', $ok ? 'Đã xoá brand.' : 'Xoá brand thất bại.');
   }
 
   public function bulkDelete(Request $request): RedirectResponse
   {
     $ids = (array) $request->input('ids', []);
     $deleted = $this->brandService->bulkDelete($ids);
-    return back()->with('toast_success', "Đã xoá {$deleted} brand.");
+    return back()->with('success', "Đã xoá {$deleted} brand.");
   }
 }

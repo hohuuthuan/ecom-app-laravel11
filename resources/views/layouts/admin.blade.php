@@ -1,27 +1,36 @@
 @extends('layouts.base')
 
-@section('head')
-@include('partials.admin.head')
-@endsection
+@section('title', trim($__env->yieldContent('title', 'Admin')))
 
-@section('body_class','admin-page')
+@push('head')
+  @includeIf('partials.admin.head')
+@endpush
 
-@section('layout')
+@section('body')
+  <div class="admin-layout">
+    @includeIf('partials.admin.navbar')
 
-<div class="container-fluid g-0">
-  <div class="row g-0">
-    @include('partials.admin.sidebar')
-    <div id="contentCol" class="col-12 col-lg-10 d-flex flex-column min-vh-100">
-      @include('partials.admin.header')
-      <main class="wrapper-content flex-grow-1">
-        @yield('content')
-      </main>
-      @include('partials.admin.footer')
+    <div class="admin-shell">
+      @includeIf('partials.admin.sidebar')
+
+      <div class="admin-content">
+        @includeIf('partials.breadcrumb')
+
+        <main id="app" data-page="@yield('page_id','')">
+          @yield('content')
+        </main>
+
+        @includeIf('partials.flash-toasts')
+      </div>
     </div>
   </div>
-</div>
 
-@include('partials.admin.offcanvas-mobile')
-@include('partials.admin.script')
+  @includeIf('partials.loading')
 @endsection
-  
+
+@push('vendor_scripts')
+  {{-- Vendor bundle: jQuery + select2 + CSS qua Vite. Nạp TRƯỚC app.ts --}}
+  @vite('resources/js/vendor.ts')
+@endpush
+
+

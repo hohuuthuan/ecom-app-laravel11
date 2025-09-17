@@ -1,41 +1,30 @@
-@extends('layouts.base')
+@extends('layouts.guest')
 @section('title','Trang chủ')
 
-@section('body')
-  <div class="container py-5">
-    <div class="text-center mb-4">
-      <h1 class="h3 mb-2">E-Commerce</h1>
-      <p class="text-muted mb-0">Trang chủ</p>
+@section('content')
+  <div class="card-header">Trang chủ</div>
+  <div class="card-body space-y-6">
+    <div class="space-y-2">
+      <h1 class="text-2xl font-semibold">Chào mừng đến Ecom</h1>
+      <p class="text-gray-600 text-sm">Demo giao diện công khai. Đăng nhập để vào khu vực quản trị.</p>
     </div>
 
+    @guest
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href="{{ route('login.form') }}" class="btn btn-primary sm:w-auto w-full">Đăng nhập</a>
+        <a href="{{ route('register.form') }}" class="btn btn-secondary sm:w-auto w-full">Đăng ký</a>
+      </div>
+    @endguest
+
     @auth
-      <div class="d-flex justify-content-center gap-2">
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-primary">
-          Vào Dashboard
-        </a>
-        <form method="POST" action="{{ route('logout') }}" class="d-inline">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href="{{ route('admin.dashboard') }}" class="btn btn-primary sm:w-auto w-full">Vào bảng điều khiển</a>
+        <form method="POST" action="{{ route('logout') }}" class="sm:w-auto w-full">
           @csrf
-          <button type="submit" class="btn btn-outline-secondary">
-            Đăng xuất
-          </button>
+          <button type="submit" class="btn btn-secondary w-full">Đăng xuất</button>
         </form>
       </div>
-    @else
-      <div class="d-flex justify-content-center gap-2">
-        <a href="{{ route('login.form') }}" class="btn btn-primary">
-          Đăng nhập
-        </a>
-        <a href="{{ route('register.form') }}" class="btn btn-outline-primary">
-          Đăng ký
-        </a>
-      </div>
+      <p class="text-sm text-gray-500">Đăng nhập với quyền phù hợp để truy cập các trang quản trị.</p>
     @endauth
   </div>
-
-  {{-- Toasts --}}
-  @includeIf('partials.flash-toasts')
 @endsection
-
-@push('vendor_scripts')
-  @vite('resources/js/vendor.ts')
-@endpush

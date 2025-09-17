@@ -1,66 +1,44 @@
 @extends('layouts.admin')
 
-@section('title','Admin Dashboard')
+@section('title','Bảng điều khiển')
 
 @section('content')
-<div class="container-fluid">
-  <div class="row g-3">
-    <div class="col-md-6 col-xl-3">
-      <div class="card shadow-sm h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h6 class="mb-0">Income</h6>
-          <span class="badge rounded-pill text-bg-success">Monthly</span>
-        </div>
-        <div class="card-body">
-          <h2 class="mb-1 fw-semibold">40 886,200</h2>
-          <div class="text-success fw-bold">98% <i class="fa fa-bolt"></i></div>
-          <small class="text-muted">Total income</small>
-        </div>
+<div class="card">
+  <div class="card-header">Demo Select2 + Cards</div>
+  <div class="card-body">
+    <form class="space-y-4">
+      <div>
+        <label class="form-label">Danh mục</label>
+        <select class="form-select setupSelect2" data-allow-clear="true" placeholder="Chọn danh mục">
+          <option></option>
+          <option value="1">Sách</option>
+          <option value="2">Văn phòng phẩm</option>
+          <option value="3">Thiết bị</option>
+        </select>
       </div>
-    </div>
 
-    <div class="col-md-6 col-xl-3">
-      <div class="card shadow-sm h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h6 class="mb-0">Orders</h6>
-          <span class="badge rounded-pill text-bg-info">Annual</span>
-        </div>
-        <div class="card-body">
-          <h2 class="mb-1 fw-semibold">275,800</h2>
-          <div class="text-info fw-bold">20% <i class="fa fa-level-up-alt"></i></div>
-          <small class="text-muted">New orders</small>
-        </div>
+      <div class="flex gap-2">
+        <button type="button" class="btn btn-primary" onclick="document.dispatchEvent(new CustomEvent('demo:toast'))">Hiện toast</button>
+        <button type="button" class="btn btn-danger" onclick="window.__confirm && window.__confirm()">Xác nhận</button>
       </div>
-    </div>
-
-    <div class="col-md-6 col-xl-3">
-      <div class="card shadow-sm h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h6 class="mb-0">Visits</h6>
-          <span class="badge rounded-pill text-bg-primary">Today</span>
-        </div>
-        <div class="card-body">
-          <h2 class="mb-1 fw-semibold">106,120</h2>
-          <div class="text-primary fw-bold">44% <i class="fa fa-level-up-alt"></i></div>
-          <small class="text-muted">New visits</small>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6 col-xl-3">
-      <div class="card shadow-sm h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h6 class="mb-0">User activity</h6>
-          <span class="badge rounded-pill text-bg-danger">Low value</span>
-        </div>
-        <div class="card-body">
-          <h2 class="mb-1 fw-semibold">80,600</h2>
-          <div class="text-danger fw-bold">38% <i class="fa fa-level-down-alt"></i></div>
-          <small class="text-muted">In first month</small>
-        </div>
-      </div>
-    </div>
-
+    </form>
   </div>
 </div>
+
+@push('scripts')
+<script>
+  document.addEventListener('demo:toast', () => {
+    const box = document.createElement('div');
+    box.setAttribute('data-toast','success');
+    box.setAttribute('data-autohide','true');
+    box.setAttribute('data-delay-ms','2500');
+    box.textContent = 'Thành công';
+    document.body.appendChild(box);
+  });
+  window.__confirm = () => {
+    document.getElementById('uiConfirmMessage').textContent = 'Bạn muốn xoá bản ghi này?';
+    document.getElementById('uiConfirmModal').dataset.open = '1';
+  };
+</script>
+@endpush
 @endsection

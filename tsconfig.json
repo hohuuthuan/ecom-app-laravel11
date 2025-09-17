@@ -4,13 +4,10 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "strict": true,
-    "skipLibCheck": true,
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["resources/js/*"]
-    },
-    "jsx": "react-jsx"
+    "paths": { "@/*": ["resources/ts/*"] },
+    "types": ["node", "jquery", "select2"],
+    "skipLibCheck": true
   },
-  "include": ["resources/js/**/*", "resources/types/**/*"],
-  "exclude": ["node_modules", "public/build"]
+  "include": ["resources/ts/**/*", "vite.config.ts"]
 }

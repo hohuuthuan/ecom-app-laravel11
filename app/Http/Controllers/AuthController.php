@@ -21,12 +21,11 @@ class AuthController extends Controller
       if (User::where('email', $request->email)->exists()) {
         return back()
           ->withInput()
-          ->with('warning', 'Email đã được sử dụng')
-          ->withErrors(['email' => 'Email đã được sử dụng']);
+          ->with(['email' => 'Email đã được sử dụng']);
       }
 
-      $ok = $this->authService->register($request->validated());
-      if (!$ok) {
+      $newAccount = $this->authService->register($request->validated());
+      if (!$newAccount) {
         return back()
           ->withInput()
           ->with('error', 'Có lỗi xảy ra, vui lòng thử lại sau');

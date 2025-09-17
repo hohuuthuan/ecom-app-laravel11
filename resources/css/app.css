@@ -1,67 +1,112 @@
-/* Entry CSS thuần cho toàn site. Không dùng @import. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Tokens cơ bản bằng CSS variables */
-:root {
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-
-  --gap-xs: 4px;
-  --gap-sm: 8px;
-  --gap-md: 12px;
-  --gap-lg: 16px;
-
-  --color-bg: #ffffff;
-  --color-surface: #f8f9fa;
-  --color-border: #e5e7eb;
-  --color-text: #111827;
+@layer base {
+  html { @apply antialiased; }
+  body { @apply bg-gray-50 text-gray-900; }
 }
 
-/* Khung admin tối thiểu, không đụng layout cũ */
-.admin-layout {
-  min-height: 100vh;
-  background: var(--color-bg);
-}
-.admin-shell {
-  display: flex;
-  min-height: calc(100vh - 56px); /* nếu navbar cao 56px */
-}
-.admin-content {
-  flex: 1 1 auto;
-  padding: var(--gap-lg);
-  background: var(--color-bg);
-}
+@layer components {
+  .btn { @apply inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed; }
+  .btn-primary { @apply btn text-white bg-primary-600 hover:bg-primary-700 focus-visible:outline-primary-600; }
+  .btn-secondary { @apply btn bg-gray-100 text-gray-900 hover:bg-gray-200 focus-visible:outline-gray-500; }
+  .btn-danger { @apply btn text-white bg-red-600 hover:bg-red-700 focus-visible:outline-red-600; }
 
-/* Bảng bo góc không vỡ viền: áp dụng trên wrapper cuộn, không áp trực tiếp lên <table> */
-.table-admin-wrap {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  overflow: hidden; /* cắt viền bên trong */
-  background: var(--color-surface);
-}
-.table-admin {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
+  .card { @apply rounded-2xl border border-gray-200 bg-white shadow; }
+  .card-header { @apply border-b border-gray-200 p-4 font-semibold; }
+  .card-body { @apply p-4; }
 
-/* Tiện ích nhỏ */
-.hidden { display: none !important; }
+  .admin-layout { @apply min-h-screen; }
+  .admin-topbar { @apply sticky top-0 z-40 bg-white border-b border-gray-200; }
+  .admin-topbar-inner { @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between; }
+  .admin-shell { @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex gap-6 py-6; }
+  .admin-sidebar { @apply w-64 shrink-0 hidden lg:block; }
+  .admin-sidebar-card { @apply card p-4; }
+  .admin-content { @apply flex-1; }
+
+  .nav-link { @apply flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100; }
+  .nav-link.active { @apply bg-gray-100 font-medium; }
 
 
-/* Loading overlay */
-.app-loading { position: fixed; inset: 0; z-index: 1055; }
-.app-loading.hidden { display: none !important; }
-.app-loading__backdrop { position: absolute; inset: 0; background: rgba(17,24,39,.45); }
-.app-loading__box {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  min-width: 220px; padding: 16px 20px; border-radius: var(--radius-md);
-  background: var(--color-bg); border: 1px solid var(--color-border);
-  display: flex; align-items: center; gap: 12px;
+
+
+  .tw-toast-container { @apply fixed top-4 right-4 z-[1060] flex flex-col gap-3; }
+  .tw-toast {
+    @apply relative rounded-2xl border bg-white px-4 py-3 shadow-lg ring-1 ring-black/5 cursor-pointer;
+    animation: tw-toast-in 180ms ease-out;
+    overflow: hidden;
+    will-change: transform;
+  }
+  .tw-toast-inner { @apply flex items-start gap-3; }
+  .tw-toast-exit { animation: tw-toast-out 420ms ease-in forwards; } /* slide-right mượt */
+  .tw-toast-icon { @apply mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full; }
+  .tw-toast-body { @apply flex-1 text-[13px] leading-5; }
+  .tw-toast-close { @apply ml-1 inline-flex h-6 w-6 items-center justify-center rounded-md hover:bg-black/5; }
+
+  .tw-toast-progress {
+    @apply pointer-events-none absolute bottom-0 left-0 right-0 h-0.5 rounded-b-2xl;
+    transform-origin: left center; transform: scaleX(1);
+  }
+
+  .tw-toast-success { @apply border-green-200 bg-green-50 text-green-800; }
+  .tw-toast-success .tw-toast-icon { @apply bg-green-600 text-white; }
+  .tw-toast-success .tw-toast-progress { @apply bg-green-600/90; }
+
+  .tw-toast-error { @apply border-red-200 bg-red-50 text-red-800; }
+  .tw-toast-error .tw-toast-icon { @apply bg-red-600 text-white; }
+  .tw-toast-error .tw-toast-progress { @apply bg-red-600/90; }
+
+  .tw-toast-warning { @apply border-amber-200 bg-amber-50 text-amber-900; }
+  .tw-toast-warning .tw-toast-icon { @apply bg-amber-500 text-white; }
+  .tw-toast-warning .tw-toast-progress { @apply bg-amber-500/90; }
+
+  .tw-toast-info { @apply border-sky-200 bg-sky-50 text-sky-900; }
+  .tw-toast-info .tw-toast-icon { @apply bg-sky-600 text-white; }
+  .tw-toast-info .tw-toast-progress { @apply bg-sky-600/90; }
+
+
+
+
+
+  
+  /* Modal */
+  .tw-modal { @apply fixed inset-0 z-[1050] hidden; }
+  .tw-modal[data-open="1"] { @apply block; }
+  .tw-modal-backdrop { @apply absolute inset-0 bg-black/40; }
+  .tw-modal-panel { @apply absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-gray-200 bg-white p-5 shadow-xl; }
+  .tw-modal-header { @apply mb-3 text-base font-semibold; }
+  .tw-modal-actions { @apply mt-5 flex justify-end gap-2; }
+
+  /* Form bridges */
+  .form-label { @apply block text-sm font-medium text-gray-700; }
+  .form-control { @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600; }
+  .form-select { @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600; }
+
+
+
+  /* Auth layout */
+  .auth-center { @apply min-h-[70vh] flex items-center justify-center; } /* vì sao: chỉ muốn login/register căn giữa, không ảnh hưởng trang khác */
+  .auth-card { @apply w-full max-w-[800px] grid grid-cols-1 md:grid-cols-2 rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden; }
+  .auth-hero { @apply hidden md:flex flex-col justify-center gap-4 bg-gradient-to-br from-sky-600 to-sky-500 text-white p-8; }
+  .auth-hero h2 { @apply text-2xl font-semibold; }
+  .auth-hero p { @apply text-white/90 text-sm; }
+  .auth-form { @apply p-6 sm:p-8; }
+  .auth-title { @apply text-center text-xl font-semibold mb-6; }
+
+  /* Input có icon bên phải */
+  .input-icon-wrap { @apply relative; }
+  .input-icon-btn { @apply absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700; }
+  .input-icon-pad { @apply pr-10; }
 }
-.app-loading__spinner {
-  width: 22px; height: 22px; border: 3px solid #e5e7eb; border-top-color: #111827;
-  border-radius: 50%; animation: appspin 0.9s linear infinite;
+
+@keyframes tw-toast-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
-.app-loading__text { font-size: 14px; color: var(--color-text); }
-@keyframes appspin { to { transform: rotate(360deg); } }
+@keyframes tw-toast-out {
+  0%   { opacity: 1; transform: translateX(0); }
+  40%  { transform: translateX(-6px); }
+  100% { opacity: 0; transform: translateX(24px); }
+}
+

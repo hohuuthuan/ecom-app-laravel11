@@ -1,95 +1,69 @@
-@extends('layouts.user')
-@section('page_id','auth.register')
+@extends('layouts.guest')
 @section('title','Đăng ký')
-@section('body_class','auth-page')
 
 @section('content')
-<a href="{{ route('home') }}" class="back-home-btn">
-  <i class="fa fa-home me-1"></i> Trang chủ
-</a>
-<div class="container animated fadeInDown">
-  <div class="row justify-content-center align-items-center min-vh-100">
-    <div class="col-lg-8">
-      <div class="row custom-form-login-shadow overflow-hidden">
-        <div class="text-justify col-md-6 bg-light p-5 col-left d-flex flex-column justify-content-center gap-4">
-          <div class="intro">
-            <h2 class="fw-bold mb-3">Gia nhập Ecom Books</h2>
-            <p>Tạo tài khoản để mua sắm nhanh chóng, lưu trữ giỏ hàng và nhận khuyến mãi đặc biệt.</p>
-            <p>Sách chính hãng, giao hàng tận nơi, trải nghiệm tiện lợi cho mọi đọc giả.</p>
-          </div>
-          <div class="text-center">
-            <img src="{{ asset('storage/logo/e-com-book-logo.png') }}"
-              alt="Ecom Books"
-              class="logo-left"
-              width="200">
-          </div>
-        </div>
-
-        <div class="col-md-6 bg-white p-5">
-          <h4 class="mb-4">Đăng ký</h4>
-
-          <form method="POST" action="{{ route('register') }}">
-            @csrf
-
-            <div class="mb-3">
-              <input type="text" name="full_name" value="{{ old('full_name') }}"
-                class="form-control @error('full_name') is-invalid @enderror"
-                placeholder="Họ và tên" autocomplete="name">
-              @error('full_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="mb-3">
-              <input type="text" name="phone" value="{{ old('phone') }}"
-                class="form-control @error('phone') is-invalid @enderror"
-                placeholder="Số điện thoại" inputmode="tel" autocomplete="tel">
-              @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="mb-3">
-              <input type="email" name="email" value="{{ old('email') }}"
-                class="form-control @error('email') is-invalid @enderror"
-                placeholder="Email" autocomplete="email">
-              @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-
-            {{-- Password --}}
-            <div class="mb-3 has-toggle">
-              <label for="regPassword" class="form-label">Mật khẩu</label>
-              <div class="input-group toggle-wrap position-relative">
-                <input id="regPassword" type="password" name="password"
-                  class="form-control pe-5 @error('password') is-invalid @enderror"
-                  placeholder="Mật khẩu" required autocomplete="new-password">
-                <button type="button"
-                  class="toggle-password btn p-0 border-0 position-absolute end-0 me-3"
-                  data-toggle-password data-target="#regPassword"
-                  aria-label="Hiện/ẩn mật khẩu">
-                  <i class="icon-eye fa fa-eye-slash" data-eye="off"></i>
-                </button>
-              </div>
-              @error('password') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-            </div>
-
-            {{-- Password confirmation --}}
-            <div class="mb-3">
-              <label for="regPasswordConfirm" class="form-label">Nhập lại mật khẩu</label>
-              <div class="input-group">
-                <input id="regPasswordConfirm" type="password" name="password_confirmation" class="form-control" required autocomplete="new-password">
-                <button type="button" class="btn btn-outline-secondary"
-                  data-toggle-password data-target="#regPasswordConfirm"
-                  aria-label="Hiện/ẩn mật khẩu">
-                  <i class="fa fa-eye" data-eye="off" aria-hidden="true"></i>
-                </button>
-              </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-login w-100 mb-3">Đăng ký</button>
-
-            <p class="text-center mb-0"><small>Đã có tài khoản?</small></p>
-            <a class="btn btn-outline-secondary w-100 mt-2" href="{{ route('login.form') }}">Đăng nhập</a>
-          </form>
-        </div>
+<div class="auth-center">
+  <div class="auth-card">
+    <aside class="auth-hero">
+      <div>
+        <h2>Tạo tài khoản</h2>
+        <p>Tham gia hệ thống để quản trị cửa hàng của bạn.</p>
       </div>
-    </div>
+      <ul class="space-y-2 text-sm">
+        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/80"></span><span>Nhanh, gọn, dễ dùng</span></li>
+        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/80"></span><span>Bảo mật hiện đại</span></li>
+        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/80"></span><span>Hỗ trợ mở rộng</span></li>
+      </ul>
+    </aside>
+
+    <section class="auth-form">
+      <h1 class="auth-title">Đăng ký</h1>
+
+      <form method="POST" action="{{ route('register') }}" class="space-y-5">
+        @csrf
+
+        <div>
+          <label for="name" class="form-label">Họ tên</label>
+          <input id="name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" class="form-control" />
+          @error('name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+        </div>
+
+        <div>
+          <label for="phone" class="form-label">Số điện thoại</label>
+          <input id="phone" name="phone" type="text" value="{{ old('phone') }}" autocomplete="phone" class="form-control" />
+          @error('phone') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+        </div>
+
+        <div>
+          <label for="email" class="form-label">Email</label>
+          <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" class="form-control" />
+          @error('email') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+        </div>
+
+        <div>
+          <label for="password_reg" class="form-label">Mật khẩu</label>
+          <div class="input-icon-wrap">
+            <input id="password_reg" name="password" type="password" autocomplete="new-password" class="form-control input-icon-pad" />
+            <button type="button" class="input-icon-btn" data-toggle-password data-target="password_reg" aria-label="Hiện/ẩn mật khẩu" aria-pressed="false">
+              <svg data-eye class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/><circle cx="12" cy="12" r="3" stroke-width="2" /></svg>
+              <svg data-eye-off class="h-5 w-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a10.04 10.04 0 012.642-4.205M6.1 6.1A9.99 9.99 0 0112 5c4.477 0 8.268 2.943 9.542 7a10.05 10.05 0 01-4.043 5.122M3 3l18 18"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 00-3-3"/></svg>
+            </button>
+          </div>
+          @error('password') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+        </div>
+
+        <div>
+          <label for="password_confirmation" class="form-label">Nhập lại mật khẩu</label>
+          <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" class="form-control" />
+        </div>
+
+        <div class="flex items-center justify-between">
+          <a href="{{ route('login.form') }}" class="text-sm text-sky-700 hover:underline">Đã có tài khoản? Đăng nhập</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full">Tạo tài khoản</button>
+      </form>
+    </section>
   </div>
 </div>
 @endsection

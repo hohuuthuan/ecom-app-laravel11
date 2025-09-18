@@ -50,7 +50,7 @@
 
         <div class="flex items-center justify-between">
           <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-            <input type="checkbox" name="remember" class="rounded border-gray-300 text-sky-600 focus:ring-sky-600" />
+            <input value="1" type="checkbox" name="remember" class="rounded border-gray-300 text-sky-600 focus:ring-sky-600" />
             Ghi nhớ tôi
           </label>
           <a href="{{ route('register.form') }}" class="text-sm text-sky-700 hover:underline">Chưa có tài khoản?</a>

@@ -1,0 +1,27 @@
+<?php
+
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+
+return new class extends Migration {
+  public function up(): void
+  {
+    Schema::create('stocks', function (Blueprint $table) {
+      $table->uuid('id')->primary();
+      $table->foreignUuid('product_id')->constrained('products')->cascadeOnDelete();
+      $table->foreignUuid('warehouse_id')->constrained('warehouses')->cascadeOnDelete();
+      $table->unsignedInteger('on_hand')->default(0); // tồn thực tế
+      $table->unsignedInteger('reserved')->default(0); // đã giữ cho đơn
+      $table->timestamps();
+      $table->unique(['product_id', 'warehouse_id']);
+      $table->index(['warehouse_id']);
+    });
+  }
+  public function down(): void
+  {
+    Schema::dropIfExists('stocks');
+  }
+};

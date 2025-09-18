@@ -1,5 +1,5 @@
 type ToastType = 'success' | 'error' | 'warning' | 'info';
-type ToastOpts = { autohide?: boolean; delay?: number; staggerMs?: number };
+type ToastOpts = { autohide?: boolean; delay?: number; staggerMs?: number; staggerIndex?: number };
 
 function ensureContainer(doc: Document): HTMLElement {
   let c = doc.querySelector('.tw-toast-container') as HTMLElement | null;
@@ -13,7 +13,7 @@ function ensureContainer(doc: Document): HTMLElement {
 
 function iconSvg(type: ToastType): string {
   if (type === 'success') return '<svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
-  if (type === 'error')   return '<svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+  if (type === 'error') return '<svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>';
   if (type === 'warning') return '<svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>';
   return '<svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 16h-1v-4h-1m1-4h.01"/><circle cx="12" cy="12" r="9"/></svg>';
 }
@@ -66,7 +66,7 @@ function slideClose(box: HTMLElement) {
 }
 
 export function show(doc: Document, type: ToastType, html: string, opts: ToastOpts = {}): void {
-  const { autohide = true, delay = 8000, staggerMs = 350 } = opts;
+  const { autohide = true, delay = 6000, staggerMs = 350, staggerIndex } = opts;
   const c = ensureContainer(doc);
 
   const box = doc.createElement('div');
@@ -80,24 +80,21 @@ export function show(doc: Document, type: ToastType, html: string, opts: ToastOp
     </div>
     ${autohide ? '<div class="tw-toast-progress"></div>' : ''}
   `;
-
-  // Click bất kỳ để đóng
   box.addEventListener('click', () => slideClose(box));
   box.querySelector<HTMLButtonElement>('.tw-toast-close')?.addEventListener('click', (e) => { e.stopPropagation(); slideClose(box); });
 
   c.appendChild(box);
 
   if (autohide) {
-    const idx = Array.prototype.indexOf.call(c.children, box) as number;
+    const idxAll = Array.prototype.indexOf.call(c.children, box) as number;
+    const idx = typeof staggerIndex === 'number' ? staggerIndex : idxAll;
     const finalDelay = delay + Math.max(0, idx) * staggerMs;
 
     const prog = box.querySelector<HTMLElement>('.tw-toast-progress');
-    if (prog) {
-      requestAnimationFrame(() => {
-        prog.style.transition = `transform ${finalDelay}ms linear`;
-        prog.style.transform = 'scaleX(0)';
-      });
-    }
+    if (prog) requestAnimationFrame(() => {
+      prog.style.transition = `transform ${finalDelay}ms linear`;
+      prog.style.transform = 'scaleX(0)';
+    });
     window.setTimeout(() => slideClose(box), finalDelay);
   }
 }
@@ -105,12 +102,19 @@ export function show(doc: Document, type: ToastType, html: string, opts: ToastOp
 export function init(doc: Document): void {
   const nodes = Array.from(doc.querySelectorAll<HTMLElement>('[data-toast]'));
   if (nodes.length === 0) return;
+  
+  const counters = new Map<ToastType, number>([['success', 0], ['error', 0], ['warning', 0], ['info', 0]]);
+
   for (const el of nodes) {
     const type = (el.getAttribute('data-toast') || 'info') as ToastType;
     const autohide = (el.getAttribute('data-autohide') ?? 'true') !== 'false';
-    const delay = Number(el.getAttribute('data-delay-ms') || 8000);
-    const stagger = Number(el.getAttribute('data-stagger-ms') || 350);
-    show(doc, type, el.innerHTML, { autohide, delay, staggerMs: stagger });
+    const delay = Number(el.getAttribute('data-delay-ms') || (type === 'error' ? 6000 : 3500));
+    const staggerMs = Number(el.getAttribute('data-stagger-ms') || 1200);
+
+    const i = counters.get(type)!;
+    counters.set(type, i + 1);
+
+    show(doc, type, el.innerHTML, { autohide, delay, staggerMs, staggerIndex: i });
     el.remove();
   }
 }

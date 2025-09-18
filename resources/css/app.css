@@ -8,46 +8,52 @@
 }
 
 @layer components {
+  /* Buttons */
   .btn { @apply inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed; }
   .btn-primary { @apply btn text-white bg-primary-600 hover:bg-primary-700 focus-visible:outline-primary-600; }
   .btn-secondary { @apply btn bg-gray-100 text-gray-900 hover:bg-gray-200 focus-visible:outline-gray-500; }
   .btn-danger { @apply btn text-white bg-red-600 hover:bg-red-700 focus-visible:outline-red-600; }
 
+  /* Cards */
   .card { @apply rounded-2xl border border-gray-200 bg-white shadow; }
   .card-header { @apply border-b border-gray-200 p-4 font-semibold; }
   .card-body { @apply p-4; }
 
-  .admin-layout { @apply min-h-screen; }
+  /* Admin shell */
+  .admin-layout { @apply min-h-screen bg-gray-50 text-gray-900; }
+  .admin-shell { @apply grid gap-6 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6; grid-template-columns: 16rem minmax(0,1fr); }
+  .admin-sidebar { @apply transition-all duration-200; width: 16rem; }
+  .admin-sidebar.is-collapsed { width: 4rem; }
+  .admin-sidebar-card { @apply card p-4 h-full; }
+  .admin-main { @apply min-w-0; }
+
+  /* Header trên cột phải */
+  .admin-header { @apply sticky top-0 z-40 bg-white border border-gray-200 rounded-2xl shadow; }
+  .admin-header-inner { @apply h-12 px-3 sm:px-4 flex items-center gap-2; }
+  .icon-btn { @apply inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-gray-100; }
+
+  /* Content */
+  .admin-content { @apply mt-4; }
+
+  /* Nav in sidebar */
+  .nav-link { @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors; }
+  .nav-link.active { @apply bg-gray-100 font-medium; }
+  .admin-sidebar.is-collapsed .nav-text { @apply hidden; }
+  .admin-sidebar.is-collapsed .sidebar-user-name { @apply hidden; }
+
+  /* Topbar (nếu dùng) */
   .admin-topbar { @apply sticky top-0 z-40 bg-white border-b border-gray-200; }
   .admin-topbar-inner { @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between; }
-  .admin-shell { @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex gap-6 py-6; }
-  .admin-sidebar { @apply w-64 shrink-0 hidden lg:block; }
-  .admin-sidebar-card { @apply card p-4; }
-  .admin-content { @apply flex-1; }
 
-  .nav-link { @apply flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100; }
-  .nav-link.active { @apply bg-gray-100 font-medium; }
-
-
-
-
+  /* Toasts */
   .tw-toast-container { @apply fixed top-4 right-4 z-[1060] flex flex-col gap-3; }
-  .tw-toast {
-    @apply relative rounded-2xl border bg-white px-4 py-3 shadow-lg ring-1 ring-black/5 cursor-pointer;
-    animation: tw-toast-in 200ms ease-out;
-    overflow: hidden;
-    will-change: transform;
-  }
+  .tw-toast { @apply relative rounded-2xl border bg-white px-4 py-3 shadow-lg ring-1 ring-black/5 cursor-pointer; animation: tw-toast-in 200ms ease-out; overflow: hidden; will-change: transform; }
   .tw-toast-inner { @apply flex items-start gap-3; }
-  .tw-toast-exit { animation: tw-toast-out 420ms ease-in forwards; } /* slide-right mượt */
+  .tw-toast-exit { animation: tw-toast-out 420ms ease-in forwards; }
   .tw-toast-icon { @apply mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full; }
   .tw-toast-body { @apply flex-1 text-[13px] leading-5; }
   .tw-toast-close { @apply ml-1 inline-flex h-6 w-6 items-center justify-center rounded-md hover:bg-black/5; }
-
-  .tw-toast-progress {
-    @apply pointer-events-none absolute bottom-0 left-0 right-0 h-0.5 rounded-b-2xl;
-    transform-origin: left center; transform: scaleX(1);
-  }
+  .tw-toast-progress { @apply pointer-events-none absolute bottom-0 left-0 right-0 h-0.5 rounded-b-2xl; transform-origin: left center; transform: scaleX(1); }
 
   .tw-toast-success { @apply border-green-200 bg-green-50 text-green-800; }
   .tw-toast-success .tw-toast-icon { @apply bg-green-600 text-white; }
@@ -65,11 +71,6 @@
   .tw-toast-info .tw-toast-icon { @apply bg-sky-600 text-white; }
   .tw-toast-info .tw-toast-progress { @apply bg-sky-600/90; }
 
-
-
-
-
-  
   /* Modal */
   .tw-modal { @apply fixed inset-0 z-[1050] hidden; }
   .tw-modal[data-open="1"] { @apply block; }
@@ -78,23 +79,19 @@
   .tw-modal-header { @apply mb-3 text-base font-semibold; }
   .tw-modal-actions { @apply mt-5 flex justify-end gap-2; }
 
-  /* Form bridges */
+  /* Forms */
   .form-label { @apply block text-sm font-medium text-gray-700; }
   .form-control { @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600; }
   .form-select { @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600; }
 
-
-
-  /* Auth layout */
-  .auth-center { @apply min-h-[70vh] flex items-center justify-center; } /* vì sao: chỉ muốn login/register căn giữa, không ảnh hưởng trang khác */
+  /* Auth pages */
+  .auth-center { @apply min-h-[70vh] flex items-center justify-center; }
   .auth-card { @apply w-full max-w-[800px] grid grid-cols-1 md:grid-cols-2 rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden; }
   .auth-hero { @apply hidden md:flex flex-col justify-center gap-4 bg-gradient-to-br from-sky-600 to-sky-500 text-white p-8; }
   .auth-hero h2 { @apply text-2xl font-semibold; }
   .auth-hero p { @apply text-white/90 text-sm; }
   .auth-form { @apply p-6 sm:p-8; }
   .auth-title { @apply text-center text-xl font-semibold mb-6; }
-
-  /* Input có icon bên phải */
   .input-icon-wrap { @apply relative; }
   .input-icon-btn { @apply absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700; }
   .input-icon-pad { @apply pr-10; }

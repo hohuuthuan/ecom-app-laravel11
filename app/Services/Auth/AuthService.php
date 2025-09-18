@@ -19,16 +19,18 @@ class AuthService
     try {
       DB::transaction(function () use ($data) {
         $user = User::create([
-          'id'        => Str::uuid()->toString(),
-          'email'     => $data['email'],
-          'password'  => Hash::make($data['password']),
-          'name'      => $data['name'],
-          'phone'     => $data['phone'],
-          'status'    => 'ACTIVE',
+          'id'       => Str::uuid()->toString(),
+          'name'     => $data['name'],
+          'email'    => $data['email'],
+          'phone'    => $data['phone'] ?? null,
+          'password' => Hash::make($data['password']),
+          'status'   => 'ACTIVE',
         ]);
 
         $customerId = Role::where('name', 'Admin')->value('id');
-        $user->roles()->attach($customerId);
+        if ($customerId) {
+          $user->roles()->attach($customerId);
+        }
       });
 
       return true;
@@ -53,7 +55,6 @@ class AuthService
     $user = User::where('email', $email)->first();
     if (!$user || !Hash::check($password, $user->password)) {
       RateLimiter::hit($key, $decaySeconds);
-      session()->flash('error', 'Email hoặc mật khẩu không đúng');
       return back()->withInput()->withErrors(['email' => 'Email hoặc mật khẩu không đúng']);
     }
     if ($user->status !== 'ACTIVE') {

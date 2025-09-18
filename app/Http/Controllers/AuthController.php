@@ -11,9 +11,7 @@ use Throwable;
 
 class AuthController extends Controller
 {
-  public function __construct(
-    private readonly AuthService $authService // đổi sang concrete class
-  ) {}
+  public function __construct(private readonly AuthService $authService) {}
 
   public function register(RegisterRequest $request): RedirectResponse
   {
@@ -21,19 +19,17 @@ class AuthController extends Controller
       if (User::where('email', $request->email)->exists()) {
         return back()
           ->withInput()
-          ->with(['email' => 'Email đã được sử dụng']);
+          ->withErrors(['email' => 'Email đã được sử dụng']);
       }
 
       $newAccount = $this->authService->register($request->validated());
       if (!$newAccount) {
         return back()
-          ->withInput()
-          ->with('error', 'Có lỗi xảy ra, vui lòng thử lại sau');
+          ->withErrors('error', 'Có lỗi xảy ra, vui lòng thử lại sau');
       }
     } catch (Throwable $e) {
       return back()
-        ->withInput()
-        ->with('error', 'Có lỗi xảy ra, vui lòng thử lại sau');
+        ->withErrors('error', 'Có lỗi xảy ra, vui lòng thử lại sau');
     }
 
     return $this->authService->login($request->email, $request->password, false);

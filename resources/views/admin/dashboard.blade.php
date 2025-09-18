@@ -1,44 +1,43 @@
+{{-- resources/views/admin/dashboard.blade.php --}}
 @extends('layouts.admin')
-
-@section('title','Bảng điều khiển')
-
+@section('title','Dashboard')
 @section('content')
-<div class="card">
-  <div class="card-header">Demo Select2 + Cards</div>
-  <div class="card-body">
-    <form class="space-y-4">
-      <div>
-        <label class="form-label">Danh mục</label>
-        <select class="form-select setupSelect2" data-allow-clear="true" placeholder="Chọn danh mục">
-          <option></option>
-          <option value="1">Sách</option>
-          <option value="2">Văn phòng phẩm</option>
-          <option value="3">Thiết bị</option>
-        </select>
-      </div>
-
-      <div class="flex gap-2">
-        <button type="button" class="btn btn-primary" onclick="document.dispatchEvent(new CustomEvent('demo:toast'))">Hiện toast</button>
-        <button type="button" class="btn btn-danger" onclick="window.__confirm && window.__confirm()">Xác nhận</button>
-      </div>
-    </form>
+<div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+  <div class="card">
+    <div class="card-header flex items-center justify-between">
+      <span>Income</span><span class="badge">Monthly</span>
+    </div>
+    <div class="card-body">
+      <div class="text-3xl font-light">40 886,200</div>
+      <div class="text-xs text-gray-500 mt-1">Total income <a href="#" class="text-sky-600">98% ↑</a></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header flex items-center justify-between">
+      <span>Orders</span><span class="badge">Annual</span>
+    </div>
+    <div class="card-body">
+      <div class="text-3xl font-light">275,800</div>
+      <div class="text-xs text-gray-500 mt-1">New orders <a href="#" class="text-emerald-600">20% ↑</a></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header flex items-center justify-between">
+      <span>Visits</span><span class="badge">Today</span>
+    </div>
+    <div class="card-body">
+      <div class="text-3xl font-light">106,120</div>
+      <div class="text-xs text-gray-500 mt-1">New visits <a href="#" class="text-emerald-600">44% ↑</a></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header flex items-center justify-between">
+      <span>User activity</span><span class="badge danger">Low value</span>
+    </div>
+    <div class="card-body">
+      <div class="text-3xl font-light">80,600</div>
+      <div class="text-xs text-gray-500 mt-1">In first month <a href="#" class="text-rose-600">38% ↓</a></div>
+    </div>
   </div>
 </div>
-
-@push('scripts')
-<script>
-  document.addEventListener('demo:toast', () => {
-    const box = document.createElement('div');
-    box.setAttribute('data-toast','success');
-    box.setAttribute('data-autohide','true');
-    box.setAttribute('data-delay-ms','2500');
-    box.textContent = 'Thành công';
-    document.body.appendChild(box);
-  });
-  window.__confirm = () => {
-    document.getElementById('uiConfirmMessage').textContent = 'Bạn muốn xoá bản ghi này?';
-    document.getElementById('uiConfirmModal').dataset.open = '1';
-  };
-</script>
-@endpush
 @endsection

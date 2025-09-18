@@ -44,19 +44,19 @@ class AccountController extends Controller
     try {
       $ok = $this->accountService->updateAccount($id, $request->validated());
       if (!$ok) {
-        return back()->withInput()->with('error', 'Cập nhật thất bại.');
+        return back()->withInput()->withErrors('error', 'Cập nhật thất bại.');
       }
       return back()->with('success', 'Cập nhật thành công.');
     } catch (Throwable $e) {
-      return back()->withInput()->with('error', 'Có lỗi xảy ra.');
+      return back()->withInput()->withErrors('error', 'Có lỗi xảy ra.');
     }
   }
 
   public function bulkUpdate(BulkUpdateAccountRequest $request)
   {
     $affected = $this->accountService->bulkUpdateStatus(
-      $request->input('ids'),          // UUID[]
-      $request->string('status')->toString() // 'ACTIVE' | 'BAN'
+      $request->input('ids'),
+      $request->string('status')->toString()
     );
 
     return redirect()

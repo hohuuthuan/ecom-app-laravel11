@@ -1,49 +1,45 @@
+{{-- resources/views/layouts/admin.blade.php --}}
 <!doctype html>
 <html lang="vi">
-  <head>
-    @include('partials.head')
-    <title>@yield('title','Bảng điều khiển')</title>
-  </head>
-  <body class="admin-layout" data-sidebar="expanded">
-    <header class="admin-topbar">
-      <div class="admin-topbar-inner">
-        <div class="flex items-center gap-3">
-          <button id="sidebarToggle" class="lg:hidden btn btn-secondary" type="button">
-            <i class="fa-solid fa-bars"></i>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>@yield('title','Admin')</title>
+  @vite(['resources/css/app.css','resources/ts/app.ts'])
+</head>
+<body class="admin-layout">
+  <div class="admin-shell">
+    {{-- Sidebar trái --}}
+    @include('partials.admin.sidebar')
+
+    {{-- Khối phải --}}
+    <div class="admin-main">
+      {{-- Header --}}
+      <header class="admin-header">
+        <div class="admin-header-inner">
+          <button id="btnSidebarToggle" type="button" class="icon-btn" aria-label="Thu/phóng menu">
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16M4 12h10M4 18h16"/>
+            </svg>
           </button>
-          <span class="font-semibold">Ecom Admin</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <a href="#" class="nav-link"><i class="fa-regular fa-bell"></i></a>
-          <a href="#" class="nav-link"><i class="fa-regular fa-user"></i></a>
-        </div>
-      </div>
-    </header>
 
-    <main class="admin-shell">
-      <aside class="admin-sidebar">
-        <div class="admin-sidebar-card">
-          <nav class="space-y-1">
-            <a class="nav-link {{ request()->is('admin') ? 'active' : '' }}" href="{{ url('/admin') }}">
-              <i class="fa-solid fa-gauge-high"></i><span>Bảng điều khiển</span>
-            </a>
-            <a class="nav-link" href="#">
-              <i class="fa-solid fa-box"></i><span>Sản phẩm</span>
-            </a>
-            <a class="nav-link" href="#">
-              <i class="fa-solid fa-users"></i><span>Khách hàng</span>
-            </a>
-          </nav>
-        </div>
-      </aside>
+          <div class="flex-1"></div>
 
-      <section class="admin-content">
-        @include('partials.flash-toasts')
+          <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="btn btn-secondary">Đăng xuất</button>
+          </form>
+        </div>
+      </header>
+
+      {{-- Content --}}
+      <main class="admin-content">
         @yield('content')
-      </section>
-    </main>
+      </main>
+    </div>
+  </div>
 
-    @include('partials.ui.confirm-modal')
-    @include('partials.script')
-  </body>
+  {{-- Toasts --}}
+  @include('partials.flash-toasts')
+</body>
 </html>

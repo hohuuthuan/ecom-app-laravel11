@@ -41,7 +41,8 @@
       </section>
     </main>
   </div>
-
+  @include('partials.flash-toasts')
+  
   @stack('scripts')
 </body>
 

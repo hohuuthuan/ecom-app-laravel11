@@ -5,12 +5,20 @@
   <meta charset="utf-8">
   <title>@yield('title', 'Admin Panel')</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  @vite(['resources/css/admin.css','resources/ts/admin.ts'])
+  <script>
+    (function() {
+      var s = localStorage.getItem('sb_state_v1');
+      if (s === 'collapsed' || s === 'expanded') {
+        document.documentElement.setAttribute('data-sb', s);
+      }
+    })();
+  </script>
+  @vite(['resources/css/admin.css','resources/ts/app.ts'])
 </head>
 
 <body class="min-h-dvh bg-gray-50 text-gray-900" data-sb="{{ session('sb_state', 'expanded') }}">
   <div class="layout">
-    @include(' partials.admin.sidebar')
+    @include('partials.admin.sidebar')
     <main class="main">
       <header class="p-2 border-b border-gray-200 bg-white">
         <div class="flex items-center justify-between">
@@ -42,8 +50,6 @@
     </main>
   </div>
   @include('partials.flash-toasts')
-  
-  @stack('scripts')
 </body>
 
 </html>

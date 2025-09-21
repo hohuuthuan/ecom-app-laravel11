@@ -24,9 +24,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const updInput  = document.getElementById('__update_action');
   const oldRoles  = document.getElementById('__old_role_ids');
 
-  // ===== Seeds
-  const ROLES = Array.isArray(window.ROLES_MASTER) ? window.ROLES_MASTER.map(r => ({ id: String(r.id), name: r.name })) : [];
-  const AVATAR_PH = typeof window.AVATAR_BASE === 'string' ? window.AVATAR_BASE : '';
+  // ===== Seed ROLES + avatar mặc định
+  let ROLES = [];
+  let AVATAR_PH = '';
+  const seed = document.getElementById('seed');
+  if (seed) {
+    try { ROLES = JSON.parse(seed.dataset.roles || '[]'); } catch(_) { ROLES = []; }
+    try { AVATAR_PH = JSON.parse(seed.dataset.avatar || '""'); } catch(_) { AVATAR_PH = ''; }
+  }
 
   // ===== Helpers
   function stripHtml(html){ const d=document.createElement('div'); d.innerHTML=html; return d.textContent||d.innerText||''; }
@@ -86,23 +91,48 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // ===== Roles UI
+  // ===== Roles UI (chips)
   let selected=[];
   function setSelected(ids){ selected=Array.from(new Set((Array.isArray(ids)?ids:[]).filter(Boolean).map(String))); renderRoles(); }
   function addById(id){ id=String(id); if(!id||selected.includes(id))return; selected.push(id); renderRoles(); }
   function removeById(id){ id=String(id); selected=selected.filter(x=>x!==id); renderRoles(); }
   function remainingRoles(){ return ROLES.filter(r=>!selected.includes(String(r.id))); }
+
   function renderRoles(){
     if(!tokensBox||!suggestEl||!hiddenBox) return;
+
+    // Hidden inputs
     hiddenBox.innerHTML='';
-    for(const id of selected){ const i=document.createElement('input'); i.type='hidden'; i.name='role_ids[]'; i.value=id; hiddenBox.appendChild(i); }
-    const tokens = selected.map(id => { const role=ROLES.find(r=>String(r.id)===String(id)); if(!role)return ''; return '<span class="ac-tag" data-id="'+id+'"><span>'+role.name+'</span><button class="ac-x" type="button" aria-label="Xóa" data-x="'+id+'">×</button></span>'; }).join('');
-    tokensBox.innerHTML=tokens; tokensBox.classList.toggle('is-empty', selected.length===0);
-    const list=remainingRoles();
-    suggestEl.innerHTML = list.map(r=>'<span class="sg" data-add="'+r.id+'"><span class="plus">＋</span><span>'+r.name+'</span></span>').join('');
+    for(const id of selected){
+      const i=document.createElement('input'); i.type='hidden'; i.name='role_ids[]'; i.value=id; hiddenBox.appendChild(i);
+    }
+
+    // Tokens or placeholder
+    const placeholder = tokensBox.getAttribute('data-placeholder') || 'Chọn vai trò';
+    if (selected.length === 0) {
+      tokensBox.innerHTML = '<span class="ac-placeholder">'+placeholder+'</span>';
+    } else {
+      const tokens = selected.map(id => {
+        const role = ROLES.find(r => String(r.id) === String(id));
+        if (!role) return '';
+        return '<span class="ac-tag" data-id="'+id+'"><span>'+role.name+'</span><button class="ac-x" type="button" aria-label="Xóa" data-x="'+id+'">×</button></span>';
+      }).join('');
+      tokensBox.innerHTML = tokens;
+    }
+    // Không dùng class .is-empty để tránh CSS ẩn hộp
+    tokensBox.classList.remove('is-empty');
+
+    // Suggest list
+    const list = remainingRoles();
+    suggestEl.innerHTML = list.map(r => '<span class="sg" data-add="'+r.id+'"><span class="plus">＋</span><span>'+r.name+'</span></span>').join('');
   }
-  if (tokensBox) tokensBox.addEventListener('click', (e)=>{ const id=e.target?.getAttribute?.('data-x'); if(id) removeById(id); });
-  if (suggestEl) suggestEl.addEventListener('click', (e)=>{ const chip=e.target.closest?.('[data-add]'); if(chip) addById(chip.getAttribute('data-add')); });
+
+  if (tokensBox) {
+    tokensBox.addEventListener('click', (e)=>{ const id=e.target?.getAttribute?.('data-x'); if(id) removeById(id); });
+  }
+  if (suggestEl) {
+    suggestEl.addEventListener('click', (e)=>{ const chip=e.target.closest?.('[data-add]'); if(chip) addById(chip.getAttribute('data-add')); });
+  }
 
   // ===== Fill modal from Edit button
   function fillFormFromBtn(btn){
@@ -130,8 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
     try { if (fileInput) fileInput.value=''; } catch(_) {}
 
     setSelected(roleIds);
-
-    // xoá lỗi cũ khi mở bằng nút Edit
     clearFormErrors();
   }
 
@@ -140,10 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!formEl) return;
     formEl.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
     formEl.querySelectorAll('.invalid-feedback').forEach(el => {
-      el.classList.remove('d-block');
-      el.classList.add('d-none');
-      // Xoá text để không còn “dòng lỗi”
-      el.textContent = '';
+      el.classList.remove('d-block'); el.classList.add('d-none'); el.textContent='';
     });
   }
 
@@ -155,14 +180,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
   });
 
-  // ===== Clear errors when user closes modal (X, backdrop, ESC)
+  // ===== Clear errors when user closes modal
   if (modalEl) {
-    modalEl.addEventListener('hidden.bs.modal', () => {
-      clearFormErrors();
-    });
+    modalEl.addEventListener('hidden.bs.modal', () => { clearFormErrors(); });
   }
 
-  // ===== Auto open after validation fail (avatar lấy từ button theo __update_action)
+  // ===== Auto open after validation fail
   if (stateEl && stateEl.dataset.hasErrors === '1' && modalEl && formEl && updInput) {
     const updateUrl = updInput.value || '';
     if (updateUrl) {
@@ -170,7 +193,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .find(b => b.getAttribute('data-update-url') === updateUrl);
       if (btn) {
         formEl.action = updateUrl;
-
         const avatar = btn.getAttribute('data-avatar') || '';
         if (imgPrev && avatar) imgPrev.src = avatar;
 

@@ -273,10 +273,12 @@
 </form>
 
 <div id="__formState"
-  data-has-errors="{{ $errors->any() ? 1 : 0 }}"
-  data-which="{{ old('__form') }}"
-  data-mode="{{ old('__mode','create') }}"
-  style="display:none"></div>
+     data-has-errors="{{ $errors->any()?1:0 }}"
+     data-which="{{ old('__form','') }}"
+     data-mode="{{ old('__mode','create') }}"
+     data-update-action="{{ old('__update_action','') }}"
+     data-image="{{ old('__image','') }}"
+     style="display:none"></div>
 
 {{-- Modals: Category & Brand --}}
 @include('partials.ui.catalog.category-modal')
@@ -284,5 +286,5 @@
 @include('partials.ui.confirm-modal')
 @endsection
 @push('scripts')
-@vite('resources/js/pages/ecom-app-laravel_admin_catalog_index.js')
+  @vite('resources/js/pages/ecom-app-laravel_admin_catalog_index.js')
 @endpush

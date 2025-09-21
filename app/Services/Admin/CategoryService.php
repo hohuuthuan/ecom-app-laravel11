@@ -91,7 +91,8 @@ class CategoryService
       ];
       if ($image instanceof UploadedFile) {
         $oldPath = $category->image;
-        $newPath = $image->store('categories', 'public');
+        $newPath = $image->hashName();
+        $image->storeAs('categories', $newPath, 'public');
         $update['image'] = $newPath;
       }
 

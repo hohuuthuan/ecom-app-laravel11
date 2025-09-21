@@ -742,3 +742,6 @@ table tbody td:first-child {
 #sidebarCol.sidebar-mini .name-role{ display: initial !important; }
 #sidebarCol.sidebar-mini .caret{ display: initial !important; }
 
+.sidebar-email {
+    color: #05a0ac;
+}

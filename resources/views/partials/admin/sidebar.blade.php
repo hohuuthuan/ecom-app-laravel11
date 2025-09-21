@@ -3,6 +3,7 @@
     @php
     $u = auth()->user();
     $name = $u->full_name ?? 'Admin';
+    $email = $u->email;
     $avatar = ($u && $u->avatar) ? Storage::url($u->avatar) : asset('storage/user/base-avatar.jpg');
     @endphp
 
@@ -10,7 +11,7 @@
       <img class="rounded-circle" src="{{ $avatar }}" width="70" height="70" alt="{{ $name }}">
       <div class="name-role">
         <div class="fw-bold text-white">{{ $name }}</div>
-        <div class="small text-muted">Administrator</div>
+        <span class="sidebar-email">{{ $email }}</span>
       </div>
     </div>
 

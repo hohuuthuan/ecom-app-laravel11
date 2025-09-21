@@ -9,8 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="{{ asset('font-awesome/css/font-awesome.css') }}">
-<link rel="stylesheet" href="{{ asset('css/toast.css') }}">
-<link rel="stylesheet" href="{{ asset('css/animate.css') }}">
+<link rel="stylesheet" href="{{ asset('css/toast.css') }}"> 
 <link rel="stylesheet" href="{{ asset('css/style-admin.css') }}">
 <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 <link rel="stylesheet" href="{{ asset('css/custom.css') }}">

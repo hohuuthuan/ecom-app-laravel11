@@ -342,29 +342,6 @@ textarea#ac_address {
     min-width: 0;
 }
 
-/* ==== MINI MODE (khi bạn đã add class .sidebar-mini vào #sidebarCol) ==== */
-#sidebarCol.sidebar-mini .nav-label {
-    display: none;
-}
-
-/* ẩn chữ trong mini */
-#sidebarCol.sidebar-mini .sidebar-link {
-    justify-content: center;
-    /* chỉ còn icon, canh giữa */
-    padding: 0.5rem;
-    /* gọn lại khi mini */
-}
-
-/* (nếu có submenu) ẩn caret khi mini */
-#sidebarCol.sidebar-mini .caret {
-    display: none;
-}
-
-/* (tuỳ chọn) header user-area thu gọn khi mini */
-#sidebarCol.sidebar-mini .name-role {
-    display: none;
-}
-
 .table-in-clip {
     overflow-x: clip;
 }
@@ -706,3 +683,62 @@ table tbody td:first-child {
     max-width: 100%;
     object-fit: cover;
 }
+
+
+/* SIDEBAR */
+#sidebarCol .nav-label,
+#sidebarCol .name-role,
+#sidebarCol .caret{
+  transition: opacity .25s ease, max-width .25s ease, width .25s ease, transform .25s ease;
+  will-change: opacity, width, max-width, transform;
+}
+
+
+#sidebarCol .nav-label,
+#sidebarCol .name-role,
+#sidebarCol .caret{
+  transition: opacity 0.45s ease, max-width 0.45s ease, width 0.45s ease, transform 0.45s ease;
+  will-change: opacity, width, max-width, transform;
+}
+@media (min-width: 992px){
+  #sidebarCol.sidebar-mini .sidebar-box > .border-bottom{
+    display: grid !important;
+    justify-items: center;
+    align-content: center;
+    padding: .25rem 0 !important;
+    gap: 0 !important;
+    text-align: center;
+  }
+  #sidebarCol.sidebar-mini .sidebar-box > .border-bottom img{
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto;
+    object-fit: cover;
+  }
+  #sidebarCol.sidebar-mini .name-role{
+    opacity: 0;
+    max-height: 0;
+    height: 0;
+    overflow: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: none;
+  }
+  #sidebarCol.sidebar-mini .nav-section{ padding: .25rem 0 .5rem !important; }
+  #sidebarCol.sidebar-mini .nav-item + .nav-item{ margin-top: .25rem; }
+  #sidebarCol.sidebar-mini .nav-item > .nav-link{
+    justify-content: center;
+    padding: .25rem !important;
+    gap: 0 !important;
+  }
+  #sidebarCol .sidebar-icon{
+    width: 1.25rem; height: 1.25rem;
+    display: grid; place-items: center;
+  }
+}
+
+#sidebarCol.sidebar-mini .nav-label{ display: initial !important; }
+#sidebarCol.sidebar-mini .name-role{ display: initial !important; }
+#sidebarCol.sidebar-mini .caret{ display: initial !important; }
+

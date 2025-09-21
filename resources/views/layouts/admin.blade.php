@@ -10,8 +10,9 @@
 
 <div class="container-fluid g-0">
   <div class="row g-0">
+    @php $mini = (($_COOKIE['adminSidebarMini'] ?? '0') === '1'); @endphp
     @include('partials.admin.sidebar')
-    <div id="contentCol" class="col-12 col-lg-10 d-flex flex-column min-vh-100">
+    <div id="contentCol" class="col-12 d-flex flex-column min-vh-100 {{ $mini ? 'col-lg-11' : 'col-lg-10' }}">
       @include('partials.admin.header')
       <main class="wrapper-content flex-grow-1">
         @yield('content')
@@ -24,4 +25,3 @@
 @include('partials.admin.offcanvas-mobile')
 @include('partials.admin.script')
 @endsection
-  

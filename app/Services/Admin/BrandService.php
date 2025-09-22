@@ -20,8 +20,8 @@ class BrandService
     if (!empty($filters['keyword'])) {
       $kw = $filters['keyword'];
       $query->where(function ($q) use ($kw) {
-        $q->where('name','LIKE',"%{$kw}%")
-          ->orWhere('slug','LIKE',"%{$kw}%");
+        $q->where('name', 'LIKE', "%{$kw}%")
+          ->orWhere('slug', 'LIKE', "%{$kw}%");
       });
     }
     if (!empty($filters['status'])) {
@@ -29,26 +29,64 @@ class BrandService
     }
 
     $perPage = (int)($filters['per_page'] ?? 10);
-    $brands  = $query->orderBy('created_at','desc')->paginate($perPage);
+    $brands  = $query->orderBy('created_at', 'desc')->paginate($perPage);
     return PaginationHelper::appendQuery($brands);
   }
 
+  // public function create(array $data, ?UploadedFile $image): bool
+  // {
+  //   $newPath = null;
+  //   try {
+  //     DB::beginTransaction();
+
+  //     $data['slug'] = Str::slug($data['slug']);
+  //     if ($image instanceof UploadedFile) {
+  //       $filename = $image->hashName();
+  //       $image->storeAs('categories', $filename, 'public');
+  //       $data['image'] = $filename;
+
+  //       $newPath = $image->store('brands', 'public');
+  //       $data['image'] = $newPath;
+  //     }
+
+  //     Brand::query()->create([
+  //       'name'        => $data['name'],
+  //       'description' => $data['description'],
+  //       'image'       => $data['image'] ?? NULL,
+  //       'slug'        => $data['slug'],
+  //       'status'      => $data['status'],
+  //     ]);
+
+  //     DB::commit();
+  //     return true;
+  //   } catch (Throwable $e) {
+  //     DB::rollBack();
+  //     if ($newPath && Storage::disk('public')->exists($newPath)) {
+  //       Storage::disk('public')->delete($newPath);
+  //     }
+  //     Log::error('Brand create failed', ['msg'=>$e->getMessage()]);
+  //     return false;
+  //   }
+  // }
+
+
   public function create(array $data, ?UploadedFile $image): bool
   {
-    $newPath = null;
+    $savedFilename = null;
     try {
       DB::beginTransaction();
 
       $data['slug'] = Str::slug($data['slug']);
       if ($image instanceof UploadedFile) {
-        $newPath = $image->store('brands', 'public');
-        $data['image'] = $newPath;
+        $savedFilename = $image->hashName();
+        $image->storeAs('brands', $savedFilename, 'public');
+        $data['image'] = $savedFilename;
       }
 
       Brand::query()->create([
         'name'        => $data['name'],
         'description' => $data['description'],
-        'image'       => $data['image'] ?? NULL,
+        'image'       => $data['image'] ?? null,
         'slug'        => $data['slug'],
         'status'      => $data['status'],
       ]);
@@ -57,13 +95,19 @@ class BrandService
       return true;
     } catch (Throwable $e) {
       DB::rollBack();
-      if ($newPath && Storage::disk('public')->exists($newPath)) {
-        Storage::disk('public')->delete($newPath);
+
+      if ($savedFilename) {
+        $path = 'brands/' . $savedFilename;
+        if (Storage::disk('public')->exists($path)) {
+          Storage::disk('public')->delete($path);
+        }
       }
-      Log::error('Brand create failed', ['msg'=>$e->getMessage()]);
+
+      Log::error('Brand create failed', ['msg' => $e->getMessage()]);
       return false;
     }
   }
+
 
   public function update(string $id, array $data, ?UploadedFile $image): bool
   {
@@ -98,7 +142,7 @@ class BrandService
       if ($newPath && Storage::disk('public')->exists($newPath)) {
         Storage::disk('public')->delete($newPath);
       }
-      Log::error('Brand update failed', ['id'=>$id,'msg'=>$e->getMessage()]);
+      Log::error('Brand update failed', ['id' => $id, 'msg' => $e->getMessage()]);
       return false;
     }
   }
@@ -118,7 +162,7 @@ class BrandService
       return true;
     } catch (Throwable $e) {
       DB::rollBack();
-      Log::error('Brand delete failed', ['id'=>$id,'msg'=>$e->getMessage()]);
+      Log::error('Brand delete failed', ['id' => $id, 'msg' => $e->getMessage()]);
       return false;
     }
   }

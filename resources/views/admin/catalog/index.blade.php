@@ -233,7 +233,7 @@
                       data-slug="{{ $brand->slug }}"
                       data-description="{{ $brand->description }}"
                       data-status="{{ $brand->status }}"
-                      data-image="{{ $brand->image ? Storage::url($brand->image) : '' }}">
+                      data-image="{{ $brand->image ? Storage::url('brands/'.$brand->image) : '' }}">
                       <i class="fa fa-edit"></i>
                     </button>
                     <form method="POST" action="{{ route('admin.brands.destroy', $brand->id) }}" class="d-inline brandDeleteForm">

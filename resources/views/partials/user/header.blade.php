@@ -27,7 +27,7 @@
           <button class="btn p-0 border-0 bg-transparent d-inline-flex align-items-center gap-2"
             type="button" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Tài khoản">
             <img class="avatar rounded-circle"
-              src="{{ auth()->user()->avatar_url ?? 'https://i.pravatar.cc/80?img=13' }}"
+              src="{{ auth()->user()->avatar ? Storage::url(auth()->user()->avatar) : asset('storage/avatars/base-avatar.jpg') }}"
               alt="Avatar người dùng">
             <span class="d-none d-md-inline fw-medium">{{ auth()->user()->name ?? auth()->user()->username }}</span>
           </button>

@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function fillFormFromBtn(btn){
     if(!btn||!formEl) return;
     const url=btn.getAttribute('data-update-url')||'';
-    const full=btn.getAttribute('data-full_name')||'';
+    const full=btn.getAttribute('data-name')||'';
     const email=btn.getAttribute('data-email')||'';
     const phone=btn.getAttribute('data-phone')||'';
     const address=btn.getAttribute('data-address')||'';
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
     formEl.action=url;
     const upd=document.getElementById('__update_action'); if (upd) upd.value=url; // nhớ URL để auto-open sau redirect
 
-    (document.getElementById('ac_full_name')||{}).value=full;
+    (document.getElementById('ac_name')||{}).value=full;
     (document.getElementById('ac_email')||{}).value=email;
     (document.getElementById('ac_phone')||{}).value=phone;
     (document.getElementById('ac_address')||{}).value=address;

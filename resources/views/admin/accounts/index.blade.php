@@ -106,7 +106,7 @@
                   <tr>
                     <td><input type="checkbox" class="row-checkbox" value="{{ $user->id }}"></td>
                     <td>{{ $users->firstItem() + $index }}</td>
-                    <td>{{ $user->full_name }}</td>
+                    <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
                     <td>{{ $user->phone ?? '-' }}</td>
                     <td>
@@ -127,7 +127,7 @@
                       <button type="button"
                         class="btn btn-sm btn-success btnAccountEdit"
                         data-update-url="{{ route('admin.accounts.update', $user->id) }}"
-                        data-full_name="{{ $user->full_name }}"
+                        data-name="{{ $user->name }}"
                         data-email="{{ $user->email }}"
                         data-phone="{{ $user->phone }}"
                         data-address="{{ $user->address }}"

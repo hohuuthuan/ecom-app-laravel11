@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Role;
 
@@ -19,16 +18,15 @@ class AuthService
     try {
       DB::transaction(function () use ($data) {
         $user = User::create([
-          'id'        => Str::uuid()->toString(),
           'email'     => $data['email'],
           'password'  => Hash::make($data['password']),
-          'full_name' => $data['full_name'],
+          'name'      => $data['name'],
           'phone'     => $data['phone'],
           'status'    => 'ACTIVE',
         ]);
 
-        $customerId = Role::where('name', 'Customer')->value('id');
-        $user->roles()->attach($customerId);
+        $roleId = Role::where('name', 'Admin')->value('id');
+        $user->roles()->attach($roleId);
       });
 
       return true;

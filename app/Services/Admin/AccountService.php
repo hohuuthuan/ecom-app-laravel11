@@ -21,7 +21,7 @@ class AccountService
     if (!empty($filters['keyword'])) {
       $keyword = $filters['keyword'];
       $query->where(function ($q) use ($keyword) {
-        $q->where('full_name', 'LIKE', "%{$keyword}%")
+        $q->where('name', 'LIKE', "%{$keyword}%")
           ->orWhere('email', 'LIKE', "%{$keyword}%")
           ->orWhere('phone', 'LIKE', "%{$keyword}%");
       });
@@ -48,10 +48,9 @@ class AccountService
     try {
       DB::beginTransaction();
       $user = User::query()->lockForUpdate()->findOrFail($id);
-      $user->full_name = $data['full_name'];
+      $user->name      = $data['name'];
       $user->email     = $data['email'];
       $user->phone     = $data['phone'] ?? null;
-      $user->address   = $data['address'] ?? null;
       $user->status    = $data['status'];
       if (isset($data['avatar']) && $data['avatar'] instanceof UploadedFile) {
         $oldAvatar = $user->avatar;

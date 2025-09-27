@@ -32,10 +32,10 @@
             @csrf
 
             <div class="mb-3">
-              <input type="text" name="full_name" value="{{ old('full_name') }}"
-                class="form-control @error('full_name') is-invalid @enderror"
+              <input type="text" name="name" value="{{ old('name') }}"
+                class="form-control @error('name') is-invalid @enderror"
                 placeholder="Họ và tên" autocomplete="name">
-              @error('full_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+              @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
             <div class="mb-3">

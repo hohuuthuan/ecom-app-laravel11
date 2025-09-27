@@ -27,23 +27,7 @@
 
       <div class="modal-body">
         <div class="row g-3 align-items-start">
-          <div class="col-lg-2">
-            <div class="ac-avatar position-relative">
-              <img id="cat_image_preview" src="" class="d-none" />
-              <div id="cat_image_placeholder" class="text-body text-center py-4">Chưa có hình ảnh</div>
-            </div>
-
-            <label class="form-label mt-2 label-select-image"><b>Chọn hình ảnh</b></label>
-            <input id="cat_image" name="image" type="file" accept="image/*" class="visually-hidden">
-            <label for="cat_image" class="btn btn-primary w-100" id="btnPickCatImage">
-              <i class="fa fa-upload me-1"></i>
-            </label>
-            @if($isCatError && $errors->has('image'))
-              <div class="invalid-feedback d-block mt-1">{{ $errors->first('image') }}</div>
-            @endif
-          </div>
-
-          <div class="col-lg-10">
+          <div class="col-lg-12">
             <div data-slug-scope class="row g-3">
               <div class="col-md-6">
                 <label for="cat_name" class="form-label"><b>Tên danh mục</b> <span class="text-danger">*</span></label>

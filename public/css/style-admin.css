@@ -26,7 +26,7 @@ width: 140px;
 .createTimeWidth{
     width: 180px;
 }
-.actionWihdth {
+.actionWidth {
     width: 140px;
 }
 
@@ -326,7 +326,7 @@ textarea#ac_address {
 
 /* Icon gọn, căn đều */
 #sidebarCol .sidebar-icon {
-    font-size: 0.95rem;
+    font-size: 20px;
     width: 1.25rem;
     /* kết hợp fa-fw -> thẳng hàng */
     text-align: center;
@@ -632,40 +632,29 @@ table tbody td:first-child {
     font-weight: 700;
 }
 
-
-/* ===== MODAL: CATEGORY & BRAND ===== */
-
-#brand_image_placeholder {
+/* ============================================= MODAL: CATEGORY, BRAND, PUBLISHER ============================================= */
+#author_image_placeholder {
     padding: 20px;
     color: #a50010 !important;
 }
 
-#cat_image_placeholder {
-    padding: 20px;
-    color: #a50010 !important;
-}
-
-#uiCategoryModal .form-label,
-#uiBrandModal .form-label {
+#uiAuthorModal .form-label {
     display: block;
     margin-bottom: .375rem;
 }
 
 /* Image picker block */
-#uiCategoryModal .label-select-image,
-#uiBrandModal .label-select-image {
+#uiAuthorModal .label-select-image {
     display: block;
     margin-top: .25rem;
 }
 
-#uiCategoryModal .input-select-image,
-#uiBrandModal .input-select-image {
+#uiAuthorModal .input-select-image {
     cursor: pointer;
 }
 
 /* Avatar preview box */
-#uiCategoryModal .ac-avatar,
-#uiBrandModal .ac-avatar {
+#uiAuthorModal .ac-avatar {
     width: 100%;
     height: 225px;
     border: 1px solid #dee2e6;
@@ -677,12 +666,58 @@ table tbody td:first-child {
     justify-content: center;
 }
 
-#uiCategoryModal .ac-avatar img,
-#uiBrandModal .ac-avatar img {
+#uiAuthorModal .ac-avatar img {
     max-height: 100%;
     max-width: 100%;
     object-fit: cover;
 }
+/* ==================================================================================================================== */
+#publisher_logo_placeholder {
+    color: #a50010 !important;
+}
+
+#uiPublisherModal .form-label {
+    display: block;
+    margin-bottom: .375rem;
+}
+
+/* Image picker block */
+#uiPublisherModal .label-select-image {
+    display: block;
+    margin-top: .25rem;
+}
+
+#uiPublisherModal .input-select-image {
+    cursor: pointer;
+}
+
+/* Avatar preview box */
+#uiPublisherModal .ac-avatar {
+    width: 100%;
+    height: 225px;
+    border: 1px solid #dee2e6;
+    border-radius: .5rem;
+    overflow: hidden;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#uiPublisherModal .ac-avatar img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: cover;
+}
+/* ==================================================================================================================== */
+
+
+
+
+
+
+
+
 
 
 /* SIDEBAR */

@@ -38,13 +38,13 @@
           <div class="col-lg-10">
             <div class="row g-3">
               <div class="col-md-4">
-                <label for="ac_full_name" class="form-label"><b>Họ tên</b> <span class="text-danger">*</span></label>
+                <label for="ac_name" class="form-label"><b>Họ tên</b> <span class="text-danger">*</span></label>
                 <input type="text"
-                       class="form-control {{ $errors->has('full_name') ? 'is-invalid' : '' }}"
-                       id="ac_full_name" name="full_name"
-                       value="{{ old('full_name') }}" placeholder="Nhập họ tên">
-                <div class="invalid-feedback {{ $errors->has('full_name') ? 'd-block' : 'd-none' }}" data-err="full_name">
-                  {{ $errors->first('full_name') }}
+                       class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}"
+                       id="ac_name" name="name"
+                       value="{{ old('name') }}" placeholder="Nhập họ tên">
+                <div class="invalid-feedback {{ $errors->has('name') ? 'd-block' : 'd-none' }}" data-err="name">
+                  {{ $errors->first('name') }}
                 </div>
               </div>
 
@@ -70,7 +70,7 @@
                 </div>
               </div>
 
-              <div class="col-12">
+              {{-- <div class="col-12">
                 <label for="ac_address" class="form-label"><b>Địa chỉ</b></label>
                 <textarea id="ac_address" name="address"
                           class="form-control {{ $errors->has('address') ? 'is-invalid' : '' }}"
@@ -78,7 +78,7 @@
                 <div class="invalid-feedback {{ $errors->has('address') ? 'd-block' : 'd-none' }}" data-err="address">
                   {{ $errors->first('address') }}
                 </div>
-              </div>
+              </div> --}}
 
               <div class="col-md-6 select2CustomWidth">
                 <label for="ac_status" class="form-label"><b>Trạng thái</b></label>

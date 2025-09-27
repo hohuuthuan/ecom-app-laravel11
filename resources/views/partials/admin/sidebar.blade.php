@@ -4,7 +4,7 @@
     $u = auth()->user();
     $name = $u->full_name ?? 'Admin';
     $email = $u->email;
-    $avatar = ($u && $u->avatar) ? Storage::url($u->avatar) : asset('storage/user/base-avatar.jpg');
+    $avatar = ($u && $u->avatar) ? Storage::url($u->avatar) : asset('storage/avatars/base-avatar.jpg');
     @endphp
 
     <div class="px-3 py-3 border-bottom border-secondary-subtle d-flex align-items-center gap-2">
@@ -19,7 +19,7 @@
       <ul class="list-unstyled mb-0">
         <x-sidebar.item route="admin.dashboard" icon="fa-home" label="Dashboard" />
         <x-sidebar.item route="admin.accounts.index" icon="fa-users" label="Tài khoản" />
-        <x-sidebar.item route="admin.catalog.index" icon="fa-tags" label="Danh mục & NSX" />
+        <x-sidebar.item route="admin.catalog.index" icon="fa-tags" label="Danh mục | Nhà xuất bản | Tác giả" />
       </ul>
     </nav>
   </div>

@@ -2,41 +2,60 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
-  use Notifiable, HasUuids;
+    use Notifiable, HasUuids;
 
-  public $incrementing = false;
-  protected $keyType = 'string';
+    protected $guarded = [];
+    public $incrementing = false;
+    protected $keyType = 'string';
 
-  protected $fillable = [
-    'email',
-    'password',
-    'full_name',
-    'phone',
-    'address',
-    'avatar',
-    'status'
-  ];
+    protected $hidden = ['password', 'remember_token'];
+    protected $casts  = ['email_verified_at' => 'datetime'];
 
-  protected $hidden = ['password', 'remember_token'];
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'role_user');
+    }
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+    public function shipments()
+    {
+        return $this->hasMany(Shipment::class, 'courier_id');
+    }
+    public function purchaseReceipts()
+    {
+        return $this->hasMany(PurchaseReceipt::class, 'created_by');
+    }
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class, 'created_by');
+    }
 
-  public function roles()
-  {
-    return $this->belongsToMany(Role::class, 'user_role', 'user_id', 'role_id')->withTimestamps();
-  }
+    public function hasRole(string|array $roles): bool
+    {
+        $q = $this->roles();
+        return is_array($roles)
+            ? $q->whereIn('name', $roles)->exists()
+            : $q->where('name', $roles)->exists();
+    }
 
-  public function hasRole(string $roleName): bool
-  {
-    return $this->roles()->where('name', $roleName)->exists();
-  }
-
-  public function hasAnyRole(string ...$names): bool
-  {
-    return $this->roles()->whereIn('name', $names)->exists();
-  }
+    public function assignRole(string|Role $role): void
+    {
+        $roleId = $role instanceof Role ? $role->id : Role::where('name', $role)->value('id');
+        if ($roleId) {
+            $this->roles()->syncWithoutDetaching([$roleId]);
+        }
+    }
 }

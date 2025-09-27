@@ -8,19 +8,15 @@ use Illuminate\Support\Str;
 
 class StoreRequest extends FormRequest
 {
-  public function authorize(): bool
-  {
-    return true;
-  }
+  public function authorize(): bool { return true; }
 
   public function rules(): array
   {
     return [
-      'name'        => ['required', 'string', 'max:255'],
-      'description' => ['required', 'string'],
-      'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-      'slug'        => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('categories', 'slug')],
-      'status'      => ['required', Rule::in(['ACTIVE', 'INACTIVE'])],
+      'name'        => ['required','string','max:255'],
+      'description' => ['required','string'],
+      'slug'        => ['required','string','max:255','regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('categories','slug')],
+      'status'      => ['required', Rule::in(['ACTIVE','INACTIVE'])],
     ];
   }
 
@@ -29,7 +25,6 @@ class StoreRequest extends FormRequest
     return [
       'name'        => 'Tên',
       'description' => 'Mô tả',
-      'image'       => 'Ảnh',
       'slug'        => 'Slug',
       'status'      => 'Trạng thái',
     ];
@@ -45,10 +40,6 @@ class StoreRequest extends FormRequest
       'description.required' => 'Vui lòng nhập :attribute.',
       'description.string'   => ':attribute phải là chuỗi.',
 
-      'image.image' => ':attribute phải là ảnh.',
-      'image.mimes' => ':attribute chỉ chấp nhận: jpg, jpeg, png, webp.',
-      'image.max'   => ':attribute tối đa 2MB.',
-
       'slug.required' => 'Vui lòng nhập :attribute.',
       'slug.string'   => ':attribute phải là chuỗi.',
       'slug.max'      => ':attribute tối đa 255 ký tự.',
@@ -63,9 +54,7 @@ class StoreRequest extends FormRequest
   protected function prepareForValidation(): void
   {
     if ($this->filled('slug')) {
-      $this->merge([
-        'slug' => Str::slug($this->input('slug')),
-      ]);
+      $this->merge(['slug' => Str::slug($this->input('slug'))]);
     }
   }
 }

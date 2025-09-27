@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!btn || !formEl) return;
 
     const url     = btn.getAttribute('data-update-url') || '';
-    const full    = btn.getAttribute('data-full_name') || '';
+    const full    = btn.getAttribute('data-name') || '';
     const email   = btn.getAttribute('data-email') || '';
     const phone   = btn.getAttribute('data-phone') || '';
     const address = btn.getAttribute('data-address') || '';
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const roleIds = (btn.getAttribute('data-role_ids') || '').split(',').map(s => s.trim()).filter(Boolean);
 
     formEl.action = url;
-    (document.getElementById('ac_full_name')||{}).value = full;
+    (document.getElementById('ac_name')||{}).value = full;
     (document.getElementById('ac_email')||{}).value     = email;
     (document.getElementById('ac_phone')||{}).value     = phone;
     (document.getElementById('ac_address')||{}).value   = address;

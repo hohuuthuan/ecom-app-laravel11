@@ -8,7 +8,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // $this->call(RoleSeeder::class);
-        $this->callWith(UserSeeder::class, ['count' => 20]);
+        $this->call([
+            RoleSeeder::class,
+            // thêm các seeder khác
+        ]);
     }
 }

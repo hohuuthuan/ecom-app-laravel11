@@ -2,18 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Role extends Model
 {
-  use HasUuids;
+    use HasUuids;
 
-  public $incrementing = false;
-  protected $keyType = 'string';
-  protected $fillable = ['name','description'];
+    protected $guarded = [];
+    public $incrementing = false;
+    protected $keyType = 'string';
 
-  public function users() {
-    return $this->belongsToMany(User::class, 'user_role', 'role_id', 'user_id')->withTimestamps();
-  }
+    public function users() { return $this->belongsToMany(User::class, 'role_user'); }
 }

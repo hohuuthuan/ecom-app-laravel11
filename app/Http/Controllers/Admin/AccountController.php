@@ -10,7 +10,6 @@ use App\Http\Requests\Admin\UpdateAccountRequest;
 use Illuminate\Http\RedirectResponse;
 use Throwable;
 
-
 class AccountController extends Controller
 {
   protected AccountService $accountService;

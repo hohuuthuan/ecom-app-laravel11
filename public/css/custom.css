@@ -8,12 +8,6 @@
     transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.custom-form-login-shadow:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18), 0 20px 50px rgba(0, 0, 0, 0.22),
-        0 30px 90px rgba(0, 0, 0, 0.15);
-    transform: translateY(-3px);
-}
-
 .text-justify {
     text-align: justify;
 }
@@ -42,6 +36,7 @@
 .icon-eye {
     font-size: 20px;
     color: #0b99c4;
+    margin-top: 3px;
 }
 
 .auth-page .has-toggle .form-control.is-invalid,

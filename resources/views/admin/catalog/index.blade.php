@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('title','Catalog: Category & Brand')
+@section('title','Catalog: Category & author')
 
 @section('content')
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb mb-0">
     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>
-    <li class="breadcrumb-item breadcrumb-active" aria-current="page">Danh mục & NSX</li>
+    <li class="breadcrumb-item breadcrumb-active" aria-current="page">Danh mục & Tác giả & Nhà xuất bản</li>
   </ol>
 </nav>
 
@@ -17,8 +17,14 @@
     </button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="brand-tab" data-bs-toggle="tab" data-bs-target="#brand-pane" type="button" role="tab">
-      NSX
+    <button class="nav-link" id="author-tab" data-bs-toggle="tab" data-bs-target="#author-pane" type="button" role="tab">
+      Tác giả
+    </button>
+  </li>
+  {{-- NEW TAB: PUBLISHER --}}
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="publisher-tab" data-bs-toggle="tab" data-bs-target="#publisher-pane" type="button" role="tab">
+      Nhà xuất bản
     </button>
   </li>
 </ul>
@@ -38,9 +44,8 @@
               <option value="50" {{ request('per_page_cat')==50?'selected':'' }}>50</option>
             </select>
             <input type="hidden" name="tab" value="category">
-            <input type="hidden" name="brand_keyword" value="{{ request('brand_keyword') }}">
-            <input type="hidden" name="brand_status" value="{{ request('brand_status') }}">
-            <input type="hidden" name="per_page_brand" value="{{ request('per_page_brand') }}">
+            <input type="hidden" name="cat_keyword" value="{{ request('cat_keyword') }}">
+            <input type="hidden" name="cat_status" value="{{ request('cat_status') }}">
           </form>
         </div>
 
@@ -61,9 +66,7 @@
               <button type="submit" class="btn btn-primary btn-admin">Lọc</button>
             </div>
             <input type="hidden" name="tab" value="category">
-            <input type="hidden" name="brand_keyword" value="{{ request('brand_keyword') }}">
-            <input type="hidden" name="brand_status" value="{{ request('brand_status') }}">
-            <input type="hidden" name="per_page_brand" value="{{ request('per_page_brand') }}">
+            <input type="hidden" name="per_page_cat" value="{{ request('per_page_cat') }}">
           </form>
 
           {{-- Bulk actions --}}
@@ -87,7 +90,7 @@
                   <th>Slug</th>
                   <th class="statusWidth">Trạng thái</th>
                   <th class="createTimeWidth">Tạo lúc</th>
-                  <th class="actionWihdth text-center">Thao tác</th>
+                  <th class="actionWidth text-center">Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -112,8 +115,7 @@
                       data-name="{{ $cat->name }}"
                       data-slug="{{ $cat->slug }}"
                       data-description="{{ $cat->description }}"
-                      data-status="{{ $cat->status }}"
-                      data-image="{{ $cat->image ? Storage::url('categories/'.$cat->image) : '' }}">
+                      data-status="{{ $cat->status }}">
                       <i class="fa fa-edit"></i>
                     </button>
                     <form method="POST" action="{{ route('admin.categories.destroy', $cat->id) }}" class="d-inline catDeleteForm">
@@ -122,7 +124,6 @@
                         <i class="fa-solid fa-trash"></i>
                       </button>
                     </form>
-
                   </td>
                 </tr>
                 @empty
@@ -142,20 +143,20 @@
     </div>
   </div>
 
-  {{-- ================== TAB 2: BRAND ================== --}}
-  <div class="tab-pane fade" id="brand-pane" role="tabpanel" aria-labelledby="brand-tab">
+  {{-- ================== TAB 2: AUTHOR ============== --}}
+  <div class="tab-pane fade" id="author-pane" role="tabpanel" aria-labelledby="author-tab">
     <div class="table-in-clip">
       <div class="card shadow-sm table-in">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Danh sách brand</h5>
+          <h5 class="mb-0">Danh sách tác giả</h5>
           <form method="GET" class="d-flex align-items-center">
             <label class="me-2 mb-0">Hiển thị</label>
-            <select class="form-select form-select-sm w-auto setupSelect2" name="per_page_brand" onchange="this.form.submit()">
-              <option value="10" {{ request('per_page_brand')==10?'selected':'' }}>10</option>
-              <option value="20" {{ request('per_page_brand')==20?'selected':'' }}>20</option>
-              <option value="50" {{ request('per_page_brand')==50?'selected':'' }}>50</option>
+            <select class="form-select form-select-sm w-auto setupSelect2" name="per_page_author" onchange="this.form.submit()">
+              <option value="10" {{ request('per_page_author')==10?'selected':'' }}>10</option>
+              <option value="20" {{ request('per_page_author')==20?'selected':'' }}>20</option>
+              <option value="50" {{ request('per_page_author')==50?'selected':'' }}>50</option>
             </select>
-            <input type="hidden" name="tab" value="brand">
+            <input type="hidden" name="tab" value="author">
             {{-- bảo toàn filter category --}}
             <input type="hidden" name="cat_keyword" value="{{ request('cat_keyword') }}">
             <input type="hidden" name="cat_status" value="{{ request('cat_status') }}">
@@ -167,19 +168,19 @@
           {{-- Filters --}}
           <form method="GET" class="row g-2 mb-3 filter-form">
             <div class="col-md-4">
-              <input type="text" name="brand_keyword" class="form-control" placeholder="Tìm tên / slug" value="{{ request('brand_keyword') }}">
+              <input type="text" name="author_keyword" class="form-control" placeholder="Tìm tên / slug" value="{{ request('author_keyword') }}">
             </div>
             <div class="col-md-2 select2CustomWidth">
-              <select name="brand_status" class="form-select setupSelect2">
+              <select name="author_status" class="form-select setupSelect2">
                 <option value="">-- Tất cả trạng thái --</option>
-                <option value="ACTIVE" {{ request('brand_status')==='ACTIVE'?'selected':'' }}>Đang hoạt động</option>
-                <option value="INACTIVE" {{ request('brand_status')==='INACTIVE'?'selected':'' }}>Ngừng hoạt động</option>
+                <option value="ACTIVE" {{ request('author_status')==='ACTIVE'?'selected':'' }}>Đang hoạt động</option>
+                <option value="INACTIVE" {{ request('author_status')==='INACTIVE'?'selected':'' }}>Ngừng hoạt động</option>
               </select>
             </div>
             <div class="col-md-1 d-grid">
               <button type="submit" class="btn btn-primary btn-admin">Lọc</button>
             </div>
-            <input type="hidden" name="tab" value="brand">
+            <input type="hidden" name="tab" value="author">
             {{-- bảo toàn filter category --}}
             <input type="hidden" name="cat_keyword" value="{{ request('cat_keyword') }}">
             <input type="hidden" name="cat_status" value="{{ request('cat_status') }}">
@@ -189,56 +190,56 @@
           {{-- Bulk actions --}}
           <div class="d-flex justify-content-between mb-2">
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-sm btn-danger btn-admin" id="brandBtnBulkDelete" disabled>Xoá đã chọn</button>
+              <button type="button" class="btn btn-sm btn-danger btn-admin" id="authorBtnBulkDelete" disabled>Xoá đã chọn</button>
             </div>
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiBrandModal">Thêm NSX</button>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiAuthorModal">Thêm tác giả</button>
             </div>
           </div>
 
           {{-- Table --}}
           <div class="table-responsive">
-            <table id="brandTable" class="table table-bordered table-striped align-middle">
+            <table id="authorTable" class="table table-bordered table-striped align-middle">
               <thead class="table-light">
                 <tr>
-                  <th class="checkAllWidth"><input type="checkbox" id="brand_check_all"></th>
+                  <th class="checkAllWidth"><input type="checkbox" id="author_check_all"></th>
                   <th class="STT_Width">#</th>
                   <th>Tên</th>
                   <th>Slug</th>
                   <th class="statusWidth">Trạng thái</th>
                   <th class="createTimeWidth">Tạo lúc</th>
-                  <th class="actionWihdth text-center">Thao tác</th>
+                  <th class="actionWidth text-center">Thao tác</th>
                 </tr>
               </thead>
               <tbody>
-                @forelse ($brands as $index => $brand)
+                @forelse ($authors as $index => $author)
                 <tr>
-                  <td><input type="checkbox" class="brand-row-checkbox" value="{{ $brand->id }}"></td>
-                  <td>{{ $brands->firstItem() + $index }}</td>
-                  <td>{{ $brand->name }}</td>
-                  <td>{{ $brand->slug }}</td>
+                  <td><input type="checkbox" class="author-row-checkbox" value="{{ $author->id }}"></td>
+                  <td>{{ $authors->firstItem() + $index }}</td>
+                  <td>{{ $author->name }}</td>
+                  <td>{{ $author->slug }}</td>
                   <td>
-                    @if($brand->status === 'ACTIVE')
+                    @if($author->status === 'ACTIVE')
                     <span class="badge bg-success">Đang hoạt động</span>
                     @else
                     <span class="badge bg-secondary">Ngừng hoạt động</span>
                     @endif
                   </td>
-                  <td>{{ $brand->created_at?->format('d/m/Y H:i') }}</td>
+                  <td>{{ $author->created_at?->format('d/m/Y H:i') }}</td>
                   <td class="text-center">
                     <button type="button"
-                      class="btn btn-sm btn-success btnBrandEdit"
-                      data-update-url="{{ route('admin.brands.update', $brand->id) }}"
-                      data-name="{{ $brand->name }}"
-                      data-slug="{{ $brand->slug }}"
-                      data-description="{{ $brand->description }}"
-                      data-status="{{ $brand->status }}"
-                      data-image="{{ $brand->image ? Storage::url($brand->image) : '' }}">
+                      class="btn btn-sm btn-success btnauthorEdit"
+                      data-update-url="{{ route('admin.authors.update', $author->id) }}"
+                      data-name="{{ $author->name }}"
+                      data-slug="{{ $author->slug }}"
+                      data-description="{{ $author->description }}"
+                      data-status="{{ $author->status }}"
+                      data-image="{{ $author->image ? Storage::url('authors/'.$author->image) : '' }}">
                       <i class="fa fa-edit"></i>
                     </button>
-                    <form method="POST" action="{{ route('admin.brands.destroy', $brand->id) }}" class="d-inline brandDeleteForm">
+                    <form method="POST" action="{{ route('admin.authors.destroy', $author->id) }}" class="d-inline authorDeleteForm">
                       @csrf @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-danger btnBrandDelete">
+                      <button type="submit" class="btn btn-sm btn-danger btnauthorDelete">
                         <i class="fa-solid fa-trash"></i>
                       </button>
                     </form>
@@ -254,7 +255,133 @@
           </div>
 
           <div class="mt-3">
-            {{ $brands->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
+            {{ $authors->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{-- ================== TAB 3: PUBLISHER (NXB) ============== --}}
+  <div class="tab-pane fade" id="publisher-pane" role="tabpanel" aria-labelledby="publisher-tab">
+    <div class="table-in-clip">
+      <div class="card shadow-sm table-in">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Danh sách NXB</h5>
+          <form method="GET" class="d-flex align-items-center">
+            <label class="me-2 mb-0">Hiển thị</label>
+            <select class="form-select form-select-sm w-auto setupSelect2" name="per_page_publisher" onchange="this.form.submit()">
+              <option value="10" {{ request('per_page_publisher')==10?'selected':'' }}>10</option>
+              <option value="20" {{ request('per_page_publisher')==20?'selected':'' }}>20</option>
+              <option value="50" {{ request('per_page_publisher')==50?'selected':'' }}>50</option>
+            </select>
+            <input type="hidden" name="tab" value="publisher">
+            {{-- bảo toàn filter category & author --}}
+            <input type="hidden" name="cat_keyword" value="{{ request('cat_keyword') }}">
+            <input type="hidden" name="cat_status" value="{{ request('cat_status') }}">
+            <input type="hidden" name="per_page_cat" value="{{ request('per_page_cat') }}">
+            <input type="hidden" name="author_keyword" value="{{ request('author_keyword') }}">
+            <input type="hidden" name="author_status" value="{{ request('author_status') }}">
+            <input type="hidden" name="per_page_author" value="{{ request('per_page_author') }}">
+          </form>
+        </div>
+
+        <div class="card-body">
+          {{-- Filters --}}
+          <form method="GET" class="row g-2 mb-3 filter-form">
+            <div class="col-md-4">
+              <input type="text" name="publisher_keyword" class="form-control" placeholder="Tìm tên / slug" value="{{ request('publisher_keyword') }}">
+            </div>
+            <div class="col-md-2 select2CustomWidth">
+              <select name="publisher_status" class="form-select setupSelect2">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="ACTIVE" {{ request('publisher_status')==='ACTIVE'?'selected':'' }}>Đang hoạt động</option>
+                <option value="INACTIVE" {{ request('publisher_status')==='INACTIVE'?'selected':'' }}>Ngừng hoạt động</option>
+              </select>
+            </div>
+            <div class="col-md-1 d-grid">
+              <button type="submit" class="btn btn-primary btn-admin">Lọc</button>
+            </div>
+            <input type="hidden" name="tab" value="publisher">
+            {{-- bảo toàn filter category & author --}}
+            <input type="hidden" name="cat_keyword" value="{{ request('cat_keyword') }}">
+            <input type="hidden" name="cat_status" value="{{ request('cat_status') }}">
+            <input type="hidden" name="per_page_cat" value="{{ request('per_page_cat') }}">
+            <input type="hidden" name="author_keyword" value="{{ request('author_keyword') }}">
+            <input type="hidden" name="author_status" value="{{ request('author_status') }}">
+            <input type="hidden" name="per_page_author" value="{{ request('per_page_author') }}">
+            <input type="hidden" name="per_page_publisher" value="{{ request('per_page_publisher') }}">
+          </form>
+
+          {{-- Bulk actions --}}
+          <div class="d-flex justify-content-between mb-2">
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-danger btn-admin" id="publisherBtnBulkDelete" disabled>Xoá đã chọn</button>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiPublisherModal">Thêm nhà xuất bản</button>
+            </div>
+          </div>
+
+          {{-- Table --}}
+          <div class="table-responsive">
+            <table id="publisherTable" class="table table-bordered table-striped align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th class="checkAllWidth"><input type="checkbox" id="publisher_check_all"></th>
+                  <th class="STT_Width">#</th>
+                  <th>Tên</th>
+                  <th>Slug</th>
+                  <th class="statusWidth">Trạng thái</th>
+                  <th class="createTimeWidth">Tạo lúc</th>
+                  <th class="actionWidth text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                @forelse ($publishers as $index => $publisher)
+                <tr>
+                  <td><input type="checkbox" class="publisher-row-checkbox" value="{{ $publisher->id }}"></td>
+                  <td>{{ $publishers->firstItem() + $index }}</td>
+                  <td>{{ $publisher->name }}</td>
+                  <td>{{ $publisher->slug }}</td>
+                  <td>
+                    @if($publisher->status === 'ACTIVE')
+                    <span class="badge bg-success">Đang hoạt động</span>
+                    @else
+                    <span class="badge bg-secondary">Ngừng hoạt động</span>
+                    @endif
+                  </td>
+                  <td>{{ $publisher->created_at?->format('d/m/Y H:i') }}</td>
+                  <td class="text-center">
+                    <button type="button"
+                      class="btn btn-sm btn-success btnPublisherEdit"
+                      data-update-url="{{ route('admin.publishers.update', $publisher->id) }}"
+                      data-name="{{ $publisher->name }}"
+                      data-slug="{{ $publisher->slug }}"
+                      data-description="{{ $publisher->description }}"
+                      data-status="{{ $publisher->status }}"
+                      data-image="{{ $publisher->image ? Storage::url('publishers/'.$publisher->image) : '' }}">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <form method="POST" action="{{ route('admin.publishers.destroy', $publisher->id) }}" class="d-inline publisherDeleteForm">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-danger btnPublisherDelete">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                @empty
+                <tr>
+                  <td colspan="7" class="text-center text-muted">Không có dữ liệu</td>
+                </tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-3">
+            {{ $publishers->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
           </div>
         </div>
       </div>
@@ -267,313 +394,30 @@
   @csrf
   <div id="catBulkIds"></div>
 </form>
-<form id="brandBulkForm" method="POST" action="{{ route('admin.brands.bulk-delete') }}" class="d-none">
+<form id="authorBulkForm" method="POST" action="{{ route('admin.authors.bulk-delete') }}" class="d-none">
   @csrf
-  <div id="brandBulkIds"></div>
+  <div id="authorBulkIds"></div>
+</form>
+{{-- NEW: publisher bulk form --}}
+<form id="publisherBulkForm" method="POST" action="{{ route('admin.publishers.bulk-delete') }}" class="d-none">
+  @csrf
+  <div id="publisherBulkIds"></div>
 </form>
 
 <div id="__formState"
-  data-has-errors="{{ $errors->any() ? 1 : 0 }}"
-  data-which="{{ old('__form') }}"
-  data-mode="{{ old('__mode','create') }}"
-  style="display:none"></div>
+     data-has-errors="{{ $errors->any()?1:0 }}"
+     data-which="{{ old('__form','') }}"
+     data-mode="{{ old('__mode','create') }}"
+     data-update-action="{{ old('__update_action','') }}"
+     data-image="{{ old('__image','') }}"
+     style="display:none"></div>
 
-{{-- Modals: Category & Brand --}}
+{{-- Modals: Category & author & publisher --}}
 @include('partials.ui.catalog.category-modal')
-@include('partials.ui.catalog.brand-modal')
+@include('partials.ui.catalog.author-modal')
+@include('partials.ui.catalog.publisher-modal')
 @include('partials.ui.confirm-modal')
 @endsection
 @push('scripts')
-<script>
-  function getTabFromURL() {
-    const u = new URL(location.href);
-    const t = u.searchParams.get('tab');
-    return ['category', 'brand'].includes(t) ? t : 'category';
-  }
-
-  function setTabInURL(tab, replace = false) {
-    const u = new URL(location.href);
-    u.searchParams.set('tab', tab);
-    replace ? history.replaceState(null, '', u) : history.pushState(null, '', u);
-  }
-
-  function showTab(tab) {
-    const trigger = document.querySelector(`[data-bs-target="#${tab}-pane"]`);
-    if (!trigger) return;
-    new bootstrap.Tab(trigger).show();
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // đúng tab theo URL
-    showTab(getTabFromURL());
-    const tabs = document.getElementById('catalogTabs');
-    if (tabs) {
-      tabs.addEventListener('shown.bs.tab', (e) => {
-        const pane = e.target.getAttribute('data-bs-target');
-        const tab = pane.includes('brand') ? 'brand' : 'category';
-        setTabInURL(tab);
-      });
-    }
-    window.addEventListener('popstate', () => showTab(getTabFromURL()));
-    setTabInURL(getTabFromURL(), true);
-  });
-</script>
-
-<script>
-  // @ts-nocheck
-  function makeHiddenInputs(container, name, values) {
-    container.innerHTML = '';
-    values.forEach(v => {
-      const i = document.createElement('input');
-      i.type = 'hidden';
-      i.name = name;
-      i.value = v;
-      container.appendChild(i);
-    });
-  }
-
-  function getCheckedValues(tableSel) {
-    const cbs = document.querySelectorAll(`${tableSel} tbody input[type=checkbox]:checked`);
-    return Array.from(cbs).map(x => x.value);
-  }
-
-  function toggleMaster(masterSel, rowSel) {
-    const master = document.querySelector(masterSel);
-    const rows = document.querySelectorAll(rowSel);
-    master?.addEventListener('change', () => {
-      rows.forEach(cb => { cb.checked = master.checked; });
-      master.indeterminate = false;
-      updateBulkButtons();
-    });
-  }
-
-  function updateBulkButtons() {
-    const catAny = getCheckedValues('#categoryTable').length > 0;
-    const brandAny = getCheckedValues('#brandTable').length > 0;
-    const catBtn = document.getElementById('catBtnBulkDelete');
-    const brandBtn = document.getElementById('brandBtnBulkDelete');
-    if (catBtn) catBtn.disabled = !catAny;
-    if (brandBtn) brandBtn.disabled = !brandAny;
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    // ================== Master & bulk ==================
-    toggleMaster('#cat_check_all', '#categoryTable tbody .cat-row-checkbox');
-    toggleMaster('#brand_check_all', '#brandTable tbody .brand-row-checkbox');
-    document.querySelector('#categoryTable')?.addEventListener('change', (e) => {
-      if (e.target.classList?.contains('cat-row-checkbox')) updateBulkButtons();
-    });
-    document.querySelector('#brandTable')?.addEventListener('change', (e) => {
-      if (e.target.classList?.contains('brand-row-checkbox')) updateBulkButtons();
-    });
-    updateBulkButtons();
-
-    // Bulk delete Category
-    document.getElementById('catBtnBulkDelete')?.addEventListener('click', async () => {
-      const ids = getCheckedValues('#categoryTable');
-      if (!ids.length) return;
-      const ok = await (window.UIConfirm ? UIConfirm({
-        title: 'Xác nhận xoá',
-        message: `Bạn sắp xoá <b>${ids.length}</b> category.`
-      }) : Promise.resolve(confirm('Xoá các category đã chọn?')));
-      if (!ok) return;
-      const form = document.getElementById('catBulkForm');
-      const box = document.getElementById('catBulkIds');
-      makeHiddenInputs(box, 'ids[]', ids);
-      form.submit();
-    });
-    // Xoá category đơn
-    document.querySelectorAll('.btnCateDelete').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const form = btn.closest('form');
-        const ok = await (window.UIConfirm ? UIConfirm({
-          title: 'Xác nhận xoá',
-          message: 'Bạn có chắc chắn muốn xoá category này?'
-        }) : Promise.resolve(confirm('Xoá category này?')));
-        if (ok) form.submit();
-      });
-    });
-
-    // Bulk delete Brand
-    document.getElementById('brandBtnBulkDelete')?.addEventListener('click', async () => {
-      const ids = getCheckedValues('#brandTable');
-      if (!ids.length) return;
-      const ok = await (window.UIConfirm ? UIConfirm({
-        title: 'Xác nhận xoá',
-        message: `Bạn sắp xoá <b>${ids.length}</b> brand.`
-      }) : Promise.resolve(confirm('Xoá các brand đã chọn?')));
-      if (!ok) return;
-      const form = document.getElementById('brandBulkForm');
-      const box = document.getElementById('brandBulkIds');
-      makeHiddenInputs(box, 'ids[]', ids);
-      form.submit();
-    });
-    // Xoá brand đơn
-    document.querySelectorAll('.btnBrandDelete').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const form = btn.closest('form');
-        const ok = await (window.UIConfirm ? UIConfirm({
-          title: 'Xác nhận xoá',
-          message: 'Bạn có chắc chắn muốn xoá brand này?'
-        }) : Promise.resolve(confirm('Xoá brand này?')));
-        if (ok) form.submit();
-      });
-    });
-
-    // ================== CATEGORY MODAL ==================
-    const catModal = document.getElementById('uiCategoryModal');
-    const catForm  = document.getElementById('uiCategoryForm');
-    const catImg   = document.getElementById('cat_image');
-    const catPrev  = document.getElementById('cat_image_preview');
-    const catPH    = document.getElementById('cat_image_placeholder');
-    const catTitle = document.getElementById('catModalTitle');
-
-    function setCatPreview(src) {
-      if (src) {
-        catPrev.src = src;
-        catPrev.classList.remove('d-none');
-        catPH.classList.add('d-none');
-      } else {
-        catPrev.src = '';
-        catPrev.classList.add('d-none');
-        catPH.classList.remove('d-none');
-      }
-    }
-
-    // Nút "Thêm category"
-    document.querySelectorAll('[data-bs-target="#uiCategoryModal"]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        catForm.querySelector('[name="__mode"]').value = 'create';
-        catForm.action = "{{ route('admin.categories.store') }}";
-        catForm.querySelector('[name=_method]').value = 'POST';
-        if (catTitle) catTitle.textContent = 'Thêm category';
-        setCatPreview('');
-      });
-    });
-
-    // Nút "Sửa category"
-    document.querySelectorAll('.btnCateEdit').forEach(btn => {
-      btn.addEventListener('click', () => {
-        catForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        catForm.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
-
-        catForm.querySelector('[name="__mode"]').value = 'edit';
-        catForm.action = btn.dataset.updateUrl;
-        catForm.querySelector('[name=_method]').value = 'PUT';
-        catForm.querySelector('[name="__form"]').value = 'category';
-
-        catForm.querySelector('#cat_name').value        = btn.dataset.name || '';
-        catForm.querySelector('#cat_slug').value        = btn.dataset.slug || '';
-        catForm.querySelector('#cat_description').value = btn.dataset.description || '';
-        catForm.querySelector('#cat_status').value      = (btn.dataset.status || 'ACTIVE');
-        if (window.jQuery && $.fn?.select2) $('#cat_status').trigger('change.select2');
-
-        setCatPreview(btn.dataset.image || '');
-        try { if (catImg) catImg.value = ''; } catch(_) {}
-
-        if (catTitle) catTitle.textContent = 'Cập nhật category';
-        bootstrap.Modal.getOrCreateInstance(catModal).show();
-      });
-    });
-
-    catImg?.addEventListener('change', () => {
-      const f = catImg.files?.[0];
-      setCatPreview(f ? URL.createObjectURL(f) : '');
-    });
-
-    // ================== BRAND MODAL ==================
-    const brandModal = document.getElementById('uiBrandModal');
-    const brandForm  = document.getElementById('uiBrandForm');
-    const brandImg   = document.getElementById('brand_image');
-    const brandPrev  = document.getElementById('brand_image_preview');
-    const brandPH    = document.getElementById('brand_image_placeholder');
-    const brandTitle = document.getElementById('brandModalTitle');
-
-    function setBrandPreview(src) {
-      if (!brandPrev || !brandPH) return;
-      if (src) {
-        brandPrev.src = src;
-        brandPrev.classList.remove('d-none');
-        brandPH.classList.add('d-none');
-      } else {
-        brandPrev.src = '';
-        brandPrev.classList.add('d-none');
-        brandPH.classList.remove('d-none');
-      }
-    }
-
-    // Nút "Thêm brand"
-    document.querySelectorAll('[data-bs-target="#uiBrandModal"]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        brandForm.querySelector('[name="__mode"]').value = 'create';
-        brandForm.action = "{{ route('admin.brands.store') }}";
-        brandForm.querySelector('[name=_method]').value = 'POST';
-        if (brandTitle) brandTitle.textContent = 'Thêm brand';
-        setBrandPreview('');
-      });
-    });
-
-    // Nút "Sửa brand"
-    document.querySelectorAll('.btnBrandEdit').forEach(btn => {
-      btn.addEventListener('click', () => {
-        brandForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        brandForm.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
-
-        brandForm.querySelector('[name="__mode"]').value = 'edit';
-        brandForm.action = btn.dataset.updateUrl;
-        brandForm.querySelector('[name=_method]').value = 'PUT';
-        brandForm.querySelector('[name="__form"]').value = 'brand';
-
-        brandForm.querySelector('#brand_name').value        = btn.dataset.name || '';
-        brandForm.querySelector('#brand_slug').value        = btn.dataset.slug || '';
-        brandForm.querySelector('#brand_description').value = btn.dataset.description || '';
-        brandForm.querySelector('#brand_status').value      = btn.dataset.status || 'ACTIVE';
-        if (window.jQuery && $.fn?.select2) $('#brand_status').trigger('change.select2');
-
-        setBrandPreview(btn.dataset.image || '');
-        try { if (brandImg) brandImg.value = ''; } catch(_) {}
-
-        if (brandTitle) brandTitle.textContent = 'Cập nhật brand';
-        bootstrap.Modal.getOrCreateInstance(brandModal).show();
-      });
-    });
-
-    brandImg?.addEventListener('change', () => {
-      const f = brandImg.files?.[0];
-      setBrandPreview(f ? URL.createObjectURL(f) : '');
-    });
-
-    // ================== RE-OPEN MODALS WHEN VALIDATION ERROR ==================
-    // Gợi ý: bổ sung data-mode vào #__formState trong Blade:
-    // <div id="__formState" data-has-errors="{{ $errors->any()?1:0 }}" data-which="{{ old('__form') }}" data-mode="{{ old('__mode','create') }}" style="display:none"></div>
-    const __stateEl   = document.getElementById('__formState');
-    const __hasErrors = __stateEl?.dataset.hasErrors === '1';
-    const __which     = (__stateEl?.dataset.which || null);
-    const __mode      = (__stateEl?.dataset.mode || 'create');
-
-    if (__hasErrors && __which === 'category') {
-      catForm.action = "{{ route('admin.categories.store') }}";
-      catForm.querySelector('[name=_method]').value = 'POST';
-      catForm.querySelector('[name="__form"]').value = 'category';
-      setCatPreview('');
-      if (catTitle) catTitle.textContent = (__mode === 'edit') ? 'Cập nhật category' : 'Thêm category';
-      bootstrap.Modal.getOrCreateInstance(catModal).show();
-      const trigger = document.querySelector('[data-bs-target="#category-pane"]');
-      if (trigger) new bootstrap.Tab(trigger).show();
-    }
-
-    if (__hasErrors && __which === 'brand') {
-      brandForm.action = "{{ route('admin.brands.store') }}";
-      brandForm.querySelector('[name=_method]').value = 'POST';
-      brandForm.querySelector('[name="__form"]').value = 'brand';
-      setBrandPreview('');
-      if (brandTitle) brandTitle.textContent = (__mode === 'edit') ? 'Cập nhật brand' : 'Thêm brand';
-      bootstrap.Modal.getOrCreateInstance(brandModal).show();
-      const trigger = document.querySelector('[data-bs-target="#brand-pane"]');
-      if (trigger) new bootstrap.Tab(trigger).show();
-    }
-  });
-</script>
+  @vite('resources/js/pages/ecom-app-laravel_admin_catalog_index.js')
 @endpush

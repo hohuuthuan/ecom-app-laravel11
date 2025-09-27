@@ -9,7 +9,6 @@ class BulkUpdateAccountRequest extends FormRequest
 {
   public function authorize(): bool
   {
-    // bạn đã có middleware role:Admin, nhưng để chắc
     return $this->user()?->hasRole('Admin') ?? false;
   }
 

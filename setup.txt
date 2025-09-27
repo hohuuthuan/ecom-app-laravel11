@@ -1,2 +1,12 @@
 composer install
 php artisan storage:link
+
+
+# migrate + seed
+php artisan migrate --seed
+
+# Làm sạch DB rồi chạy lại toàn bộ seed
+php artisan migrate:fresh --seed
+
+# Chỉ seed RoleSeeder
+php artisan db:seed --class=Database\\Seeders\\RoleSeeder

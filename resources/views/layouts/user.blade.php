@@ -12,4 +12,5 @@
     @yield('content')
   </main>
   @include('partials.user.footer')
+  @include('partials.user.script')
 @endsection

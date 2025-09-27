@@ -1,0 +1,73 @@
+:root{
+  --bs-success-light: #d6f5d8;
+  --hero-start: #4cc9f0;
+  --hero-end: #80ed99;
+}
+
+/* Search */
+.search-group{ border:1px solid #cfead1; border-radius:5px; overflow:hidden; }
+.search-icon{ background:var(--bs-success-light); border-right:1px solid #cfead1; }
+.rounded-5px{ border-radius:5px; }
+.rounded-start-5px{ border-top-left-radius:5px; border-bottom-left-radius:5px; }
+
+/* Hero banner */
+.hero{
+  background: linear-gradient(135deg, var(--hero-start), var(--hero-end)) no-repeat center/cover;
+  min-height: 220px;
+}
+
+/* 5-per-row on desktop (>=992px) */
+@media (min-width: 992px){
+  .col-lg-5th{ flex:0 0 20%; max-width:20%; }
+}
+
+/* Product card */
+.product-card .card-img-top{ aspect-ratio: 4/5; object-fit: cover; }
+.discount-badge{
+  position:absolute; top:.5rem; left:.5rem;
+  background:#ff4757; color:#fff; font-weight:700; font-size:.8rem;
+  padding:.25rem .4rem; border-radius:.35rem;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+
+/* Horizontal scroller */
+.hsnap-wrapper{ position:relative; }
+.hsnap{
+  display:grid; grid-auto-flow: column; gap:1rem;
+  grid-auto-columns: 80%;
+  overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:.5rem;
+}
+.hsnap::-webkit-scrollbar{ height:8px; }
+.hsnap::-webkit-scrollbar-thumb{ background:#ddd; border-radius:4px; }
+.hsnap-item{ scroll-snap-align: start; min-width:0; }
+.hsnap-item .card-img-top{ aspect-ratio: 16/10; object-fit: cover; }
+
+@media (min-width: 768px){
+  .hsnap{ grid-auto-columns: 40%; }
+}
+@media (min-width: 992px){
+  .hsnap{ grid-auto-columns: 25%; }
+}
+
+/* Scroller buttons */
+.hsnap-btn{
+  position:absolute; top:50%; transform:translateY(-50%);
+  border:none; background:rgba(255,255,255,.9);
+  width:38px; height:38px; border-radius:50%;
+  box-shadow:0 4px 12px rgba(0,0,0,.15);
+  display:flex; align-items:center; justify-content:center;
+}
+.hsnap-btn.left{ left:-12px; }
+.hsnap-btn.right{ right:-12px; }
+.hsnap-btn:hover{ background:#fff; }
+
+/* Back-to-top */
+.backtop{
+  position:fixed; right:30px; bottom:30px;
+  width:48px; height:48px; border-radius:9999px;
+  display:inline-flex; align-items:center; justify-content:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  opacity:0; visibility:hidden; transform:translateY(8px);
+  transition:opacity .25s ease, transform .25s ease, visibility .25s ease;
+}
+.backtop.show{ opacity:1; visibility:visible; transform:translateY(0); }

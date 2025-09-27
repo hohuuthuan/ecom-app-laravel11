@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Hanami Books — Hiệu sách trực tuyến</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header tối giản, trung tâm -->
+  <header class="hb-header">
+    <div class="hb-header__bar">
+      <a class="hb-logo" href="#" aria-label="Trang chủ Hanami Books">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#FFB3C7"/><stop offset="1" stop-color="#B3E5FC"/></linearGradient></defs><rect x="8" y="12" rx="12" ry="12" width="48" height="40" fill="url(#g)"/><path d="M20 22h24v4H20zm0 10h24v4H20z" fill="#222"/></svg>
+        <span>Hanami<span class="dot">•</span>Books</span>
+      </a>
+      <form id="formSearch" class="hb-search" role="search">
+        <input id="q" type="search" placeholder="Tìm tên sách, tác giả, ISBN…" aria-label="Tìm kiếm">
+        <button class="hb-btn" type="submit">Tìm</button>
+      </form>
+      <button id="btnCart" class="hb-icon" aria-label="Mở giỏ hàng">🛒 <b id="cartN">0</b></button>
+    </div>
+  </header>
+
+  <!-- Khung 2 cột: sidebar trái + grid sản phẩm phải -->
+  <main class="hb-shell">
+    <aside class="hb-side" aria-label="Danh mục">
+      <h2 class="hb-side__title">Danh mục</h2>
+      <nav id="catNav" class="hb-cats">
+        <button class="hb-cat is-active" data-cat="all">Tất cả</button>
+        <button class="hb-cat" data-cat="fiction">Tiểu thuyết</button>
+        <button class="hb-cat" data-cat="business">Kinh doanh</button>
+        <button class="hb-cat" data-cat="tech">Công nghệ</button>
+        <button class="hb-cat" data-cat="selfhelp">Kỹ năng sống</button>
+        <button class="hb-cat" data-cat="kids">Thiếu nhi</button>
+      </nav>
+
+      <section class="hb-promo">
+        <h3>Ưu đãi</h3>
+        <p>Đăng ký nhận <strong>-20%</strong> cho đơn đầu.</p>
+        <form id="sub" class="hb-sub">
+          <input id="email" type="email" placeholder="Email của bạn" required>
+          <button class="hb-btn hb-btn--prime" type="submit">Nhận mã</button>
+        </form>
+      </section>
+    </aside>
+
+    <section class="hb-gridwrap">
+      <header class="hb-sectionhead">
+        <h2 id="gridTitle">Tất cả sách</h2>
+        <div class="hb-tags" aria-label="Bộ lọc nhanh">
+          <button class="hb-tag" data-price="lt100">Dưới 100k</button>
+          <button class="hb-tag" data-price="100-200">100–200k</button>
+          <button class="hb-tag" data-price="gt200">Trên 200k</button>
+          <button class="hb-tag is-clear" id="clearFilter">Bỏ lọc</button>
+        </div>
+      </header>
+
+      <div id="grid" class="hb-grid">
+        <!-- Card khác cấu trúc: figure + figcaption -->
+        <figure class="hb-card" data-id="b1" data-cat="tech" data-price="159000" data-title="JavaScript Hiện Đại" data-author="Nguyễn A">
+          <picture class="hb-thumb" aria-hidden="true"></picture>
+          <figcaption class="hb-info">
+            <h3 class="hb-name">JavaScript Hiện Đại</h3>
+            <p class="hb-author">Nguyễn A</p>
+            <div class="hb-buy">
+              <span class="hb-price">159.000₫</span>
+              <button class="hb-btn hb-btn--sm add">Thêm</button>
+            </div>
+          </figcaption>
+        </figure>
+
+        <figure class="hb-card" data-id="b2" data-cat="business" data-price="189000" data-title="Tư Duy Nhanh Và Chậm" data-author="Daniel Kahneman">
+          <picture class="hb-thumb"></picture>
+          <figcaption class="hb-info">
+            <h3 class="hb-name">Tư Duy Nhanh Và Chậm</h3>
+            <p class="hb-author">Daniel Kahneman</p>
+            <div class="hb-buy">
+              <span class="hb-price">189.000₫</span>
+              <button class="hb-btn hb-btn--sm add">Thêm</button>
+            </div>
+          </figcaption>
+        </figure>
+
+        <figure class="hb-card" data-id="b3" data-cat="fiction" data-price="129000" data-title="Những Đứa Trẻ Ở Đại Dương Đen" data-author="T. Phan">
+          <picture class="hb-thumb"></picture>
+          <figcaption class="hb-info">
+            <h3 class="hb-name">Những Đứa Trẻ Ở Đại Dương Đen</h3>
+            <p class="hb-author">T. Phan</p>
+            <div class="hb-buy">
+              <span class="hb-price">129.000₫</span>
+              <button class="hb-btn hb-btn--sm add">Thêm</button>
+            </div>
+          </figcaption>
+        </figure>
+
+        <figure class="hb-card" data-id="b4" data-cat="tech" data-price="99000" data-title="Kể Chuyện Máy Tính" data-author="B. Lê">
+          <picture class="hb-thumb"></picture>
+          <figcaption class="hb-info">
+            <h3 class="hb-name">Kể Chuyện Máy Tính</h3>
+            <p class="hb-author">B. Lê</p>
+            <div class="hb-buy">
+              <span class="hb-price">99.000₫</span>
+              <button class="hb-btn hb-btn--sm add">Thêm</button>
+            </div>
+          </figcaption>
+        </figure>
+
+        <figure class="hb-card" data-id="b5" data-cat="kids" data-price="79000" data-title="Dế Mèn Phiêu Lưu Ký" data-author="Tô Hoài">
+          <picture class="hb-thumb"></picture>
+          <figcaption class="hb-info">
+            <h3 class="hb-name">Dế Mèn Phiêu Lưu Ký</h3>
+            <p class="hb-author">Tô Hoài</p>
+            <div class="hb-buy">
+              <span class="hb-price">79.000₫</span>
+              <button class="hb-btn hb-btn--sm add">Thêm</button>
+            </div>
+          </figcaption>
+        </figure>
+
+        <figure class="hb-card" data-id="b6" data-cat="selfhelp" data-price="175000" data-title="Atomic Habits" data-author="James Clear">
+          <picture class="hb-thumb"></picture>
+          <figcaption class="hb-info">
+            <h3 class="hb-name">Atomic Habits</h3>
+            <p class="hb-author">James Clear</p>
+            <div class="hb-buy">
+              <span class="hb-price">175.000₫</span>
+              <button class="hb-btn hb-btn--sm add">Thêm</button>
+            </div>
+          </figcaption>
+        </figure>
+
+        <figure class="hb-card" data-id="b7" data-cat="tech" data-price="259000" data-title="Clean Code" data-author="Robert C. Martin">
+          <picture class="hb-thumb"></picture>
+          <figcaption class="hb-info">
+            <h3 class="hb-name">Clean Code</h3>
+            <p class="hb-author">Robert C. Martin</p>
+            <div class="hb-buy">
+              <span class="hb-price">259.000₫</span>
+              <button class="hb-btn hb-btn--sm add">Thêm</button>
+            </div>
+          </figcaption>
+        </figure>
+
+        <figure class="hb-card" data-id="b8" data-cat="business" data-price="99000" data-title="Tuổi Trẻ Đáng Giá Bao Nhiêu" data-author="R. Hạ">
+          <picture class="hb-thumb"></picture>
+          <figcaption class="hb-info">
+            <h3 class="hb-name">Tuổi Trẻ Đáng Giá Bao Nhiêu</h3>
+            <p class="hb-author">R. Hạ</p>
+            <div class="hb-buy">
+              <span class="hb-price">99.000₫</span>
+              <button class="hb-btn hb-btn--sm add">Thêm</button>
+            </div>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <footer class="hb-foot">
+    <p>© <span id="y"></span> Hanami Books • Đọc hay mỗi ngày</p>
+    <nav class="hb-foot__links">
+      <a href="#">Về chúng tôi</a>
+      <a href="#">Chính sách</a>
+      <a href="#">Hỗ trợ</a>
+    </nav>
+  </footer>
+
+  <!-- Toast + Drawer giỏ hàng -->
+  <div id="toast" role="status" aria-live="polite"></div>
+  <aside id="drawer" class="hb-drawer" aria-label="Giỏ hàng" aria-hidden="true">
+    <header class="hb-drawer__hd">
+      <h3>Giỏ hàng</h3>
+      <button id="closeDrawer" class="hb-icon" aria-label="Đóng">✕</button>
+    </header>
+    <ul id="cartList" class="hb-cart"></ul>
+    <div class="hb-drawer__ft">
+      <span>Tổng: <b id="cartSum">0₫</b></span>
+      <button class="hb-btn hb-btn--prime" disabled id="checkout">Thanh toán</button>
+    </div>
+  </aside>
+
+  <script src="script.js" defer></script>
+</body>
+</html>

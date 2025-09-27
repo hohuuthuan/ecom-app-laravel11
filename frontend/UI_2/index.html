@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bookly — Cửa hàng sách trực tuyến</title>
+
+  <!-- Font thân thiện -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23222' d='M12 14h30a10 10 0 0 1 10 10v28H22a10 10 0 0 1-10-10z'/%3E%3Cpath fill='%23fff' d='M18 18h22a8 8 0 0 1 8 8v22H26a8 8 0 0 1-8-8z'/%3E%3Cpath fill='%23222' d='M20 24h18v2H20zm0 8h18v2H20zm0 8h12v2H20z'/%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="#" aria-label="Bookly trang chủ">
+        <svg viewBox="0 0 64 64" aria-hidden="true" class="logo-svg">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1">
+              <stop offset="0" stop-color="#FFB3C7"/>
+              <stop offset="1" stop-color="#B3E5FC"/>
+            </linearGradient>
+          </defs>
+          <path d="M10 12h34a10 10 0 0 1 10 10v30H20a10 10 0 0 1-10-10z" fill="url(#g1)"></path>
+          <path d="M16 16h24a8 8 0 0 1 8 8v24H24a8 8 0 0 1-8-8z" fill="#fff"></path>
+          <path d="M20 22h20v2H20zm0 8h20v2H20zm0 8h14v2H20z" fill="#222"></path>
+        </svg>
+        <span>Bookly</span>
+      </a>
+
+      <button id="navToggle" class="icon-btn" aria-expanded="false" aria-controls="siteNav" aria-label="Mở menu">☰</button>
+
+      <nav id="siteNav" class="nav">
+        <a href="#moi-ra-mat">Mới ra mắt</a>
+        <a href="#ban-chay">Bán chạy</a>
+        <a href="#uu-dai">Ưu đãi</a>
+      </nav>
+
+      <div class="header-cta">
+        <button id="themeToggle" class="icon-btn" aria-label="Đổi giao diện sáng/tối">◐</button>
+        <button id="cartBtn" class="btn btn-primary">
+          Giỏ hàng <span id="cartCount" class="badge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- hero có “anime stickers” -->
+  <main>
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <h1>Hiệu sách số phong cách anime</h1>
+          <p>Khám phá hàng nghìn tựa sách. Màu pastel dịu. Trải nghiệm mượt trên mọi thiết bị.</p>
+          <form id="searchForm" class="search" role="search">
+            <input id="searchInput" type="search" placeholder="Tìm theo tên sách, tác giả, ISBN…" aria-label="Tìm kiếm sách">
+            <button class="btn" type="submit">Tìm</button>
+          </form>
+          <div class="chips" role="list" aria-label="Danh mục">
+            <button class="chip is-active" data-category="all">Tất cả</button>
+            <button class="chip" data-category="fiction">Tiểu thuyết</button>
+            <button class="chip" data-category="business">Kinh doanh</button>
+            <button class="chip" data-category="tech">Công nghệ</button>
+            <button class="chip" data-category="kids">Thiếu nhi</button>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="book-illus">
+            <div class="sticker star"></div>
+            <div class="sticker spark"></div>
+            <div class="sticker heart"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="moi-ra-mat" class="container section">
+      <div class="section-head">
+        <h2>Mới ra mắt</h2>
+        <a class="link" href="#">Xem tất cả</a>
+      </div>
+      <div id="gridNew" class="book-grid">
+        <article class="book-card" data-title="Lập Trình JavaScript Hiện Đại" data-author="Nguyễn A" data-category="tech" data-price="159000">
+          <div class="thumb" aria-hidden="true"></div>
+          <h3 class="book-title">Lập Trình JavaScript Hiện Đại</h3>
+          <p class="book-author">Nguyễn A</p>
+          <div class="price-row">
+            <span class="price">159.000₫</span>
+            <button class="btn btn-sm add-to-cart" data-id="b1">Thêm</button>
+          </div>
+        </article>
+        <article class="book-card" data-title="Tư Duy Nhanh Và Chậm" data-author="Daniel Kahneman" data-category="business" data-price="189000">
+          <div class="thumb"></div>
+          <h3 class="book-title">Tư Duy Nhanh Và Chậm</h3>
+          <p class="book-author">Daniel Kahneman</p>
+          <div class="price-row">
+            <span class="price">189.000₫</span>
+            <button class="btn btn-sm add-to-cart" data-id="b2">Thêm</button>
+          </div>
+        </article>
+        <article class="book-card" data-title="Những Đứa Trẻ Ở Đại Dương Đen" data-author="T. Phan" data-category="fiction" data-price="129000">
+          <div class="thumb"></div>
+          <h3 class="book-title">Những Đứa Trẻ Ở Đại Dương Đen</h3>
+          <p class="book-author">T. Phan</p>
+          <div class="price-row">
+            <span class="price">129.000₫</span>
+            <button class="btn btn-sm add-to-cart" data-id="b3">Thêm</button>
+          </div>
+        </article>
+        <article class="book-card" data-title="Kể Chuyện Máy Tính" data-author="B. Lê" data-category="tech" data-price="99000">
+          <div class="thumb"></div>
+          <h3 class="book-title">Kể Chuyện Máy Tính</h3>
+          <p class="book-author">B. Lê</p>
+          <div class="price-row">
+            <span class="price">99.000₫</span>
+            <button class="btn btn-sm add-to-cart" data-id="b4">Thêm</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="ban-chay" class="container section">
+      <div class="section-head">
+        <h2>Bán chạy</h2>
+        <a class="link" href="#">Xem tất cả</a>
+      </div>
+      <div id="gridBest" class="book-grid">
+        <article class="book-card" data-title="Dế Mèn Phiêu Lưu Ký" data-author="Tô Hoài" data-category="kids" data-price="79000">
+          <div class="thumb"></div>
+          <h3 class="book-title">Dế Mèn Phiêu Lưu Ký</h3>
+          <p class="book-author">Tô Hoài</p>
+          <div class="price-row">
+            <span class="price">79.000₫</span>
+            <button class="btn btn-sm add-to-cart" data-id="b5">Thêm</button>
+          </div>
+        </article>
+        <article class="book-card" data-title="Atomic Habits" data-author="James Clear" data-category="business" data-price="175000">
+          <div class="thumb"></div>
+          <h3 class="book-title">Atomic Habits</h3>
+          <p class="book-author">James Clear</p>
+          <div class="price-row">
+            <span class="price">175.000₫</span>
+            <button class="btn btn-sm add-to-cart" data-id="b6">Thêm</button>
+          </div>
+        </article>
+        <article class="book-card" data-title="Clean Code" data-author="Robert C. Martin" data-category="tech" data-price="259000">
+          <div class="thumb"></div>
+          <h3 class="book-title">Clean Code</h3>
+          <p class="book-author">Robert C. Martin</p>
+          <div class="price-row">
+            <span class="price">259.000₫</span>
+            <button class="btn btn-sm add-to-cart" data-id="b7">Thêm</button>
+          </div>
+        </article>
+        <article class="book-card" data-title="Tuổi Trẻ Đáng Giá Bao Nhiêu" data-author="R. Hạ" data-category="business" data-price="99000">
+          <div class="thumb"></div>
+          <h3 class="book-title">Tuổi Trẻ Đáng Giá Bao Nhiêu</h3>
+          <p class="book-author">R. Hạ</p>
+          <div class="price-row">
+            <span class="price">99.000₫</span>
+            <button class="btn btn-sm add-to-cart" data-id="b8">Thêm</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="uu-dai" class="promo">
+      <div class="container promo-inner">
+        <h2>Giảm 20% cho đơn hàng đầu tiên</h2>
+        <form id="subForm" class="sub">
+          <input id="emailInput" type="email" placeholder="Nhập email để nhận mã giảm" required aria-label="Email">
+          <button class="btn btn-primary" type="submit">Nhận mã</button>
+        </form>
+        <p class="muted">Đăng ký để nhận tin khuyến mãi. Có thể hủy bất cứ lúc nào.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>Bookly</strong>
+        <p class="muted">Sách hay. Giá tốt. Giao nhanh.</p>
+      </div>
+      <nav class="footer-nav">
+        <a href="#">Về chúng tôi</a>
+        <a href="#">Chính sách</a>
+        <a href="#">Hỗ trợ</a>
+      </nav>
+    </div>
+  </footer>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js" defer></script>
+</body>
+</html>

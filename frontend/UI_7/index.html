@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bookly — Cửa hàng sách trực tuyến</title>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- App CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="border-bottom bg-white">
+    <div class="container py-2">
+      <div class="d-flex align-items-center justify-content-between gap-3">
+        <!-- Logo -->
+        <a href="#" class="navbar-brand d-flex align-items-center gap-2 m-0">
+          <span class="logo-circle d-inline-flex align-items-center justify-content-center">
+            <i class="bi bi-book"></i>
+          </span>
+          <span class="fw-bold fs-5 text-dark">Bookly</span>
+        </a>
+
+        <!-- Search -->
+        <form class="flex-grow-1 search-group" role="search" autocomplete="off">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input type="search" class="form-control" placeholder="Tìm sách, tác giả, thể loại..." aria-label="Tìm kiếm">
+          </div>
+        </form>
+
+        <!-- Actions -->
+        <div class="d-flex align-items-center gap-3">
+          <a href="#" class="text-dark position-relative action-icon" aria-label="Giỏ hàng">
+            <i class="bi bi-cart3 fs-4"></i>
+            <span class="cart-badge">3</span>
+          </a>
+          <div class="d-flex align-items-center gap-2">
+            <img src="https://i.pravatar.cc/80?img=5" alt="Avatar" class="rounded-circle avatar">
+            <span class="fw-medium d-none d-sm-inline">thuan.dev</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-grow-1">
+    <!-- Info row -->
+    <section class="py-2 info-row">
+      <div class="container">
+        <div class="row g-2 align-items-center">
+          <div class="col-12 col-md-3">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-journal-bookmark fs-5 text-brand"></i>
+              <select class="form-select form-select-sm">
+                <option selected>Danh mục sách</option>
+                <option value="1">Thiếu nhi</option>
+                <option value="2">Văn học</option>
+                <option value="3">Kinh tế</option>
+                <option value="4">Khoa học</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-md-3">
+            <a href="#" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+              <i class="bi bi-clock-history fs-5 text-brand"></i>
+              <span>Sản phẩm đã xem</span>
+            </a>
+          </div>
+          <div class="col-12 col-md-3">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-truck fs-5 text-brand"></i>
+              <span>Ship COD toàn quốc</span>
+            </div>
+          </div>
+          <div class="col-12 col-md-3">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-telephone fs-5 text-brand"></i>
+              <span>Hotline: <strong>1900 1234</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Banner -->
+    <section class="py-3">
+      <div class="container">
+        <div class="banner ratio ratio-21x9 rounded-4 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop" alt="Banner giới thiệu" class="w-100 h-100 object-fit-cover">
+          <div class="banner-overlay p-4 p-md-5">
+            <h2 class="text-white fw-bold mb-2">Khám phá kho sách khổng lồ</h2>
+            <p class="text-white-50 m-0">Ưu đãi mỗi ngày. Giao nhanh. Chính hãng 100%.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products grid -->
+    <section class="py-4">
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h3 class="section-title m-0">Sản phẩm nổi bật</h3>
+          <a href="#" class="link-brand">Xem tất cả</a>
+        </div>
+
+        <div class="row g-3 row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5">
+          <!-- Item -->
+          <!-- Lặp demo 10 sản phẩm -->
+          <!-- Bạn có thể thay dữ liệu thật sau -->
+          <!-- 1 -->
+          <div class="col">
+            <div class="card product-card h-100">
+              <div class="position-relative">
+                <span class="discount-badge">-20%</span>
+                <img class="card-img-top" src="https://picsum.photos/seed/book1/400/500" alt="Book 1">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title product-name">Dế Mèn Phiêu Lưu Ký</h6>
+                <div class="mt-auto">
+                  <div class="price-line">
+                    <span class="original">120.000₫</span>
+                    <span class="sale">96.000₫</span>
+                  </div>
+                  <button class="btn btn-brand w-100 mt-2">
+                    <i class="bi bi-bag-plus me-1"></i> Thêm vào giỏ
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 2 -->
+          <div class="col">
+            <div class="card product-card h-100">
+              <div class="position-relative">
+                <span class="discount-badge">-35%</span>
+                <img class="card-img-top" src="https://picsum.photos/seed/book2/400/500" alt="Book 2">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title product-name">Tuổi Trẻ Đáng Giá Bao Nhiêu</h6>
+                <div class="mt-auto">
+                  <div class="price-line">
+                    <span class="original">150.000₫</span>
+                    <span class="sale">97.500₫</span>
+                  </div>
+                  <button class="btn btn-brand w-100 mt-2"><i class="bi bi-bag-plus me-1"></i> Thêm vào giỏ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 3 -->
+          <div class="col">
+            <div class="card product-card h-100">
+              <div class="position-relative">
+                <span class="discount-badge">-10%</span>
+                <img class="card-img-top" src="https://picsum.photos/seed/book3/400/500" alt="Book 3">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title product-name">Đắc Nhân Tâm</h6>
+                <div class="mt-auto">
+                  <div class="price-line">
+                    <span class="original">180.000₫</span>
+                    <span class="sale">162.000₫</span>
+                  </div>
+                  <button class="btn btn-brand w-100 mt-2"><i class="bi bi-bag-plus me-1"></i> Thêm vào giỏ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 4 -->
+          <div class="col">
+            <div class="card product-card h-100">
+              <div class="position-relative">
+                <span class="discount-badge">-25%</span>
+                <img class="card-img-top" src="https://picsum.photos/seed/book4/400/500" alt="Book 4">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title product-name">Atomic Habits</h6>
+                <div class="mt-auto">
+                  <div class="price-line">
+                    <span class="original">220.000₫</span>
+                    <span class="sale">165.000₫</span>
+                  </div>
+                  <button class="btn btn-brand w-100 mt-2"><i class="bi bi-bag-plus me-1"></i> Thêm vào giỏ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 5 -->
+          <div class="col">
+            <div class="card product-card h-100">
+              <div class="position-relative">
+                <span class="discount-badge">-15%</span>
+                <img class="card-img-top" src="https://picsum.photos/seed/book5/400/500" alt="Book 5">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title product-name">Thiên Tài Bên Trái, Kẻ Điên Bên Phải</h6>
+                <div class="mt-auto">
+                  <div class="price-line">
+                    <span class="original">190.000₫</span>
+                    <span class="sale">161.500₫</span>
+                  </div>
+                  <button class="btn btn-brand w-100 mt-2"><i class="bi bi-bag-plus me-1"></i> Thêm vào giỏ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 6 -->
+          <div class="col">
+            <div class="card product-card h-100">
+              <div class="position-relative">
+                <span class="discount-badge">-30%</span>
+                <img class="card-img-top" src="https://picsum.photos/seed/book6/400/500" alt="Book 6">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title product-name">Sapiens: Lược Sử Loài Người</h6>
+                <div class="mt-auto">
+                  <div class="price-line">
+                    <span class="original">260.000₫</span>
+                    <span class="sale">182.000₫</span>
+                  </div>
+                  <button class="btn btn-brand w-100 mt-2"><i class="bi bi-bag-plus me-1"></i> Thêm vào giỏ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 7 -->
+          <div class="col">
+            <div class="card product-card h-100">
+              <div class="position-relative">
+                <span class="discount-badge">-18%</span>
+                <img class="card-img-top" src="https://picsum.photos/seed/book7/400/500" alt="Book 7">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title product-name">1984</h6>
+                <div class="mt-auto">
+                  <div class="price-line">
+                    <span class="original">170.000₫</span>
+                    <span class="sale">139.400₫</span>
+                  </div>
+                  <button class="btn btn-brand w-100 mt-2"><i class="bi bi-bag-plus me-1"></i> Thêm vào giỏ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 8 -->
+          <div class="col">
+            <div class="card product-card h-100">
+              <div class="position-relative">
+                <span class="discount-badge">-22%</span>
+                <img class="card-img-top" src="https://picsum.photos/seed/book8/400/500" alt="Book 8">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title product-name">The Pragmatic Programmer</h6>
+                <div class="mt-auto">
+                  <div class="price-line">
+                    <span class="original">300.000₫</span>
+                    <span class="sale">234.000₫</span>
+                  </div>
+                  <button class="btn btn-brand w-100 mt-2"><i class="bi bi-bag-plus me-1"></i> Thêm vào giỏ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 9 -->
+          <div class="col">
+            <div class="card product-card h-100">
+              <div class="position-relative">
+                <span class="discount-badge">-12%</span>
+                <img class="card-img-top" src="https://picsum.photos/seed/book9/400/500" alt="Book 9">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title product-name">Clean Code</h6>
+                <div class="mt-auto">
+                  <div class="price-line">
+                    <span class="original">320.000₫</span>
+                    <span class="sale">281.600₫</span>
+                  </div>
+                  <button class="btn btn-brand w-100 mt-2"><i class="bi bi-bag-plus me-1"></i> Thêm vào giỏ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 10 -->
+          <div class="col">
+            <div class="card product-card h-100">
+              <div class="position-relative">
+                <span class="discount-badge">-28%</span>
+                <img class="card-img-top" src="https://picsum.photos/seed/book10/400/500" alt="Book 10">
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title product-name">Deep Work</h6>
+                <div class="mt-auto">
+                  <div class="price-line">
+                    <span class="original">240.000₫</span>
+                    <span class="sale">172.800₫</span>
+                  </div>
+                  <button class="btn btn-brand w-100 mt-2"><i class="bi bi-bag-plus me-1"></i> Thêm vào giỏ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /items -->
+        </div>
+      </div>
+    </section>
+
+    <!-- New arrivals carousel -->
+    <section class="py-4">
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h3 class="section-title m-0">Sản phẩm mới lên kệ</h3>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-brand btn-sm carousel-prev" data-target="#newArrivals"><i class="bi bi-chevron-left"></i></button>
+            <button class="btn btn-outline-brand btn-sm carousel-next" data-target="#newArrivals"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+
+        <div id="newArrivals" class="h-scroller">
+          <!-- slide items -->
+          <!-- 8 items demo -->
+          <div class="h-item card">
+            <img src="https://picsum.photos/seed/new1/400/500" class="card-img-top" alt="new1">
+            <div class="card-body py-2">
+              <div class="small fw-medium text-truncate">The Midnight Library</div>
+            </div>
+          </div>
+          <div class="h-item card">
+            <img src="https://picsum.photos/seed/new2/400/500" class="card-img-top" alt="new2">
+            <div class="card-body py-2">
+              <div class="small fw-medium text-truncate">Project Hail Mary</div>
+            </div>
+          </div>
+          <div class="h-item card">
+            <img src="https://picsum.photos/seed/new3/400/500" class="card-img-top" alt="new3">
+            <div class="card-body py-2">
+              <div class="small fw-medium text-truncate">Start With Why</div>
+            </div>
+          </div>
+          <div class="h-item card">
+            <img src="https://picsum.photos/seed/new4/400/500" class="card-img-top" alt="new4">
+            <div class="card-body py-2">
+              <div class="small fw-medium text-truncate">Ikigai</div>
+            </div>
+          </div>
+          <div class="h-item card">
+            <img src="https://picsum.photos/seed/new5/400/500" class="card-img-top" alt="new5">
+            <div class="card-body py-2">
+              <div class="small fw-medium text-truncate">Rich Dad Poor Dad</div>
+            </div>
+          </div>
+          <div class="h-item card">
+            <img src="https://picsum.photos/seed/new6/400/500" class="card-img-top" alt="new6">
+            <div class="card-body py-2">
+              <div class="small fw-medium text-truncate">The Alchemist</div>
+            </div>
+          </div>
+          <div class="h-item card">
+            <img src="https://picsum.photos/seed/new7/400/500" class="card-img-top" alt="new7">
+            <div class="card-body py-2">
+              <div class="small fw-medium text-truncate">Lean Startup</div>
+            </div>
+          </div>
+          <div class="h-item card">
+            <img src="https://picsum.photos/seed/new8/400/500" class="card-img-top" alt="new8">
+            <div class="card-body py-2">
+              <div class="small fw-medium text-truncate">Zero to One</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Posts carousel -->
+    <section class="py-4">
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h3 class="section-title m-0">Bài viết</h3>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-brand btn-sm carousel-prev" data-target="#postCarousel"><i class="bi bi-chevron-left"></i></button>
+            <button class="btn btn-outline-brand btn-sm carousel-next" data-target="#postCarousel"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+
+        <div id="postCarousel" class="h-scroller">
+          <!-- 6 posts demo -->
+          <article class="h-item card">
+            <img src="https://picsum.photos/seed/post1/800/500" class="card-img-top" alt="post1">
+            <div class="card-body">
+              <h6 class="card-title text-truncate">Top 10 sách kỹ năng nên đọc</h6>
+              <p class="card-text small text-secondary text-truncate-2">Danh sách ngắn giúp bạn cải thiện công việc và cuộc sống mỗi ngày.</p>
+            </div>
+          </article>
+          <article class="h-item card">
+            <img src="https://picsum.photos/seed/post2/800/500" class="card-img-top" alt="post2">
+            <div class="card-body">
+              <h6 class="card-title text-truncate">Hướng dẫn chọn sách cho thiếu nhi</h6>
+              <p class="card-text small text-secondary text-truncate-2">Tiêu chí an toàn, giáo dục và giải trí phù hợp từng độ tuổi.</p>
+            </div>
+          </article>
+          <article class="h-item card">
+            <img src="https://picsum.photos/seed/post3/800/500" class="card-img-top" alt="post3">
+            <div class="card-body">
+              <h6 class="card-title text-truncate">Bí quyết đọc sách hiệu quả</h6>
+              <p class="card-text small text-secondary text-truncate-2">Gợi ý phương pháp note, tóm tắt và ôn tập.</p>
+            </div>
+          </article>
+          <article class="h-item card">
+            <img src="https://picsum.photos/seed/post4/800/500" class="card-img-top" alt="post4">
+            <div class="card-body">
+              <h6 class="card-title text-truncate">Tủ sách khởi nghiệp</h6>
+              <p class="card-text small text-secondary text-truncate-2">Những tựa sách nền tảng cho doanh nhân trẻ.</p>
+            </div>
+          </article>
+          <article class="h-item card">
+            <img src="https://picsum.photos/seed/post5/800/500" class="card-img-top" alt="post5">
+            <div class="card-body">
+              <h6 class="card-title text-truncate">Văn học Việt Nam đương đại</h6>
+              <p class="card-text small text-secondary text-truncate-2">Nhìn lại các tác phẩm nổi bật và tác giả tiêu biểu.</p>
+            </div>
+          </article>
+          <article class="h-item card">
+            <img src="https://picsum.photos/seed/post6/800/500" class="card-img-top" alt="post6">
+            <div class="card-body">
+              <h6 class="card-title text-truncate">Sách khoa học phổ thông</h6>
+              <p class="card-text small text-secondary text-truncate-2">Kích thích tò mò, nuôi dưỡng tư duy khám phá.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-top bg-white">
+    <div class="container py-4">
+      <div class="row g-3">
+        <div class="col-12 col-md-4">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="logo-circle d-inline-flex align-items-center justify-content-center">
+              <i class="bi bi-book"></i>
+            </span>
+            <span class="fw-bold fs-5 text-dark">Bookly</span>
+          </div>
+          <p class="small text-secondary mb-2">Nền tảng mua sách trực tuyến với hàng chục ngàn đầu sách chính hãng, giao nhanh trên toàn quốc.</p>
+          <div class="d-flex gap-2">
+            <a class="btn btn-icon" href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a class="btn btn-icon" href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            <a class="btn btn-icon" href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <h6 class="fw-semibold">Hỗ trợ</h6>
+          <ul class="list-unstyled small m-0">
+            <li><a href="#" class="link-secondary text-decoration-none">Chính sách vận chuyển</a></li>
+            <li><a href="#" class="link-secondary text-decoration-none">Chính sách đổi trả</a></li>
+            <li><a href="#" class="link-secondary text-decoration-none">Bảo mật & Điều khoản</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-md-4">
+          <h6 class="fw-semibold">Liên hệ</h6>
+          <ul class="list-unstyled small m-0">
+            <li>Email: support@bookly.vn</li>
+            <li>Phone: 1900 1234</li>
+            <li>Địa chỉ: 123 Đường Sách, Q.1, TP.HCM</li>
+          </ul>
+        </div>
+      </div>
+      <div class="text-center small text-secondary mt-3">© 2025 Bookly. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <!-- Back to top -->
+  <button id="backTop" class="backtop" aria-label="Về đầu trang">
+    <i class="bi bi-arrow-up"></i>
+  </button>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- App JS -->
+  <script src="app.js"></script>
+</body>
+</html>

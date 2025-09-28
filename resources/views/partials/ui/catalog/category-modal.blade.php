@@ -81,4 +81,4 @@
   </div>
 </div>
 
-<script src="{{ asset('library/slugify.js') }}"></script>
+@vite(['resources/js/pages/slugify.js'])

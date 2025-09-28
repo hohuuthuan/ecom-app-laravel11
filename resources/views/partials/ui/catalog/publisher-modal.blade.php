@@ -21,7 +21,7 @@
       @endphp
 
       <div class="modal-header">
-        <h3 class="modal-title" id="authorModalTitle">Thêm nhà xuất bản</h3>
+        <h3 class="modal-title" id="publisherModalTitle">Thêm nhà xuất bản</h3>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
       </div>
 

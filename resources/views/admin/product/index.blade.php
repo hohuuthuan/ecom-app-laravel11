@@ -36,54 +36,84 @@
     <div class="card-body">
       {{-- Filters --}}
       <form method="GET" class="row g-2 mb-3 filter-form">
-        <div class="col-md-4">
-          <input type="text" name="keyword" class="form-control" placeholder="Tìm tên / ISBN / slug" value="{{ request('keyword') }}">
+        <div class="col-md-12">
+          <div class="row">
+            <div class="col-md-6 searchProduct">
+              <label for="keyword" class="form-label mb-1 label-filter-admin-product">Tìm kiếm</label>
+              <input id="keyword" type="text" name="keyword" class="form-control" placeholder="Tìm tên / ISBN / slug" value="{{ request('keyword') }}">
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-primary btn-admin btn-submit-filter-admin-product"><i class="fa fa-search me-1"></i> Tìm kiếm</button>
+            </div>
+          </div>
+
+          <div class="row searchProduct">
+            <div class="col-md-2">
+              <label for="category_id" class="form-label mb-1 label-filter-admin-product">Danh mục</label>
+              <select id="category_id" name="category_id" class="form-select setupSelect2">
+                <option value="">-- Tất cả danh mục --</option>
+                @foreach($categories as $c)
+                <option value="{{ $c->id }}" {{ request('category_id') === (string)$c->id ? 'selected' : '' }}>
+                  {{ $c->name }}
+                </option>
+                @endforeach
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label for="author_id" class="form-label mb-1 label-filter-admin-product">Tác giả</label>
+              <select id="author_id" name="author_id" class="form-select setupSelect2">
+                <option value="">-- Tất cả tác giả --</option>
+                @foreach($authors as $a)
+                <option value="{{ $a->id }}" {{ request('author_id') === (string)$a->id ? 'selected' : '' }}>
+                  {{ $a->name }}
+                </option>
+                @endforeach
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label for="publisher_id" class="form-label mb-1 label-filter-admin-product">Nhà xuất bản</label>
+              <select id="publisher_id" name="publisher_id" class="form-select setupSelect2">
+                <option value="">-- Tất cả NXB --</option>
+                @foreach($publishers as $p)
+                <option value="{{ $p->id }}" {{ request('publisher_id') === (string)$p->id ? 'selected' : '' }}>
+                  {{ $p->name }}
+                </option>
+                @endforeach
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label for="status" class="form-label mb-1 label-filter-admin-product">Trạng thái</label>
+              <select id="status" name="status" class="form-select setupSelect2">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="ACTIVE" {{ request('status')==='ACTIVE'?'selected':'' }}>Đang bán</option>
+                <option value="INACTIVE" {{ request('status')==='INACTIVE'?'selected':'' }}>Ẩn</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-2">
+              <label for="price_min" class="form-label mb-1 label-filter-admin-product">Giá từ</label>
+              <input id="price_min" type="number" name="price_min" class="form-control" placeholder="0" value="{{ request('price_min') }}" min="0" step="1">
+            </div>
+            <div class="col-md-2">
+              <label for="price_max" class="form-label mb-1 label-filter-admin-product">Giá đến</label>
+              <input id="price_max" type="number" name="price_max" class="form-control" placeholder="∞" value="{{ request('price_max') }}" min="0" step="1">
+            </div>
+            <div class="col-md-2">
+              <label for="stock_min" class="form-label mb-1 label-filter-admin-product">Tồn từ</label>
+              <input id="stock_min" type="number" name="stock_min" class="form-control" placeholder="0" value="{{ request('stock_min') }}" min="0" step="1">
+            </div>
+            <div class="col-md-2">
+              <label for="stock_max" class="form-label mb-1 label-filter-admin-product">Tồn đến</label>
+              <input id="stock_max" type="number" name="stock_max" class="form-control" placeholder="∞" value="{{ request('stock_max') }}" min="0" step="1">
+            </div>
+          </div>
         </div>
 
-        <div class="col-md-2 select2CustomWidth">
-          <select name="category_id" class="form-select setupSelect2">
-            <option value="">-- Tất cả danh mục --</option>
-            @foreach($categories as $c)
-            <option value="{{ $c->id }}" {{ request('category_id') === (string)$c->id ? 'selected' : '' }}>
-              {{ $c->name }}
-            </option>
-            @endforeach
-          </select>
-        </div>
-
-        <div class="col-md-2 select2CustomWidth">
-          <select name="author_id" class="form-select setupSelect2">
-            <option value="">-- Tất cả tác giả --</option>
-            @foreach($authors as $a)
-            <option value="{{ $a->id }}" {{ request('author_id') === (string)$a->id ? 'selected' : '' }}>
-              {{ $a->name }}
-            </option>
-            @endforeach
-          </select>
-        </div>
-
-        <div class="col-md-2 select2CustomWidth">
-          <select name="publisher_id" class="form-select setupSelect2">
-            <option value="">-- Tất cả NXB --</option>
-            @foreach($publishers as $p)
-            <option value="{{ $p->id }}" {{ request('publisher_id') === (string)$p->id ? 'selected' : '' }}>
-              {{ $p->name }}
-            </option>
-            @endforeach
-          </select>
-        </div>
-
-        <div class="col-md-2 select2CustomWidth">
-          <select name="status" class="form-select setupSelect2">
-            <option value="">-- Tất cả trạng thái --</option>
-            <option value="ACTIVE" {{ request('status')==='ACTIVE'?'selected':'' }}>Đang bán</option>
-            <option value="INACTIVE" {{ request('status')==='INACTIVE'?'selected':'' }}>Ẩn</option>
-          </select>
-        </div>
-
-        <div class="col-md-1 d-grid">
-          <button type="submit" class="btn btn-primary btn-admin">Lọc</button>
-        </div>
       </form>
 
       {{-- Bulk actions --}}

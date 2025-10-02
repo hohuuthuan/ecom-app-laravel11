@@ -780,3 +780,19 @@ table tbody td:first-child {
 .sidebar-email {
     color: #05a0ac;
 }
+
+
+/* ============================================= ADMIN PRODUCT ============================================= */
+.searchProduct {
+    margin-bottom: 15px;
+}
+
+.btn-submit-filter-admin-product {
+    min-width: 120px !important;
+    margin-top: 28px;
+}
+
+.label-filter-admin-product {
+    font-weight: 600;
+    color: #00455a;
+}

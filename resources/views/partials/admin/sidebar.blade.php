@@ -20,6 +20,7 @@
         <x-sidebar.item route="admin.dashboard" icon="fa-home" label="Dashboard" />
         <x-sidebar.item route="admin.accounts.index" icon="fa-users" label="Tài khoản" />
         <x-sidebar.item route="admin.catalog.index" icon="fa-tags" label="Danh mục | Nhà xuất bản | Tác giả" />
+        <x-sidebar.item route="admin.product.index" icon="fa-tags" label="Sản phẩm" />
       </ul>
     </nav>
   </div>

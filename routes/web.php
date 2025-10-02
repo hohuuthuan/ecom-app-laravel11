@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\Page\CatalogPageController;
+use App\Http\Controllers\Admin\Page\ProductPageController;
+
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PublisherController;
@@ -49,6 +51,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/publishers/{id}', [PublisherController::class, 'update'])->name('publishers.update');
         Route::delete('/publishers/{id}', [PublisherController::class, 'destroy'])->name('publishers.destroy');
         Route::post('/publishers/bulk-delete', [PublisherController::class, 'bulkDelete'])->name('publishers.bulk-delete');
+
+        Route::get('/product', [ProductPageController::class, 'index'])->name('product.index');
     });
 });
 

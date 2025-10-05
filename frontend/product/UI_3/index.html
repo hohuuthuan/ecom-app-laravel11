@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chip Hover Red Sync Effect + Dropdown Custom</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+
+  <style>
+    :root {
+      --tagify-dd-color-primary: #cccccc; 
+      --chip-remove-space: 46px;
+      --chip-bg: #e6f6ff;
+      --chip-text: #215e83;
+      --chip-border: #bfe8ff;
+      --chip-bg-hover-green: #e3fcec;
+      --chip-border-green: #b6f2ca;
+      --chip-bg-remove: #f8d7da;
+      --chip-border-remove: #f1b0b7;
+    }
+
+    body { background: #f1f5f9; }
+    .panel { border: 1px solid #e5e7eb; background: #fff; border-radius: 6px; }
+    .panel-header { padding: .5rem .75rem; border-bottom: 1px solid #e5e7eb; background: #f8fafc; font-weight: 600; }
+    .panel-body { padding: .75rem; }
+
+    .tag-input {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 0px;
+      padding: .5rem .625rem;
+      outline: 0;
+    }
+    .tag-input:focus { border-color: none; box-shadow: none; }
+
+    .tagify { --tags-border-color: transparent; }
+
+    /* ==== CHIP ==== */
+    .tagify__tag {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      width: 100%;
+      background: var(--chip-bg) !important;
+      color: var(--chip-text);
+      border: 1px solid var(--chip-border);
+      padding: .5rem var(--chip-remove-space) .5rem .75rem;
+      margin: 4px 0;
+      transform-origin: center;
+      transition: transform .12s ease, background .15s ease, border-color .15s ease;
+    }
+
+    .tagify__tag:hover {
+      background: var(--chip-bg-hover-green) !important;
+      border-color: var(--chip-border-green) !important;
+      transform: scale(1.02);
+    }
+
+    .tagify__tag > div {
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 100%;
+    }
+    .tagify__tag > div::before { display: none !important; }
+
+    .tagify__tag-text {
+      display: block !important;
+      white-space: normal !important;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      line-height: 1.4;
+      width: 100%;
+    }
+
+    .tagify__tag__removeBtn {
+      position: absolute !important;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%) scale(1);
+      font-size: 20px;
+      color: #555;
+      background: transparent !important;
+      border: 0;
+      cursor: pointer;
+      line-height: 1;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s ease;
+    }
+
+    .tagify__tag__removeBtn:hover {
+      background: var(--chip-bg-remove) !important;
+      color: #fff !important;
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 0 0 2px var(--chip-border-remove);
+    }
+
+    .tagify__tag:has(.tagify__tag__removeBtn:hover) {
+      background: var(--chip-bg-remove) !important;
+      border-color: var(--chip-border-remove) !important;
+      color: #fff !important;
+      transform: scale(1.02);
+    }
+
+    @keyframes chip-in {
+      0% { transform: scaleX(.9); opacity: .6; }
+      70% { transform: scaleX(1.06); opacity: 1; }
+      100% { transform: scaleX(1); }
+    }
+    .chip-anim-in { animation: chip-in .18s ease-out; }
+
+    @keyframes chip-out {
+      0% { transform: translateX(0); opacity: 1; }
+      100% { transform: translateX(-12px); opacity: 0; }
+    }
+    .tagify__tag--hide,
+    .tagify__tag--removed {
+      animation: chip-out .18s ease-in forwards !important;
+      width: 100% !important;
+      margin: 4px 0 !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
+    }
+
+    .tagify__tag--hide .tagify__tag-text,
+    .tagify__tag--removed .tagify__tag-text {
+      white-space: normal !important;
+      overflow-wrap: anywhere !important;
+    }
+
+    /* ==== DROPDOWN CUSTOM ==== */
+    .tagify__dropdown__wrapper {
+      border-color: #cccccc !important;
+      background: #e7e7e7 !important;
+      color: #000000 !important;
+      box-shadow: none !important;
+      padding: 4px 0 !important;
+    }
+
+    .tagify__dropdown__item {
+      background: transparent !important;
+      font-weight: 400;
+      color: #000000 !important;
+      padding: 6px 10px !important;
+      transition: background .1s ease;
+    }
+
+    .tagify__dropdown__item:hover,
+    .tagify__dropdown__item--active {
+      background: rgba(126, 250, 153, 0.5) !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <h4 class="mb-3">Tagify Chip</h4>
+    <div class="row g-4">
+      <div class="col-lg-6">
+   
+       
+            <label class="fw-semibold mb-2">Chọn danh mục</label>
+            <input id="categoriesInput" class="tag-input" placeholder="Gõ để chọn danh mục...">
+            <div class="form-text">Gõ để tìm, Enter để chọn, Backspace xóa.</div>
+
+      </div>
+      <div class="col-lg-6">
+        <div class="panel">
+          <div class="panel-header">Tác giả</div>
+          <div class="panel-body">
+            <label class="fw-semibold mb-2">Chọn tác giả</label>
+            <input id="authorsInput" class="tag-input" placeholder="Gõ để chọn tác giả...">
+            <div class="form-text">Có thể dán hàng loạt, phân tách bằng dấu phẩy.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+  <script>
+    const categories = [
+      { value:'1',label:'Khoa học - Công nghệ - Môi trường - Xu hướng trong kỷ nguyên sốooooooooooooooooooooooooooooooooooooooo' },
+      { value:'2',label:'Văn học thiếu nhi: Những câu chuyện dài bất tận về tuổi thơ và ước mơ' },
+      { value:'3',label:'Tâm lý học ứng dụng trong đời sống hiện đại' },
+      { value:'4',label:'Kinh tế - Quản trị - Khởi nghiệp - Câu chuyện thương hiệu Việt Nam' }
+    ];
+    const authors = [
+      { value:'a1',label:'Nguyễn Văn A với một cái tên tác giả cực kỳ dài để kiểm tra giao diện hiển thị và tính thân thiện' },
+      { value:'a2',label:'Trần Thị B' },
+      { value:'a3',label:'Haruki Murakami' },
+      { value:'a4',label:'Gabriel García Márquez' }
+    ];
+
+    function setupTagify(inputEl, list) {
+      const tagify = new Tagify(inputEl, {
+        enforceWhitelist: true,
+        whitelist: list.map(x => ({ value: x.value, name: x.label })),
+        tagTextProp: 'name',
+        dropdown: {
+          enabled: 0,
+          maxItems: 20,
+          closeOnSelect: false,
+          highlightFirst: true,
+          mapValueTo: 'name',
+          searchKeys: ['name']
+        },
+        originalInputValueFormat: arr => arr.map(v => v.value).join(','),
+        editTags: false
+      });
+
+      function openDropdown() { tagify.dropdown.show.call(tagify, inputEl.value); }
+      inputEl.addEventListener('focus', openDropdown);
+      inputEl.addEventListener('click', openDropdown);
+
+      tagify.on('add', e => {
+        const tag = e.detail.tag;
+        tag.title = e.detail.data.name || e.detail.data.value;
+        tag.classList.add('chip-anim-in');
+        tag.addEventListener('animationend', () => tag.classList.remove('chip-anim-in'), { once: true });
+      });
+
+      tagify.on('dropdown:show', () => {
+        const items = tagify.DOM.dropdown.content.querySelectorAll('[title=""]');
+        items.forEach(it => { it.title = it.textContent.trim(); });
+      });
+
+      return tagify;
+    }
+
+    const cats = setupTagify(document.getElementById('categoriesInput'), categories);
+    const auth = setupTagify(document.getElementById('authorsInput'), authors);
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Admin — Quản lý sản phẩm (mock, light)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap 5 + Select2 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+  <style>
+    :root { --gap:.75rem; }
+    body { background:#f6f8fb; color:#1f2328; }
+    .page-wrap { padding:24px; }
+    .card { background:#fff; border-color:#e5e7eb; box-shadow:0 1px 2px rgba(16,24,40,.04); }
+    .form-control, .form-select, .select2-container--default .select2-selection--single {
+      background:#fff; border-color:#d0d7de; color:#1f2328;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color:#84c5f4; box-shadow:0 0 0 .25rem rgba(13,110,253,.15);
+    }
+    .select2-dropdown { background:#fff; border-color:#d0d7de; color:#1f2328; }
+    .select2-results__option--highlighted { background:#e7f1ff !important; color:#0a58ca !important; }
+    .table { color:#1f2328; }
+    .table thead th { white-space:nowrap; user-select:none; position:sticky; top:0; background:#fff; z-index:1; }
+    .table > :not(caption) > * > * { border-bottom-color:#eef2f6; }
+    .table img.thumb { width:44px; height:60px; object-fit:cover; border-radius:6px; }
+    .filter-grid { display:grid; grid-template-columns: repeat(12, 1fr); gap:var(--gap); }
+    .filter-grid > * { grid-column: span 3; }
+    @media (max-width: 992px){ .filter-grid > * { grid-column: span 6; } }
+    @media (max-width: 576px){ .filter-grid > * { grid-column: span 12; } }
+    .badge-dot { position:relative; padding-left:16px; }
+    .badge-dot::before { content:""; width:8px; height:8px; border-radius:50%; background:currentColor; position:absolute; left:6px; top:50%; transform:translateY(-50%); }
+    .table-tools { gap:.5rem; }
+    .pagination { margin:0; }
+    .select2-container { width:100% !important; }
+    .search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); opacity:.55; }
+    .search-input { padding-left:32px; }
+    .cursor-pointer { cursor:pointer; }
+    .toast-container { z-index:1080; }
+    .offcanvas { background:#fff; color:#1f2328; border-left:1px solid #e5e7eb; }
+    .modal-content { background:#fff; color:#1f2328; }
+    .btn-outline-light { border-color:#d0d7de; color:#1f2328; }
+    .btn-outline-light:hover { background:#f2f4f7; border-color:#c6cdd5; }
+    .small.text-secondary { color:#6b7280 !important; }
+  </style>
+</head>
+<body>
+  <div class="page-wrap container-xxl">
+    <!-- Title + actions -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+      <div>
+        <h2 class="h4 mb-0">Quản lý sản phẩm</h2>
+        <small class="text-secondary">Danh sách, lọc, bulk action, export (mock tĩnh)</small>
+      </div>
+      <div class="d-flex table-tools">
+        <button id="btn-export" class="btn btn-outline-light btn-sm">Xuất CSV</button>
+        <div class="btn-group">
+          <button class="btn btn-outline-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">Tác vụ hàng loạt</button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" data-bulk="visible">Hiện</a></li>
+            <li><a class="dropdown-item" data-bulk="hidden">Ẩn</a></li>
+            <li><a class="dropdown-item" data-bulk="featured">Đánh dấu nổi bật</a></li>
+            <li><a class="dropdown-item" data-bulk="price+5">Tăng giá +5%</a></li>
+            <li><a class="dropdown-item" data-bulk="price-5">Giảm giá -5%</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" data-bulk="delete">Xóa</a></li>
+          </ul>
+        </div>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#productModal">Tạo sản phẩm</button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="filter-grid">
+          <div class="position-relative">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5L21.5 20zM9.5 14A4.5 4.5 0 1 1 14 9.5A4.505 4.505 0 0 1 9.5 14"></path></svg>
+            <input id="f-keyword" class="form-control search-input" placeholder="Từ khóa: tên sách, ISBN">
+          </div>
+          <select id="f-category" class="form-select sel2" data-placeholder="Danh mục"></select>
+          <select id="f-author" class="form-select sel2" data-placeholder="Tác giả"></select>
+          <select id="f-publisher" class="form-select sel2" data-placeholder="NXB"></select>
+
+          <select id="f-status" class="form-select">
+            <option value="">Trạng thái</option>
+            <option value="active">Đang bán</option>
+            <option value="hidden">Ẩn</option>
+          </select>
+          <select id="f-featured" class="form-select">
+            <option value="">Nổi bật?</option>
+            <option value="1">Có</option>
+            <option value="0">Không</option>
+          </select>
+          <input id="f-price-min" class="form-control" type="number" min="0" placeholder="Giá min">
+          <input id="f-price-max" class="form-control" type="number" min="0" placeholder="Giá max">
+
+          <select id="f-stock" class="form-select">
+            <option value="">Tồn kho</option>
+            <option value="zero">= 0</option>
+            <option value="gt0">&gt; 0</option>
+            <option value="ltReorder">&lt; mức cảnh báo</option>
+          </select>
+          <input id="f-date-from" class="form-control" type="date" placeholder="Từ ngày">
+          <input id="f-date-to" class="form-control" type="date" placeholder="Đến ngày">
+          <div class="d-flex gap-2 align-items-center">
+            <button id="btn-search" class="btn btn-primary w-100">Lọc</button>
+            <button id="btn-reset" class="btn btn-outline-light w-100">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="tbl-products">
+          <thead>
+            <tr>
+              <th style="width:36px;"><input id="chk-all" class="form-check-input" type="checkbox"></th>
+              <th class="cursor-pointer" data-sort="title">Tên sách</th>
+              <th>Ảnh</th>
+              <th class="cursor-pointer" data-sort="isbn">ISBN</th>
+              <th>Danh mục</th>
+              <th>Tác giả</th>
+              <th>NXB</th>
+              <th class="cursor-pointer" data-sort="price">Giá</th>
+              <th>Giá KM</th>
+              <th class="cursor-pointer" data-sort="stock">Tồn</th>
+              <th>Trạng thái</th>
+              <th>Nổi bật</th>
+              <th class="cursor-pointer" data-sort="updated_at">Cập nhật</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-between align-items-center p-3">
+        <div id="summary" class="small text-secondary">0 sản phẩm</div>
+        <nav><ul class="pagination pagination-sm m-0" id="pager"></ul></nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick view offcanvas -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="quickView" style="width:420px;">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Chi tiết nhanh</h5>
+      <button class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body small" id="quickViewBody">Đang tải…</div>
+  </div>
+
+  <!-- Product modal (mock form) -->
+  <div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tạo/Sửa sản phẩm (mock)</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label">Tên sách</label>
+              <input class="form-control" placeholder="Nhập tên sách">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">ISBN</label>
+              <input class="form-control" placeholder="ISBN">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Giá (VND)</label>
+              <input class="form-control" type="number" min="0" step="1000">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Giá KM (VND)</label>
+              <input class="form-control" type="number" min="0" step="1000">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Tồn kho</label>
+              <input class="form-control" type="number" min="0">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Danh mục</label>
+              <select class="form-select sel2"></select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Tác giả</label>
+              <select class="form-select sel2"></select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">NXB</label>
+              <select class="form-select sel2"></select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Trạng thái</label>
+              <select class="form-select">
+                <option>Đang bán</option><option>Ẩn</option>
+              </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="chk-featured">
+                <label class="form-check-label" for="chk-featured">Nổi bật</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Mô tả ngắn</label>
+              <textarea class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-light" data-bs-dismiss="modal">Đóng</button>
+          <button class="btn btn-primary">Lưu (demo)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script>
+    // --- Mock data -----------------------------------------------------------
+    const mockCategories = ["Kinh tế","Thiếu nhi","CNTT","Tiểu thuyết","Khoa học"];
+    const mockAuthors = ["Nguyễn Nhật Ánh","Yuval Harari","Robert C. Martin","J.K. Rowling","J.R.R. Tolkien"];
+    const mockPublishers = ["NXB Trẻ","NXB Kim Đồng","NXB Lao Động","NXB Thế Giới","NXB CNTT"];
+
+    const DATA = Array.from({length:58},(_,i)=>{
+      const cat = mockCategories[i%mockCategories.length];
+      const auth = mockAuthors[i%mockAuthors.length];
+      const pub = mockPublishers[i%mockPublishers.length];
+      const price = 50000 + (i%20)*5000;
+      const sale = i%3===0 ? Math.floor(price*0.9) : 0;
+      const stock = (i*7)%60;
+      return {
+        id:i+1,title:`Sách mẫu #${i+1} — ${cat}`,
+        isbn:`978-1-${String(100000000+i).slice(0,9)}`,
+        category:cat, author:auth, publisher:pub,
+        price, price_sale:sale, stock, reorder:5+(i%4)*5,
+        status: stock===0 && i%2 ? 'hidden':'active',
+        featured:i%5===0,
+        updated_at:new Date(Date.now()-i*86400000).toISOString(),
+        image:`https://picsum.photos/seed/book${i}/90/120`
+      };
+    });
+
+    // --- State ---------------------------------------------------------------
+    const state = { page:1, limit:10, sortBy:'updated_at', sortDir:'desc', rows: DATA.slice(), selected:new Set(), filters:{} };
+
+    // --- Helpers -------------------------------------------------------------
+    function fmtVND(n){ return n ? n.toLocaleString('vi-VN') : '—'; }
+    function fmtDate(iso){ const d=new Date(iso); return d.toLocaleDateString('vi-VN',{year:'numeric',month:'2-digit',day:'2-digit'}); }
+    function toast(msg,type='info'){
+      const el=document.createElement('div');
+      el.className='toast align-items-center text-bg-'+(type==='error'?'danger':type)+' border-0';
+      el.role='alert';
+      el.innerHTML=`<div class="d-flex"><div class="toast-body">${msg}</div><button class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+      document.querySelector('.toast-container').appendChild(el);
+      new bootstrap.Toast(el,{delay:2200}).show();
+    }
+
+    // --- Select2 -------------------------------------------------------------
+    function initSelect2(){
+      const opts=s=>({ data:['',...s].map(v=>({id:v,text:v||'-- tất cả --'})) });
+      document.querySelectorAll('.sel2').forEach(x=>{
+        if (x.classList.contains('select2-hidden-accessible')) return;
+        const placeholder=x.getAttribute('data-placeholder')||'Chọn';
+        $(x).select2({ placeholder, allowClear:true, width:'100%' });
+      });
+      $('#f-category').select2(opts(mockCategories)).val('').trigger('change');
+      $('#f-author').select2(opts(mockAuthors)).val('').trigger('change');
+      $('#f-publisher').select2(opts(mockPublishers)).val('').trigger('change');
+    }
+
+    // --- Filtering -----------------------------------------------------------
+    function applyFilters(){
+      const f=state.filters; let arr=DATA.slice();
+      if (f.keyword){ const k=f.keyword.toLowerCase(); arr=arr.filter(r=>r.title.toLowerCase().includes(k)||r.isbn.toLowerCase().includes(k)); }
+      if (f.category){ arr=arr.filter(r=>r.category===f.category); }
+      if (f.author){ arr=arr.filter(r=>r.author===f.author); }
+      if (f.publisher){ arr=arr.filter(r=>r.publisher===f.publisher); }
+      if (f.status){ arr=arr.filter(r=>r.status===f.status); }
+      if (f.featured!==undefined && f.featured!==''){ arr=arr.filter(r=>String(r.featured?1:0)===String(f.featured)); }
+      if (f.priceMin){ arr=arr.filter(r=>r.price>=f.priceMin); }
+      if (f.priceMax){ arr=arr.filter(r=>r.price<=f.priceMax); }
+      if (f.stock){
+        if (f.stock==='zero') arr=arr.filter(r=>r.stock===0);
+        if (f.stock==='gt0') arr=arr.filter(r=>r.stock>0);
+        if (f.stock==='ltReorder') arr=arr.filter(r=>r.stock<r.reorder);
+      }
+      if (f.from){ arr=arr.filter(r=>new Date(r.updated_at)>=new Date(f.from)); }
+      if (f.to){ arr=arr.filter(r=>new Date(r.updated_at)<=new Date(f.to+'T23:59:59')); }
+      state.rows=arr; state.page=1; render();
+    }
+
+    // --- Sorting -------------------------------------------------------------
+    function sortRows(){
+      const {sortBy,sortDir}=state; const dir=sortDir==='asc'?1:-1;
+      state.rows.sort((a,b)=>{
+        let va=a[sortBy], vb=b[sortBy];
+        if (sortBy==='title' || sortBy==='isbn'){ va=String(va).toLowerCase(); vb=String(vb).toLowerCase(); }
+        if (va<vb) return -1*dir; if (va>vb) return 1*dir; return 0;
+      });
+    }
+
+    // --- Rendering -----------------------------------------------------------
+    function render(){
+      sortRows();
+      const start=(state.page-1)*state.limit;
+      const paged=state.rows.slice(start,start+state.limit);
+      const tbody=document.querySelector('#tbl-products tbody');
+      tbody.innerHTML=paged.map(r=>`
+        <tr data-id="${r.id}">
+          <td><input class="form-check-input row-check" type="checkbox" ${state.selected.has(r.id)?'checked':''}></td>
+          <td><div class="fw-semibold">${r.title}</div><div class="small text-secondary">#${r.id}</div></td>
+          <td><img class="thumb" src="${r.image}" alt=""></td>
+          <td><code>${r.isbn}</code></td>
+          <td>${r.category}</td>
+          <td>${r.author}</td>
+          <td>${r.publisher}</td>
+          <td>${fmtVND(r.price)}</td>
+          <td>${r.price_sale?'<span class="text-success">'+fmtVND(r.price_sale)+'</span>':'—'}</td>
+          <td>${r.stock}<div class="small text-secondary">reorder ${r.reorder}</div></td>
+          <td>${r.status==='active'
+              ? '<span class="badge text-bg-success badge-dot">Đang bán</span>'
+              : '<span class="badge text-bg-secondary badge-dot">Ẩn</span>'}
+          </td>
+          <td>${r.featured?'<span class="badge text-bg-warning">★</span>':''}</td>
+          <td>${fmtDate(r.updated_at)}</td>
+          <td>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-light btn-view" data-id="${r.id}" data-bs-toggle="offcanvas" data-bs-target="#quickView">Xem</button>
+              <button class="btn btn-outline-light">Sửa</button>
+              <button class="btn btn-outline-light">Nhân bản</button>
+              <button class="btn btn-outline-light">${r.status==='active'?'Ẩn':'Hiện'}</button>
+              <button class="btn btn-outline-danger">Xóa</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      document.querySelectorAll('#tbl-products thead th[data-sort]').forEach(th=>{
+        th.innerHTML = th.getAttribute('data-sort')==='title' ? 'Tên sách' :
+                       th.getAttribute('data-sort')==='isbn' ? 'ISBN' :
+                       th.getAttribute('data-sort')==='price' ? 'Giá' :
+                       th.getAttribute('data-sort')==='stock' ? 'Tồn' : 'Cập nhật';
+        if (th.getAttribute('data-sort')===state.sortBy){
+          th.innerHTML += state.sortDir==='asc' ? ' ▲' : ' ▼';
+        }
+      });
+
+      document.getElementById('summary').textContent =
+        `${state.rows.length} sản phẩm • Trang ${state.page}/${Math.max(1,Math.ceil(state.rows.length/state.limit))}`;
+
+      const totalPages=Math.max(1,Math.ceil(state.rows.length/state.limit));
+      const pager=document.getElementById('pager'); let items=[];
+      function li(p,label=p,disabled=false,active=false){
+        items.push(`<li class="page-item ${disabled?'disabled':''} ${active?'active':''}">
+          <a class="page-link" data-page="${p}" href="#">${label}</a></li>`);
+      }
+      li(state.page-1,'«',state.page===1);
+      for(let p=Math.max(1,state.page-2); p<=Math.min(totalPages,state.page+2); p++){ li(p,p,false,p===state.page); }
+      li(state.page+1,'»',state.page===totalPages);
+      pager.innerHTML=items.join('');
+
+      tbody.querySelectorAll('.row-check').forEach(chk=>{
+        chk.addEventListener('change', ()=>{
+          const id=Number(chk.closest('tr').dataset.id);
+          if (chk.checked) state.selected.add(id); else state.selected.delete(id);
+          document.getElementById('chk-all').checked =
+            state.selected.size && [...tbody.querySelectorAll('.row-check')].every(c=>c.checked);
+        });
+      });
+      document.querySelectorAll('.btn-view').forEach(btn=>{
+        btn.addEventListener('click', ()=> openQuickView(Number(btn.dataset.id)));
+      });
+    }
+
+    // --- Quick view ----------------------------------------------------------
+    function openQuickView(id){
+      const r=DATA.find(x=>x.id===id); if(!r) return;
+      document.getElementById('quickViewBody').innerHTML=`
+        <div class="d-flex gap-3">
+          <img src="${r.image}" class="rounded" width="96" height="128">
+          <div>
+            <div class="fw-semibold">${r.title}</div>
+            <div class="text-secondary small"><code>${r.isbn}</code></div>
+            <div class="small mt-2">Danh mục: ${r.category}</div>
+            <div class="small">Tác giả: ${r.author}</div>
+            <div class="small">NXB: ${r.publisher}</div>
+            <div class="small">Giá: <b>${fmtVND(r.price)}</b> ${r.price_sale?`(KM ${fmtVND(r.price_sale)})`:''}</div>
+            <div class="small">Tồn: <b>${r.stock}</b> (ngưỡng ${r.reorder})</div>
+            <div class="small">Cập nhật: ${fmtDate(r.updated_at)}</div>
+          </div>
+        </div>
+        <hr>
+        <div class="small">
+          <div class="fw-semibold mb-2">Lịch sử (mock):</div>
+          <ul class="mb-0">
+            <li>${fmtDate(r.updated_at)} — Cập nhật giá</li>
+            <li>${fmtDate(new Date(Date.parse(r.updated_at)-3*86400000).toISOString())} — Nhập kho +15</li>
+            <li>${fmtDate(new Date(Date.parse(r.updated_at)-10*86400000).toISOString())} — Tạo sản phẩm</li>
+          </ul>
+        </div>`;
+    }
+
+    // --- Events --------------------------------------------------------------
+    document.addEventListener('click', e=>{
+      if (e.target.closest('#pager .page-link')){
+        e.preventDefault();
+        const p=Number(e.target.getAttribute('data-page'));
+        if(!isNaN(p)){ state.page=Math.max(1,p); render(); }
+      }
+      if (e.target.closest('[data-bulk]')){
+        const action=e.target.getAttribute('data-bulk');
+        if (state.selected.size===0){ toast('Chưa chọn sản phẩm nào','warning'); return; }
+        toast(`Thực hiện bulk: ${action} cho ${state.selected.size} sản phẩm (demo)`,'success');
+      }
+    });
+    document.getElementById('chk-all').addEventListener('change', e=>{
+      const tbody=document.querySelector('#tbl-products tbody');
+      state.selected.clear();
+      tbody.querySelectorAll('.row-check').forEach(chk=>{
+        chk.checked=e.target.checked;
+        if (chk.checked){ state.selected.add(Number(chk.closest('tr').dataset.id)); }
+      });
+    });
+    document.querySelectorAll('#tbl-products thead th[data-sort]').forEach(th=>{
+      th.addEventListener('click', ()=>{
+        const key=th.getAttribute('data-sort');
+        if (state.sortBy===key){ state.sortDir=state.sortDir==='asc'?'desc':'asc'; }
+        else { state.sortBy=key; state.sortDir='asc'; }
+        render();
+      });
+    });
+
+    document.getElementById('btn-search').addEventListener('click', ()=>{
+      state.filters={
+        keyword:document.getElementById('f-keyword').value.trim(),
+        category:$('#f-category').val()||'',
+        author:$('#f-author').val()||'',
+        publisher:$('#f-publisher').val()||'',
+        status:document.getElementById('f-status').value,
+        featured:document.getElementById('f-featured').value,
+        priceMin:Number(document.getElementById('f-price-min').value)||0,
+        priceMax:Number(document.getElementById('f-price-max').value)||0,
+        stock:document.getElementById('f-stock').value,
+        from:document.getElementById('f-date-from').value,
+        to:document.getElementById('f-date-to').value
+      };
+      if(!state.filters.priceMin) delete state.filters.priceMin;
+      if(!state.filters.priceMax) delete state.filters.priceMax;
+      applyFilters();
+    });
+    document.getElementById('btn-reset').addEventListener('click', ()=>{
+      document.querySelectorAll('.filter-grid .form-control, .filter-grid .form-select').forEach(el=> el.value='');
+      $('#f-category,#f-author,#f-publisher').val('').trigger('change');
+      state.filters={}; state.rows=DATA.slice(); state.page=1; render();
+    });
+
+    document.getElementById('btn-export').addEventListener('click', ()=>{
+      const header=['id','title','isbn','category','author','publisher','price','price_sale','stock','status','featured','updated_at'];
+      const start=(state.page-1)*state.limit;
+      const rows=state.rows.slice(start,start+state.limit);
+      const csv=[header.join(',')].concat(rows.map(r=>header.map(h=>{
+        const v=r[h]; return typeof v==='string'?`"${v.replace(/"/g,'""')}"`:v;
+      }).join(','))).join('\n');
+      const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      const url=URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download='products.csv'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    // --- Boot ---------------------------------------------------------------
+    initSelect2(); render();
+  </script>
+</body>
+</html>

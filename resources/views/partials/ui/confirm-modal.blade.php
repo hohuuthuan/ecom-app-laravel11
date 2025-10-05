@@ -1,4 +1,3 @@
-{{-- Reusable Confirm Modal (Bootstrap 5) --}}
 <div class="modal fade" id="uiConfirmModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-md modal-top">
     <div class="modal-content border-0 rounded-4 shadow-lg">

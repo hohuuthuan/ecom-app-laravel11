@@ -1,12 +1,14 @@
-composer install
-php artisan storage:link
+### HƯỚNG DẪN CÀI ĐẶT DỰ ÁN LẦN ĐẦU ###
+- Tạo file .env và copy nội dung .env.example
+- Chỉnh sửa tên DB_DATABASE, DB_USERNAME và DB_PASSWORD
+- Vào thư mục econ-app-laravel11 mở lên terminal
+- Cài đặt dependencies: composer install && npm install
+- Link thư mục: php artisan storage:link
+- Chạy migrate database sạch và seed 2 role cơ bản: php artisan migrate:fresh --seed
+- Chạy dự án: npm run app
 
-
-# migrate + seed
-php artisan migrate --seed
-
-# Làm sạch DB rồi chạy lại toàn bộ seed
-php artisan migrate:fresh --seed
-
-# Chỉ seed RoleSeeder
-php artisan db:seed --class=Database\\Seeders\\RoleSeeder
+### HƯỚNG DẪN LẤY CODE MỚI ###
+- Vào thư mục econ-app-laravel11 mở lên terminal
+- Chạy lệnh: git pull origin main
+- Chạy lệnh (nếu có chỉnh sửa database, không có thì bỏ qua): php artisan migrate:fresh --seed
+- Chạy dự án: npm run app

@@ -22,7 +22,7 @@ Go to the project directory
 Install dependencies
 
 ```bash
-  composer install & npm install 
+  composer install && npm install 
 ```
 
 Start the app

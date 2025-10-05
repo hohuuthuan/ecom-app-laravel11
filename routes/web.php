@@ -4,52 +4,62 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\Page\CatalogPageController;
+use App\Http\Controllers\Admin\Page\ProductPageController;
+
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PublisherController;
+use App\Http\Controllers\Admin\ProductController;
 
 // === PUBLIC ===
 Route::view('/', 'user.home')->name('home');
 
 // === GUEST ===
 Route::middleware('guest')->group(function () {
-    Route::view('/login', 'auth.login')->name('login.form');
-    Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('throttle:10,1');
+  Route::view('/login', 'auth.login')->name('login.form');
+  Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('throttle:10,1');
 
-    Route::view('/register', 'auth.register')->name('register.form');
-    Route::post('/register', [AuthController::class, 'register'])->name('register');
+  Route::view('/register', 'auth.register')->name('register.form');
+  Route::post('/register', [AuthController::class, 'register'])->name('register');
 });
 
 // === LOGGED IN ===
 Route::middleware(['auth'])->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+  Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
-        Route::get('/dashboard', fn () => view('admin.dashboard'))->name('dashboard');
+  Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
+    Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
 
-        // Accounts
-        Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
-        Route::post('/accounts/bulk-update', [AccountController::class, 'bulkUpdate'])->name('accounts.bulk-update');
-        Route::put('/accounts/{id}', [AccountController::class, 'updateAccount'])->name('accounts.update');
+    // Accounts
+    Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
+    Route::post('/accounts/bulk-update', [AccountController::class, 'bulkUpdate'])->name('accounts.bulk-update');
+    Route::put('/accounts/{id}', [AccountController::class, 'updateAccount'])->name('accounts.update');
 
-        Route::get('/catalog', [CatalogPageController::class, 'index'])->name('catalog.index');
-        // Authors
-        Route::post('/authors', [AuthorController::class, 'store'])->name('authors.store');
-        Route::put('/authors/{id}', [AuthorController::class, 'update'])->name('authors.update');
-        Route::delete('/authors/{id}', [AuthorController::class, 'destroy'])->name('authors.destroy');
-        Route::delete('/authors/bulk-delete', [AuthorController::class, 'bulkDelete'])->name('authors.bulk-delete');
-        // Categories
-        Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
-        Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
-        Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-        Route::delete('/categories/bulk-delete', [CategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
+    Route::get('/catalog', [CatalogPageController::class, 'index'])->name('catalog.index');
+    // Authors
+    Route::post('/authors', [AuthorController::class, 'store'])->name('authors.store');
+    Route::put('/authors/{id}', [AuthorController::class, 'update'])->name('authors.update');
+    Route::delete('/authors/{id}', [AuthorController::class, 'destroy'])->name('authors.destroy');
+    Route::delete('/authors/bulk-delete', [AuthorController::class, 'bulkDelete'])->name('authors.bulk-delete');
+    // Categories
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::delete('/categories/bulk-delete', [CategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
 
-        // Publishers
-        Route::post('/publishers', [PublisherController::class, 'store'])->name('publishers.store');
-        Route::put('/publishers/{id}', [PublisherController::class, 'update'])->name('publishers.update');
-        Route::delete('/publishers/{id}', [PublisherController::class, 'destroy'])->name('publishers.destroy');
-        Route::post('/publishers/bulk-delete', [PublisherController::class, 'bulkDelete'])->name('publishers.bulk-delete');
-    });
+    // Publishers
+    Route::post('/publishers', [PublisherController::class, 'store'])->name('publishers.store');
+    Route::put('/publishers/{id}', [PublisherController::class, 'update'])->name('publishers.update');
+    Route::delete('/publishers/{id}', [PublisherController::class, 'destroy'])->name('publishers.destroy');
+    Route::post('/publishers/bulk-delete', [PublisherController::class, 'bulkDelete'])->name('publishers.bulk-delete');
+
+    Route::get('/product', [ProductPageController::class, 'index'])->name('product.index');
+    Route::get('/product/create', [ProductPageController::class, 'create'])->name('product.create');
+    Route::get('/products/{id}/edit',  [ProductPageController::class, 'edit'])->name('product.edit');
+
+    Route::post('/product', [ProductController::class, 'store'])->name('product.store');
+    Route::put('/products/{id}', [ProductController::class, 'update'])->name('product.update');
+  });
 });
 
-Route::fallback(fn () => response()->view('errors.404', [], 404));
+Route::fallback(fn() => response()->view('errors.404', [], 404));

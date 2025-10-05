@@ -820,6 +820,8 @@ table tbody td:first-child {
 }
 
 .create-product-page .form-control,
+.edit-product-page .form-control,
+.edit-product-page .btn,    
 .create-product-page .btn {
     border-radius: 2px !important;
 }
@@ -953,6 +955,7 @@ body {
 
 /* ==== CHIP ==== */
 .tagify__tag {
+    cursor: pointer;
     position: relative;
     display: flex;
     align-items: flex-start;
@@ -1099,5 +1102,4 @@ body {
 .create-product-page .input-group-text {
     border-radius: 0px !important;
 }
-
 /* ====================================== */

@@ -44,4 +44,18 @@ class ProductPageController extends Controller
 
     return view('admin.product.create', compact('categories', 'authors', 'publishers'));
   }
+
+  public function edit(string $id)
+  {
+    $categories = $this->productService->getListCategory();
+    $authors    = $this->productService->getListAuthor();
+    $publishers = $this->productService->getListPublisher();
+
+    $product = $this->productService->findById($id);
+    if (!$product) {
+      return back()->with('toast_error', 'Sản phẩm không tồn tại');
+    }
+
+    return view('admin.product.edit', compact('product', 'categories', 'authors', 'publishers'));
+  }
 }

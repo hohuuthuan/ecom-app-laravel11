@@ -144,4 +144,54 @@ class ProductService
       return false;
     }
   }
+
+  public function findById(string $id): ?Product
+  {
+    return Product::with(['categories:id', 'authors:id'])->find($id);
+  }
+
+  public function update(Product $product, array $data, ?UploadedFile $image): bool
+  {
+    $oldImage = $product->image;
+    try {
+      DB::transaction(function () use ($product, $data, $image, $oldImage) {
+        if ($image instanceof UploadedFile) {
+          $newName = $image->hashName();
+          $image->storeAs('products', $newName, 'public');
+          $product->image = $newName;
+        }
+
+        $product->title             = $data['title'];
+        $product->slug              = $data['slug'];
+        $product->code              = $data['code'];
+        $product->isbn              = $data['isbn'];
+        $product->description       = $data['description'];
+        $product->selling_price_vnd = $data['selling_price_vnd'];
+        $product->unit              = $data['unit'];
+        $product->status            = $data['status'];
+        $product->publisher_id      = $data['publisher_id'];
+        $product->save();
+
+        $product->categories()->sync($data['categoriesInput']);
+        $product->authors()->sync($data['authorsInput']);
+        if ($image instanceof UploadedFile && $oldImage && $oldImage !== $product->image) {
+          $path = 'products/' . $oldImage;
+          if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+          }
+        }
+      });
+
+      return true;
+    } catch (\Throwable $e) { 
+      if (isset($newName)) {
+        $path = 'products/' . $newName;
+        if (Storage::disk('public')->exists($path)) {
+          Storage::disk('public')->delete($path);
+        }
+      }
+      Log::error('Product update failed', ['msg' => $e->getMessage()]);
+      return false;
+    }
+  }
 }

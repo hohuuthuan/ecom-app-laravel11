@@ -121,7 +121,7 @@
       {{-- Bulk actions --}}
       <div class="d-flex justify-content-between mb-2">
         <div class="d-flex gap-2">
-          <button type="button" class="btn btn-sm btn-danger btn-admin" id="productBtnBulkDelete" disabled>Xoá đã chọn</button>
+
         </div>
         <div class="d-flex gap-2">
           <a href="{{ route('admin.product.create') }}"><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiProductModal">Thêm sản phẩm</button></a>
@@ -166,15 +166,11 @@
                 @endif
               </td>
               <td class="text-center">
-                <button type="button" class="btn btn-sm btn-success btnProductEdit" disabled>
-                  <i class="fa fa-edit"></i>
-                </button>
-                <form method="POST" class="d-inline productDeleteForm">
-                  @csrf @method('DELETE')
-                  <button type="submit" class="btn btn-sm btn-danger btnProductDelete" disabled>
-                    <i class="fa-solid fa-trash"></i>
+                <a href="{{ route('admin.product.edit', $p->id) }}">
+                  <button type="button" class="btn btn-sm btn-success btnProductEdit">
+                    <i class="fa fa-edit"></i>
                   </button>
-                </form>
+                </a>
               </td>
             </tr>
             @empty

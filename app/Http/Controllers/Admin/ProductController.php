@@ -63,34 +63,49 @@ class ProductController extends Controller
     }
   }
 
-  // public function update(UpdateRequest $request, string $id): RedirectResponse
-  // {
-  //   try {
-  //     $updatedAuthor = $this->productService->update($id, $request->validated());
-  //     if (!$updatedAuthor) {
-  //       return back()->with('toast_error', 'Cập nhật nhà xuất bản thất bại');
-  //     }
+  public function update(UpdateRequest $request, string $id): RedirectResponse
+  {
+    try {
+      $data = $request->validated();
+      $errors = [];
+      if (Product::where('title', $data['title'])->where('id', '!=', $id)->exists()) {
+        $errors['title'] = 'Tiêu đề đã tồn tại';
+      }
+      if (Product::where('slug', $data['slug'])->where('id', '!=', $id)->exists()) {
+        $errors['slug'] = 'Slug đã tồn tại';
+      }
+      if (Product::where('code', $data['code'])->where('id', '!=', $id)->exists()) {
+        $errors['code'] = 'Mã sản phẩm đã tồn tại';
+      }
+      if (Product::where('isbn', $data['isbn'])->where('id', '!=', $id)->exists()) {
+        $errors['isbn'] = 'ISBN đã tồn tại';
+      }
+      if (!Publisher::whereKey($data['publisher_id'])->exists()) {
+        $errors['publisher_id'] = 'Nhà xuất bản không tồn tại';
+      }
+      if (Category::whereIn('id', $data['categoriesInput'])->count() !== count($data['categoriesInput'])) {
+        $errors['categoriesInput'] = 'Có danh mục không tồn tại';
+      }
+      if (Author::whereIn('id', $data['authorsInput'])->count() !== count($data['authorsInput'])) {
+        $errors['authorsInput'] = 'Có tác giả không tồn tại';
+      }
+      if ($errors) {
+        return back()->withErrors($errors)->withInput()->with('toast_error', 'Vui lòng kiểm tra các trường bị lỗi');
+      }
 
-  //     return back()->with('toast_success', 'Cập nhật nhà xuất bản thành công');
-  //   } catch (Throwable $e) {
-  //     return back()->with('toast_error', 'Có lỗi xảy ra');
-  //   }
-  // }
+      $product = Product::find($id);
+      if (!$product) {
+        return back()->with('toast_error', 'Sản phẩm không tồn tại');
+      }
 
-  // public function destroy(string $id): RedirectResponse
-  // {
-  //   $ok = $this->productService->delete($id);
-  //   if (!$ok) {
-  //     return back()->with('toast_error', 'Xóa nhà xuất bản thất bại');
-  //   }
+      $ok = $this->productService->update($product, $data, $request->file('image'));
+      if (!$ok) {
+        return back()->withInput()->with('toast_error', 'Cập nhật sản phẩm thất bại');
+      }
 
-  //   return back()->with('toast_success', 'Xóa nhà xuất bản thành công');
-  // }
-
-  // public function bulkDelete(Request $request): RedirectResponse
-  // {
-  //   $ids = (array) $request->input('ids', []);
-  //   $deleted = $this->productService->bulkDelete($ids);
-  //   return back()->with('toast_success', "Đã xoá {$deleted} nhà xuất bản");
-  // }
+      return back()->with('toast_success', 'Cập nhật sản phẩm thành công');
+    } catch (Throwable $e) {
+      return back()->with('toast_error', 'Có lỗi xảy ra');
+    }
+  }
 }

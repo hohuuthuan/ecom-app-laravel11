@@ -215,9 +215,9 @@
 
         <hr class="my-3">
         <div class="d-flex justify-content-end gap-2">
-          <button type="button" class="btn btn-primary" id="btnSaveDraftBottom">
+          {{-- <button type="button" class="btn btn-primary" id="btnSaveDraftBottom">
             <i class="fa-solid fa-floppy-disk me-1"></i> Lưu nháp
-          </button>
+          </button> --}}
           <button type="submit" class="btn btn-success">
             <i class="fa-solid fa-check me-1"></i> Lưu sản phẩm
           </button>

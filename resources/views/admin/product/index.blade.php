@@ -207,7 +207,3 @@
 {{-- Confirm modal dùng chung --}}
 @include('partials.ui.confirm-modal')
 @endsection
-
-@push('scripts')
-@vite('resources/js/pages/ecom-app-laravel_admin_product_index.js')
-@endpush

@@ -1,6 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
   <div class="container-fluid">
-    <button id="btnCollapseDesktop" class="btn btn-primary me-2 d-none d-lg-inline-flex" type="button"
+    {{-- btnCollapseDesktop --}}
+    <button id="" class="btn btn-primary me-2 d-none d-lg-inline-flex" type="button"
       title="Thu gọn sidebar">
       <i class="fa fa-bars"></i>
     </button>

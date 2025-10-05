@@ -141,7 +141,6 @@
               <th>TÁC GIẢ</th>
               <th>NHÀ XUẤT BẢN</th>
               <th>GIÁ BÁN</th>
-              <th>TỒN</th>
               <th class="statusWidth">TRẠNG THÁI</th>
               <th class="actionWidth text-center">THAO TÁC</th>
             </tr>
@@ -151,14 +150,14 @@
             <tr>
               <td><input type="checkbox" class="product-row-checkbox" value="{{ $p->id }}"></td>
               <td>{{ $products->firstItem() + $idx }}</td>
-              <td>{{ $p->name }}</td>
+              <td>{{ $p->title }}</td>
               <td>{{ $p->slug }}</td>
-              <td><code>{{ $p->isbn13 ?? '—' }}</code></td>
+              <td><code>{{ $p->isbn ?? '—' }}</code></td>
               <td>{{ $p->categories?->pluck('name')->join(', ') }}</td>
               <td>{{ $p->authors?->pluck('name')->join(', ') }}</td>
               <td>{{ $p->publisher?->name }}</td>
-              <td>{{ number_format((int)$p->price,0,',','.') }}₫</td>
-              <td>{{ (int)$p->stock }}</td>
+              <td>{{ number_format((int)$p->selling_price_vnd,0,',','.') }}₫</td>
+
               <td>
                 @if($p->status === 'ACTIVE')
                 <span class="badge bg-success">Đang bán</span>

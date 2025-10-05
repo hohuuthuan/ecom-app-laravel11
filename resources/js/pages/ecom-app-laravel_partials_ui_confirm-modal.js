@@ -1,7 +1,3 @@
-// Generated from inline <script> blocks in: ecom-app-laravel/resources/views/partials/ui/confirm-modal.blade.php
-// Each section preserves original order and approximate line ranges.
-
-/* ===== BEGIN inline script #1 (lines 29-100) ===== */
 (function() {
     const modalEl = document.getElementById('uiConfirmModal');
     if (!modalEl) return;
@@ -28,7 +24,7 @@
 
       // set size
       // set size & position
-      dialogEl.classList.remove('modal-sm', 'modal-md', 'modal-lg', 'modal-dialog-centered'); // nhớ remove luôn centered
+      dialogEl.classList.remove('modal-sm', 'modal-md', 'modal-lg', 'modal-dialog-centered');
       dialogEl.classList.add(`modal-${size}`);
 
       // (tùy chọn) gắn class lên modal để CSS định vị top
@@ -72,4 +68,3 @@
       });
     };
   })();
-/* ===== END inline script #1 ===== */

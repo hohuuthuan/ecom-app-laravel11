@@ -36,21 +36,20 @@
     const sameHash = href && href.startsWith('#');
     if (newTab || sameHash || a.dataset.noLoading !== undefined) return;
     showDelayed();
-  }, true); // capture để bắt sớm
+  }, true);
 
   document.addEventListener('submit', function (e) {
+    if (e.defaultPrevented) return; 
     if (e.target?.dataset?.noLoading !== undefined) return;
     showDelayed();
   }, true);
 
-  // Khi trang được hiển thị lại (bfcache) hoặc đã tải xong → đảm bảo ẩn
   window.addEventListener('pageshow', hideNow);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') hideNow();
   });
 })();
   
-// Giữ nguyên logic dọn field rỗng trước khi submit filter
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll("form.filter-form").forEach(form => {
     form.addEventListener("submit", function () {

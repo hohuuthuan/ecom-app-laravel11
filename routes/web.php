@@ -28,7 +28,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
-        Route::get('/dashboard', fn () => view('admin.dashboard'))->name('dashboard');
+        Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
 
         // Accounts
         Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
@@ -55,8 +55,8 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/product', [ProductPageController::class, 'index'])->name('product.index');
         Route::get('/product/create', [ProductPageController::class, 'create'])->name('product.create');
-        
+        Route::post('/product/store', [ProductController::class, 'store'])->name('product.store');
     });
 });
 
-Route::fallback(fn () => response()->view('errors.404', [], 404));
+Route::fallback(fn() => response()->view('errors.404', [], 404));

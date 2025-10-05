@@ -901,7 +901,6 @@ table tbody td:first-child {
     cursor: pointer
 }
 
-
 :root {
     --tagify-dd-color-primary: #cccccc;
     --chip-remove-space: 46px;

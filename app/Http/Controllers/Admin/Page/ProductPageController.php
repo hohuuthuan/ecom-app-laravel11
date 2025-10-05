@@ -35,4 +35,13 @@ class ProductPageController extends Controller
 
     return view('admin.product.index', compact('categories', 'authors', 'publishers', 'products'));
   }
+
+  public function create()
+  {
+    $categories = $this->productService->getListCategory();
+    $authors    = $this->productService->getListAuthor();
+    $publishers = $this->productService->getListPublisher();
+
+    return view('admin.product.create', compact('categories', 'authors', 'publishers'));
+  }
 }

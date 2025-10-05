@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\Page\ProductPageController;
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PublisherController;
+use App\Http\Controllers\Admin\ProductController;
 
 // === PUBLIC ===
 Route::view('/', 'user.home')->name('home');
@@ -53,6 +54,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/publishers/bulk-delete', [PublisherController::class, 'bulkDelete'])->name('publishers.bulk-delete');
 
         Route::get('/product', [ProductPageController::class, 'index'])->name('product.index');
+        Route::get('/product/create', [ProductPageController::class, 'create'])->name('product.create');
+        
     });
 });
 

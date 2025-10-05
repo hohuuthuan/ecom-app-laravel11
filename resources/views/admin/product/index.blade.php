@@ -122,7 +122,7 @@
           <button type="button" class="btn btn-sm btn-danger btn-admin" id="productBtnBulkDelete" disabled>Xoá đã chọn</button>
         </div>
         <div class="d-flex gap-2">
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiProductModal">Thêm sản phẩm</button>
+          <a href="{{ route('admin.product.create') }}"><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiProductModal">Thêm sản phẩm</button></a>
         </div>
       </div>
 

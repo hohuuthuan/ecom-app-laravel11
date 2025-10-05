@@ -2,6 +2,8 @@
 
 @section('title','Products: Thêm sản phẩm')
 
+@section('body_class','create-product-page')
+
 @section('content')
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb mb-0">
@@ -54,32 +56,32 @@
 
           <div class="row g-3 mb-2">
             <div class="col-md-6">
-              <label class="form-label label-filter-admin-product">Code <span class="text-danger">*</span></label>
+              <label class="form-label label-filter-admin-product mt-2">Code <span class="text-danger">*</span></label>
               <input type="text" class="form-control" placeholder="Mã nội bộ" name="code">
             </div>
             <div class="col-md-6">
-              <label class="form-label label-filter-admin-product">ISBN <span class="text-danger">*</span></label>
+              <label class="form-label label-filter-admin-product mt-2">ISBN <span class="text-danger">*</span></label>
               <input type="text" class="form-control" placeholder="ISBN" name="isbn">
             </div>
           </div>
 
           <div class="row g-3 mb-2">
             <div class="col-12">
-              <label class="form-label label-filter-admin-product">Mô tả sản phẩm <span class="text-danger">*</span></label>
+              <label class="form-label label-filter-admin-product mt-2">Mô tả sản phẩm <span class="text-danger">*</span></label>
               <textarea rows="4" class="form-control" placeholder="Mô tả chi tiết…" name="description"></textarea>
             </div>
           </div>
 
           <div class="row g-3 mb-2">
             <div class="col-md-6">
-              <label class="form-label label-filter-admin-product">Giá bán <span class="text-danger">*</span></label>
+              <label class="form-label label-filter-admin-product mt-2">Giá bán <span class="text-danger">*</span></label>
               <div class="input-group">
                 <input type="number" min="0" step="1" class="form-control" placeholder="0" name="price">
-                <span class="input-group-text">₫</span>
+                <span class="input-group-text">VND</span>
               </div>
             </div>
             <div class="col-md-6">
-              <label class="form-label label-filter-admin-product">Đơn vị tính <span class="text-danger">*</span></label>
+              <label class="form-label label-filter-admin-product mt-2">Đơn vị tính <span class="text-danger">*</span></label>
               <input type="text" class="form-control" placeholder="Quyển / Bộ / ..." name="unit">
             </div>
           </div>
@@ -87,7 +89,7 @@
           <!-- Tagify: Danh mục / Tác giả -->
           <div class="row g-4">
             <div class="col-lg-6">
-              <label class="form-label label-filter-admin-product">Chọn danh mục <span class="text-danger">*</span></label>
+              <label class="form-label label-filter-admin-product mt-2">Chọn danh mục <span class="text-danger">*</span></label>
               <input
                 id="categoriesInput"
                 class="tag-input"
@@ -97,7 +99,7 @@
               <div class="form-text">Gõ để tìm, Enter để chọn, Backspace xóa</div>
             </div>
             <div class="col-lg-6">
-              <label class="form-label label-filter-admin-product">Chọn tác giả <span class="text-danger">*</span></label>
+              <label class="form-label label-filter-admin-product mt-2">Chọn tác giả <span class="text-danger">*</span></label>
               <input
                 id="authorsInput"
                 class="tag-input"
@@ -110,7 +112,7 @@
 
           <div class="row g-4 mb-2">
             <div class="col-md-6">
-              <label class="form-label label-filter-admin-product">Nhà xuất bản <span class="text-danger">*</span></label>
+              <label class="form-label label-filter-admin-product mt-3">Nhà xuất bản <span class="text-danger">*</span></label>
               <select class="form-select setupSelect2" name="publisher_id">
                 <option value="">-- Chọn NXB --</option>
                 @foreach ($publishers as $pub)
@@ -119,7 +121,7 @@
               </select>
             </div>
             <div class="col-md-6">
-              <label class="form-label label-filter-admin-product">Trạng thái <span class="text-danger">*</span></label>
+              <label class="form-label label-filter-admin-product mt-3">Trạng thái <span class="text-danger">*</span></label>
               <select class="form-select setupSelect2" name="status">
                 <option value="">-- Chọn trạng thái --</option>
                 <option value="ACTIVE">Đang bán</option>

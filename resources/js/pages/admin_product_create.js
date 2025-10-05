@@ -19,7 +19,7 @@
 
   btnClear?.addEventListener('click', ()=>{
     if(fileInput){ fileInput.value = ''; }
-    previewBox.innerHTML = '<span class="text-muted"><i class="fa-regular fa-image me-1"></i> 300×300</span>';
+    previewBox.innerHTML = '<span class="text-muted"><i class="fa-regular fa-image me-1"></i> Ảnh sản phẩm</span>';
   });
 })();
 

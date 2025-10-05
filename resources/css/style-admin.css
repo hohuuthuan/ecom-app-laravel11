@@ -34,16 +34,6 @@ a:hover {
     width: 140px;
 }
 
-.admin-page .form-control:focus {
-    border-color: #016989 !important;
-    box-shadow: 0 0 0 1px #098fb8 !important;
-}
-
-.btn-admin {
-    background-color: #22b1dc !important;
-    border-color: #22b1dc !important;
-}
-
 .btn-admin:hover,
 .btn-admin:focus {
     background-color: #0189b2 !important;
@@ -829,6 +819,16 @@ table tbody td:first-child {
     color: #00455a;
 }
 
+.create-product-page .form-control,
+.create-product-page .btn {
+    border-radius: 2px !important;
+}
+
+.create-product-page .form-control:focus {
+    border-color: #0b99c4 !important;
+    box-shadow: 0 0 0 1px #098fb8 !important;
+}
+
 /* ======== ADMIN CREATE PRODUCT ======== */
 .product-image-box {
     width: 100%;
@@ -1095,6 +1095,10 @@ body {
 .tagify__dropdown__item:hover,
 .tagify__dropdown__item--active {
     background: rgba(126, 250, 153, 0.5) !important;
+}
+
+.create-product-page .input-group-text {
+    border-radius: 0px !important;
 }
 
 /* ====================================== */

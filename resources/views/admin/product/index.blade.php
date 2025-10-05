@@ -2,6 +2,8 @@
 
 @section('title','Products: Danh sách sản phẩm')
 
+@section('body_class','create-product-page')
+
 @section('content')
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb mb-0">

@@ -26,7 +26,7 @@
         <div class="row">
           <!-- LEFT: Ảnh -->
           <div class="col-lg-3 mb-3">
-            <label class="form-label label-filter-admin-product">Hình ảnh sản phẩm</label>
+            <label class="form-label label-filter-admin-product">Hình ảnh sản phẩm <span class="text-danger">*</span></label>
             <div class="product-image-box mb-2 {{ $errors->has('image') ? 'is-invalid' : '' }}" id="previewBox">
               @if($product->image)
                 <img src="{{ asset('storage/products/'.$product->image) }}" alt="preview">

@@ -2,6 +2,8 @@
 
 @section('title','Quản lý tài khoản')
 
+@section('body_class','account-page')
+
 @section('content')
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb mb-0">

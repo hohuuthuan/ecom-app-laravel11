@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookHub - Thế giới sách số</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: '', sans-serif;
+            line-height: 1.6;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+            --accent-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--primary-color) !important;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="books" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none"/><rect x="2" y="8" width="3" height="10" fill="rgba(255,255,255,0.1)"/><rect x="6" y="6" width="3" height="12" fill="rgba(255,255,255,0.1)"/><rect x="10" y="7" width="3" height="11" fill="rgba(255,255,255,0.1)"/><rect x="14" y="5" width="3" height="13" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23books)"/></svg>') repeat;
+            opacity: 0.1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .book-card {
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            height: 100%;
+        }
+
+        .book-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .book-cover {
+            height: 250px;
+            background: linear-gradient(45deg, #3498db, #9b59b6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-cover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .book-card:hover .book-cover::before {
+            transform: translateX(100%);
+        }
+
+        .price {
+            color: var(--secondary-color);
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .stats-section {
+            background: var(--primary-color);
+            color: white;
+            padding: 4rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .testimonial-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            height: 100%;
+        }
+
+        .rating {
+            color: #ffc107;
+        }
+
+        .footer {
+            background: var(--dark-text);
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: var(--accent-color);
+        }
+
+        .floating-cart {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .floating-cart:hover {
+            transform: scale(1.1);
+            background: var(--primary-color);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                min-height: 60vh;
+                text-align: center;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .book-cover {
+                height: 200px;
+            }
+        }
+
+        .newsletter-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#" onclick="goHome()">
+                <i class="fas fa-book-open text-primary me-2"></i>BookHub
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Trang chủ</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Danh mục
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-heart me-2"></i>Tiểu thuyết</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-briefcase me-2"></i>Kinh doanh</a>
+                            </li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-brain me-2"></i>Tâm lý</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-child me-2"></i>Thiếu nhi</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#bestsellers">Bán chạy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Liên hệ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="navigateToPage('about')">Giới thiệu</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center">
+                    <div class="input-group me-3" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Tìm kiếm sách..." id="searchInput">
+                        <button class="btn btn-outline-primary" type="button" onclick="performSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <!-- Wishlist -->
+                        <a href="#" class="text-decoration-none me-3 position-relative" onclick="toggleWishlist()">
+                            <i class="fas fa-heart text-danger" style="font-size: 1.2rem;"></i>
+                            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle"
+                                id="wishlistCount" style="font-size: 0.7rem;">0</span>
+                        </a>
+
+                        <!-- Cart -->
+                        <a href="#" class="text-decoration-none me-3 position-relative" onclick="showCart()">
+                            <i class="fas fa-shopping-cart text-primary" style="font-size: 1.2rem;"></i>
+                            <span class="badge bg-primary position-absolute top-0 start-100 translate-middle"
+                                id="headerCartBadge" style="font-size: 0.7rem;">0</span>
+                        </a>
+
+                        <!-- User Avatar Dropdown -->
+                        <div class="dropdown">
+                            <a href="#" class="dropdown-toggle text-decoration-none d-flex align-items-center"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2"
+                                    style="width: 35px; height: 35px;">
+                                    <i class="fas fa-user text-white" style="font-size: 0.9rem;"></i>
+                                </div>
+                                <span class="text-dark fw-medium d-none d-md-inline">Nguyễn Văn A</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                <li>
+                                    <div class="dropdown-header">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2"
+                                                style="width: 40px; height: 40px;">
+                                                <i class="fas fa-user text-white"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Nguyễn Văn A</div>
+                                                <small class="text-muted">nguyenvana@email.com</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="showProfile()">
+                                        <i class="fas fa-user me-2"></i>Tài khoản của tôi
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="showProfileTab('orders')">
+                                        <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="showProfileTab('wishlist')">
+                                        <i class="fas fa-heart me-2"></i>Sách yêu thích
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="showProfileTab('settings')">
+                                        <i class="fas fa-cog me-2"></i>Cài đặt
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#" onclick="logout()">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="homePage" class="page-content">
+        <!-- Hero Section -->
+        <section class="hero-section" id="home">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <div class="hero-content">
+                            <h1 class="display-4 fw-bold mb-4">Khám phá thế giới tri thức</h1>
+                            <p class="lead mb-4">Hàng nghìn cuốn sách hay đang chờ bạn khám phá. Từ tiểu thuyết đến sách
+                                chuyên môn, tất cả đều có tại BookHub.</p>
+                            <div class="d-flex flex-wrap gap-3">
+                                <button class="btn btn-primary btn-lg" onclick="scrollToSection('categories')">
+                                    <i class="fas fa-compass me-2"></i>Khám phá ngay
+                                </button>
+                                <button class="btn btn-outline-light btn-lg" onclick="scrollToSection('bestsellers')">
+                                    <i class="fas fa-fire me-2"></i>Sách hot
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="text-center">
+                            <div class="position-relative">
+                                <i class="fas fa-book-open" style="font-size: 15rem; opacity: 0.3;"></i>
+                                <div class="position-absolute top-50 start-50 translate-middle">
+                                    <div class="d-flex justify-content-center">
+                                        <div
+                                            class="bg-white rounded-circle p-3 shadow me-3 animate__animated animate__fadeInUp">
+                                            <i class="fas fa-star text-warning" style="font-size: 2rem;"></i>
+                                        </div>
+                                        <div
+                                            class="bg-white rounded-circle p-3 shadow animate__animated animate__fadeInUp animate__delay-1s">
+                                            <i class="fas fa-heart text-danger" style="font-size: 2rem;"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3 col-6 mb-4">
+                        <div class="stat-item">
+                            <div class="stat-number" data-target="15000">0</div>
+                            <p class="mb-0">Đầu sách</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-4">
+                        <div class="stat-item">
+                            <div class="stat-number" data-target="50000">0</div>
+                            <p class="mb-0">Khách hàng</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-4">
+                        <div class="stat-item">
+                            <div class="stat-number" data-target="98">0</div>
+                            <p class="mb-0">% Hài lòng</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-4">
+                        <div class="stat-item">
+                            <div class="stat-number" data-target="24">0</div>
+                            <p class="mb-0">Giờ hỗ trợ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="py-5 bg-light" id="categories">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">Danh mục sách</h2>
+                    <p class="lead text-muted">Tìm kiếm theo sở thích của bạn</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="category-card" onclick="filterByCategory('novel')">
+                            <div class="category-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <h5 class="fw-bold">Tiểu thuyết</h5>
+                            <p class="text-muted mb-0">Những câu chuyện cảm động</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="category-card" onclick="filterByCategory('business')">
+                            <div class="category-icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <h5 class="fw-bold">Kinh doanh</h5>
+                            <p class="text-muted mb-0">Phát triển sự nghiệp</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="category-card" onclick="filterByCategory('psychology')">
+                            <div class="category-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h5 class="fw-bold">Tâm lý học</h5>
+                            <p class="text-muted mb-0">Hiểu về con người</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="category-card" onclick="filterByCategory('children')">
+                            <div class="category-icon">
+                                <i class="fas fa-child"></i>
+                            </div>
+                            <h5 class="fw-bold">Thiếu nhi</h5>
+                            <p class="text-muted mb-0">Nuôi dưỡng tâm hồn trẻ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bestsellers Section -->
+        <section class="py-5" id="bestsellers">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-5">
+                    <div>
+                        <h2 class="display-5 fw-bold text-primary">Sách bán chạy</h2>
+                        <p class="lead text-muted">Những cuốn sách được yêu thích nhất</p>
+                    </div>
+                    <button class="btn btn-outline-primary" onclick="loadMoreBooks()">
+                        Xem thêm <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+
+                <div class="row g-4" id="booksContainer">
+                    <!-- Books will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">Khách hàng nói gì</h2>
+                    <p class="lead text-muted">Những phản hồi chân thực từ độc giả</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="testimonial-card">
+                            <div class="rating mb-3">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="mb-4">"BookHub có bộ sưu tập sách rất phong phú. Giao hàng nhanh, đóng gói cẩn
+                                thận. Tôi đã tìm được nhiều cuốn sách hay ở đây!"</p>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Nguyễn Văn An</h6>
+                                    <small class="text-muted">Khách hàng thân thiết</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="testimonial-card">
+                            <div class="rating mb-3">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="mb-4">"Website dễ sử dụng, tìm kiếm sách rất tiện lợi. Giá cả hợp lý, chất lượng
+                                sách tốt. Sẽ tiếp tục ủng hộ BookHub!"</p>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Trần Thị Bình</h6>
+                                    <small class="text-muted">Độc giả đam mê</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="testimonial-card">
+                            <div class="rating mb-3">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="mb-4">"Dịch vụ khách hàng tuyệt vời! Nhân viên tư vấn nhiệt tình, giúp tôi chọn
+                                được những cuốn sách phù hợp với nhu cầu."</p>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Lê Minh Cường</h6>
+                                    <small class="text-muted">Khách hàng mới</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="newsletter-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+                        <h2 class="display-5 fw-bold mb-4">Đăng ký nhận tin</h2>
+                        <p class="lead mb-4">Nhận thông báo về sách mới, ưu đãi đặc biệt và các sự kiện thú vị</p>
+
+                        <form class="row g-3 justify-content-center" onsubmit="subscribeNewsletter(event)">
+                            <div class="col-md-6">
+                                <input type="email" class="form-control form-control-lg"
+                                    placeholder="Nhập email của bạn" required>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-warning btn-lg">
+                                    <span class="button-text">Đăng ký</span>
+                                    <div class="loading-spinner"></div>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer" id="contact">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <h5 class="fw-bold mb-4">
+                            <i class="fas fa-book-open text-warning me-2"></i>BookHub
+                        </h5>
+                        <p class="mb-4">Nơi kết nối bạn với tri thức. Chúng tôi cam kết mang đến những cuốn sách chất
+                            lượng cao với dịch vụ tốt nhất.</p>
+                        <div class="social-icons">
+                            <a href="#"><i class="fab fa-facebook"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6">
+                        <h6 class="fw-bold mb-4">Danh mục</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><a href="#" class="text-light text-decoration-none">Tiểu thuyết</a></li>
+                            <li class="mb-2"><a href="#" class="text-light text-decoration-none">Kinh doanh</a></li>
+                            <li class="mb-2"><a href="#" class="text-light text-decoration-none">Tâm lý học</a></li>
+                            <li class="mb-2"><a href="#" class="text-light text-decoration-none">Thiếu nhi</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <h6 class="fw-bold mb-4">Hỗ trợ</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><a href="#" class="text-light text-decoration-none">Chính sách đổi trả</a>
+                            </li>
+                            <li class="mb-2"><a href="#" class="text-light text-decoration-none">Hướng dẫn mua hàng</a>
+                            </li>
+                            <li class="mb-2"><a href="#" class="text-light text-decoration-none">Câu hỏi thường gặp</a>
+                            </li>
+                            <li class="mb-2"><a href="#" class="text-light text-decoration-none">Liên hệ</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <h6 class="fw-bold mb-4">Liên hệ</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                123 Đường ABC, Quận 1, TP.HCM
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-phone me-2"></i>
+                                (028) 1234 5678
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-envelope me-2"></i>
+                                info@bookhub.vn
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-clock me-2"></i>
+                                8:00 - 22:00 (Hàng ngày)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <div class="text-center">
+                    <p class="mb-0">&copy; 2024 BookHub. Tất cả quyền được bảo lưu.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Product Details Page -->
+    <div id="productPage" class="page-content" style="display: none;">
+        <div class="container py-5">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#" onclick="goHome()">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Chi tiết sản phẩm</li>
+                </ol>
+            </nav>
+
+            <div class="row g-5">
+                <div class="col-lg-6">
+                    <div id="productCover" class="book-cover" style="height: 500px; border-radius: 15px;">
+                        <div class="text-center">
+                            <h3 id="productTitle">Tên sách</h3>
+                            <p id="productAuthor">Tác giả</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <h1 id="productTitleDetail" class="display-5 fw-bold mb-3">Tên sách</h1>
+                    <p class="lead text-muted mb-4">Tác giả: <span id="productAuthorDetail">Tác giả</span></p>
+
+                    <div class="mb-4">
+                        <span class="h2 text-danger me-3" id="productPrice">299.000đ</span>
+                        <span class="h5 text-muted text-decoration-line-through"
+                            id="productOriginalPrice">399.000đ</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="rating mb-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <span class="ms-2">(4.8/5 - 124 đánh giá)</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Mô tả sản phẩm</h5>
+                        <p>Cuốn sách này mang đến những kiến thức quý báu và góc nhìn mới mẻ về cuộc sống. Với ngôn ngữ
+                            dễ hiểu và nội dung phong phú, đây là lựa chọn tuyệt vời cho mọi độc giả.</p>
+
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Nội dung chất lượng cao</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Dịch thuật chuẩn xác</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Bìa đẹp, in ấn sắc nét</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Giao hàng nhanh chóng</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Số lượng:</label>
+                        <div class="input-group" style="width: 150px;">
+                            <button class="btn btn-outline-secondary" onclick="changeQuantity(-1)">-</button>
+                            <input type="number" class="form-control text-center" value="1" min="1" id="quantity">
+                            <button class="btn btn-outline-secondary" onclick="changeQuantity(1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button class="btn btn-primary btn-lg flex-fill" onclick="addToCartFromProduct()">
+                            <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                        </button>
+                        <button class="btn btn-outline-danger btn-lg" onclick="toggleWishlistFromProduct()">
+                            <i class="fas fa-heart me-2"></i>Yêu thích
+                        </button>
+                    </div>
+
+                    <input type="hidden" id="productId" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Page -->
+    <div id="cartPage" class="page-content" style="display: none;">
+        <div class="container py-5">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#" onclick="goHome()">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Giỏ hàng</li>
+                </ol>
+            </nav>
+
+            <h1 class="display-5 fw-bold mb-4">Giỏ hàng của bạn</h1>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div id="cartItems">
+                        <!-- Cart items will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Tóm tắt đơn hàng</h5>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tạm tính:</span>
+                                <span id="subtotal">0đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Phí vận chuyển:</span>
+                                <span>30.000đ</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <strong>Tổng cộng:</strong>
+                                <strong id="total">30.000đ</strong>
+                            </div>
+                            <button class="btn btn-primary w-100 btn-lg" onclick="checkout()">
+                                <i class="fas fa-credit-card me-2"></i>Thanh toán
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="profilePage" class="page-content" style="display: none;">
+        <div class="container py-5">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#" onclick="goHome()">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Tài khoản</li>
+                </ol>
+            </nav>
+
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                                style="width: 80px; height: 80px;">
+                                <i class="fas fa-user text-white" style="font-size: 2rem;"></i>
+                            </div>
+                            <h5>Nguyễn Văn A</h5>
+                            <p class="text-muted">Khách hàng thân thiết</p>
+                        </div>
+                    </div>
+
+                    <div class="list-group mt-3">
+                        <a href="#" class="list-group-item list-group-item-action active"
+                            onclick="showProfileTab('info')">
+                            <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" onclick="showProfileTab('orders')">
+                            <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" onclick="showProfileTab('wishlist')">
+                            <i class="fas fa-heart me-2"></i>Sách yêu thích
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" onclick="showProfileTab('settings')">
+                            <i class="fas fa-cog me-2"></i>Cài đặt
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-9">
+                    <div id="profileInfo" class="profile-tab">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Thông tin cá nhân</h5>
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Họ và tên</label>
+                                            <input type="text" class="form-control" value="Nguyễn Văn A">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" value="nguyenvana@email.com">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Số điện thoại</label>
+                                            <input type="tel" class="form-control" value="0123456789">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Ngày sinh</label>
+                                            <input type="date" class="form-control" value="1990-01-01">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Địa chỉ</label>
+                                        <textarea class="form-control" rows="3">123 Đường ABC, Quận 1, TP.HCM</textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Cập nhật thông tin</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="profileOrders" class="profile-tab" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Đơn hàng của tôi</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Mã đơn</th>
+                                                <th>Ngày đặt</th>
+                                                <th>Tổng tiền</th>
+                                                <th>Trạng thái</th>
+                                                <th>Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>#DH001</td>
+                                                <td>15/12/2024</td>
+                                                <td>599.000đ</td>
+                                                <td><span class="badge bg-success">Đã giao</span></td>
+                                                <td><button class="btn btn-sm btn-outline-primary">Xem chi tiết</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>#DH002</td>
+                                                <td>10/12/2024</td>
+                                                <td>299.000đ</td>
+                                                <td><span class="badge bg-warning">Đang giao</span></td>
+                                                <td><button class="btn btn-sm btn-outline-primary">Xem chi tiết</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="profileWishlist" class="profile-tab" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Sách yêu thích</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="wishlistItems" class="row g-3">
+                                    <!-- Wishlist items will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="profileSettings" class="profile-tab" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Cài đặt tài khoản</h5>
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="mb-3">
+                                        <label class="form-label">Đổi mật khẩu</label>
+                                        <input type="password" class="form-control mb-2"
+                                            placeholder="Mật khẩu hiện tại">
+                                        <input type="password" class="form-control mb-2" placeholder="Mật khẩu mới">
+                                        <input type="password" class="form-control" placeholder="Xác nhận mật khẩu mới">
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="emailNotifications"
+                                                checked>
+                                            <label class="form-check-label" for="emailNotifications">
+                                                Nhận thông báo qua email
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="smsNotifications">
+                                            <label class="form-check-label" for="smsNotifications">
+                                                Nhận thông báo qua SMS
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Lưu cài đặt</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Page -->
+    <div id="aboutPage" class="page-content" style="display: none;">
+        <div class="container py-5">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#" onclick="goHome()">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Giới thiệu</li>
+                </ol>
+            </nav>
+
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary">Về BookHub</h1>
+                <p class="lead">Nơi kết nối bạn với tri thức</p>
+            </div>
+
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-6">
+                    <h2 class="fw-bold mb-4">Câu chuyện của chúng tôi</h2>
+                    <p class="mb-4">BookHub được thành lập với sứ mệnh mang tri thức đến gần hơn với mọi người. Chúng
+                        tôi tin rằng sách là cầu nối giữa con người với kiến thức, giữa hiện tại và tương lai.</p>
+                    <p class="mb-4">Với hơn 15.000 đầu sách từ các nhà xuất bản uy tín trong và ngoài nước, BookHub cam
+                        kết cung cấp những cuốn sách chất lượng cao với giá cả hợp lý nhất.</p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="text-center">
+                        <i class="fas fa-book-open text-primary" style="font-size: 10rem; opacity: 0.7;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                            style="width: 80px; height: 80px;">
+                            <i class="fas fa-shipping-fast text-white" style="font-size: 2rem;"></i>
+                        </div>
+                        <h5 class="fw-bold">Giao hàng nhanh</h5>
+                        <p class="text-muted">Giao hàng trong 24h tại TP.HCM và 2-3 ngày toàn quốc</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="bg-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                            style="width: 80px; height: 80px;">
+                            <i class="fas fa-shield-alt text-white" style="font-size: 2rem;"></i>
+                        </div>
+                        <h5 class="fw-bold">Chất lượng đảm bảo</h5>
+                        <p class="text-muted">100% sách chính hãng, đổi trả trong 7 ngày</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                            style="width: 80px; height: 80px;">
+                            <i class="fas fa-headset text-white" style="font-size: 2rem;"></i>
+                        </div>
+                        <h5 class="fw-bold">Hỗ trợ 24/7</h5>
+                        <p class="text-muted">Đội ngũ tư vấn nhiệt tình, sẵn sàng hỗ trợ mọi lúc</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-light rounded p-5 text-center">
+                <h3 class="fw-bold mb-4">Tầm nhìn và sứ mệnh</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="text-primary fw-bold">Tầm nhìn</h5>
+                        <p>Trở thành nền tảng sách trực tuyến hàng đầu Việt Nam, nơi mọi người có thể dễ dàng tiếp cận
+                            tri thức.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-primary fw-bold">Sứ mệnh</h5>
+                        <p>Kết nối độc giả với những cuốn sách hay nhất, góp phần xây dựng một xã hội học tập suốt đời.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const books = [
+            {
+                id: 1,
+                title: "Sapiens: Lược sử loài người",
+                author: "Yuval Noah Harari",
+                price: "299.000đ",
+                originalPrice: "399.000đ",
+                cover: "linear-gradient(45deg, #667eea, #764ba2)",
+                category: "psychology"
+            },
+            {
+                id: 2,
+                title: "Atomic Habits",
+                author: "James Clear",
+                price: "249.000đ",
+                originalPrice: "329.000đ",
+                cover: "linear-gradient(45deg, #f093fb, #f5576c)",
+                category: "business"
+            },
+            {
+                id: 3,
+                title: "Thinking, Fast and Slow",
+                author: "Daniel Kahneman",
+                price: "329.000đ",
+                originalPrice: "429.000đ",
+                cover: "linear-gradient(45deg, #4facfe, #00f2fe)",
+                category: "psychology"
+            },
+            {
+                id: 4,
+                title: "Nhà giả kim",
+                author: "Paulo Coelho",
+                price: "179.000đ",
+                originalPrice: "229.000đ",
+                cover: "linear-gradient(45deg, #43e97b, #38f9d7)",
+                category: "novel"
+            },
+            {
+                id: 5,
+                title: "Rich Dad Poor Dad",
+                author: "Robert Kiyosaki",
+                price: "199.000đ",
+                originalPrice: "259.000đ",
+                cover: "linear-gradient(45deg, #fa709a, #fee140)",
+                category: "business"
+            },
+            {
+                id: 6,
+                title: "Dế Mèn phiêu lưu ký",
+                author: "Tô Hoài",
+                price: "89.000đ",
+                originalPrice: "119.000đ",
+                cover: "linear-gradient(45deg, #a8edea, #fed6e3)",
+                category: "children"
+            }
+        ];
+
+        let cart = [];
+        let wishlist = [];
+
+        // Load books on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            loadBooks();
+            animateStats();
+        });
+
+        // Load books into container
+        function loadBooks() {
+            const container = document.getElementById('booksContainer');
+            container.innerHTML = '';
+
+            books.forEach(book => {
+                const bookCard = createBookCard(book);
+                container.appendChild(bookCard);
+            });
+        }
+
+        // Create book card element
+        function createBookCard(book) {
+            const col = document.createElement('div');
+            col.className = 'col-lg-4 col-md-6';
+
+            col.innerHTML = `
+                <div class="card book-card">
+                    <div class="book-cover" style="background: ${book.cover};">
+                        <div>
+                            <h5 class="mb-2">${book.title}</h5>
+                            <p class="mb-0">${book.author}</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title">${book.title}</h6>
+                        <p class="card-text text-muted">${book.author}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <span class="price">${book.price}</span>
+                                <small class="text-muted text-decoration-line-through ms-2">${book.originalPrice}</small>
+                            </div>
+                            <button class="btn btn-outline-danger btn-sm" onclick="toggleWishlistItem(${book.id})">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary" onclick="showProductDetails(${book.id})">
+                                <i class="fas fa-eye me-2"></i>Xem chi tiết
+                            </button>
+                            <button class="btn btn-primary" onclick="addToCart(${book.id})">
+                                <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return col;
+        }
+
+        // Add to cart function
+        function addToCart(bookId) {
+            const book = books.find(b => b.id === bookId);
+            if (book) {
+                const existingItem = cart.find(item => item.id === bookId);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({ ...book, quantity: 1 });
+                }
+                updateCartBadge();
+                showToast('Đã thêm vào giỏ hàng!', 'success');
+            }
+        }
+
+        // Toggle wishlist item
+        function toggleWishlistItem(bookId) {
+            const index = wishlist.findIndex(id => id === bookId);
+            if (index > -1) {
+                wishlist.splice(index, 1);
+                showToast('Đã xóa khỏi danh sách yêu thích', 'info');
+            } else {
+                wishlist.push(bookId);
+                showToast('Đã thêm vào danh sách yêu thích!', 'success');
+            }
+            updateWishlistBadge();
+        }
+
+        // Update cart badge
+        function updateCartBadge() {
+            const badge = document.getElementById('cartBadge');
+            const headerBadge = document.getElementById('headerCartBadge');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            badge.textContent = totalItems;
+            headerBadge.textContent = totalItems;
+        }
+
+        // Update wishlist badge
+        function updateWishlistBadge() {
+            const badge = document.getElementById('wishlistCount');
+            badge.textContent = wishlist.length;
+        }
+
+        // Show cart
+        function showCart() {
+            navigateToPage('cart');
+        }
+
+        // Show profile
+        function showProfile() {
+            navigateToPage('profile');
+        }
+
+        // Navigation system
+        function navigateToPage(page) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+
+            // Show selected page
+            const targetPage = document.getElementById(page + 'Page');
+            if (targetPage) {
+                targetPage.style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // Show product details
+        function showProductDetails(bookId) {
+            const book = books.find(b => b.id === bookId);
+            if (book) {
+                // Update product details page
+                document.getElementById('productTitle').textContent = book.title;
+                document.getElementById('productAuthor').textContent = book.author;
+                document.getElementById('productPrice').textContent = book.price;
+                document.getElementById('productOriginalPrice').textContent = book.originalPrice;
+                document.getElementById('productCover').style.background = book.cover;
+                document.getElementById('productId').value = book.id;
+
+                navigateToPage('product');
+            }
+        }
+
+        // Go back to home
+        function goHome() {
+            document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+            document.getElementById('homePage').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        // Toggle wishlist
+        function toggleWishlist() {
+            if (wishlist.length === 0) {
+                showToast('Danh sách yêu thích trống!', 'warning');
+                return;
+            }
+
+            const wishlistBooks = books.filter(book => wishlist.includes(book.id));
+            let wishlistContent = 'Sách yêu thích:\n\n';
+            wishlistBooks.forEach(book => {
+                wishlistContent += `${book.title} - ${book.author}\n`;
+            });
+            alert(wishlistContent);
+        }
+
+        // Perform search
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (!searchTerm) {
+                showToast('Vui lòng nhập từ khóa tìm kiếm!', 'warning');
+                return;
+            }
+
+            const results = books.filter(book =>
+                book.title.toLowerCase().includes(searchTerm) ||
+                book.author.toLowerCase().includes(searchTerm)
+            );
+
+            if (results.length > 0) {
+                showToast(`Tìm thấy ${results.length} kết quả cho "${searchTerm}"`, 'success');
+                // In a real app, you would filter the displayed books
+            } else {
+                showToast(`Không tìm thấy kết quả cho "${searchTerm}"`, 'info');
+            }
+        }
+
+        // Filter by category
+        function filterByCategory(category) {
+            const filteredBooks = books.filter(book => book.category === category);
+            showToast(`Hiển thị ${filteredBooks.length} sách trong danh mục này`, 'info');
+            // In a real app, you would update the displayed books
+        }
+
+        // Load more books
+        function loadMoreBooks() {
+            showToast('Đang tải thêm sách...', 'info');
+            // In a real app, you would load more books from the server
+        }
+
+        // Scroll to section
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Subscribe to newsletter
+        function subscribeNewsletter(event) {
+            event.preventDefault();
+            const email = event.target.querySelector('input[type="email"]').value;
+            const button = event.target.querySelector('button[type="submit"]');
+            const buttonText = button.querySelector('.button-text');
+            const spinner = button.querySelector('.loading-spinner');
+
+            // Show loading
+            buttonText.style.display = 'none';
+            spinner.style.display = 'inline-block';
+            button.disabled = true;
+
+            // Simulate API call
+            setTimeout(() => {
+                buttonText.style.display = 'inline';
+                spinner.style.display = 'none';
+                button.disabled = false;
+
+                showToast(`Cảm ơn! Chúng tôi đã ghi nhận email: ${email}`, 'success');
+                event.target.reset();
+            }, 2000);
+        }
+
+        // Animate statistics
+        function animateStats() {
+            const stats = document.querySelectorAll('.stat-number');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = parseInt(entry.target.getAttribute('data-target'));
+                        animateNumber(entry.target, target);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+
+            stats.forEach(stat => observer.observe(stat));
+        }
+
+        // Animate number counting
+        function animateNumber(element, target) {
+            let current = 0;
+            const increment = target / 100;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current).toLocaleString();
+            }, 20);
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : type === 'error' ? 'danger' : 'info'} position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'error' ? 'times-circle' : 'info-circle'} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 3000);
+        }
+
+        // Search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Product page functions
+        function changeQuantity(change) {
+            const quantityInput = document.getElementById('quantity');
+            let currentValue = parseInt(quantityInput.value);
+            currentValue += change;
+            if (currentValue < 1) currentValue = 1;
+            quantityInput.value = currentValue;
+        }
+
+        function addToCartFromProduct() {
+            const bookId = parseInt(document.getElementById('productId').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+
+            const book = books.find(b => b.id === bookId);
+            if (book) {
+                const existingItem = cart.find(item => item.id === bookId);
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    cart.push({ ...book, quantity: quantity });
+                }
+                updateCartBadge();
+                showToast(`Đã thêm ${quantity} cuốn "${book.title}" vào giỏ hàng!`, 'success');
+            }
+        }
+
+        function toggleWishlistFromProduct() {
+            const bookId = parseInt(document.getElementById('productId').value);
+            toggleWishlistItem(bookId);
+        }
+
+        // Cart page functions
+        function loadCartItems() {
+            const cartContainer = document.getElementById('cartItems');
+            const subtotalElement = document.getElementById('subtotal');
+            const totalElement = document.getElementById('total');
+
+            if (cart.length === 0) {
+                cartContainer.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-cart text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="mt-3">Giỏ hàng trống</h4>
+                        <p class="text-muted">Hãy thêm một số sách vào giỏ hàng của bạn</p>
+                        <button class="btn btn-primary" onclick="goHome()">Tiếp tục mua sắm</button>
+                    </div>
+                `;
+                subtotalElement.textContent = '0đ';
+                totalElement.textContent = '30.000đ';
+                return;
+            }
+
+            let subtotal = 0;
+            cartContainer.innerHTML = '';
+
+            cart.forEach(item => {
+                const price = parseInt(item.price.replace(/[^\d]/g, ''));
+                const itemTotal = price * item.quantity;
+                subtotal += itemTotal;
+
+                const cartItem = document.createElement('div');
+                cartItem.className = 'card mb-3';
+                cartItem.innerHTML = `
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                <div class="book-cover" style="height: 80px; width: 60px; ${item.cover}; border-radius: 8px;">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="mb-1">${item.title}</h6>
+                                <small class="text-muted">${item.author}</small>
+                            </div>
+                            <div class="col-md-2">
+                                <span class="fw-bold">${item.price}</span>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="input-group input-group-sm">
+                                    <button class="btn btn-outline-secondary" onclick="updateCartQuantity(${item.id}, -1)">-</button>
+                                    <input type="text" class="form-control text-center" value="${item.quantity}" readonly>
+                                    <button class="btn btn-outline-secondary" onclick="updateCartQuantity(${item.id}, 1)">+</button>
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <div class="fw-bold mb-2">${itemTotal.toLocaleString()}đ</div>
+                                <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${item.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                cartContainer.appendChild(cartItem);
+            });
+
+            subtotalElement.textContent = subtotal.toLocaleString() + 'đ';
+            totalElement.textContent = (subtotal + 30000).toLocaleString() + 'đ';
+        }
+
+        function updateCartQuantity(bookId, change) {
+            const item = cart.find(item => item.id === bookId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(bookId);
+                } else {
+                    loadCartItems();
+                    updateCartBadge();
+                }
+            }
+        }
+
+        function removeFromCart(bookId) {
+            const index = cart.findIndex(item => item.id === bookId);
+            if (index > -1) {
+                cart.splice(index, 1);
+                loadCartItems();
+                updateCartBadge();
+                showToast('Đã xóa sản phẩm khỏi giỏ hàng', 'info');
+            }
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                showToast('Giỏ hàng trống!', 'warning');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => {
+                const price = parseInt(item.price.replace(/[^\d]/g, ''));
+                return sum + (price * item.quantity);
+            }, 0) + 30000;
+
+            showToast(`Đang xử lý đơn hàng ${total.toLocaleString()}đ...`, 'info');
+
+            // Simulate checkout process
+            setTimeout(() => {
+                cart.length = 0;
+                updateCartBadge();
+                loadCartItems();
+                showToast('Đặt hàng thành công! Cảm ơn bạn đã mua sắm tại BookHub.', 'success');
+            }, 2000);
+        }
+
+        // Profile page functions
+        function showProfileTab(tabName) {
+            // First navigate to profile page if not already there
+            navigateToPage('profile');
+
+            // Hide all tabs
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.style.display = 'none';
+            });
+
+            // Remove active class from all nav items
+            document.querySelectorAll('.list-group-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById('profile' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
+
+            // Add active class to corresponding nav item
+            const navItems = document.querySelectorAll('.list-group-item');
+            navItems.forEach(item => {
+                if (item.textContent.toLowerCase().includes(tabName === 'info' ? 'thông tin' :
+                    tabName === 'orders' ? 'đơn hàng' :
+                        tabName === 'wishlist' ? 'yêu thích' : 'cài đặt')) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Load wishlist if wishlist tab is selected
+            if (tabName === 'wishlist') {
+                loadWishlistItems();
+            }
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                // Clear user data
+                cart.length = 0;
+                wishlist.length = 0;
+                updateCartBadge();
+                updateWishlistBadge();
+
+                // Show logout message
+                showToast('Đã đăng xuất thành công!', 'success');
+
+                // Navigate to home
+                goHome();
+            }
+        }
+
+        function loadWishlistItems() {
+            const wishlistContainer = document.getElementById('wishlistItems');
+
+            if (wishlist.length === 0) {
+                wishlistContainer.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-heart text-muted" style="font-size: 4rem;"></i>
+                        <h5 class="mt-3">Chưa có sách yêu thích</h5>
+                        <p class="text-muted">Hãy thêm những cuốn sách bạn yêu thích</p>
+                    </div>
+                `;
+                return;
+            }
+
+            wishlistContainer.innerHTML = '';
+
+            wishlist.forEach(bookId => {
+                const book = books.find(b => b.id === bookId);
+                if (book) {
+                    const wishlistItem = document.createElement('div');
+                    wishlistItem.className = 'col-md-6';
+                    wishlistItem.innerHTML = `
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-4">
+                                        <div class="book-cover" style="height: 80px; background: ${book.cover}; border-radius: 8px;"></div>
+                                    </div>
+                                    <div class="col-8">
+                                        <h6 class="mb-1">${book.title}</h6>
+                                        <small class="text-muted">${book.author}</small>
+                                        <div class="mt-2">
+                                            <span class="fw-bold text-danger">${book.price}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <button class="btn btn-sm btn-primary me-2" onclick="addToCart(${book.id})">
+                                                <i class="fas fa-cart-plus"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="toggleWishlistItem(${book.id}); loadWishlistItems();">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    wishlistContainer.appendChild(wishlistItem);
+                }
+            });
+        }
+
+        // Update navigation system to load cart items when cart page is shown
+        const originalNavigateToPage = navigateToPage;
+        navigateToPage = function (page) {
+            originalNavigateToPage(page);
+
+            if (page === 'cart') {
+                loadCartItems();
+            }
+
+            // Update product details page
+            if (page === 'product') {
+                const productId = document.getElementById('productId').value;
+                if (productId) {
+                    document.getElementById('productTitleDetail').textContent = document.getElementById('productTitle').textContent;
+                    document.getElementById('productAuthorDetail').textContent = document.getElementById('productAuthor').textContent;
+                }
+            }
+        };
+
+        // Smooth scrolling for navbar links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'98a64e62620fd176',t:'MTc1OTc2NTc0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
+</html>

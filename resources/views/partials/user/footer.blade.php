@@ -1,36 +1,69 @@
-<footer class="bg-white border-top">
-  <div class="container py-4">
-    <div class="row g-4">
-      <div class="col-12 col-lg-4">
-        <div class="d-flex align-items-center gap-2 mb-2">
-          <span class="logo-circle"><i class="bi bi-journal-richtext"></i></span>
-          <strong>LeafBook</strong>
+<footer class="footer" id="contact">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <h5 class="fw-bold mb-4">
+                    <i class="fas fa-book-open text-warning me-2"></i>BookStore
+                </h5>
+                <p class="mb-4">Nơi kết nối bạn với tri thức. Chúng tôi cam kết mang đến những cuốn sách chất
+                    lượng cao với dịch vụ tốt nhất.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h6 class="fw-bold mb-4">Danh mục</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Tiểu thuyết</a></li>
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Kinh doanh</a></li>
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Tâm lý học</a></li>
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Thiếu nhi</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h6 class="fw-bold mb-4">Hỗ trợ</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Chính sách đổi trả</a>
+                    </li>
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Hướng dẫn mua hàng</a>
+                    </li>
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Câu hỏi thường gặp</a>
+                    </li>
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Liên hệ</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3">
+                <h6 class="fw-bold mb-4">Liên hệ</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        123 Đường ABC, Quận 1, TP.HCM
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-phone me-2"></i>
+                        (028) 1234 5678
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-envelope me-2"></i>
+                        info@BookStore.vn
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-clock me-2"></i>
+                        8:00 - 22:00 (Hàng ngày)
+                    </li>
+                </ul>
+            </div>
         </div>
-        <p class="small text-secondary m-0">Cửa hàng sách thân thiện. Chúng tôi chọn lọc tựa sách hay cho mọi lứa tuổi, giao nhanh và hỗ trợ tận tâm.</p>
-      </div>
-      <div class="col-6 col-lg-4">
-        <h6 class="fw-semibold">Hỗ trợ</h6>
-        <ul class="list-unstyled small m-0">
-          <li><a class="link-secondary text-decoration-none" href="#">Chính sách vận chuyển</a></li>
-          <li><a class="link-secondary text-decoration-none" href="#">Đổi trả & Hoàn tiền</a></li>
-          <li><a class="link-secondary text-decoration-none" href="#">Bảo mật & Điều khoản</a></li>
-        </ul>
-      </div>
-      <div class="col-6 col-lg-4">
-        <h6 class="fw-semibold">Liên hệ</h6>
-        <ul class="list-unstyled small m-0">
-          <li>Email: hello@leafbook.vn</li>
-          <li>Hotline: 1900 1234</li>
-          <li>Địa chỉ: 123 Đường Sách, Q.1, TP.HCM</li>
-        </ul>
-        <div class="d-flex gap-2 mt-2">
-          <a class="btn btn-icon" href="#"><i class="bi bi-facebook"></i></a>
-          <a class="btn btn-icon" href="#"><i class="bi bi-instagram"></i></a>
-          <a class="btn btn-icon" href="#"><i class="bi bi-youtube"></i></a>
+
+        <hr class="my-4">
+        <div class="text-center">
+            <p class="mb-0">&copy; 2024 BookStore. Tất cả quyền được bảo lưu.</p>
         </div>
-      </div>
     </div>
-    <div class="text-center small text-secondary pt-3">© 2025 LeafBook</div>
-  </div>
 </footer>
-<button id="backTop" class="backtop" aria-label="Về đầu trang"><i class="bi bi-arrow-up"></i></button>

@@ -2,6 +2,8 @@
 
 @section('title','Admin Dashboard')
 
+@section('body_class','dashboard-page')
+
 @section('content')
 <div class="container-fluid">
   <div class="row g-3">

@@ -629,6 +629,35 @@ table tbody td:first-child {
 #uiAccountEditModal .ac-suggest .plus {
     font-weight: 700;
 }
+/* ============================================= PAGE: CATALOG, ACCOUNT ============================================= */
+.catalog-page .form-control,  
+.catalog-page .btn {
+    border-radius: 2px !important;
+}
+.catalog-page .form-control:focus {
+    border-color: #0b99c4 !important;
+    box-shadow: 0 0 0 1px #098fb8 !important;
+}
+
+.account-page .form-control,  
+.account-page .btn {
+    border-radius: 2px !important;
+}
+.account-page .form-control:focus {
+    border-color: #0b99c4 !important;
+    box-shadow: 0 0 0 1px #098fb8 !important;
+}
+
+.dashboard-page .form-control,  
+.dashboard-page .btn {
+    border-radius: 2px !important;
+}
+.dashboard-page .form-control:focus {
+    border-color: #0b99c4 !important;
+    box-shadow: 0 0 0 1px #098fb8 !important;
+}
+
+/* ==================================================================================================================== */
 
 /* ============================================= MODAL: CATEGORY, BRAND, PUBLISHER ============================================= */
 #author_image_placeholder {

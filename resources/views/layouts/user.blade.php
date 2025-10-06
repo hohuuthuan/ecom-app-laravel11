@@ -8,9 +8,7 @@
 
 @section('layout')
   @include('partials.user.header')
-  <main class="container py-4">
     @yield('content')
-  </main>
   @include('partials.user.footer')
   @include('partials.user.script')
 @endsection

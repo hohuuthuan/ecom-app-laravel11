@@ -11,5 +11,4 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
 @vite(['resources/css/toast.css'])
 @vite(['resources/css/style-admin.css'])
-@vite(['resources/css/style.css'])
 @vite(['resources/css/custom.css'])

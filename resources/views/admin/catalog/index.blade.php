@@ -2,6 +2,8 @@
 
 @section('title','Catalog: Category & author')
 
+@section('body_class','catalog-page')
+
 @section('content')
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb mb-0">

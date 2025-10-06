@@ -1,6 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
   <div class="container-fluid">
-    {{-- btnCollapseDesktop --}}
     <button id="" class="btn btn-primary me-2 d-none d-lg-inline-flex" type="button"
       title="Thu gọn sidebar">
       <i class="fa fa-bars"></i>
@@ -9,6 +8,11 @@
       data-bs-target="#offcanvasSidebar" title="Mở menu">
       <i class="fa fa-bars"></i>
     </button>
+
+    <!-- Nút về trang Home -->
+    <a href="{{ route('home') }}" class="btn btn-outline-secondary me-2" title="Về trang chủ" aria-label="Về trang chủ">
+      <i class="fa fa-home"></i> <span class="d-none d-sm-inline ms-1">Trang chủ</span>
+    </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav">
       <span class="navbar-toggler-icon"></span>

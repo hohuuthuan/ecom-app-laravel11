@@ -62,7 +62,7 @@
                 @endif
               </div>
               <div class="col-md-6">
-                <label class="form-label label-filter-admin-product">Slug</label>
+                <label class="form-label label-filter-admin-product">Slug <span class="text-danger">*</span></label>
                 <input type="text"
                   class="form-control {{ $errors->has('slug') ? 'is-invalid' : '' }}"
                   placeholder="slug-tu-dong"

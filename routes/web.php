@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\Page\CatalogPageController;
 use App\Http\Controllers\Admin\Page\ProductPageController;
+use App\Http\Controllers\Admin\Page\OrderPageController;
 
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -59,6 +60,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/product', [ProductController::class, 'store'])->name('product.store');
     Route::put('/products/{id}', [ProductController::class, 'update'])->name('product.update');
+
+    Route::get('/order', [OrderPageController::class, 'index'])->name('order.index');
+    Route::get('/order/detail/{id}', [OrderPageController::class, 'detail'])->name('order.detail');
   });
 });
 

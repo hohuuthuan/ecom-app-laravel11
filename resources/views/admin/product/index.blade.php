@@ -189,21 +189,5 @@
   </div>
 </div>
 
-{{-- Bulk form --}}
-<form id="productBulkForm" method="POST" class="d-none">
-  @csrf
-  <div id="productBulkIds"></div>
-</form>
-
-{{-- giữ nguyên formState placeholder nếu cần về sau --}}
-<div id="__formState"
-  data-has-errors="0"
-  data-which=""
-  data-mode="create"
-  data-update-action=""
-  data-image=""
-  style="display:none"></div>
-
-{{-- Confirm modal dùng chung --}}
 @include('partials.ui.confirm-modal')
 @endsection

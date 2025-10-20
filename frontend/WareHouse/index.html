@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Kho</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+            background: linear-gradient(135deg, #e3f2fd 0%, #e8eaf6 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .nav-btn {
+            border: none;
+            background: none;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        .nav-btn:hover {
+            background-color: #e3f2fd !important;
+            color: #1976d2 !important;
+        }
+        
+        .nav-btn.active {
+            background-color: #e3f2fd !important;
+            color: #1976d2 !important;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stats-card {
+            border-left: 4px solid;
+        }
+        
+        .stats-card.blue { border-left-color: #2196f3; }
+        .stats-card.green { border-left-color: #4caf50; }
+        .stats-card.yellow { border-left-color: #ff9800; }
+        .stats-card.red { border-left-color: #f44336; }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-down {
+            animation: slideDown 0.2s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn-custom {
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-stock {
+            font-size: 0.75rem;
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .activity-item {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #2196f3;
+            box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+        }
+        
+        .alert-custom {
+            border: none;
+            border-radius: 10px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            border-radius: 10px;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="h-100">
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0 sidebar">
+                <div class="p-4 border-bottom">
+                    <h2 class="h4 mb-0 fw-bold text-dark">📦 Quản Lý Kho</h2>
+                </div>
+                <nav class="mt-4">
+                    <div class="px-3">
+                        <button onclick="showSection('dashboard')" class="nav-btn btn w-100 text-start p-3 mb-2 d-flex align-items-center">
+                            <span class="me-3">📊</span>
+                            <span>Tổng Quan</span>
+                        </button>
+                        <button onclick="showSection('products')" class="nav-btn btn w-100 text-start p-3 mb-2 d-flex align-items-center">
+                            <span class="me-3">📋</span>
+                            <span>Sản Phẩm</span>
+                        </button>
+                        <button onclick="showSection('inventory')" class="nav-btn btn w-100 text-start p-3 mb-2 d-flex align-items-center">
+                            <span class="me-3">📦</span>
+                            <span>Tồn Kho</span>
+                        </button>
+                        <button onclick="showSection('import')" class="nav-btn btn w-100 text-start p-3 mb-2 d-flex align-items-center">
+                            <span class="me-3">⬇️</span>
+                            <span>Nhập Kho</span>
+                        </button>
+                        <button onclick="showSection('export')" class="nav-btn btn w-100 text-start p-3 mb-2 d-flex align-items-center">
+                            <span class="me-3">⬆️</span>
+                            <span>Xuất Kho</span>
+                        </button>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 p-4">
+                <!-- Dashboard Section -->
+                <div id="dashboard" class="section">
+                    <div class="mb-5">
+                        <h1 class="display-6 fw-bold text-dark mb-2">Tổng Quan Kho</h1>
+                        <p class="text-muted">Thống kê và báo cáo tổng quan</p>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stats-card blue">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <p class="text-muted small mb-1">Tổng Sản Phẩm</p>
+                                            <h3 class="fw-bold mb-0">1,247</h3>
+                                        </div>
+                                        <div class="fs-1">📦</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stats-card green">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <p class="text-muted small mb-1">Giá Trị Kho</p>
+                                            <h3 class="fw-bold mb-0">2.5 tỷ</h3>
+                                        </div>
+                                        <div class="fs-1">💰</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stats-card yellow">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <p class="text-muted small mb-1">Sắp Hết Hàng</p>
+                                            <h3 class="fw-bold mb-0">23</h3>
+                                        </div>
+                                        <div class="fs-1">⚠️</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stats-card red">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <p class="text-muted small mb-1">Hết Hàng</p>
+                                            <h3 class="fw-bold mb-0">5</h3>
+                                        </div>
+                                        <div class="fs-1">🚫</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activities -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title fw-semibold mb-4">Hoạt Động Gần Đây</h4>
+                            <div class="d-flex flex-column gap-3">
+                                <div class="activity-item p-3 d-flex align-items-center">
+                                    <div class="fs-4 me-3">⬇️</div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1 fw-medium">Nhập kho 100 sản phẩm iPhone 15</p>
+                                        <small class="text-muted">2 giờ trước</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item p-3 d-flex align-items-center">
+                                    <div class="fs-4 me-3">⬆️</div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1 fw-medium">Xuất kho 50 sản phẩm Samsung Galaxy</p>
+                                        <small class="text-muted">4 giờ trước</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item p-3 d-flex align-items-center">
+                                    <div class="fs-4 me-3">📝</div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1 fw-medium">Cập nhật thông tin sản phẩm Laptop Dell</p>
+                                        <small class="text-muted">6 giờ trước</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Section -->
+                <div id="products" class="section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-5">
+                        <div>
+                            <h1 class="display-6 fw-bold text-dark mb-2">Quản Lý Sản Phẩm</h1>
+                            <p class="text-muted">Thêm, sửa, xóa thông tin sản phẩm</p>
+                        </div>
+                        <button onclick="showAddProductForm()" class="btn btn-primary btn-custom px-4 py-2 d-flex align-items-center">
+                            <span class="me-2">➕</span>
+                            <span>Thêm Sản Phẩm</span>
+                        </button>
+                    </div>
+
+                    <!-- Search and Filter -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label for="search-product" class="form-label fw-medium">Tìm kiếm sản phẩm</label>
+                                    <input type="text" class="form-control" id="search-product" placeholder="Nhập tên sản phẩm...">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="category-filter" class="form-label fw-medium">Danh mục</label>
+                                    <select class="form-select" id="category-filter">
+                                        <option value="">Tất cả danh mục</option>
+                                        <option value="electronics">Điện tử</option>
+                                        <option value="clothing">Thời trang</option>
+                                        <option value="books">Sách</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products Table -->
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-4 py-3">Mã SP</th>
+                                            <th class="px-4 py-3">Tên Sản Phẩm</th>
+                                            <th class="px-4 py-3">Danh Mục</th>
+                                            <th class="px-4 py-3">Giá</th>
+                                            <th class="px-4 py-3">Tồn Kho</th>
+                                            <th class="px-4 py-3">Thao Tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="products-table">
+                                        <tr>
+                                            <td class="px-4 py-3 fw-medium">SP001</td>
+                                            <td class="px-4 py-3">iPhone 15 Pro Max</td>
+                                            <td class="px-4 py-3 text-muted">Điện tử</td>
+                                            <td class="px-4 py-3">29,990,000đ</td>
+                                            <td class="px-4 py-3">
+                                                <span class="badge bg-success badge-stock">150</span>
+                                            </td>
+                                            <td class="px-4 py-3">
+                                                <button class="btn btn-sm btn-outline-primary me-1">✏️</button>
+                                                <button class="btn btn-sm btn-outline-danger">🗑️</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 fw-medium">SP002</td>
+                                            <td class="px-4 py-3">Samsung Galaxy S24</td>
+                                            <td class="px-4 py-3 text-muted">Điện tử</td>
+                                            <td class="px-4 py-3">22,990,000đ</td>
+                                            <td class="px-4 py-3">
+                                                <span class="badge bg-warning badge-stock">25</span>
+                                            </td>
+                                            <td class="px-4 py-3">
+                                                <button class="btn btn-sm btn-outline-primary me-1">✏️</button>
+                                                <button class="btn btn-sm btn-outline-danger">🗑️</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Section -->
+                <div id="inventory" class="section d-none">
+                    <div class="mb-5">
+                        <h1 class="display-6 fw-bold text-dark mb-2">Báo Cáo Tồn Kho</h1>
+                        <p class="text-muted">Theo dõi số lượng tồn kho theo thời gian thực</p>
+                    </div>
+
+                    <!-- Inventory Alerts -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title d-flex align-items-center mb-4">
+                                        <span class="me-2">⚠️</span>
+                                        Sản Phẩm Sắp Hết Hàng
+                                    </h5>
+                                    <div class="d-flex flex-column gap-3">
+                                        <div class="alert alert-warning alert-custom d-flex justify-content-between align-items-center mb-0">
+                                            <span class="fw-medium">Samsung Galaxy S24</span>
+                                            <span class="badge bg-warning">25 còn lại</span>
+                                        </div>
+                                        <div class="alert alert-warning alert-custom d-flex justify-content-between align-items-center mb-0">
+                                            <span class="fw-medium">MacBook Air M2</span>
+                                            <span class="badge bg-warning">12 còn lại</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title d-flex align-items-center mb-4">
+                                        <span class="me-2">🚫</span>
+                                        Sản Phẩm Hết Hàng
+                                    </h5>
+                                    <div class="d-flex flex-column gap-3">
+                                        <div class="alert alert-danger alert-custom d-flex justify-content-between align-items-center mb-0">
+                                            <span class="fw-medium">iPad Pro 12.9</span>
+                                            <span class="badge bg-danger">0 còn lại</span>
+                                        </div>
+                                        <div class="alert alert-danger alert-custom d-flex justify-content-between align-items-center mb-0">
+                                            <span class="fw-medium">AirPods Pro</span>
+                                            <span class="badge bg-danger">0 còn lại</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Chart Placeholder -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Biểu Đồ Tồn Kho Theo Danh Mục</h5>
+                            <div class="bg-light rounded p-5 text-center" style="height: 300px;">
+                                <div class="d-flex align-items-center justify-content-center h-100">
+                                    <p class="text-muted fs-5">📊 Biểu đồ tồn kho sẽ hiển thị tại đây</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Import Section -->
+                <div id="import" class="section d-none">
+                    <div class="mb-5">
+                        <h1 class="display-6 fw-bold text-dark mb-2">Nhập Kho</h1>
+                        <p class="text-muted">Tạo phiếu nhập kho mới</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="import-form">
+                                <div class="row g-4 mb-4">
+                                    <div class="col-md-6">
+                                        <label for="import-date" class="form-label fw-medium">Ngày nhập</label>
+                                        <input type="date" class="form-control" id="import-date">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="supplier" class="form-label fw-medium">Nhà cung cấp</label>
+                                        <select class="form-select" id="supplier">
+                                            <option value="">Chọn nhà cung cấp</option>
+                                            <option value="apple">Apple Vietnam</option>
+                                            <option value="samsung">Samsung Electronics</option>
+                                            <option value="dell">Dell Technologies</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="import-note" class="form-label fw-medium">Ghi chú</label>
+                                    <textarea class="form-control" id="import-note" rows="3" placeholder="Nhập ghi chú cho phiếu nhập..."></textarea>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0">Chi Tiết Sản Phẩm</h5>
+                                    <button type="button" onclick="addImportItem()" class="btn btn-success btn-custom">
+                                        ➕ Thêm Sản Phẩm
+                                    </button>
+                                </div>
+
+                                <div id="import-items">
+                                    <div class="import-item card bg-light mb-3">
+                                        <div class="card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-3">
+                                                    <label class="form-label small fw-medium">Sản phẩm</label>
+                                                    <select class="form-select">
+                                                        <option value="">Chọn sản phẩm</option>
+                                                        <option value="SP001">iPhone 15 Pro Max</option>
+                                                        <option value="SP002">Samsung Galaxy S24</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label small fw-medium">Số lượng</label>
+                                                    <input type="number" class="form-control" min="1" placeholder="0">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label small fw-medium">Giá nhập</label>
+                                                    <input type="number" class="form-control" min="0" placeholder="0">
+                                                </div>
+                                                <div class="col-md-3 d-flex align-items-end">
+                                                    <button type="button" onclick="removeImportItem(this)" class="btn btn-danger btn-custom w-100">
+                                                        🗑️ Xóa
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="d-flex justify-content-end gap-3">
+                                    <button type="button" class="btn btn-outline-secondary btn-custom px-4">Hủy</button>
+                                    <button type="submit" class="btn btn-primary btn-custom px-4">Tạo Phiếu Nhập</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Section -->
+                <div id="export" class="section d-none">
+                    <div class="mb-5">
+                        <h1 class="display-6 fw-bold text-dark mb-2">Xuất Kho</h1>
+                        <p class="text-muted">Tạo phiếu xuất kho mới</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="export-form">
+                                <div class="row g-4 mb-4">
+                                    <div class="col-md-6">
+                                        <label for="export-date" class="form-label fw-medium">Ngày xuất</label>
+                                        <input type="date" class="form-control" id="export-date">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="customer" class="form-label fw-medium">Khách hàng</label>
+                                        <input type="text" class="form-control" id="customer" placeholder="Nhập tên khách hàng...">
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="export-note" class="form-label fw-medium">Ghi chú</label>
+                                    <textarea class="form-control" id="export-note" rows="3" placeholder="Nhập ghi chú cho phiếu xuất..."></textarea>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0">Chi Tiết Sản Phẩm</h5>
+                                    <button type="button" onclick="addExportItem()" class="btn btn-success btn-custom">
+                                        ➕ Thêm Sản Phẩm
+                                    </button>
+                                </div>
+
+                                <div id="export-items">
+                                    <div class="export-item card bg-light mb-3">
+                                        <div class="card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-3">
+                                                    <label class="form-label small fw-medium">Sản phẩm</label>
+                                                    <select class="form-select">
+                                                        <option value="">Chọn sản phẩm</option>
+                                                        <option value="SP001">iPhone 15 Pro Max (150 có sẵn)</option>
+                                                        <option value="SP002">Samsung Galaxy S24 (25 có sẵn)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label small fw-medium">Số lượng</label>
+                                                    <input type="number" class="form-control" min="1" placeholder="0">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label small fw-medium">Giá bán</label>
+                                                    <input type="number" class="form-control" min="0" placeholder="0">
+                                                </div>
+                                                <div class="col-md-3 d-flex align-items-end">
+                                                    <button type="button" onclick="removeExportItem(this)" class="btn btn-danger btn-custom w-100">
+                                                        🗑️ Xóa
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="d-flex justify-content-end gap-3">
+                                    <button type="button" class="btn btn-outline-secondary btn-custom px-4">Hủy</button>
+                                    <button type="submit" class="btn btn-primary btn-custom px-4">Tạo Phiếu Xuất</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal fade" id="add-product-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-semibold">Thêm Sản Phẩm Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-product-form">
+                        <div class="mb-3">
+                            <label for="product-code" class="form-label fw-medium">Mã sản phẩm</label>
+                            <input type="text" class="form-control" id="product-code" placeholder="VD: SP003">
+                        </div>
+                        <div class="mb-3">
+                            <label for="product-name" class="form-label fw-medium">Tên sản phẩm</label>
+                            <input type="text" class="form-control" id="product-name" placeholder="Nhập tên sản phẩm...">
+                        </div>
+                        <div class="mb-3">
+                            <label for="product-category" class="form-label fw-medium">Danh mục</label>
+                            <select class="form-select" id="product-category">
+                                <option value="">Chọn danh mục</option>
+                                <option value="electronics">Điện tử</option>
+                                <option value="clothing">Thời trang</option>
+                                <option value="books">Sách</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="product-price" class="form-label fw-medium">Giá bán</label>
+                            <input type="number" class="form-control" id="product-price" min="0" placeholder="0">
+                        </div>
+                        <div class="mb-3">
+                            <label for="product-stock" class="form-label fw-medium">Số lượng ban đầu</label>
+                            <input type="number" class="form-control" id="product-stock" min="0" placeholder="0">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary btn-custom" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="add-product-form" class="btn btn-primary btn-custom">Thêm Sản Phẩm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let addProductModal;
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('d-none');
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionId);
+            targetSection.classList.remove('d-none');
+            targetSection.classList.add('fade-in');
+            
+            // Update active nav button
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Product Modal
+        function showAddProductForm() {
+            addProductModal.show();
+        }
+
+        function hideAddProductForm() {
+            addProductModal.hide();
+        }
+
+        // Import/Export Items
+        function addImportItem() {
+            const container = document.getElementById('import-items');
+            const newItem = container.children[0].cloneNode(true);
+            newItem.classList.add('slide-down');
+            
+            // Clear input values
+            newItem.querySelectorAll('input, select').forEach(input => {
+                input.value = '';
+            });
+            
+            container.appendChild(newItem);
+        }
+
+        function removeImportItem(button) {
+            const container = document.getElementById('import-items');
+            if (container.children.length > 1) {
+                button.closest('.import-item').remove();
+            }
+        }
+
+        function addExportItem() {
+            const container = document.getElementById('export-items');
+            const newItem = container.children[0].cloneNode(true);
+            newItem.classList.add('slide-down');
+            
+            // Clear input values
+            newItem.querySelectorAll('input, select').forEach(input => {
+                input.value = '';
+            });
+            
+            container.appendChild(newItem);
+        }
+
+        function removeExportItem(button) {
+            const container = document.getElementById('export-items');
+            if (container.children.length > 1) {
+                button.closest('.export-item').remove();
+            }
+        }
+
+        // Form Submissions
+        document.getElementById('add-product-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const productCode = document.getElementById('product-code').value;
+            const productName = document.getElementById('product-name').value;
+            const productCategory = document.getElementById('product-category').value;
+            const productPrice = document.getElementById('product-price').value;
+            const productStock = document.getElementById('product-stock').value;
+            
+            if (productCode && productName && productCategory && productPrice) {
+                // Add to products table
+                const tableBody = document.getElementById('products-table');
+                const newRow = document.createElement('tr');
+                
+                const stockBadgeClass = productStock > 50 ? 'bg-success' : productStock > 10 ? 'bg-warning' : 'bg-danger';
+                
+                newRow.innerHTML = `
+                    <td class="px-4 py-3 fw-medium">${productCode}</td>
+                    <td class="px-4 py-3">${productName}</td>
+                    <td class="px-4 py-3 text-muted">${productCategory}</td>
+                    <td class="px-4 py-3">${parseInt(productPrice).toLocaleString('vi-VN')}đ</td>
+                    <td class="px-4 py-3">
+                        <span class="badge ${stockBadgeClass} badge-stock">${productStock}</span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <button class="btn btn-sm btn-outline-primary me-1">✏️</button>
+                        <button class="btn btn-sm btn-outline-danger">🗑️</button>
+                    </td>
+                `;
+                tableBody.appendChild(newRow);
+                
+                // Reset form and hide modal
+                this.reset();
+                addProductModal.hide();
+                
+                // Show success message
+                showNotification('Thêm sản phẩm thành công!', 'success');
+            }
+        });
+
+        document.getElementById('import-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showNotification('Tạo phiếu nhập thành công!', 'success');
+            this.reset();
+        });
+
+        document.getElementById('export-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showNotification('Tạo phiếu xuất thành công!', 'success');
+            this.reset();
+        });
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const alertClass = type === 'success' ? 'alert-success' : 
+                              type === 'error' ? 'alert-danger' : 'alert-info';
+            
+            const notification = document.createElement('div');
+            notification.className = `alert ${alertClass} notification`;
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <span class="me-2">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Bootstrap modal
+            addProductModal = new bootstrap.Modal(document.getElementById('add-product-modal'));
+            
+            // Set default active section
+            showSection('dashboard');
+            document.querySelector('.nav-btn').classList.add('active');
+            
+            // Set current date for forms
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('import-date').value = today;
+            document.getElementById('export-date').value = today;
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9918d89a629f87b4',t:'MTc2MDk2Njc3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

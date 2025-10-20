@@ -54,7 +54,6 @@ class ProductService
         'publisher:id,name'
       ]);
 
-    // keyword: tìm theo name, slug, isbn
     if (!empty($filters['keyword'])) {
       $kw = trim((string)$filters['keyword']);
       $query->where(function ($q) use ($kw) {
@@ -63,7 +62,6 @@ class ProductService
           ->orWhere('isbn', 'LIKE', "%{$kw}%");
       });
     }
-
     if (!empty($filters['status'])) {
       $query->where('status', $filters['status']);
     }

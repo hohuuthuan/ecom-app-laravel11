@@ -2,18 +2,22 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Admin\AccountController;
+
+use App\Http\Controllers\User\Page\HomePageController;
+use App\Http\Controllers\User\HomeController;
+
 use App\Http\Controllers\Admin\Page\CatalogPageController;
 use App\Http\Controllers\Admin\Page\ProductPageController;
 use App\Http\Controllers\Admin\Page\OrderPageController;
 
+use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PublisherController;
 use App\Http\Controllers\Admin\ProductController;
 
 // === PUBLIC ===
-Route::view('/', 'user.home')->name('home');
+Route::get('/', [HomePageController::class, 'index'])->name('home');
 
 // === GUEST ===
 Route::middleware('guest')->group(function () {
@@ -27,6 +31,10 @@ Route::middleware('guest')->group(function () {
 // === LOGGED IN ===
 Route::middleware(['auth'])->group(function () {
   Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+  Route::get('/favorite', [HomePageController::class, 'listFavoriteProduct'])->name('listFavoriteProduct');
+  Route::post('/favorite', [HomeController::class, 'addFavoriteProduct'])->name('addFavoriteProduct');
+  Route::delete('/favorite/{productId}', [HomeController::class, 'destroyFavoriteProduct'])->name('destroyFavoriteProduct');
 
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
     Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');

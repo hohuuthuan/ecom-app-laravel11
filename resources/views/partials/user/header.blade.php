@@ -11,7 +11,7 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link active" href="#home">Trang chủ</a>
+          <a class="nav-link active" href="{{ route('home') }}">Trang chủ</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -45,10 +45,18 @@
 
         <div class="d-flex align-items-center">
           <!-- Wishlist -->
-          <a href="#" class="text-decoration-none me-3 position-relative" onclick="toggleWishlist()">
+          @php
+          $wishlistCount = auth()->check()
+          ? auth()->user()->favorites()->count()
+          : 0;
+          @endphp
+
+          <a href="{{ route('listFavoriteProduct') }}" class="text-decoration-none me-3 position-relative">
             <i class="fas fa-heart text-danger" style="font-size: 1.2rem;"></i>
             <span class="badge bg-danger position-absolute top-0 start-100 translate-middle"
-              id="wishlistCount" style="font-size: 0.7rem;">0</span>
+              id="wishlistCount" style="font-size: 0.7rem;">
+              {{ $wishlistCount }}
+            </span>
           </a>
 
           <!-- Cart -->

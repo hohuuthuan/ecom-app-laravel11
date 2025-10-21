@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin\Product;
+namespace App\Services\User;
 
 use App\Models\Product;
 use App\Models\Category;
@@ -12,6 +12,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 class ProductService
@@ -51,6 +52,8 @@ class ProductService
         'categories:id,name',
         'authors:id,name',
         'publisher:id,name'
+      ])->withExists([
+        'favoredBy as is_favorited' => fn($q) => $q->where('users.id', Auth::user())
       ]);
 
     if (!empty($filters['keyword'])) {
@@ -180,7 +183,7 @@ class ProductService
       });
 
       return true;
-    } catch (\Throwable $e) { 
+    } catch (\Throwable $e) {
       if (isset($newName)) {
         $path = 'products/' . $newName;
         if (Storage::disk('public')->exists($path)) {

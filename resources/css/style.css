@@ -4,6 +4,23 @@ body {
   line-height: 1.6;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.breadcrumb {
+  font-size: 20px;
+  font-weight: 500;
+  background: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.breadcrumb-active{
+  color: #0189b2;
+}
+
 :root {
   --primary-color: #2c3e50;
   --secondary-color: #e74c3c;
@@ -81,7 +98,7 @@ body {
   transition: transform 0.6s;
 }
 
-.book-card:hover .book-cover::before {
+.book-cover::before {
   transform: translateX(100%);
 }
 
@@ -235,6 +252,202 @@ body {
 }
 
 
+/*  ============================================================= PRODUCT DETAIL ============================================================= */
+
+.book-detail-cover {
+  position: relative;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.18), 0 4px 12px rgba(0,0,0,.12);
+}
+
+.book-detail-cover:hover {
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22), 0 6px 16px rgba(0, 0, 0, 0.16);
+}
+
+.book-detail-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.quantity-control {
+  display: inline-flex;
+  align-items: stretch;
+  width: 180px;
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: .5rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.quantity-control>.btn {
+  background-color: #007092;
+  color: #fff;
+  font-size: 20px;
+  flex: 0 0 44px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none !important;
+}
+
+.quantity-control>.form-control {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 64px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none !important;
+}
+
+.quantity-control input[type="number"]::-webkit-outer-spin-button,
+.quantity-control input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.quantity-control:has(input:focus) {
+  outline: 2px solid rgba(13, 110, 253, .25);
+  outline-offset: 2px;
+}
+
+.text-rating {
+  font-size: 1rem;
+  color: #0857be;
+  font-style: italic;
+}
+
+.book-detail-cover.is-out::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.45); /* lớp mờ */
+}
+
+.book-detail-cover .oos-badge {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  height: max-content;
+  width: max-content;
+  padding: .6rem 1rem;
+  border-radius: .5rem;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: .2px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.2);
+  z-index: 1;
+}
+
+
+/* ====== Reviews ====== */
+.review-title {
+  font-weight: 700;
+  color: #007092;
+  font-size: 25px;
+}
+
+.product-reviews {
+  --rv-border: #e9ecef;
+  --rv-muted: #6c757d;
+  --rv-bg: #ffffff;
+  --rv-bg-soft: #f8f9fa;
+  --rv-shadow: 0 6px 16px rgba(0,0,0,.06);
+}
+
+.product-reviews .reviews-head .reviews-view-all {
+  text-decoration: none;
+  font-weight: 600;
+}
+.product-reviews .reviews-head .reviews-view-all:hover {
+  text-decoration: underline;
+}
+
+.product-reviews .reviews-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.product-reviews .review-card {
+  background: var(--rv-bg);
+  border: 1px solid var(--rv-border);
+  border-radius: .75rem;
+  box-shadow: var(--rv-shadow);
+  padding: 1rem 1.25rem;
+}
+
+.product-reviews .review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-bottom: .5rem;
+}
+
+.product-reviews .review-left {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.product-reviews .review-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--rv-bg-soft);
+  color: #343a40;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid var(--rv-border);
+}
+
+.product-reviews .review-author .review-name {
+  line-height: 1.2;
+}
+.product-reviews .review-author .review-date {
+  font-size: .875rem;
+  color: var(--rv-muted);
+}
+
+.product-reviews .review-right .review-stars {
+  display: inline-flex;
+  gap: 2px;
+  font-size: .95rem;
+}
+.product-reviews .review-right .review-stars .fa-star {
+  color: #ced4da;
+}
+.product-reviews .review-right .review-stars .fa-star.filled {
+  color: #f1c40f; /* vàng */
+}
+
+.product-reviews .review-body {
+  margin-top: .5rem;
+  line-height: 1.6;
+}
+
+.product-reviews .review-reply {
+  margin-top: .75rem;
+  background: var(--rv-bg-soft);
+  border: 1px dashed var(--rv-border);
+  border-radius: .5rem;
+  padding: .75rem .85rem;
+}
+.product-reviews .review-reply .reply-title {
+  font-weight: 600;
+  margin-bottom: .25rem;
+}
+.product-reviews .reviews-empty {
+  padding: .75rem 0;
+}
 
 
 

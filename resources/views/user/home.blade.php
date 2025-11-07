@@ -183,12 +183,12 @@
                   data-del-url="{{ route('destroyFavoriteProduct', '__ID__') }}"
                   aria-pressed="{{ $isFav ? 'true' : 'false' }}">
                   <i class="bi {{ $isFav ? 'bi-heart-fill' : 'bi-heart' }}"></i>
-                  <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Thích' }}</span>
+                  <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Yêu thích' }}</span>
                 </button>
               </div>
 
               <div class="mt-auto d-grid gap-2">
-                <a href="" class="btn btn-outline-primary">
+                <a href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}" class="btn btn-outline-primary">
                   <i class="fas fa-eye me-2"></i>Xem chi tiết
                 </a>
 

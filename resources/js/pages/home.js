@@ -65,7 +65,7 @@ function formatNumber(n) {
 (function () {
   // === Config ===
   const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-  const loginUrl = '/login'; // chỉnh nếu route đăng nhập khác
+  const loginUrl = '/login';
 
   // === Helpers ===
   async function api(url, { method = 'POST', body = null } = {}) {
@@ -100,14 +100,32 @@ function formatNumber(n) {
   }
 
   function setBtnState(btn, favOn) {
-    btn.classList.toggle('btn-danger', favOn);
-    btn.classList.toggle('btn-outline-danger', !favOn);
-    const icon = btn.querySelector('i');
-    if (icon) icon.className = favOn ? 'bi bi-heart-fill' : 'bi bi-heart';
-    const label = btn.querySelector('.js-fav-label');
-    if (label) label.textContent = favOn ? 'Bỏ thích' : 'Thích';
-    btn.setAttribute('aria-pressed', favOn ? 'true' : 'false');
+  btn.classList.toggle('btn-danger', favOn);
+  btn.classList.toggle('btn-outline-danger', !favOn);
+
+  const icon = btn.querySelector('i');
+  if (icon) {
+    const cls = icon.className;
+
+    // Bootstrap Icons
+    if (cls.includes('bi')) {
+      icon.className = favOn ? 'bi bi-heart-fill' : 'bi bi-heart';
+    }
+    // Font Awesome 5/6 (solid/regular)
+    else if (cls.includes('fa')) {
+      // Giữ lại các class util như me-2 nếu có
+      const keep = cls.split(' ').filter(c => c.startsWith('me-') || c.startsWith('ms-') || c.startsWith('mx-') || c.startsWith('my-'));
+      const base = favOn ? ['fas','fa-heart'] : ['far','fa-heart']; // solid vs regular
+      icon.className = base.concat(keep).join(' ');
+    }
   }
+
+  const label = btn.querySelector('.js-fav-label');
+  if (label) {
+    label.textContent = favOn ? 'Bỏ thích' : 'Yêu thích';
+  }
+  btn.setAttribute('aria-pressed', favOn ? 'true' : 'false');
+}
 
   // === Events ===
   document.addEventListener('click', async (e) => {
@@ -163,3 +181,90 @@ function formatNumber(n) {
   });
 })();
 /*  ===================================================================== END FAVORITE PRODUCT =================================================================== */
+
+
+/*  ====================================================================== CHANGE QUANTITY (PRODUCT DETAIL) ====================================================================== */
+(function () {
+  function getBounds(input) {
+    const min = parseInt(input.getAttribute('min') || '1', 10);
+    const maxAttr = input.getAttribute('max');
+    const hasMax = maxAttr !== null && maxAttr !== '';
+    let max = hasMax ? parseInt(maxAttr, 10) : Infinity;
+
+    // Nếu max không hợp lệ hoặc nhỏ hơn min thì coi như không giới hạn
+    if (!Number.isFinite(max) || max < min) {
+      max = Infinity;
+    }
+    return { min, max, hasMax };
+  }
+
+  function clamp(n, min, max) {
+    return Number.isFinite(max) ? Math.min(Math.max(n, min), max) : Math.max(n, min);
+  }
+
+  function syncButtons(input) {
+    const { min, max, hasMax } = getBounds(input);
+    const val = parseInt(input.value, 10);
+    const curr = Number.isFinite(val) ? val : min;
+
+    const box = input.parentElement;
+    if (!box) { return; }
+    const btns = box.querySelectorAll('button[data-delta]');
+    if (btns[0]) { btns[0].disabled = curr <= min; }
+    if (btns[1]) { btns[1].disabled = hasMax && Number.isFinite(max) && curr >= max; }
+  }
+
+  function applyClamp(input) {
+    const { min, max, hasMax } = getBounds(input);
+    const raw = parseInt(input.value, 10);
+    const curr = Number.isFinite(raw) ? raw : min;
+    const next = clamp(curr, min, max);
+    if (next !== curr) {
+      input.value = String(next);
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    syncButtons(input);
+  }
+
+  function changeQuantity(delta) {
+    const input = document.getElementById('quantity');
+    if (!input) { return; }
+
+    const { min, max } = getBounds(input);
+    const val = parseInt(input.value, 10);
+    const curr = Number.isFinite(val) ? val : min;
+    const next = clamp(curr + Number(delta), min, max);
+
+    if (next !== curr) {
+      input.value = String(next);
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    syncButtons(input);
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const box = document.getElementById('qtyBox');
+    const input = document.getElementById('quantity');
+    if (!box || !input) { return; }
+
+    // Click nút +/- (không dùng onclick inline)
+    box.addEventListener('click', function (e) {
+      const btn = e.target.closest('button[data-delta]');
+      if (!btn) { return; }
+      changeQuantity(btn.getAttribute('data-delta'));
+    });
+
+    // Clamp khi gõ tay/rời focus
+    input.addEventListener('input', function () { applyClamp(input); });
+    input.addEventListener('blur', function () { applyClamp(input); });
+
+    // Khởi tạo
+    applyClamp(input);
+  });
+
+  // Nếu cần gọi từ nơi khác
+  window.changeQuantity = changeQuantity;
+})();
+/*  ====================================================================== END CHANGE QUANTITY (PRODUCT DETAIL) ====================================================================== */

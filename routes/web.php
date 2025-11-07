@@ -36,6 +36,8 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/favorite', [HomeController::class, 'addFavoriteProduct'])->name('addFavoriteProduct');
   Route::delete('/favorite/{productId}', [HomeController::class, 'destroyFavoriteProduct'])->name('destroyFavoriteProduct');
 
+  Route::get('product/{slug}/{id}', [HomePageController::class, 'productDetail'])->name('product.detail');
+
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
     Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
 

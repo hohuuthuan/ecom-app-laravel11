@@ -103,9 +103,7 @@ class ProductService
       $perPage = 200;
     }
 
-    $products = $query
-      ->orderByDesc('created_at')
-      ->paginate($perPage);
+    $products = $query->orderByDesc('created_at')->paginate($perPage);
 
     return PaginationHelper::appendQuery($products);
   }
@@ -193,5 +191,47 @@ class ProductService
       Log::error('Product update failed', ['msg' => $e->getMessage()]);
       return false;
     }
+  }
+
+  public function getProductDetail(string $id): ?Product
+  {
+    $userId = Auth::id();
+
+    $product = Product::query()->select('products.*')
+      ->selectSub(function ($q) {
+        $q->from('reviews')
+          ->selectRaw('COUNT(*)')
+          ->whereColumn('reviews.product_id', 'products.id')
+          ->where('is_active', true);
+      }, 'reviews_count')
+      ->selectSub(function ($q) {
+        $q->from('reviews')
+          ->selectRaw('AVG(rating)')
+          ->whereColumn('reviews.product_id', 'products.id')
+          ->where('is_active', true);
+      }, 'rating_avg')
+      ->selectSub(function ($q) use ($userId) {
+        if ($userId) {
+          $q->from('favorites')
+            ->selectRaw('CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END')
+            ->whereColumn('favorites.product_id', 'products.id')
+            ->where('user_id', $userId);
+        } else {
+          $q->from('favorites')->selectRaw('0');
+        }
+      }, 'is_favorite')
+      ->selectSub(function ($q) {
+        $q->from('stocks')
+          ->selectRaw('COALESCE(SUM(on_hand - reserved), 0)')
+          ->whereColumn('stocks.product_id', 'products.id');
+      }, 'quantity_available')
+      ->with([
+        'categories:id,name,slug',
+        'authors:id,name,slug',
+        'publisher:id,name,slug',
+      ])
+      ->find($id);
+
+    return $product;
   }
 }

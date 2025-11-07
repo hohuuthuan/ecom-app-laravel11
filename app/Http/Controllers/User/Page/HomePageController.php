@@ -47,4 +47,15 @@ class HomePageController extends Controller
 
     return view('user.favoriteProduct', compact('categories', 'authors', 'publishers', 'products'));
   }
+
+  public function productDetail(Request $request)
+  {
+    $id = (string) $request->route('id');
+    $product = $this->productService->getProductDetail($id);
+    if (!$product) {
+      return back()->with('toast_error', 'Không tìm thấy sản phẩm');
+    }
+
+    return view('user.productDetail', compact('product'));
+  }
 }

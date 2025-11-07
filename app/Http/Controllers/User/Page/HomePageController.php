@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\User\Page;
 
+use App\Models\Product;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\User\ProductService;
 use App\Services\User\HomeService;
+use App\Services\User\CartService;
 
 class HomePageController extends Controller
 {
   public function __construct(
     private ProductService $productService,
     private HomeService $homeService,
+    private CartService $cartService
   ) {}
 
   public function index(Request $r)
@@ -57,5 +60,60 @@ class HomePageController extends Controller
     }
 
     return view('user.productDetail', compact('product'));
+  }
+
+  public function cartPage(CartService $svc)
+  {
+    $cart = $svc->recalc();
+    return view('user.cart', compact('cart'));
+  }
+
+  public function addItemToCart(Request $request, CartService $svc)
+  {
+    $data = $request->validate([
+      'product_id' => ['required', 'exists:products,id'],
+      'qty'        => ['nullable', 'integer', 'min:1'],
+    ]);
+
+    $qty = (int)($data['qty'] ?? 1);
+
+    $p = Product::query()
+      ->select('id', 'title')
+      ->with('stocks:product_id,on_hand,reserved')
+      ->find($data['product_id']);
+    if (!$p) {
+      return back()->with('toast_error', 'Sản phẩm không tồn tại');
+    }
+
+    $available = (int)$p->stocks->sum(function ($s) {
+      return (int)$s->on_hand - (int)$s->reserved;
+    });
+    if ($available <= 0) {
+      return back()->with('toast_error', 'Sản phẩm tạm hết hàng');
+    }
+
+    $cart  = $svc->get();
+    $key   = $data['product_id'];
+    $curr  = isset($cart['items'][$key]) ? (int)$cart['items'][$key]['qty'] : 0;
+    $need  = $curr + $qty;
+    if ($need > $available) {
+      return back()->with('toast_error', 'Số lượng vượt quá tồn kho (còn ' . $available . ')');
+    }
+
+    $svc->add($data['product_id'], null, $qty);
+    return back()->with('toast_success', 'Đã thêm sản phẩm vào giỏ hàng');
+  }
+
+  public function updateQuantityItemInCart(string $key, Request $request, CartService $svc)
+  {
+    $request->validate(['qty' => 'required|integer|min:1']);
+    $svc->updateQuantityItemInCart($key, (int)$request->qty);
+    return back();
+  }
+
+  public function removeItemInCart(string $key, CartService $svc)
+  {
+    $svc->removeItemInCart($key);
+    return back()->with('toast_success', 'Đã xoá sản phẩm khỏi giỏ');
   }
 }

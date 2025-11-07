@@ -51,7 +51,8 @@ class ProductService
       ->with([
         'categories:id,name',
         'authors:id,name',
-        'publisher:id,name'
+        'publisher:id,name',
+        'stocks:product_id,on_hand,reserved',
       ])->withExists([
         'favoredBy as is_favorited' => fn($q) => $q->where('users.id', Auth::user())
       ]);

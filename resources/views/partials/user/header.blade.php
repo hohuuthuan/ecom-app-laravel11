@@ -60,10 +60,10 @@
           </a>
 
           <!-- Cart -->
-          <a href="#" class="text-decoration-none me-3 position-relative" onclick="showCart()">
+          <a href="{{ route('cart') }}" class="text-decoration-none me-3 position-relative">
             <i class="fas fa-shopping-cart text-primary" style="font-size: 1.2rem;"></i>
             <span class="badge bg-primary position-absolute top-0 start-100 translate-middle"
-              id="headerCartBadge" style="font-size: 0.7rem;">0</span>
+              id="cartCount" style="font-size: 0.7rem;">0</span>
           </a>
 
           @auth

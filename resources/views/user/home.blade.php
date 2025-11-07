@@ -146,7 +146,12 @@
 
       <div class="row g-4" id="booksContainer">
         @forelse($products as $product)
-        @php $isFav = in_array($product->id, $favIds, true); @endphp
+        @php
+        $isFav = auth()->check()
+        ? in_array($product->id, auth()->user()->favorites()->pluck('products.id')->all(), true)
+        : false;
+        @endphp
+
         <div class="col-lg-4 col-md-6">
           <div class="card book-card h-100">
             <div class="book-cover p-0">
@@ -159,19 +164,17 @@
             <div class="card-body d-flex flex-column">
               <h6 class="card-title line-clamp-2 mb-1">{{ $product->title }}</h6>
 
-              @php
-              $authorNames = optional($product->authors)->pluck('name')->join(', ');
-              @endphp
+              @php $authorNames = optional($product->authors)->pluck('name')->join(', '); @endphp
               <p class="card-text text-muted mb-3">{{ $authorNames ?: 'Không rõ tác giả' }}</p>
 
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
                   <span class="price">
-                    {{ number_format($product->selling_price_vnd, 0, ',', '.') }}đ
+                    {{ number_format((int)$product->selling_price_vnd, 0, ',', '.') }}đ
                   </span>
-                  @if(!empty($product->listed_price_vnd) && $product->listed_price_vnd > $product->selling_price_vnd)
+                  @if(!empty($product->listed_price_vnd) && (int)$product->listed_price_vnd > (int)$product->selling_price_vnd)
                   <small class="text-muted text-decoration-line-through ms-2">
-                    {{ number_format($product->listed_price_vnd, 0, ',', '.') }}đ
+                    {{ number_format((int)$product->listed_price_vnd, 0, ',', '.') }}đ
                   </small>
                   @endif
                 </div>
@@ -192,9 +195,10 @@
                   <i class="fas fa-eye me-2"></i>Xem chi tiết
                 </a>
 
-                <form action="" method="post">
+                <form action="{{ route('cart.item.add') }}" method="post" class="add-to-cart-form">
                   @csrf
                   <input type="hidden" name="product_id" value="{{ $product->id }}">
+                  <input type="hidden" name="qty" value="1">
                   <button type="submit" class="btn btn-primary w-100">
                     <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
                   </button>
@@ -209,6 +213,7 @@
         </div>
         @endforelse
       </div>
+
     </div>
   </section>
 

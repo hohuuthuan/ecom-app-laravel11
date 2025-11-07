@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 
 use App\Http\Controllers\User\Page\HomePageController;
 use App\Http\Controllers\User\HomeController;
+use App\Http\Controllers\User\CheckoutController;
 
 use App\Http\Controllers\Admin\Page\CatalogPageController;
 use App\Http\Controllers\Admin\Page\ProductPageController;
@@ -37,6 +38,13 @@ Route::middleware(['auth'])->group(function () {
   Route::delete('/favorite/{productId}', [HomeController::class, 'destroyFavoriteProduct'])->name('destroyFavoriteProduct');
 
   Route::get('product/{slug}/{id}', [HomePageController::class, 'productDetail'])->name('product.detail');
+
+  Route::get('/cart', [HomePageController::class, 'cartPage'])->name('cart');
+  Route::post('/cart/add', [HomePageController::class, 'addItemToCart'])->name('cart.item.add');
+  Route::patch('/cart/item/{key}', [HomePageController::class, 'updateQuantityItemInCart'])->name('cart.item.update');
+  Route::delete('/cart/item/{key}', [HomePageController::class, 'removeItemInCart'])->name('cart.item.remove');
+
+  Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
     Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');

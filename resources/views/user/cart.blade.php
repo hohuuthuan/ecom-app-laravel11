@@ -86,7 +86,7 @@
 
                   <div class="d-flex align-items-center gap-3">
                     <div class="line-total text-primary fw-bold item-total">{{ number_format($line['line_total'],0,',','.') }}đ</div>
-                    <form action="{{ route('cart.item.remove', $line['key']) }}" method="POST" class="d-inline">
+                    <form action="{{ route('cart.item.remove', $line['key']) }}" method="POST" class="d-inline remove-cart-item-form" data-no-loading>
                       @csrf @method('DELETE')
                       <button type="submit" class="btn btn-link text-danger p-0 remove-btn" title="Xoá">
                         <i class="bi bi-trash" style="font-size:1.25rem;"></i>
@@ -106,7 +106,7 @@
     <!-- RIGHT: Summary -->
     <div class="col-lg-4">
       <div class="card summary-section">
-        <div class="summary-title h5 mb-2">Tóm Tắt Đơn Hàng</div>
+        <div class="summary-title h5 mb-2">Tóm tắt đơn hàng</div>
         <div id="selectedCount" class="selected-count">Đã chọn 0 sản phẩm</div>
 
         <div class="d-flex justify-content-between mb-2 summary-row">

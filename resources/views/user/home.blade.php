@@ -195,7 +195,7 @@
                   <i class="fas fa-eye me-2"></i>Xem chi tiết
                 </a>
 
-                <form action="{{ route('cart.item.add') }}" method="post" class="add-to-cart-form">
+                <form action="{{ route('cart.item.add') }}" method="post" class="add-to-cart-form" data-no-loading>
                   @csrf
                   <input type="hidden" name="product_id" value="{{ $product->id }}">
                   <input type="hidden" name="qty" value="1">

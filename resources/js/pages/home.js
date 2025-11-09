@@ -70,7 +70,7 @@ function formatNumber(n) {
     if (body && method !== 'DELETE') { opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
     const res = await fetch(url, opt);
     if (res.status === 401) { window.location.href = loginUrl; return { ok: false, status: 401 }; }
-    let data = null; try { data = await res.json(); } catch {}
+    let data = null; try { data = await res.json(); } catch { }
     return { ok: res.ok && (data?.ok ?? true), status: res.status, data };
   }
 
@@ -175,18 +175,3 @@ function formatNumber(n) {
   applyClamp();
 })();
 /* ======================= END CHANGE QUANTITY (PRODUCT DETAIL) ======================= */
-
-
-/* ======================= SYNC ADD-TO-CART (COPY QTY ON SUBMIT) ====================== */
-(function () {
-  const form = document.getElementById('addToCartForm');
-  if (!form) return;
-  form.addEventListener('submit', function () {
-    const qtyInput = document.getElementById('quantity');
-    const hiddenQty = document.getElementById('addToCartQty');
-    if (qtyInput && hiddenQty) {
-      const n = Math.max(1, parseInt(qtyInput.value || '1', 10));
-      hiddenQty.value = String(n);
-    }
-  });
-})();

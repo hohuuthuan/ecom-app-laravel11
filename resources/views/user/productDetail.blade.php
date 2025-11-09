@@ -109,7 +109,7 @@
           </div>
 
           <div class="d-grid gap-2 d-md-flex">
-            <form id="addToCartForm" action="{{ route('cart.item.add') }}" method="POST" class="flex-fill d-flex">
+            <form id="addToCartForm" action="{{ route('cart.item.add') }}" method="POST" class="flex-fill d-flex add-to-cart-form" data-no-loading>
               @csrf
               <input type="hidden" name="product_id" value="{{ $product->id }}">
               <input type="hidden" name="qty" id="addToCartQty" value="1">
@@ -119,19 +119,19 @@
                 {{ $out ? 'disabled aria-disabled=true' : '' }}>
                 <i class="fas fa-cart-plus me-2" aria-hidden="true"></i>Thêm vào giỏ
               </button>
-            </form>
+              </form>
 
-            <button
-              type="button"
-              class="btn btn-lg {{ $isFav ? 'btn-danger' : 'btn-outline-danger' }} js-fav-toggle"
-              data-id="{{ $product->id }}"
-              data-add-url="{{ route('addFavoriteProduct') }}"
-              data-del-url="{{ route('destroyFavoriteProduct', '__ID__') }}"
-              aria-pressed="{{ $isFav ? 'true' : 'false' }}"
-              id="btnFavorite">
-              <i class="{{ $isFav ? 'fas fa-heart' : 'far fa-heart' }} me-2" aria-hidden="true"></i>
-              <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Yêu thích' }}</span>
-            </button>
+              <button
+                type="button"
+                class="btn btn-lg {{ $isFav ? 'btn-danger' : 'btn-outline-danger' }} js-fav-toggle"
+                data-id="{{ $product->id }}"
+                data-add-url="{{ route('addFavoriteProduct') }}"
+                data-del-url="{{ route('destroyFavoriteProduct', '__ID__') }}"
+                aria-pressed="{{ $isFav ? 'true' : 'false' }}"
+                id="btnFavorite">
+                <i class="{{ $isFav ? 'fas fa-heart' : 'far fa-heart' }} me-2" aria-hidden="true"></i>
+                <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Yêu thích' }}</span>
+              </button>
           </div>
 
           <input type="hidden" id="productId" value="{{ $product->id }}">

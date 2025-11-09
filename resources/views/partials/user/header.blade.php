@@ -60,10 +60,18 @@
           </a>
 
           <!-- Cart -->
+          @php
+          $cart = session('cart', ['items' => []]);
+          $cartItems = is_array($cart['items'] ?? null) ? $cart['items'] : [];
+          $cartCount = count($cartItems);
+          @endphp
+
           <a href="{{ route('cart') }}" class="text-decoration-none me-3 position-relative">
             <i class="fas fa-shopping-cart text-primary" style="font-size: 1.2rem;"></i>
-            <span class="badge bg-primary position-absolute top-0 start-100 translate-middle"
-              id="cartCount" style="font-size: 0.7rem;">0</span>
+            <span id="cartCount"
+              class="badge bg-primary position-absolute top-0 start-100 translate-middle"
+              style="font-size: 0.7rem;"
+              data-count-url="{{ route('cart.count') }}">{{ $cartCount }}</span>
           </a>
 
           @auth
@@ -127,17 +135,17 @@
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="#" onclick="showProfileTab('orders')">
+                <a class="dropdown-item" href="#">
                   <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="#" onclick="showProfileTab('wishlist')">
+                <a class="dropdown-item" href="#">
                   <i class="fas fa-heart me-2"></i>Sách yêu thích
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="#" onclick="showProfileTab('settings')">
+                <a class="dropdown-item" href="#">
                   <i class="fas fa-cog me-2"></i>Cài đặt
                 </a>
               </li>

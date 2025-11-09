@@ -58,10 +58,14 @@
 }
 
 .cart-page .items-section {
+  min-height: 464px;
   background: #fff;
   border-radius: 5px;
   padding: 44px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
+
+  /* Tạm thời */
+  margin-bottom: 200px;
 }
 
 .cart-page .select-all-section {
@@ -250,7 +254,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
   height: fit-content;
   position: sticky;
-  top: 20px;
+  top: 85px;
 }
 
 .cart-page .summary-title {

@@ -129,9 +129,18 @@ class HomePageController extends Controller
     return back();
   }
 
-  public function removeItemInCart(string $key, CartService $svc)
+  public function removeItemInCart(string $key, Request $request, CartService $svc) // Thêm Request
   {
-    $svc->removeItemInCart($key);
+    $cart = $svc->removeItemInCart($key);
+
+    if ($request->ajax() || $request->expectsJson()) {
+      return response()->json([
+        'ok' => true,
+        'count' => $svc->countDistinct(),
+        'cart' => $cart
+      ], 200);
+    }
+
     return back()->with('toast_success', 'Đã xoá sản phẩm khỏi giỏ hàng');
   }
 }

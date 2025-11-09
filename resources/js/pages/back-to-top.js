@@ -35,33 +35,3 @@
   bind(prevBtns, -1);
 })();
 
-// Add-to-cart demo (UX feedback only)
-(() => {
-  const toastContainer = document.createElement('div');
-  toastContainer.className = 'position-fixed top-0 start-50 translate-middle-x p-3';
-  toastContainer.style.zIndex = '1080';
-  document.body.appendChild(toastContainer);
-
-  const notify = (title) => {
-    const toastEl = document.createElement('div');
-    toastEl.className = 'toast align-items-center text-bg-success border-0 show';
-    toastEl.setAttribute('role', 'status');
-    toastEl.setAttribute('aria-live', 'polite');
-    toastEl.setAttribute('aria-atomic', 'true');
-    toastEl.innerHTML = `
-      <div class="d-flex">
-        <div class="toast-body"><i class="bi bi-check2-circle me-2"></i>Đã thêm <strong>${title}</strong> vào giỏ</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Đóng"></button>
-      </div>`;
-    toastContainer.appendChild(toastEl);
-    setTimeout(() => toastEl.remove(), 2200);
-  };
-
-  document.querySelectorAll('.add-to-cart').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const card = e.currentTarget.closest('.product');
-      const title = card?.querySelector('.product-title')?.textContent?.trim() || 'sản phẩm';
-      notify(title);
-    });
-  });
-})();

@@ -70,7 +70,7 @@ function formatNumber(n) {
     if (body && method !== 'DELETE') { opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
     const res = await fetch(url, opt);
     if (res.status === 401) { window.location.href = loginUrl; return { ok: false, status: 401 }; }
-    let data = null; try { data = await res.json(); } catch {}
+    let data = null; try { data = await res.json(); } catch { }
     return { ok: res.ok && (data?.ok ?? true), status: res.status, data };
   }
 
@@ -190,3 +190,33 @@ function formatNumber(n) {
     }
   });
 })();
+
+/* ===================== COUNT CART ITEMS (SIMPLE & SAFE) ===================== */
+(function () {
+  var badge = document.getElementById('cartCount');
+  if (!badge) { return; }
+
+  var COUNT_URL = badge.getAttribute('data-count-url') || '/cart/count';
+
+  function set(n) {
+    badge.textContent = String(Math.max(0, n | 0));
+  }
+
+  function sync() {
+    fetch(COUNT_URL, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      credentials: 'same-origin'
+    })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) { if (d && typeof d.count === 'number') { set(d.count); } })
+    .catch(function () { });
+  }
+
+  document.addEventListener('DOMContentLoaded', sync);
+  window.addEventListener('pageshow', sync);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) { sync(); }
+  });
+})();
+

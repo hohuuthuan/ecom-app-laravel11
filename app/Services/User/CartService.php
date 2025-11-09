@@ -14,6 +14,15 @@ class CartService
     return Session::get(self::SSN_KEY, ['items' => []]);
   }
 
+  public function countDistinct(): int
+  {
+    $cart = $this->get();
+    if (!is_array($cart) || !isset($cart['items']) || !is_array($cart['items'])) {
+      return 0;
+    }
+    return count($cart['items']);
+  }
+
   public function add(string $productId, ?string $variantId, int $qty = 1): array
   {
     if ($qty < 1) {
@@ -24,7 +33,7 @@ class CartService
     $key = $this->key($productId, $variantId);
     if (!isset($cart['items'][$key])) {
       $cart['items'][$key] = [
-        'product_id' => $productId, 
+        'product_id' => $productId,
         'variant_id' => $variantId,
         'qty' => 0
       ];

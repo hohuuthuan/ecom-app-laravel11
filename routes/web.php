@@ -43,6 +43,7 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/cart/add', [HomePageController::class, 'addItemToCart'])->name('cart.item.add');
   Route::patch('/cart/item/{key}', [HomePageController::class, 'updateQuantityItemInCart'])->name('cart.item.update');
   Route::delete('/cart/item/{key}', [HomePageController::class, 'removeItemInCart'])->name('cart.item.remove');
+  Route::get('/cart/count', [HomePageController::class, 'countProductInCart'])->name('cart.count');
 
   Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
   Route::post('/checkout', [CheckoutController::class, 'place'])->name('checkout.place');

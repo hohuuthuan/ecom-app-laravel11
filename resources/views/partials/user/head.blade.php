@@ -9,3 +9,5 @@
 @vite(['resources/css/toast.css'])
 @vite(['resources/css/style.css'])
 @vite(['resources/css/custom.css'])
+@vite(['resources/css/cart.css'])
+@vite(['resources/css/checkout.css'])

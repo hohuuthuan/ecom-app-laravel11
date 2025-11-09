@@ -60,162 +60,89 @@ function formatNumber(n) {
 /*  ====================================================================== END HOME ANIMATE NUMBER ====================================================================== */
 
 
-
-/*  ====================================================================== FAVORITE PRODUCT ====================================================================== */
+/* =============================== FAVORITE PRODUCT =============================== */
 (function () {
-  // === Config ===
   const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
   const loginUrl = '/login';
 
-  // === Helpers ===
   async function api(url, { method = 'POST', body = null } = {}) {
-    const opt = {
-      method,
-      headers: {
-        'Accept': 'application/json',
-        'X-CSRF-TOKEN': csrf
-      }
-    };
-    if (body && method !== 'DELETE') {
-      opt.headers['Content-Type'] = 'application/json';
-      opt.body = JSON.stringify(body);
-    }
+    const opt = { method, headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf } };
+    if (body && method !== 'DELETE') { opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
     const res = await fetch(url, opt);
     if (res.status === 401) { window.location.href = loginUrl; return { ok: false, status: 401 }; }
-    let data = null;
-    try { data = await res.json(); } catch { }
+    let data = null; try { data = await res.json(); } catch {}
     return { ok: res.ok && (data?.ok ?? true), status: res.status, data };
   }
 
   function bumpWishlist(delta) {
-    const el = document.getElementById('wishlistCount');
-    if (!el) return;
+    const el = document.getElementById('wishlistCount'); if (!el) return;
     const n = parseInt(String(el.textContent).replace(/[^\d]/g, '')) || 0;
     el.textContent = String(Math.max(0, n + delta));
   }
   function setWishlist(count) {
-    const el = document.getElementById('wishlistCount');
-    if (!el) return;
+    const el = document.getElementById('wishlistCount'); if (!el) return;
     el.textContent = String(Math.max(0, parseInt(count) || 0));
   }
 
-  function setBtnState(btn, favOn) {
-  btn.classList.toggle('btn-danger', favOn);
-  btn.classList.toggle('btn-outline-danger', !favOn);
-
-  const icon = btn.querySelector('i');
-  if (icon) {
-    const cls = icon.className;
-
-    // Bootstrap Icons
-    if (cls.includes('bi')) {
-      icon.className = favOn ? 'bi bi-heart-fill' : 'bi bi-heart';
-    }
-    // Font Awesome 5/6 (solid/regular)
-    else if (cls.includes('fa')) {
-      // Giữ lại các class util như me-2 nếu có
-      const keep = cls.split(' ').filter(c => c.startsWith('me-') || c.startsWith('ms-') || c.startsWith('mx-') || c.startsWith('my-'));
-      const base = favOn ? ['fas','fa-heart'] : ['far','fa-heart']; // solid vs regular
-      icon.className = base.concat(keep).join(' ');
-    }
+  function setBtnState(btn, on) {
+    btn.classList.toggle('btn-danger', on);
+    btn.classList.toggle('btn-outline-danger', !on);
+    const icon = btn.querySelector('i');
+    if (icon) { icon.className = on ? 'fas fa-heart me-2' : 'far fa-heart me-2'; }
+    const label = btn.querySelector('.js-fav-label');
+    if (label) { label.textContent = on ? 'Bỏ thích' : 'Yêu thích'; }
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
 
-  const label = btn.querySelector('.js-fav-label');
-  if (label) {
-    label.textContent = favOn ? 'Bỏ thích' : 'Yêu thích';
-  }
-  btn.setAttribute('aria-pressed', favOn ? 'true' : 'false');
-}
-
-  // === Events ===
   document.addEventListener('click', async (e) => {
-    // Toggle on product cards
-    const toggleBtn = e.target.closest('.js-fav-toggle');
-    if (toggleBtn) {
-      const id = toggleBtn.dataset.id;
-      const addUrl = toggleBtn.dataset.addUrl;
-      const delUrlTpl = toggleBtn.dataset.delUrl; // chứa "__ID__"
-      const isFav = toggleBtn.getAttribute('aria-pressed') === 'true';
+    const btn = e.target.closest('.js-fav-toggle'); if (!btn) return;
+    const id = btn.dataset.id;
+    const addUrl = btn.dataset.addUrl;
+    const delUrl = btn.dataset.delUrl?.replace('__ID__', id);
+    const isOn = btn.getAttribute('aria-pressed') === 'true';
 
-      toggleBtn.disabled = true;
-      try {
-        if (!isFav) {
-          const { ok, data } = await api(addUrl, { method: 'POST', body: { product_id: id } });
-          if (ok) {
-            setBtnState(toggleBtn, true);
-            if (data?.count !== undefined) setWishlist(data.count); else bumpWishlist(+1);
-          }
-        } else {
-          const delUrl = delUrlTpl.replace('__ID__', id);
-          const { ok, data } = await api(delUrl, { method: 'DELETE' });
-          if (ok) {
-            setBtnState(toggleBtn, false);
-            if (data?.count !== undefined) setWishlist(data.count); else bumpWishlist(-1);
-          }
-        }
-      } finally {
-        toggleBtn.disabled = false;
-      }
-      return;
-    }
-
-    // Remove on favorites page
-    const rmBtn = e.target.closest('.js-fav-remove');
-    if (rmBtn) {
-      const id = rmBtn.dataset.id;
-      const delUrl = rmBtn.dataset.delUrl.replace('__ID__', id);
-      rmBtn.disabled = true;
-      try {
+    btn.disabled = true;
+    try {
+      if (!isOn) {
+        const { ok, data } = await api(addUrl, { method: 'POST', body: { product_id: id } });
+        if (ok) { setBtnState(btn, true); if (data?.count !== undefined) setWishlist(data.count); else bumpWishlist(+1); }
+      } else {
         const { ok, data } = await api(delUrl, { method: 'DELETE' });
-        if (ok) {
-          const card = rmBtn.closest('.card');
-          if (card) card.remove();
-          if (data?.count !== undefined) setWishlist(data.count); else bumpWishlist(-1);
-          // nếu hết mục, có thể hiển thị empty-state hoặc reload
-          if (!document.querySelector('.js-fav-remove')) location.reload();
-        }
-      } finally {
-        rmBtn.disabled = false;
+        if (ok) { setBtnState(btn, false); if (data?.count !== undefined) setWishlist(data.count); else bumpWishlist(-1); }
       }
+    } finally {
+      btn.disabled = false;
     }
   });
 })();
-/*  ===================================================================== END FAVORITE PRODUCT =================================================================== */
+/* ============================ END FAVORITE PRODUCT ============================ */
 
 
-/*  ====================================================================== CHANGE QUANTITY (PRODUCT DETAIL) ====================================================================== */
+/* ========================= CHANGE QUANTITY (PRODUCT DETAIL) ========================= */
 (function () {
-  function getBounds(input) {
+  const box = document.getElementById('qtyBox');
+  const input = document.getElementById('quantity');
+  if (!box || !input) return;
+
+  function getBounds() {
     const min = parseInt(input.getAttribute('min') || '1', 10);
     const maxAttr = input.getAttribute('max');
     const hasMax = maxAttr !== null && maxAttr !== '';
     let max = hasMax ? parseInt(maxAttr, 10) : Infinity;
-
-    // Nếu max không hợp lệ hoặc nhỏ hơn min thì coi như không giới hạn
-    if (!Number.isFinite(max) || max < min) {
-      max = Infinity;
-    }
+    if (!Number.isFinite(max) || max < min) max = Infinity;
     return { min, max, hasMax };
   }
-
-  function clamp(n, min, max) {
-    return Number.isFinite(max) ? Math.min(Math.max(n, min), max) : Math.max(n, min);
-  }
-
-  function syncButtons(input) {
-    const { min, max, hasMax } = getBounds(input);
+  function clamp(n, min, max) { return Number.isFinite(max) ? Math.min(Math.max(n, min), max) : Math.max(n, min); }
+  function syncButtons() {
+    const { min, max, hasMax } = getBounds();
     const val = parseInt(input.value, 10);
     const curr = Number.isFinite(val) ? val : min;
-
-    const box = input.parentElement;
-    if (!box) { return; }
     const btns = box.querySelectorAll('button[data-delta]');
-    if (btns[0]) { btns[0].disabled = curr <= min; }
-    if (btns[1]) { btns[1].disabled = hasMax && Number.isFinite(max) && curr >= max; }
+    if (btns[0]) btns[0].disabled = curr <= min;
+    if (btns[1]) btns[1].disabled = hasMax && Number.isFinite(max) && curr >= max;
   }
-
-  function applyClamp(input) {
-    const { min, max, hasMax } = getBounds(input);
+  function applyClamp() {
+    const { min, max } = getBounds();
     const raw = parseInt(input.value, 10);
     const curr = Number.isFinite(raw) ? raw : min;
     const next = clamp(curr, min, max);
@@ -224,47 +151,42 @@ function formatNumber(n) {
       input.dispatchEvent(new Event('change', { bubbles: true }));
       input.dispatchEvent(new Event('input', { bubbles: true }));
     }
-    syncButtons(input);
+    syncButtons();
   }
-
-  function changeQuantity(delta) {
-    const input = document.getElementById('quantity');
-    if (!input) { return; }
-
-    const { min, max } = getBounds(input);
+  function bump(delta) {
+    const { min, max } = getBounds();
     const val = parseInt(input.value, 10);
     const curr = Number.isFinite(val) ? val : min;
     const next = clamp(curr + Number(delta), min, max);
-
     if (next !== curr) {
       input.value = String(next);
       input.dispatchEvent(new Event('change', { bubbles: true }));
       input.dispatchEvent(new Event('input', { bubbles: true }));
     }
-    syncButtons(input);
+    syncButtons();
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    const box = document.getElementById('qtyBox');
-    const input = document.getElementById('quantity');
-    if (!box || !input) { return; }
-
-    // Click nút +/- (không dùng onclick inline)
-    box.addEventListener('click', function (e) {
-      const btn = e.target.closest('button[data-delta]');
-      if (!btn) { return; }
-      changeQuantity(btn.getAttribute('data-delta'));
-    });
-
-    // Clamp khi gõ tay/rời focus
-    input.addEventListener('input', function () { applyClamp(input); });
-    input.addEventListener('blur', function () { applyClamp(input); });
-
-    // Khởi tạo
-    applyClamp(input);
+  box.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-delta]'); if (!btn) return;
+    bump(btn.getAttribute('data-delta'));
   });
-
-  // Nếu cần gọi từ nơi khác
-  window.changeQuantity = changeQuantity;
+  input.addEventListener('input', applyClamp);
+  input.addEventListener('blur', applyClamp);
+  applyClamp();
 })();
-/*  ====================================================================== END CHANGE QUANTITY (PRODUCT DETAIL) ====================================================================== */
+/* ======================= END CHANGE QUANTITY (PRODUCT DETAIL) ======================= */
+
+
+/* ======================= SYNC ADD-TO-CART (COPY QTY ON SUBMIT) ====================== */
+(function () {
+  const form = document.getElementById('addToCartForm');
+  if (!form) return;
+  form.addEventListener('submit', function () {
+    const qtyInput = document.getElementById('quantity');
+    const hiddenQty = document.getElementById('addToCartQty');
+    if (qtyInput && hiddenQty) {
+      const n = Math.max(1, parseInt(qtyInput.value || '1', 10));
+      hiddenQty.value = String(n);
+    }
+  });
+})();

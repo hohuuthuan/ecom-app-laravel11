@@ -23,7 +23,11 @@ class CartService
     $cart = $this->get();
     $key = $this->key($productId, $variantId);
     if (!isset($cart['items'][$key])) {
-      $cart['items'][$key] = ['product_id' => $productId, 'variant_id' => $variantId, 'qty' => 0];
+      $cart['items'][$key] = [
+        'product_id' => $productId, 
+        'variant_id' => $variantId,
+        'qty' => 0
+      ];
     }
     $cart['items'][$key]['qty'] += $qty;
 

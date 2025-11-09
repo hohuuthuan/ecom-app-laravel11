@@ -15,7 +15,7 @@ class CheckoutController extends Controller
       return redirect()->route('cart')->with('toast_error', 'Vui lòng chọn sản phẩm trước khi thanh toán.');
     }
 
-    $keys = array_filter(array_map('trim', explode(',', $raw)));
+    $keys = array_values(array_unique(array_filter(array_map('trim', explode(',', $raw)))));
     if (empty($keys)) {
       return redirect()->route('cart')->with('toast_error', 'Vui lòng chọn sản phẩm trước khi thanh toán.');
     }
@@ -25,6 +25,26 @@ class CheckoutController extends Controller
       return redirect()->route('cart')->with('toast_error', 'Các sản phẩm đã chọn không còn hợp lệ.');
     }
 
-    return view('user.checkout', $summary);
+    $effectiveKeys = [];
+    foreach ($summary['items'] as $line) {
+      if (!empty($line['key'])) {
+        $effectiveKeys[] = $line['key'];
+      }
+    }
+    if (empty($effectiveKeys)) {
+      return redirect()->route('cart')->with('toast_error', 'Các sản phẩm đã chọn không còn hợp lệ.');
+    }
+
+    return view('user.checkout', [
+      'items'    => $summary['items'],
+      'subtotal' => (int)$summary['subtotal'],
+      'shipping' => (int)$summary['shipping'],
+      'total'    => (int)$summary['total'],
+      'keys'     => implode(',', $effectiveKeys),
+    ]);
+  }
+
+  public function place(Request $request, CartService $svc) {
+    echo "Place order coming soon...";
   }
 }

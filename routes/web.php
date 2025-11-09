@@ -45,6 +45,7 @@ Route::middleware(['auth'])->group(function () {
   Route::delete('/cart/item/{key}', [HomePageController::class, 'removeItemInCart'])->name('cart.item.remove');
 
   Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+  Route::post('/checkout', [CheckoutController::class, 'place'])->name('checkout.place');
 
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
     Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');

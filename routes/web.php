@@ -45,8 +45,9 @@ Route::middleware(['auth'])->group(function () {
   Route::delete('/cart/item/{key}', [HomePageController::class, 'removeItemInCart'])->name('cart.item.remove');
   Route::get('/cart/count', [HomePageController::class, 'countProductInCart'])->name('cart.count');
 
-  Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-  Route::post('/checkout', [CheckoutController::class, 'place'])->name('checkout.place');
+  Route::post('/checkout', [CheckoutController::class, 'enter'])->name('checkout.index');
+  Route::get('/checkout', [CheckoutController::class, 'index'])->middleware(['checkout.valid'])->name('checkout.page');
+  Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
 
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
     Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');

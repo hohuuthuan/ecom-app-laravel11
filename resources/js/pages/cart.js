@@ -29,13 +29,13 @@
     var selected = window.CartUI.getSelectedRows();
     var selectedCountEl = document.getElementById('selectedCount');
     var subtotalEl = document.getElementById('subtotal');
+    var shippingEl = document.getElementById('shipping');
     var totalEl = document.getElementById('total');
     var hiddenKeys = document.getElementById('selectedKeys');
     var checkoutBtn = document.getElementById('proceedCheckout');
 
     var sum = 0;
     var keys = [];
-
     for (var i = 0; i < selected.length; i++) {
       var row = selected[i];
       var t = parseInt(row.getAttribute('data-total') || '0', 10);
@@ -44,10 +44,23 @@
       if (key) { keys.push(key); }
     }
 
+    // phí ship lấy từ data-fee, mặc định 0 nếu không có
+    var fee = 0;
+    if (shippingEl) {
+      var raw = shippingEl.getAttribute('data-fee') || '0';
+      var cfg = parseInt(raw, 10);
+      fee = isNaN(cfg) ? 0 : cfg;
+    }
+
+    // chỉ tính ship khi có ít nhất 1 sản phẩm được tick
+    var shipping = selected.length > 0 ? fee : 0;
+    var total = sum + shipping;
+
     if (selectedCountEl) { selectedCountEl.textContent = 'Đã chọn ' + selected.length + ' sản phẩm'; }
     if (hiddenKeys) { hiddenKeys.value = keys.join(','); }
     if (subtotalEl) { subtotalEl.textContent = window.CartUI.fmt(sum); }
-    if (totalEl) { totalEl.textContent = window.CartUI.fmt(sum); }
+    if (shippingEl) { shippingEl.textContent = window.CartUI.fmt(shipping); }
+    if (totalEl) { totalEl.textContent = window.CartUI.fmt(total); }
     if (checkoutBtn) { checkoutBtn.disabled = selected.length === 0; }
   };
 

@@ -357,6 +357,10 @@
   margin-bottom: 20px;
 }
 
+.cart-item-remove-icon {
+  font-size: 2rem;
+}
+
 @media (max-width: 992px) {
   .cart-page .page-content {
     grid-template-columns: 1fr;

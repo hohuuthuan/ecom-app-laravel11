@@ -89,7 +89,7 @@
                     <form action="{{ route('cart.item.remove', $line['key']) }}" method="POST" class="d-inline remove-cart-item-form" data-no-loading>
                       @csrf @method('DELETE')
                       <button type="submit" class="btn btn-link text-danger p-0 remove-btn" title="Xoá">
-                        <i class="bi bi-trash" style="font-size:1.25rem;"></i>
+                        <i class="bi bi-trash cart-item-remove-icon"></i>
                       </button>
                     </form>
                   </div>

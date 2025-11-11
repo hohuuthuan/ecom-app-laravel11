@@ -125,18 +125,24 @@ class HomePageController extends Controller
   public function updateQuantityItemInCart(string $key, Request $request, CartService $svc)
   {
     $request->validate(['qty' => 'required|integer|min:1']);
-    $svc->updateQuantityItemInCart($key, (int)$request->qty);
-    return back();
-  }
-
-  public function removeItemInCart(string $key, Request $request, CartService $svc) // Thêm Request
-  {
-    $cart = $svc->removeItemInCart($key);
-
+    $cart = $svc->updateQuantityItemInCart($key, (int)$request->qty);
     if ($request->ajax() || $request->expectsJson()) {
       return response()->json([
         'ok' => true,
         'count' => $svc->countDistinct(),
+        'cart' => $cart
+      ], 200);
+    }
+    return back();
+  }
+
+  public function removeItemInCart(string $key, Request $request)
+  {
+    $cart = $this->cartService->removeItemInCart($key);
+    if ($request->ajax() || $request->expectsJson()) {
+      return response()->json([
+        'ok' => true,
+        'count' => $this->cartService->countDistinct(),
         'cart' => $cart
       ], 200);
     }

@@ -7,8 +7,8 @@
     <h1 class="pageTitle"><i class="bi bi-cart-fill"></i> GIỎ HÀNG CỦA BẠN </h1>
     <div class="page-nav">
       <a class="btn continue-shopping" href="{{ route('home') }}">
-          <i class="bi bi-arrow-left"></i>
-          Quay lại trang chủ
+        <i class="bi bi-arrow-left"></i>
+        Quay lại trang chủ
       </a>
     </div>
   </div>
@@ -64,7 +64,7 @@
                     <span class="text-muted small quantity-label">Số lượng:</span>
 
                     {{-- Giảm --}}
-                    <form action="{{ route('cart.item.update', $line['key']) }}" method="POST" class="d-inline">
+                    <form action="{{ route('cart.item.update', $line['key']) }}" method="POST" class="d-inline" data-no-loading>
                       @csrf @method('PATCH')
                       <input type="hidden" name="qty" value="{{ max(1, (int)$line['qty'] - 1) }}">
                       <button type="submit" class="btn btn-sm btn-outline-secondary quantity-btn" {{ $line['qty']<=1 ? 'disabled' : '' }}>
@@ -75,7 +75,7 @@
                     <span class="fw-semibold quantity-display">{{ (int)$line['qty'] }}</span>
 
                     {{-- Tăng --}}
-                    <form action="{{ route('cart.item.update', $line['key']) }}" method="POST" class="d-inline">
+                    <form action="{{ route('cart.item.update', $line['key']) }}" method="POST" class="d-inline" data-no-loading>
                       @csrf @method('PATCH')
                       <input type="hidden" name="qty" value="{{ (int)$line['qty'] + 1 }}">
                       <button type="submit" class="btn btn-sm btn-outline-secondary quantity-btn">

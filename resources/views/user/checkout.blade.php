@@ -132,7 +132,7 @@
             <i class="bi bi-check-circle"></i> Đặt Hàng
           </button>
           <a href="{{ route('cart') }}">
-            <button class="continue-shopping">
+            <button type="button" class="continue-shopping">
               <i class="bi bi-arrow-left"></i> Quay lại giỏ hàng
             </button>
           </a>

@@ -62,7 +62,7 @@ class HomePageController extends Controller
     return view('user.productDetail', compact('product'));
   }
 
-  public function cartPage(CartService $svc)
+  public function cartPage(Request $request, CartService $svc)
   {
     $cart = $svc->recalc();
     return view('user.cart', compact('cart'));

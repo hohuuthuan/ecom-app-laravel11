@@ -4,47 +4,113 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Product;
 use App\Services\User\CartService;
 
 class CheckoutController extends Controller
 {
-  public function index(Request $request, CartService $svc)
-  {
-    $raw = (string)$request->query('keys', '');
-    if ($raw === '') {
-      return redirect()->route('cart')->with('toast_error', 'Vui lòng chọn sản phẩm trước khi thanh toán.');
+
+    public function enter(Request $request, CartService $svc)
+    {
+        $raw = (string) $request->input('keys', '');
+        $ids = array_values(array_filter(array_unique(explode(',', $raw))));
+        if (count($ids) === 0) {
+            return redirect()->route('cart')->with('toast_error', 'Bạn cần chọn sản phẩm trước.');
+        }
+
+        $cart = $svc->get();
+        if (!is_array($cart) || empty($cart['items'])) {
+            return redirect()->route('cart')->with('toast_error', 'Các sản phẩm không còn hợp lệ.');
+        }
+
+        $cartMap = [];
+        foreach ($cart['items'] as $line) {
+            if (!empty($line['product_id'])) {
+                $cartMap[$line['product_id']] = (int) ($line['qty'] ?? 1);
+            }
+        }
+
+        $pairs = [];
+        foreach ($ids as $pid) {
+            if (!isset($cartMap[$pid])) {
+                return redirect()->route('cart')->with('toast_error', 'Các sản phẩm không còn hợp lệ');
+            }
+            $pairs[] = ['id' => $pid, 'qty' => $cartMap[$pid]];
+        }
+
+        $exists = Product::query()->whereIn('id', $ids)->pluck('id')->all();
+        if (count($exists) !== count($ids)) {
+            return redirect()->route('cart')->with('toast_error', 'Các sản phẩm không còn hợp lệ');
+        }
+
+        $request->session()->put('checkout.items', $pairs);
+        $request->session()->put('checkout.expires_at', now()->addMinutes(15)->timestamp);
+
+        return redirect()->route('checkout.page');
     }
 
-    $keys = array_values(array_unique(array_filter(array_map('trim', explode(',', $raw)))));
-    if (empty($keys)) {
-      return redirect()->route('cart')->with('toast_error', 'Vui lòng chọn sản phẩm trước khi thanh toán.');
+
+    public function index(Request $request)
+    {
+
+        $pairs = $request->session()->get('checkout.items', []);
+        if (!is_array($pairs) || count($pairs) === 0) {
+            return redirect()->route('cart')->with('toast_error', 'Bạn cần chọn sản phẩm trước');
+        }
+
+        $ids = [];
+        $qtyMap = [];
+        foreach ($pairs as $it) {
+            if (!empty($it['id'])) {
+                $ids[] = $it['id'];
+                $qtyMap[$it['id']] = (int)($it['qty'] ?? 1);
+            }
+        }
+        if (count($ids) === 0) {
+            $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+            return redirect()->route('cart')->with('toast_error', 'Bạn cần chọn sản phẩm trước');
+        }
+
+        $rows = \App\Models\Product::query()
+            ->select(['id', 'title', 'image', 'selling_price_vnd'])
+            ->whereIn('id', $ids)
+            ->get()
+            ->keyBy('id');
+
+        if ($rows->count() !== count($ids)) {
+            $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+            return redirect()->route('cart')->with('toast_error', 'Các sản phẩm đã chọn không còn hợp lệ');
+        }
+
+        $items = [];
+        $subtotal = 0;
+        foreach ($ids as $pid) {
+            $p = $rows[$pid];
+            $qty = $qtyMap[$pid] ?? 1;
+            $price = (int)$p->selling_price_vnd;
+            $lineTotal = $price * $qty;
+
+            $items[] = [
+                'id'         => (string)$p->id,
+                'title'      => (string)$p->title,
+                'image'      => (string)($p->image ?? ''),
+                'qty'        => $qty,
+                'price'      => $price,
+                'line_total' => $lineTotal,
+            ];
+
+            $subtotal += $lineTotal;
+        }
+
+        $shipping = count($items) > 0 ? 30000 : 0;
+        $total = $subtotal + $shipping;
+
+        return view('user.checkout', compact('items', 'subtotal', 'shipping', 'total'));
     }
 
-    $summary = $svc->summarize($keys);
-    if (empty($summary['items'])) {
-      return redirect()->route('cart')->with('toast_error', 'Các sản phẩm đã chọn không còn hợp lệ.');
-    }
 
-    $effectiveKeys = [];
-    foreach ($summary['items'] as $line) {
-      if (!empty($line['key'])) {
-        $effectiveKeys[] = $line['key'];
-      }
+    public function place(Request $request)
+    {
+        echo "Place order coming soon...";
     }
-    if (empty($effectiveKeys)) {
-      return redirect()->route('cart')->with('toast_error', 'Các sản phẩm đã chọn không còn hợp lệ.');
-    }
-
-    return view('user.checkout', [
-      'items'    => $summary['items'],
-      'subtotal' => (int)$summary['subtotal'],
-      'shipping' => (int)$summary['shipping'],
-      'total'    => (int)$summary['total'],
-      'keys'     => implode(',', $effectiveKeys),
-    ]);
-  }
-
-  public function place(Request $request, CartService $svc) {
-    echo "Place order coming soon...";
-  }
 }

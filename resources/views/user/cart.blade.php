@@ -89,7 +89,7 @@
                     <form action="{{ route('cart.item.remove', $line['key']) }}" method="POST" class="d-inline remove-cart-item-form" data-no-loading>
                       @csrf @method('DELETE')
                       <button type="submit" class="btn btn-link text-danger p-0 remove-btn" title="Xoá">
-                        <i class="bi bi-trash" style="font-size:1.25rem;"></i>
+                        <i class="bi bi-trash cart-item-remove-icon"></i>
                       </button>
                     </form>
                   </div>
@@ -113,13 +113,14 @@
           <span>Tạm tính</span><span id="subtotal">0₫</span>
         </div>
         <div class="d-flex justify-content-between mb-2 summary-row">
-          <span>Phí vận chuyển</span><span id="shipping">0₫</span>
+          <span>Phí vận chuyển</span><span id="shipping" data-fee="30000">0₫</span>
         </div>
         <div class="d-flex justify-content-between border-top pt-2 mt-2 summary-row total">
           <span class="fw-semibold">Tổng cộng</span><span id="total" class="fw-bold text-primary amount">0₫</span>
         </div>
 
-        <form action="{{ route('checkout.index') }}" method="GET" id="goCheckoutForm" class="mt-3">
+        <form action="{{ route('checkout.index') }}" method="POST" id="goCheckoutForm" class="mt-3">
+          @csrf
           <input type="hidden" name="keys" id="selectedKeys">
           <button type="submit" class="btn btn-primary w-100 checkout-btn" id="proceedCheckout" disabled>
             <i class="bi bi-credit-card"></i> Tiến hành thanh toán

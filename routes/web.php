@@ -51,11 +51,11 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
 
   Route::prefix('profile')->name('user.address.')->group(function () {
-    Route::get('addresses', [UserAddressController::class, 'index'])->name('index');
-    Route::post('addresses', [UserAddressController::class, 'store'])->name('store');
-    Route::patch('addresses/{id}', [UserAddressController::class, 'update'])->name('update');
-    Route::delete('addresses/{id}', [UserAddressController::class, 'destroy'])->name('destroy');
-    Route::post('addresses/{id}/default', [UserAddressController::class, 'setDefault'])->name('default');
+    Route::get('/', [UserAddressController::class, 'index'])->name('index');
+    Route::post('/addresses', [UserAddressController::class, 'store'])->name('store');
+    Route::patch('/addresses/{id}', [UserAddressController::class, 'update'])->name('update');
+    Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy'])->name('destroy');
+    Route::post('/addresses/{id}/default', [UserAddressController::class, 'setDefault'])->name('default');
   });
 
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {

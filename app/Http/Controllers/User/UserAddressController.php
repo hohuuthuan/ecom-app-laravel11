@@ -29,8 +29,9 @@ class UserAddressController extends Controller
   public function index(Request $request): View|RedirectResponse
   {
     try {
-      $userAddress = $this->addressService->getList();
-      return view('user.profile.userAddress', compact('userAddress'));
+      // $profileOverview = $this->addressService->getList();
+      // return view('user.profile.profileOverview', compact('userAddress'));
+       return view('user.profileOverview');
     } catch (Throwable $e) {
       return back()->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
     }

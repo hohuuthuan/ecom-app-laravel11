@@ -1,0 +1,338 @@
+.page-header {
+  background: #fff;
+  border-radius: 5px;
+  padding: 30px;
+  margin-bottom: 30px;
+  margin-top: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header h1 {
+  color: #667eea;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.page-header h1 i {
+  color: #667eea;
+}
+
+.continue-shopping {
+  width: 100%;
+  padding: 14px;
+  background: #fff;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: all .3s ease;
+}
+
+.continue-shopping:hover {
+  background: #667eea;
+  color: #fff;
+}
+
+.profile-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 30px;
+  align-items: flex-start;
+  padding: 30px 0 300px; 
+}
+
+.profile-nav,
+.profile-main {
+  background: rgb(255, 255, 255);
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  min-height: 316px;
+}
+
+.profile-nav {
+  padding: 24px;
+}
+
+.profile-nav-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-nav-title i {
+  color: #667eea;
+}
+
+.profile-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-nav-item {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.profile-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: #4a5568;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.profile-nav-link i {
+  font-size: 18px;
+  color: #667eea;
+}
+
+.profile-nav-link:hover {
+  background: #edf2ff;
+  color: #2d3748;
+}
+
+.profile-nav-link.active {
+  background: #667eea;
+  color: white;
+}
+
+.profile-nav-link.active i {
+  color: white;
+}
+
+/* Nội dung bên phải */
+.profile-main {
+  padding: 24px 28px;
+}
+
+.profile-section {
+  display: none;
+}
+
+.profile-section.active {
+  display: block;
+}
+
+.profile-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #1a202c;
+}
+
+.profile-section-subtitle {
+  font-size: 14px;
+  color: #718096;
+  margin-bottom: 20px;
+}
+
+/* Thông tin cá nhân */
+.profile-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 32px;
+}
+
+.profile-info-item-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  color: #a0aec0;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.profile-info-item-value {
+  font-size: 15px;
+  color: #2d3748;
+}
+
+/* Lịch sử đơn hàng */
+.order-table {
+  font-size: 14px;
+}
+
+.badge-status {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.badge-status-success {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+.badge-status-pending {
+  background: #fefcbf;
+  color: #744210;
+}
+
+.badge-status-cancel {
+  background: #fed7d7;
+  color: #742a2a;
+}
+
+/* Sổ địa chỉ */
+.address-wrapper {
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 20px 22px;
+}
+
+.address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.address-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.address-header-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.address-header-subtitle {
+  font-size: 14px;
+  color: #718096;
+}
+
+.address-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: none;
+  background: #ff9f1c;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.address-card {
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 14px 16px;
+  background: #d0d8fd;
+}
+
+.address-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.address-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.address-card-title i {
+  color: #667eea;
+}
+
+.address-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #4a5568;
+}
+
+.address-card-actions button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.address-card-actions i {
+  font-size: 16px;
+}
+
+.address-card-body {
+  font-size: 14px;
+  color: #2d3748;
+  margin-top: 4px;
+}
+
+/* Đổi mật khẩu */
+.password-form {
+  max-width: 420px;
+}
+
+.password-form .form-label {
+  font-size: 14px;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.password-form .form-control {
+  font-size: 14px;
+}
+
+.password-form .btn-primary {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+.password-form .btn-primary:hover {
+  background: #5568d3;
+  border-color: #5568d3;
+}
+
+@media (max-width: 992px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-nav {
+    position: static;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .profile-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .address-wrapper {
+    padding: 16px;
+  }
+}

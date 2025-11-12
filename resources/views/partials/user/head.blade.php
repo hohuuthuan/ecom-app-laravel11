@@ -11,3 +11,4 @@
 @vite(['resources/css/custom.css'])
 @vite(['resources/css/cart.css'])
 @vite(['resources/css/checkout.css'])
+@vite(['resources/css/profile.css'])

@@ -119,19 +119,19 @@
                 {{ $out ? 'disabled aria-disabled=true' : '' }}>
                 <i class="fas fa-cart-plus me-2" aria-hidden="true"></i>Thêm vào giỏ
               </button>
-              </form>
+            </form>
 
-              <button
-                type="button"
-                class="btn btn-lg {{ $isFav ? 'btn-danger' : 'btn-outline-danger' }} js-fav-toggle"
-                data-id="{{ $product->id }}"
-                data-add-url="{{ route('addFavoriteProduct') }}"
-                data-del-url="{{ route('destroyFavoriteProduct', '__ID__') }}"
-                aria-pressed="{{ $isFav ? 'true' : 'false' }}"
-                id="btnFavorite">
-                <i class="{{ $isFav ? 'fas fa-heart' : 'far fa-heart' }} me-2" aria-hidden="true"></i>
-                <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Yêu thích' }}</span>
-              </button>
+            <button
+              type="button"
+              class="btn btn-lg {{ $isFav ? 'btn-danger' : 'btn-outline-danger' }} js-fav-toggle"
+              data-id="{{ $product->id }}"
+              data-add-url="{{ route('addFavoriteProduct') }}"
+              data-del-url="{{ route('destroyFavoriteProduct', '__ID__') }}"
+              aria-pressed="{{ $isFav ? 'true' : 'false' }}"
+              id="btnFavorite">
+              <i class="{{ $isFav ? 'fas fa-heart' : 'far fa-heart' }} me-2" aria-hidden="true"></i>
+              <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Yêu thích' }}</span>
+            </button>
           </div>
 
           <input type="hidden" id="productId" value="{{ $product->id }}">

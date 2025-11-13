@@ -76,15 +76,18 @@ $favIds = auth()->check()
             </div>
 
             <div class="mt-auto d-grid gap-2">
-              <a href="" class="btn btn-outline-primary">
+              <a href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}" class="btn btn-outline-primary">
                 <i class="fas fa-eye me-2"></i>Xem chi tiết
               </a>
 
-              <form action="" method="post">
+              <form id="addToCartForm" action="{{ route('cart.item.add') }}" method="POST" class="flex-fill d-flex add-to-cart-form" data-no-loading>
                 @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
-                <button type="submit" class="btn btn-primary w-100">
-                  <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                <input type="hidden" name="qty" id="addToCartQty" value="1">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg w-100">
+                  <i class="fas fa-cart-plus me-2" aria-hidden="true"></i>Thêm vào giỏ
                 </button>
               </form>
             </div>

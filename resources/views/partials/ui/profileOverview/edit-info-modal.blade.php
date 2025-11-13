@@ -69,7 +69,7 @@
                 Email <span class="text-danger">*</span>
               </label>
               <input
-                type="email"
+                type="text"
                 id="profileEmail"
                 name="email"
                 class="form-control profile-modal-input @error('email','profile') is-invalid @enderror"

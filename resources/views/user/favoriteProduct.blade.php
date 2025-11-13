@@ -18,7 +18,7 @@ $favIds = auth()->check()
         </a>
       </div>
       <h1 class="pageTitle">SẢN PHẨM BẠN ĐÃ THÍCH</h1>
-      <span class="badge bg-primary">{{ $products->count() }} mục</span>
+      <span class="badge bg-primary">{{ $products->count() }} sản phẩm</span>
     </div>
 
     @if($products->isEmpty())

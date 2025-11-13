@@ -22,6 +22,31 @@
   color: #667eea;
 }
 
+.profile-overview-page .page-header {
+  background: #fff;
+  border-radius: 5px;
+  padding: 30px;
+  margin-bottom: 30px;
+  margin-top: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-overview-page .page-header h1 {
+  color: #667eea;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.profile-overview-page  .page-header h1 i {
+  color: #667eea;
+}
+
 .continue-shopping {
   width: 100%;
   padding: 14px;
@@ -358,6 +383,186 @@
 .password-form .btn-primary:hover {
   background: #5568d3;
   border-color: #5568d3;
+}
+
+/* ===================== PROFILE MODALS (INFO + ADDRESS) ===================== */
+.profile-modal,
+.address-modal {
+  border-radius: 5px;
+  border: 0;
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(148, 163, 184, 0.12);
+}
+
+.profile-modal-header,
+.address-modal-header {
+  border-bottom: 0;
+  padding: 18px 24px 8px;
+}
+
+.profile-modal-header .modal-title,
+.address-modal-header .modal-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.profile-modal-body,
+.address-modal-body {
+  padding: 4px 24px 20px;
+}
+
+.profile-modal-footer,
+.address-modal-footer {
+  border-top: 0;
+  padding: 12px 24px 20px;
+  background-color: #f9fafb;
+}
+
+.profile-modal-label,
+.address-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+.profile-modal-input,
+.profile-modal-select,
+.address-input,
+.address-select {
+  font-size: 0.9rem;
+  border-radius: 10px;
+  border-color: #e5e7eb;
+  padding: 0.5rem 0.75rem;
+}
+
+.profile-modal-input:focus,
+.profile-modal-select:focus,
+.address-input:focus,
+.address-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.profile-modal-footer .btn,
+.address-modal-footer .btn {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Select2 trong modal chỉnh sửa thông tin */
+.profile-modal .select2-container {
+  width: 100% !important;
+}
+
+.profile-modal .select2-container--default .select2-selection--single {
+  height: 40px;
+  border-radius: 10px;
+  border-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+}
+
+.profile-modal .select2-container--default .select2-selection--single .select2-selection__rendered {
+  padding-left: 0;
+  padding-right: 1.5rem;
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.profile-modal .select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 100%;
+  right: 8px;
+}
+
+/* Focus state giống input */
+.profile-modal .select2-container--default.select2-container--open .select2-selection--single,
+.profile-modal .select2-container--default .select2-selection--single:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* ===================== ADD ADDRESS MODAL ===================== */
+.address-modal {
+  border-radius: 5px;
+  border: 0;
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(148, 163, 184, 0.12);
+}
+
+.address-modal-header {
+  border-bottom: 0;
+  padding: 18px 24px 8px;
+}
+
+.address-modal-header .modal-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.address-modal-body {
+  padding: 4px 24px 20px;
+}
+
+.address-modal-footer {
+  border-top: 0;
+  padding: 12px 24px 20px;
+  background-color: #f9fafb;
+}
+
+.address-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+.address-input,
+.address-select {
+  font-size: 0.9rem;
+  border-radius: 10px;
+  border-color: #e5e7eb;
+  padding: 0.5rem 0.75rem;
+}
+
+.address-input:focus,
+.address-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Select2 trong modal địa chỉ */
+.address-modal .select2-container {
+  width: 100% !important;
+}
+
+.address-modal .select2-container--default .select2-selection--single {
+  height: 40px;
+  border-radius: 10px;
+  border-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+}
+
+.address-modal .select2-selection__rendered {
+  font-size: 0.9rem;
+  color: #111827;
+  padding-left: 0.75rem;
+}
+
+.address-modal .select2-selection__arrow {
+  height: 100%;
+}
+
+/* Nút trong footer */
+.address-modal-footer .btn {
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 @media (max-width: 992px) {

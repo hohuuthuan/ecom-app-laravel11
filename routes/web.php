@@ -20,6 +20,9 @@ use App\Http\Controllers\Admin\ProductController;
 
 // === PUBLIC ===
 Route::get('/', [HomePageController::class, 'index'])->name('home');
+Route::get('product/{slug}/{id}', [HomePageController::class, 'productDetail'])->name('product.detail');
+Route::get('/cart', [HomePageController::class, 'cartPage'])->name('cart');
+Route::post('/cart/add', [HomePageController::class, 'addItemToCart'])->name('cart.item.add');
 
 // === GUEST ===
 Route::middleware('guest')->group(function () {
@@ -38,10 +41,7 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/favorite', [HomeController::class, 'addFavoriteProduct'])->name('addFavoriteProduct');
   Route::delete('/favorite/{productId}', [HomeController::class, 'destroyFavoriteProduct'])->name('destroyFavoriteProduct');
 
-  Route::get('product/{slug}/{id}', [HomePageController::class, 'productDetail'])->name('product.detail');
 
-  Route::get('/cart', [HomePageController::class, 'cartPage'])->name('cart');
-  Route::post('/cart/add', [HomePageController::class, 'addItemToCart'])->name('cart.item.add');
   Route::patch('/cart/item/{key}', [HomePageController::class, 'updateQuantityItemInCart'])->name('cart.item.update');
   Route::delete('/cart/item/{key}', [HomePageController::class, 'removeItemInCart'])->name('cart.item.remove');
   Route::get('/cart/count', [HomePageController::class, 'countProductInCart'])->name('cart.count');

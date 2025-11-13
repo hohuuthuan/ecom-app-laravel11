@@ -1,4 +1,3 @@
-<!-- Modal chỉnh sửa thông tin cá nhân -->
 <div
   class="modal fade"
   id="editProfileModal"
@@ -14,7 +13,7 @@
         <div class="modal-header">
           <h2 class="modal-title" id="editProfileModalLabel">
             Chỉnh sửa thông tin cá nhân
-          </h5>
+          </h2>
           <button
             type="button"
             class="btn-close"

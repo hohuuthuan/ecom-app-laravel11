@@ -130,7 +130,7 @@
               @endif
 
               <li>
-                <a class="dropdown-item" href="#" onclick="showProfile()">
+                <a class="dropdown-item" href="{{ route('user.profile.index') }}">
                   <i class="fas fa-user me-2"></i>Tài khoản của tôi
                 </a>
               </li>

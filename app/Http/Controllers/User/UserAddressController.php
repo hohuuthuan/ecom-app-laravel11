@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\User\AddressService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\View\View;
 use App\Http\Requests\User\Address\StoreRequest;
 use App\Http\Requests\User\Address\UpdateRequest;
@@ -38,16 +39,45 @@ class UserAddressController extends Controller
         ->latest('placed_at')
         ->limit(5)
         ->get();
+
       $addresses = $this->addressService->getList();
+      $provinces = Province::orderBy('name')->get();
 
       return view('user.profileOverview', [
         'user'         => $user,
         'addresses'    => $addresses,
         'recentOrders' => $recentOrders,
+        'provinces'    => $provinces,
       ]);
     } catch (Throwable $e) {
       return back()->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
     }
+  }
+
+  public function getWards(Request $request): JsonResponse
+  {
+    $provinceId = (int) $request->query('province_id');
+
+    if ($provinceId <= 0) {
+      return response()->json([
+        'success' => false,
+        'message' => 'Thiếu hoặc sai Tỉnh/Thành phố',
+        'wards'   => [],
+      ], 400);
+    }
+
+    $wards = Ward::where('province_id', $provinceId)
+      ->orderBy('name_with_type')
+      ->get([
+        'id',
+        'name',
+        'name_with_type',
+      ]);
+
+    return response()->json([
+      'success' => true,
+      'wards'   => $wards,
+    ]);
   }
 
   public function store(StoreRequest $request): RedirectResponse

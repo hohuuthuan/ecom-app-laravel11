@@ -2,6 +2,14 @@
 @section('title','Quản lý hồ sơ')
 
 @section('content')
+@php
+$activeTab = request('tab', 'info');
+$validTabs = ['info', 'orders', 'addresses', 'password'];
+if (!in_array($activeTab, $validTabs, true)) {
+$activeTab = 'info';
+}
+@endphp
+
 <div class="container profile-overview-page">
     <div class="page-header">
         <div class="page-nav">
@@ -22,25 +30,45 @@
                 </div>
                 <ul class="profile-nav-list">
                     <li class="profile-nav-item">
-                        <a href="#" class="profile-nav-link active" data-target="info">
+                        <a
+                            href="{{ route('user.profile.index', ['tab' => 'info']) }}"
+                            class="profile-nav-link {{ $activeTab === 'info' ? 'active' : '' }}"
+                            data-target="info"
+                            data-no-loading="1"
+                            >
                             <i class="bi bi-person-lines-fill"></i>
                             <span>Thông tin cá nhân</span>
                         </a>
                     </li>
                     <li class="profile-nav-item">
-                        <a href="#" class="profile-nav-link" data-target="orders">
+                        <a
+                            href="{{ route('user.profile.index', ['tab' => 'orders']) }}"
+                            class="profile-nav-link {{ $activeTab === 'orders' ? 'active' : '' }}"
+                            data-target="orders"
+                            data-no-loading="1"
+                            >
                             <i class="bi bi-receipt"></i>
                             <span>Lịch sử đơn hàng</span>
                         </a>
                     </li>
                     <li class="profile-nav-item">
-                        <a href="#" class="profile-nav-link" data-target="addresses">
+                        <a
+                            href="{{ route('user.profile.index', ['tab' => 'addresses']) }}"
+                            class="profile-nav-link {{ $activeTab === 'addresses' ? 'active' : '' }}"
+                            data-target="addresses"
+                            data-no-loading="1"
+                            >
                             <i class="bi bi-geo-alt-fill"></i>
                             <span>Sổ địa chỉ</span>
                         </a>
                     </li>
                     <li class="profile-nav-item">
-                        <a href="#" class="profile-nav-link" data-target="password">
+                        <a
+                            href="{{ route('user.profile.index', ['tab' => 'password']) }}"
+                            class="profile-nav-link {{ $activeTab === 'password' ? 'active' : '' }}"
+                            data-target="password"
+                            data-no-loading="1"
+                            >
                             <i class="bi bi-shield-lock-fill"></i>
                             <span>Đổi mật khẩu</span>
                         </a>
@@ -51,7 +79,7 @@
             <!-- BÊN PHẢI: NỘI DUNG TĨNH -->
             <main class="profile-main">
                 <!-- Thông tin cá nhân -->
-                <section class="profile-section active" data-section="info">
+                <section class="profile-section {{ $activeTab === 'info' ? 'active' : '' }}" data-section="info">
                     <div class="profile-info-card">
                         <div class="profile-info-card-header">
                             <div>
@@ -63,7 +91,7 @@
 
                             <button
                                 type="button"
-                                class="btn btn-outline-primary btn-sm profile-edit-btn"
+                                class="edit-info-btn"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editProfileModal">
                                 <i class="bi bi-pencil-square me-1"></i>
@@ -124,7 +152,7 @@
                 </section>
 
                 <!-- Lịch sử đơn hàng -->
-                <section class="profile-section" data-section="orders">
+                <section class="profile-section {{ $activeTab === 'orders' ? 'active' : '' }}" data-section="orders">
                     <h2 class="profile-section-title">Lịch sử đơn hàng</h2>
                     <p class="profile-section-subtitle">Danh sách một số đơn hàng gần đây.</p>
 
@@ -180,13 +208,17 @@
                 </section>
 
                 <!-- Sổ địa chỉ -->
-                <section class="profile-section" data-section="addresses">
+                <section class="profile-section {{ $activeTab === 'addresses' ? 'active' : '' }}" data-section="addresses">
                     <div class="address-header">
                         <div class="address-header-text">
                             <div class="address-header-title">Sổ địa chỉ</div>
                             <div class="address-header-subtitle">Quản lý các địa chỉ thường dùng</div>
                         </div>
-                        <button type="button" class="address-add-btn">
+                        <button
+                            type="button"
+                            class="address-add-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addAddressModal">
                             <span>+</span>
                             <span>Thêm địa chỉ</span>
                         </button>
@@ -233,7 +265,7 @@
                 </section>
 
                 <!-- Đổi mật khẩu -->
-                <section class="profile-section" data-section="password">
+                <section class="profile-section {{ $activeTab === 'password' ? 'active' : '' }}" data-section="password">
                     <h2 class="profile-section-title">Đổi mật khẩu</h2>
                     <p class="profile-section-subtitle">Cập nhật mật khẩu để tăng tính bảo mật cho tài khoản.</p>
 
@@ -258,6 +290,7 @@
     </div>
 </div>
 @include('partials.ui.profileOverview.edit-info-modal')
+@include('partials.ui.profileOverview.add-address-modal')
 @endsection
 
 @push('scripts')

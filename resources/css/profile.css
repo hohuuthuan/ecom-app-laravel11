@@ -1,0 +1,594 @@
+.page-header {
+  background: #fff;
+  border-radius: 5px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header h1 {
+  color: #667eea;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.page-header h1 i {
+  color: #667eea;
+}
+
+.profile-overview-page .page-header {
+  background: #fff;
+  border-radius: 5px;
+  padding: 30px;
+  margin-bottom: 30px;
+  margin-top: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-overview-page .page-header h1 {
+  color: #667eea;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.profile-overview-page  .page-header h1 i {
+  color: #667eea;
+}
+
+.continue-shopping {
+  width: 100%;
+  padding: 14px;
+  background: #fff;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: all .3s ease;
+}
+
+.continue-shopping:hover {
+  background: #667eea;
+  color: #fff;
+}
+
+.profile-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 30px;
+  align-items: flex-start;
+  padding: 30px 0 300px; 
+}
+
+.profile-nav,
+.profile-main {
+  background: rgb(255, 255, 255);
+  border-radius: 5px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  min-height: 316px;
+}
+
+.profile-nav {
+  padding: 24px;
+}
+
+.profile-nav-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-nav-title i {
+  color: #667eea;
+}
+
+.profile-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-nav-item {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.profile-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: #4a5568;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.profile-nav-link i {
+  font-size: 18px;
+  color: #667eea;
+}
+
+.profile-nav-link:hover {
+  background: #edf2ff;
+  color: #2d3748;
+}
+
+.profile-nav-link.active {
+  background: #667eea;
+  color: white;
+}
+
+.profile-nav-link.active i {
+  color: white;
+}
+
+/* Nội dung bên phải */
+.profile-main {
+  padding: 24px 28px;
+}
+
+.profile-section {
+  display: none;
+}
+
+.profile-section.active {
+  display: block;
+}
+
+.profile-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #1a202c;
+}
+
+.profile-section-subtitle {
+  font-size: 14px;
+  color: #718096;
+  margin-bottom: 20px;
+}
+
+/* Thông tin cá nhân */
+.profile-info-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.profile-info-grid-edit .profile-info-item-label {
+  margin-bottom: 4px;
+}
+
+.profile-info-grid-edit .profile-info-item-value {
+  margin-top: 0;
+}
+
+.profile-info-grid-edit .profile-info-item-value .form-control,
+.profile-info-grid-edit .profile-info-item-value .form-select {
+  width: 100%;
+  font-size: 0.95rem;
+  border-radius: 8px;
+}
+
+.edit-info-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 5px;
+  border: none;
+  background: #ff9f1c;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.modal-title {
+  color: #575656;
+}
+
+.modal-title h2 {
+  margin: 0 auto;
+}
+
+.profile-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 32px;
+}
+
+.profile-info-item-label {
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #2b4ff0;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.profile-info-item-value {
+  font-size: 15px;
+  color: #2d3748;
+}
+
+/* Lịch sử đơn hàng */
+.order-table {
+  font-size: 14px;
+}
+
+.badge-status {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.badge-status-success {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+.badge-status-pending {
+  background: #fefcbf;
+  color: #744210;
+}
+
+.badge-status-cancel {
+  background: #fed7d7;
+  color: #742a2a;
+}
+
+/* Sổ địa chỉ */
+
+.address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.address-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.address-header-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.address-header-subtitle {
+  font-size: 14px;
+  color: #718096;
+}
+
+.address-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 5px;
+  border: none;
+  background: #ff9f1c;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.address-edit-btn i {
+  color: #ff9f1c;
+}
+
+.address-card {
+  border-radius: 5px;
+  border: 1px solid #e2e8f0;
+  padding: 14px 16px;
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(148, 163, 184, 0.12);
+  margin-bottom: 20px;
+  transition: all .3s ease;
+}
+
+.address-card:hover {
+  box-shadow: 0 5px 15px rgba(187, 187, 187, 0.6);
+  transform: translateY(-2px);
+}
+
+.address-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.address-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.address-card-title i {
+  color: #667eea;
+}
+
+.address-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #4a5568;
+}
+
+.address-card-actions button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.address-card-actions i {
+  font-size: 27px;
+}
+
+.address-card-body {
+  font-size: 15px;
+  color: #2d3748;
+  margin-top: 4px;
+}
+
+/* Đổi mật khẩu */
+.password-form {
+  max-width: 420px;
+}
+
+.password-form .form-label {
+  font-size: 14px;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.password-form .form-control {
+  font-size: 14px;
+}
+
+.password-form .btn-primary {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+.password-form .btn-primary:hover {
+  background: #5568d3;
+  border-color: #5568d3;
+}
+
+/* ===================== PROFILE MODALS (INFO + ADDRESS) ===================== */
+.profile-modal,
+.address-modal {
+  border-radius: 5px;
+  border: 0;
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(148, 163, 184, 0.12);
+}
+
+.profile-modal-header,
+.address-modal-header {
+  border-bottom: 0;
+  padding: 18px 24px 8px;
+}
+
+.profile-modal-header .modal-title,
+.address-modal-header .modal-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.profile-modal-body,
+.address-modal-body {
+  padding: 4px 24px 20px;
+}
+
+.profile-modal-footer,
+.address-modal-footer {
+  border-top: 0;
+  padding: 12px 24px 20px;
+  background-color: #f9fafb;
+}
+
+.profile-modal-label,
+.address-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+.profile-modal-input,
+.profile-modal-select,
+.address-input,
+.address-select {
+  font-size: 0.9rem;
+  border-radius: 10px;
+  border-color: #e5e7eb;
+  padding: 0.5rem 0.75rem;
+}
+
+.profile-modal-input:focus,
+.profile-modal-select:focus,
+.address-input:focus,
+.address-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.profile-modal-footer .btn,
+.address-modal-footer .btn {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Select2 trong modal chỉnh sửa thông tin */
+.profile-modal .select2-container {
+  width: 100% !important;
+}
+
+.profile-modal .select2-container--default .select2-selection--single {
+  height: 40px;
+  border-radius: 10px;
+  border-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+}
+
+.profile-modal .select2-container--default .select2-selection--single .select2-selection__rendered {
+  padding-left: 0;
+  padding-right: 1.5rem;
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.profile-modal .select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 100%;
+  right: 8px;
+}
+
+/* Focus state giống input */
+.profile-modal .select2-container--default.select2-container--open .select2-selection--single,
+.profile-modal .select2-container--default .select2-selection--single:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* ===================== ADD ADDRESS MODAL ===================== */
+.address-modal {
+  border-radius: 5px;
+  border: 0;
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(148, 163, 184, 0.12);
+}
+
+.address-modal-header {
+  border-bottom: 0;
+  padding: 18px 24px 8px;
+}
+
+.address-modal-header .modal-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.address-modal-body {
+  padding: 4px 24px 20px;
+}
+
+.address-modal-footer {
+  border-top: 0;
+  padding: 12px 24px 20px;
+  background-color: #f9fafb;
+}
+
+.address-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+.address-input,
+.address-select {
+  font-size: 0.9rem;
+  border-radius: 10px;
+  border-color: #e5e7eb;
+  padding: 0.5rem 0.75rem;
+}
+
+.address-input:focus,
+.address-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Select2 trong modal địa chỉ */
+.address-modal .select2-container {
+  width: 100% !important;
+}
+
+.address-modal .select2-container--default .select2-selection--single {
+  height: 40px;
+  border-radius: 10px;
+  border-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+}
+
+.address-modal .select2-selection__rendered {
+  font-size: 0.9rem;
+  color: #111827;
+  padding-left: 0.75rem;
+}
+
+.address-modal .select2-selection__arrow {
+  height: 100%;
+}
+
+/* Nút trong footer */
+.address-modal-footer .btn {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+@media (max-width: 992px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-nav {
+    position: static;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .profile-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .address-wrapper {
+    padding: 16px;
+  }
+}

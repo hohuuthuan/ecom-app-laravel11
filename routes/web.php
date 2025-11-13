@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\User\Page\HomePageController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\CheckoutController;
+use App\Http\Controllers\User\UserAddressController;
 
 use App\Http\Controllers\Admin\Page\CatalogPageController;
 use App\Http\Controllers\Admin\Page\ProductPageController;
@@ -48,6 +49,18 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/checkout', [CheckoutController::class, 'enter'])->name('checkout.index');
   Route::get('/checkout', [CheckoutController::class, 'index'])->middleware(['checkout.valid'])->name('checkout.page');
   Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
+
+  Route::prefix('profile')->name('user.profile.')->group(function () {
+    Route::get('/', [UserAddressController::class, 'index'])->name('index');
+    Route::get('/wards', [UserAddressController::class, 'getWards'])->name('wards');
+
+    Route::put('/info', [UserAddressController::class, 'updateInfo'])->name('info.update');
+
+    Route::post('/address', [UserAddressController::class, 'storeNewAddress'])->name('storeNewAddress');
+    Route::put('/address/{id}', [UserAddressController::class, 'updateAddress'])->name('updateAddress');
+    Route::delete('/address/{id}', [UserAddressController::class, 'destroyAddress'])->name('destroyAddress');
+    Route::put('/address/{id}/default', [UserAddressController::class, 'setAddressDefault'])->name('setAddressDefault');
+  });
 
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
     Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');

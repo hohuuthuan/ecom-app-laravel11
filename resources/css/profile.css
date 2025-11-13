@@ -149,6 +149,43 @@
 }
 
 /* Thông tin cá nhân */
+.profile-info-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.profile-edit-btn {
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.profile-info-grid-edit .profile-info-item-label {
+  margin-bottom: 4px;
+}
+
+.profile-info-grid-edit .profile-info-item-value {
+  margin-top: 0;
+}
+
+.profile-info-grid-edit .profile-info-item-value .form-control,
+.profile-info-grid-edit .profile-info-item-value .form-select {
+  width: 100%;
+  font-size: 0.95rem;
+  border-radius: 8px;
+}
+
+.modal-title {
+  color: #575656;
+}
+
+.modal-title h2 {
+  margin: 0 auto;
+}
+
 .profile-info-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

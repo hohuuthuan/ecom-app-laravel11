@@ -52,44 +52,72 @@
             <main class="profile-main">
                 <!-- Thông tin cá nhân -->
                 <section class="profile-section active" data-section="info">
-                    <h2 class="profile-section-title">Thông tin cá nhân</h2>
-                    <p class="profile-section-subtitle">Một số thông tin cơ bản về tài khoản của bạn.</p>
+                    <div class="profile-info-card">
+                        <div class="profile-info-card-header">
+                            <div>
+                                <h2 class="profile-section-title mb-1">Thông tin cá nhân</h2>
+                                <p class="profile-section-subtitle mb-0">
+                                    Một số thông tin cơ bản về tài khoản của bạn.
+                                </p>
+                            </div>
 
-                    <div class="profile-info-grid">
-                        <div>
-                            <div class="profile-info-item-label">Họ và tên</div>
-                            <div class="profile-info-item-value">
-                                {{ $user->name }}
-                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary btn-sm profile-edit-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editProfileModal">
+                                <i class="bi bi-pencil-square me-1"></i>
+                                Chỉnh sửa
+                            </button>
                         </div>
-                        <div>
-                            <div class="profile-info-item-label">Số điện thoại</div>
-                            <div class="profile-info-item-value">
-                                {{ $user->phone ?? 'Chưa cập nhật' }}
+
+                        <div class="profile-info-grid">
+                            <div>
+                                <div class="profile-info-item-label">Họ và tên</div>
+                                <div class="profile-info-item-value">
+                                    {{ $user->name }}
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <div class="profile-info-item-label">Email</div>
-                            <div class="profile-info-item-value">
-                                {{ $user->email }}
+                            <div>
+                                <div class="profile-info-item-label">Số điện thoại</div>
+                                <div class="profile-info-item-value">
+                                    {{ $user->phone ?? 'Chưa cập nhật' }}
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <div class="profile-info-item-label">Ngày sinh</div>
-                            <div class="profile-info-item-value text-muted">
-                                Chưa cập nhật
+                            <div>
+                                <div class="profile-info-item-label">Email</div>
+                                <div class="profile-info-item-value">
+                                    {{ $user->email }}
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <div class="profile-info-item-label">Giới tính</div>
-                            <div class="profile-info-item-value text-muted">
-                                Chưa cập nhật
+                            <div>
+                                <div class="profile-info-item-label">Ngày sinh</div>
+                                <div class="profile-info-item-value">
+                                    {{ $user->birthday ?? 'Chưa cập nhật' }}
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <div class="profile-info-item-label">Tham gia từ</div>
-                            <div class="profile-info-item-value">
-                                {{ optional($user->created_at)->format('m/Y') }}
+                            <div>
+                                <div class="profile-info-item-label">Giới tính</div>
+                                <div class="profile-info-item-value">
+                                    @php
+                                    $gender = $user->gender ?? null;
+                                    @endphp
+                                    @if ($gender === 'male')
+                                    Nam
+                                    @elseif ($gender === 'female')
+                                    Nữ
+                                    @elseif ($gender === 'other')
+                                    Khác
+                                    @else
+                                    Chưa cập nhật
+                                    @endif
+                                </div>
+                            </div>
+                            <div>
+                                <div class="profile-info-item-label">Tham gia từ</div>
+                                <div class="profile-info-item-value">
+                                    {{ optional($user->created_at)->format('m/Y') }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -229,6 +257,7 @@
         </div>
     </div>
 </div>
+@include('partials.ui.profileOverview.edit-info-modal')
 @endsection
 
 @push('scripts')

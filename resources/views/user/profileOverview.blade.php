@@ -72,7 +72,7 @@ $activeTab = 'info';
                 </ul>
             </aside>
 
-            <!-- BÊN PHẢI: NỘI DUNG TĨNH -->
+            <!-- BÊN PHẢI: NỘI DUNG -->
             <main class="profile-main">
                 <!-- Thông tin cá nhân -->
                 <section class="profile-section {{ $activeTab === 'info' ? 'active' : '' }}" data-section="info">
@@ -219,70 +219,67 @@ $activeTab = 'info';
                             <span>Thêm địa chỉ</span>
                         </button>
                     </div>
-                    <div class="address-wrapper">
-                        @forelse ($addresses as $address)
-                        <div class="address-card">
-                            <div class="address-card-header">
-                                <div class="address-card-title">
-                                    <i class="bi bi-geo-alt"></i>
-                                    <span>{{ $address->address }}</span>
-                                    @if ($address->default)
-                                    <span class="badge bg-primary ms-2">Mặc định</span>
-                                    @endif
-                                </div>
-                                <div class="address-card-actions">
-                                    {{-- Sửa địa chỉ --}}
+                    @forelse ($addresses as $address)
+                    <div class="address-card">
+                        <div class="address-card-header">
+                            <div class="address-card-title">
+                                <i class="bi bi-geo-alt"></i>
+                                <span>{{ $address->address }}</span>
+                                @if ($address->default)
+                                <span class="badge bg-primary ms-2">Mặc định</span>
+                                @endif
+                            </div>
+                            <div class="address-card-actions">
+                                {{-- Sửa địa chỉ --}}
+                                <button
+                                    type="button"
+                                    class="address-edit-btn"
+                                    aria-label="Sửa địa chỉ"
+                                    data-id="{{ $address->id }}"
+                                    data-update-url="{{ route('user.profile.updateAddress', $address->id) }}"
+                                    data-address="{{ $address->address }}"
+                                    data-province-id="{{ $address->address_province_id }}"
+                                    data-ward-id="{{ $address->address_ward_id }}"
+                                    data-note="{{ $address->note ?? '' }}"
+                                    data-default="{{ $address->default ? '1' : '0' }}">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                {{-- Xoá địa chỉ --}}
+                                <form
+                                    method="POST"
+                                    action="{{ route('user.profile.destroyAddress', $address->id) }}"
+                                    class="d-inline js-address-delete-form">
+                                    @csrf
+                                    @method('DELETE')
                                     <button
                                         type="button"
-                                        class="address-edit-btn"
-                                        aria-label="Sửa địa chỉ"
-                                        data-id="{{ $address->id }}"
-                                        data-update-url="{{ route('user.profile.updateAddress', $address->id) }}"
-                                        data-address="{{ $address->address }}"
-                                        data-province-id="{{ $address->address_province_id }}"
-                                        data-ward-id="{{ $address->address_ward_id }}"
-                                        data-note="{{ $address->note ?? '' }}"
-                                        data-default="{{ $address->default ? '1' : '0' }}">
-                                        <i class="bi bi-pencil-square"></i>
+                                        aria-label="Xóa địa chỉ"
+                                        class="btn btn-link text-danger p-0 remove-btn js-address-delete-btn"
+                                        data-confirm-message="Bạn có chắc chắn muốn xoá địa chỉ này không?">
+                                        <i class="bi bi-trash"></i>
                                     </button>
-
-
-                                    {{-- Xoá địa chỉ --}}
-                                    <form
-                                        method="POST"
-                                        action="{{ route('user.profile.destroyAddress', $address->id) }}"
-                                        class="d-inline js-address-delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button
-                                            type="button"
-                                            aria-label="Xóa địa chỉ"
-                                            class="btn p-0 border-0 bg-transparent js-address-delete-btn"
-                                            data-confirm-message="Bạn có chắc chắn muốn xoá địa chỉ này không?">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-
+                                </form>
                             </div>
-                            <div class="address-card-body">
-                                {{ $address->address }}
-                                @if ($address->ward || $address->province)
-                                , {{ optional($address->ward)->name }},
-                                {{ optional($address->province)->name }}
-                                @endif
-                                @if (!empty($address->note))
-                                <br>
-                                <small class="text-muted">{{ $address->note }}</small>
-                                @endif
-                            </div>
+
                         </div>
-                        @empty
-                        <p class="text-muted mb-0">
-                            Bạn chưa có địa chỉ nào. Hãy thêm địa chỉ mới để đặt hàng nhanh hơn.
-                        </p>
-                        @endforelse
+                        <div class="address-card-body">
+                            {{ $address->address }}
+                            @if ($address->ward || $address->province)
+                            , {{ optional($address->ward)->name }},
+                            {{ optional($address->province)->name }}
+                            @endif
+                            @if (!empty($address->note))
+                            <br>
+                            <small class="text-muted">Ghi chú: {{ $address->note }}</small>
+                            @endif
+                        </div>
                     </div>
+                    @empty
+                    <p class="text-muted mb-0">
+                        Bạn chưa có địa chỉ nào. Hãy thêm địa chỉ mới để đặt hàng nhanh hơn.
+                    </p>
+                    @endforelse
                 </section>
 
                 <!-- Đổi mật khẩu -->

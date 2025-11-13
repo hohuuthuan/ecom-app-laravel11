@@ -264,11 +264,6 @@
 }
 
 /* Sổ địa chỉ */
-.address-wrapper {
-  border-radius: 5px;
-  border: 1px solid #e2e8f0;
-  padding: 20px 22px;
-}
 
 .address-header {
   display: flex;
@@ -308,11 +303,24 @@
   cursor: pointer;
 }
 
+.address-edit-btn i {
+  color: #ff9f1c;
+}
+
 .address-card {
-  border-radius: 12px;
+  border-radius: 5px;
   border: 1px solid #e2e8f0;
   padding: 14px 16px;
-  background: #d0d8fd;
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(148, 163, 184, 0.12);
+  margin-bottom: 20px;
+  transition: all .3s ease;
+}
+
+.address-card:hover {
+  box-shadow: 0 5px 15px rgba(187, 187, 187, 0.6);
+  transform: translateY(-2px);
 }
 
 .address-card-header {
@@ -326,7 +334,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
   color: #2d3748;
 }
@@ -338,8 +346,7 @@
 .address-card-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 16px;
+  gap: 12px;
   color: #4a5568;
 }
 
@@ -351,11 +358,11 @@
 }
 
 .address-card-actions i {
-  font-size: 16px;
+  font-size: 27px;
 }
 
 .address-card-body {
-  font-size: 14px;
+  font-size: 15px;
   color: #2d3748;
   margin-top: 4px;
 }

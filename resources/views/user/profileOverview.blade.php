@@ -231,14 +231,39 @@ $activeTab = 'info';
                                     @endif
                                 </div>
                                 <div class="address-card-actions">
-                                    {{-- Sau này gắn route edit/destroy vào đây --}}
-                                    <button type="button" aria-label="Sửa địa chỉ">
+                                    {{-- Sửa địa chỉ --}}
+                                    <button
+                                        type="button"
+                                        class="address-edit-btn"
+                                        aria-label="Sửa địa chỉ"
+                                        data-id="{{ $address->id }}"
+                                        data-update-url="{{ route('user.profile.updateAddress', $address->id) }}"
+                                        data-address="{{ $address->address }}"
+                                        data-province-id="{{ $address->address_province_id }}"
+                                        data-ward-id="{{ $address->address_ward_id }}"
+                                        data-note="{{ $address->note ?? '' }}"
+                                        data-default="{{ $address->default ? '1' : '0' }}">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
-                                    <button type="button" aria-label="Xóa địa chỉ">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+
+
+                                    {{-- Xoá địa chỉ --}}
+                                    <form
+                                        method="POST"
+                                        action="{{ route('user.profile.destroyAddress', $address->id) }}"
+                                        class="d-inline js-address-delete-form">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button
+                                            type="button"
+                                            aria-label="Xóa địa chỉ"
+                                            class="btn p-0 border-0 bg-transparent js-address-delete-btn"
+                                            data-confirm-message="Bạn có chắc chắn muốn xoá địa chỉ này không?">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
+
                             </div>
                             <div class="address-card-body">
                                 {{ $address->address }}
@@ -287,6 +312,8 @@ $activeTab = 'info';
 </div>
 @include('partials.ui.profileOverview.edit-info-modal')
 @include('partials.ui.profileOverview.add-address-modal')
+@include('partials.ui.profileOverview.update-address-modal')
+@include('partials.ui.confirm-modal')
 @endsection
 
 @push('scripts')
@@ -296,10 +323,30 @@ $activeTab = 'info';
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var modalEl = document.getElementById('editProfileModal');
-        if (!modalEl) return;
-        var Modal = window.bootstrap && window.bootstrap.Modal ? window.bootstrap.Modal : null;
-        if (!Modal) return;
-        var modal = Modal.getOrCreateInstance(modalEl);
+        if (!modalEl || !window.bootstrap) return;
+        var modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    });
+</script>
+@endif
+
+@if ($errors->addressStore->any())
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('addAddressModal');
+        if (!el || !window.bootstrap) return;
+        var modal = window.bootstrap.Modal.getOrCreateInstance(el);
+        modal.show();
+    });
+</script>
+@endif
+
+@if ($errors->addressUpdate->any())
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('updateAddressModal');
+        if (!el || !window.bootstrap) return;
+        var modal = window.bootstrap.Modal.getOrCreateInstance(el);
         modal.show();
     });
 </script>

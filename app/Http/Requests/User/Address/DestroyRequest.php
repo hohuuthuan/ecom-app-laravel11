@@ -6,12 +6,29 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class DestroyRequest extends FormRequest
 {
-  public function authorize(): bool { return true; }
+  public function authorize(): bool
+  {
+    return true;
+  }
+
+  /**
+   * Đưa route param {id} vào data để rules có thể validate
+   */
+  protected function prepareForValidation(): void
+  {
+    $routeId = $this->route('id');
+
+    if ($routeId) {
+      $this->merge([
+        'id' => $routeId,
+      ]);
+    }
+  }
 
   public function rules(): array
   {
     return [
-      'id' => ['required','uuid'],
+      'id' => ['required', 'uuid'],
     ];
   }
 

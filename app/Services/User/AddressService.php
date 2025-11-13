@@ -29,119 +29,100 @@ class AddressService
   {
     try {
       $userId = Auth::id();
-      if ($data['default']) {
+      $isDefault = !empty($data['default']);
+
+      if ($isDefault) {
         Address::where('user_id', $userId)->update(['default' => false]);
       }
 
       $newAddress = Address::create([
-        'user_id'              => $userId,
-        'address'              => (string) $data['address'],
-        'address_ward_id'      => (int) $data['address_ward_id'],
-        'address_province_id'  => (int) $data['address_province_id'],
-        'note'                 => $data['note'] ?? '',
-        'default'              => !empty($data['default']),
+        'user_id'             => $userId,
+        'address'             => (string) $data['address'],
+        'address_ward_id'     => (int) $data['address_ward_id'],
+        'address_province_id' => (int) $data['address_province_id'],
+        'note'                => $data['note'] ?? '',
+        'default'             => $isDefault,
       ]);
 
-      return (bool) $newAddress;
+      return $newAddress instanceof Address;
     } catch (\Throwable $e) {
       Log::error('Address create failed', ['msg' => $e->getMessage()]);
       return false;
     }
   }
 
-  public function update(string $id, array $data): ?Address
+  public function update(string $id, array $data): bool
   {
-    $user = Auth::user();
-    if ($user === null) {
-      return null;
-    }
-
     try {
-      return DB::transaction(function () use ($user, $id, $data) {
-        $row = Address::where('user_id', $user->id)->where('id', $id)->first();
-        if ($row === null) {
-          return null;
-        }
+      $userId = Auth::id();
 
-        if (Address::where('user_id', $user->id)
-          ->where('address', $data['address'])
-          ->where('id', '!=', $id)
-          ->exists()
-        ) {
-          return null;
-        }
+      $address = Address::where('user_id', $userId)
+        ->where('id', $id)
+        ->first();
 
-        if (!empty($data['default'])) {
-          Address::where('user_id', $user->id)->update(['default' => false]);
-          $row->default = true;
-        } elseif (array_key_exists('default', $data)) {
-          $row->default = (bool) $data['default'];
-        }
+      if ($address === null) {
+        return false;
+      }
 
-        $row->address = $data['address'];
-        $row->address_ward_id = (int) $data['address_ward_id'];
-        $row->address_province_id = (int) $data['address_province_id'];
-        $row->note = $data['note'] ?? null;
-        $row->save();
+      $isDefault = !empty($data['default']);
 
-        return $row->refresh();
-      });
+      if ($isDefault) {
+        Address::where('user_id', $userId)
+          ->where('id', '!=', $address->id)
+          ->update(['default' => false]);
+      }
+
+      $address->address             = (string) $data['address'];
+      $address->address_ward_id     = (int) $data['address_ward_id'];
+      $address->address_province_id = (int) $data['address_province_id'];
+      $address->note                = $data['note'] ?? '';
+      $address->default             = $isDefault;
+
+      return $address->save();
     } catch (\Throwable $e) {
-      Log::warning('AddressService.update failed', [
-        'user_id' => $user->id ?? null,
-        'id'      => $id,
-        'payload' => $data,
-        'error'   => $e->getMessage(),
-      ]);
-      return null;
+      Log::error('Address update failed', ['msg' => $e->getMessage()]);
+      return false;
     }
   }
 
-  public function destroy(string $id): int
+  public function destroy(string $id): bool
   {
-    $userId = Auth::id();
-    if (!$userId) {
-      return 0;
-    }
-
     try {
-      return Address::where('user_id', $userId)->where('id', $id)->delete();
+      $userId = Auth::id();
+
+      $deleted = Address::where('user_id', $userId)
+        ->where('id', $id)
+        ->delete();
+
+      return $deleted > 0;
     } catch (\Throwable $e) {
-      Log::warning('AddressService.destroy failed', [
-        'user_id' => $userId,
-        'id'      => $id,
-        'error'   => $e->getMessage(),
-      ]);
-      return 0;
+      Log::error('Address destroy failed', ['msg' => $e->getMessage()]);
+      return false;
     }
   }
 
   public function setDefault(string $id): bool
   {
-    $userId = Auth::id();
-    if (!$userId) {
-      return false;
-    }
-
     try {
-      return DB::transaction(function () use ($userId, $id) {
-        $row = Address::where('user_id', $userId)->where('id', $id)->first();
-        if ($row === null) {
-          return false;
-        }
+      $userId = Auth::id();
 
+      $address = Address::where('user_id', $userId)
+        ->where('id', $id)
+        ->first();
+
+      if ($address === null) {
+        return false;
+      }
+
+      DB::transaction(function () use ($userId, $address) {
         Address::where('user_id', $userId)->update(['default' => false]);
-        $row->default = true;
-        $row->save();
-
-        return true;
+        $address->default = true;
+        $address->save();
       });
+
+      return true;
     } catch (\Throwable $e) {
-      Log::warning('AddressService.setDefault failed', [
-        'user_id' => $userId,
-        'id'      => $id,
-        'error'   => $e->getMessage(),
-      ]);
+      Log::error('Address setDefault failed', ['msg' => $e->getMessage()]);
       return false;
     }
   }

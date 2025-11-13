@@ -6,6 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRequest extends FormRequest
 {
+  protected $errorBag = 'addressStore';
+
   public function authorize(): bool { return true; }
 
   public function rules(): array
@@ -45,8 +47,8 @@ class StoreRequest extends FormRequest
       'address_province_id.integer'  => ':attribute phải là số.',
       'address_province_id.min'      => ':attribute không hợp lệ.',
 
-      'note.string'    => ':attribute phải là chuỗi.',
-      'default.boolean'=> ':attribute không hợp lệ.',
+      'note.string'     => ':attribute phải là chuỗi.',
+      'default.boolean' => ':attribute không hợp lệ.',
     ];
   }
 }

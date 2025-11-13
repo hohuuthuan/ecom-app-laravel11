@@ -56,10 +56,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::put('/info', [UserAddressController::class, 'updateInfo'])->name('info.update');
 
-    Route::post('/addresses', [UserAddressController::class, 'store'])->name('store');
-    Route::patch('/addresses/{id}', [UserAddressController::class, 'update'])->name('update');
-    Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy'])->name('destroy');
-    Route::post('/addresses/{id}/default', [UserAddressController::class, 'setDefault'])->name('default');
+    Route::post('/address', [UserAddressController::class, 'storeNewAddress'])->name('storeNewAddress');
+    Route::put('/address/{id}', [UserAddressController::class, 'updateAddress'])->name('updateAddress');
+    Route::delete('/address/{id}', [UserAddressController::class, 'destroyAddress'])->name('destroyAddress');
+    Route::put('/address/{id}/default', [UserAddressController::class, 'setAddressDefault'])->name('setAddressDefault');
   });
 
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {

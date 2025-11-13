@@ -122,23 +122,25 @@ class UserAddressController extends Controller
     ]);
   }
 
-  public function store(StoreRequest $request): RedirectResponse
+  public function storeNewAddress(StoreRequest $request): RedirectResponse
   {
     try {
       $userId  = Auth::id();
       $address = $request->input('address');
 
-      $checkAddress = Address::where('user_id', $userId)
+      $isExists = Address::where('user_id', $userId)
         ->where('address', $address)
         ->exists();
-      if ($checkAddress) {
+
+      if ($isExists) {
         return back()
           ->withInput()
           ->with('toast_error', 'Tên địa chỉ đã tồn tại');
       }
 
-      $provinceId = $request->input('address_province_id');
-      $wardId     = $request->input('address_ward_id');
+      $provinceId = (int) $request->input('address_province_id');
+      $wardId     = (int) $request->input('address_ward_id');
+
       if (!Province::where('id', $provinceId)->exists()) {
         return back()
           ->withInput()
@@ -150,8 +152,8 @@ class UserAddressController extends Controller
           ->with('toast_error', 'Phường/Xã không hợp lệ hoặc không thuộc Tỉnh/Thành đã chọn');
       }
 
-      $newUserAddress = $this->addressService->create($request->validated());
-      if (!$newUserAddress) {
+      $created = $this->addressService->create($request->validated());
+      if (!$created) {
         return back()->with('toast_error', 'Thêm địa chỉ thất bại');
       }
 
@@ -163,9 +165,46 @@ class UserAddressController extends Controller
     }
   }
 
-  public function update(string $id, UpdateRequest $request): RedirectResponse
+
+  public function updateAddress(string $id, UpdateRequest $request): RedirectResponse
   {
     try {
+      $userId  = Auth::id();
+      $address = $request->input('address');
+
+      $isExists = Address::where('user_id', $userId)
+        ->where('address', $address)
+        ->where('id', '!=', $id)
+        ->exists();
+
+      if ($isExists) {
+        return back()
+          ->withInput()
+          ->with('toast_error', 'Tên địa chỉ đã tồn tại');
+      }
+
+      $provinceId = (int) $request->input('address_province_id');
+      $wardId     = (int) $request->input('address_ward_id');
+
+      if (!Province::where('id', $provinceId)->exists()) {
+        return back()
+          ->withInput()
+          ->with('toast_error', 'Tỉnh/Thành phố không hợp lệ');
+      }
+
+      if (!Ward::where('id', $wardId)->where('province_id', $provinceId)->exists()) {
+        return back()
+          ->withInput()
+          ->with('toast_error', 'Phường/Xã không hợp lệ hoặc không thuộc Tỉnh/Thành đã chọn');
+      }
+
+      $updated = $this->addressService->update($id, $request->validated());
+      if (!$updated) {
+        return back()
+          ->withInput()
+          ->with('toast_error', 'Cập nhật địa chỉ thất bại');
+      }
+
       return back()->with('toast_success', 'Cập nhật địa chỉ thành công');
     } catch (Throwable $e) {
       return back()
@@ -174,24 +213,39 @@ class UserAddressController extends Controller
     }
   }
 
-  public function destroy(string $id, DestroyRequest $request): RedirectResponse
+  public function destroyAddress(string $id, DestroyRequest $request): RedirectResponse
   {
-    return back()->with('toast_success', 'Xóa địa chỉ thành công');
     try {
+      $deleted = $this->addressService->destroy($id);
+
+      if (!$deleted) {
+        return redirect()
+          ->route('user.profile.index', ['tab' => 'addresses'])
+          ->with('toast_error', 'Xóa địa chỉ thất bại');
+      }
+
+      return redirect()
+        ->route('user.profile.index', ['tab' => 'addresses'])
+        ->with('toast_success', 'Xóa địa chỉ thành công');
     } catch (Throwable $e) {
-      return back()
-        ->withInput()
+      return redirect()
+        ->route('user.profile.index', ['tab' => 'addresses'])
         ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
     }
   }
 
-  public function setDefault(string $id, Request $request): RedirectResponse
+  public function setAddressDefault(string $id): RedirectResponse
   {
-    return back()->with('toast_success', 'Đặt mặc định địa chỉ thành công');
     try {
+      $ok = $this->addressService->setDefault($id);
+      if (!$ok) {
+        return back()
+          ->with('toast_error', 'Đặt mặc định địa chỉ thất bại');
+      }
+
+      return back()->with('toast_success', 'Đặt mặc định địa chỉ thành công');
     } catch (Throwable $e) {
       return back()
-        ->withInput()
         ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
     }
   }

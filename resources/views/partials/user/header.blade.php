@@ -131,22 +131,7 @@
 
               <li>
                 <a class="dropdown-item" href="{{ route('user.profile.index') }}">
-                  <i class="fas fa-user me-2"></i>Tài khoản của tôi
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-heart me-2"></i>Sách yêu thích
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-cog me-2"></i>Cài đặt
+                  <i class="fas fa-user me-2"></i>Hồ sơ
                 </a>
               </li>
 

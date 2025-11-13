@@ -7,10 +7,9 @@
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content profile-modal">
-      <form method="POST" action="#">
+      <form method="POST" action="{{ route('user.profile.info.update') }}">
         @csrf
-        {{-- Sau này đổi action thành route update, ví dụ:
-             action="{{ route('user.profile.update') }}" và thêm @method('PUT') --}}
+        @method('PUT')
 
         <div class="modal-header profile-modal-header">
           <h5 class="modal-title" id="editProfileModalLabel">
@@ -34,9 +33,14 @@
                 type="text"
                 id="profileName"
                 name="name"
-                class="form-control profile-modal-input"
+                class="form-control profile-modal-input @error('name','profile') is-invalid @enderror"
                 value="{{ old('name', $user->name) }}"
-                required>
+                data-original-value="{{ $user->name }}">
+              @error('name','profile')
+              <div class="invalid-feedback">
+                {{ $message }}
+              </div>
+              @enderror
             </div>
 
             {{-- Số điện thoại --}}
@@ -48,9 +52,15 @@
                 type="text"
                 id="profilePhone"
                 name="phone"
-                class="form-control profile-modal-input"
+                class="form-control profile-modal-input @error('phone','profile') is-invalid @enderror"
                 value="{{ old('phone', $user->phone) }}"
+                data-original-value="{{ $user->phone }}"
                 placeholder="Nhập số điện thoại">
+              @error('phone','profile')
+              <div class="invalid-feedback">
+                {{ $message }}
+              </div>
+              @enderror
             </div>
 
             {{-- Email --}}
@@ -62,9 +72,14 @@
                 type="email"
                 id="profileEmail"
                 name="email"
-                class="form-control profile-modal-input"
+                class="form-control profile-modal-input @error('email','profile') is-invalid @enderror"
                 value="{{ old('email', $user->email) }}"
-                required>
+                data-original-value="{{ $user->email }}">
+              @error('email','profile')
+              <div class="invalid-feedback">
+                {{ $message }}
+              </div>
+              @enderror
             </div>
 
             {{-- Ngày sinh --}}
@@ -76,8 +91,14 @@
                 type="date"
                 id="profileBirthday"
                 name="birthday"
-                class="form-control profile-modal-input"
-                value="{{ old('birthday', $user->birthday ?? '') }}">
+                class="form-control profile-modal-input @error('birthday','profile') is-invalid @enderror"
+                value="{{ old('birthday', $user->birthday ?? '') }}"
+                data-original-value="{{ $user->birthday ?? '' }}">
+              @error('birthday','profile')
+              <div class="invalid-feedback">
+                {{ $message }}
+              </div>
+              @enderror
             </div>
 
             {{-- Giới tính --}}
@@ -91,14 +112,28 @@
               <select
                 id="profileGender"
                 name="gender"
-                class="setupSelect2 profile-modal-select">
+                class="setupSelect2 profile-modal-select @error('gender','profile') is-invalid @enderror"
+                data-original-value="{{ $user->gender ?? '' }}">
                 <option value="">Chọn giới tính</option>
                 <option value="male" @if($genderValue==='male' ) selected @endif>Nam</option>
                 <option value="female" @if($genderValue==='female' ) selected @endif>Nữ</option>
                 <option value="other" @if($genderValue==='other' ) selected @endif>Khác</option>
               </select>
+              @error('gender','profile')
+              <div class="invalid-feedback d-block">
+                {{ $message }}
+              </div>
+              @enderror
             </div>
+
           </div>
+
+          {{-- Lỗi chung (nếu có) --}}
+          @error('general','profile')
+          <div class="alert alert-danger mt-3 mb-0">
+            {{ $message }}
+          </div>
+          @enderror
         </div>
 
         <div class="modal-footer profile-modal-footer">

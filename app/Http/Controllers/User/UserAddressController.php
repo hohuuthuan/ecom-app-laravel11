@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\User\AddressService;
+use App\Services\User\ProfileService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
@@ -17,15 +18,18 @@ use Illuminate\Contracts\View\View;
 use App\Http\Requests\User\Address\StoreRequest;
 use App\Http\Requests\User\Address\UpdateRequest;
 use App\Http\Requests\User\Address\DestroyRequest;
+use App\Http\Requests\User\UpdateProfileRequest;
 use Throwable;
 
 class UserAddressController extends Controller
 {
   protected AddressService $addressService;
+  protected ProfileService $profileService;
 
-  public function __construct(AddressService $addressService)
+  public function __construct(AddressService $addressService, ProfileService $profileService)
   {
     $this->addressService = $addressService;
+    $this->profileService = $profileService;
   }
 
   public function index(Request $request): View|RedirectResponse
@@ -53,6 +57,44 @@ class UserAddressController extends Controller
       return back()->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
     }
   }
+
+  public function updateInfo(UpdateProfileRequest $request): RedirectResponse
+  {
+    $authUser = Auth::user();
+    if ($authUser === null) {
+      return redirect()->route('login');
+    }
+
+    try {
+      $data = $request->validated();
+      $updated = $this->profileService->updateInfo($authUser->id, $data);
+
+      if (!$updated) {
+        return redirect()
+          ->route('user.profile.index', ['tab' => 'info'])
+          ->withInput()
+          ->withErrors(
+            ['general' => 'Không tìm thấy tài khoản, vui lòng đăng nhập lại.'],
+            'profile'
+          );
+      }
+
+      return redirect()
+        ->route('user.profile.index', ['tab' => 'info'])
+        ->with('toast_success', 'Cập nhật thành công');
+    } catch (Throwable $e) {
+      report($e);
+
+      return redirect()
+        ->route('user.profile.index', ['tab' => 'info'])
+        ->withInput()
+        ->withErrors(
+          ['general' => 'Có lỗi xảy ra, vui lòng thử lại sau'],
+          'profile'
+        );
+    }
+  }
+
 
   public function getWards(Request $request): JsonResponse
   {

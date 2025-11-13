@@ -53,6 +53,9 @@ Route::middleware(['auth'])->group(function () {
   Route::prefix('profile')->name('user.profile.')->group(function () {
     Route::get('/', [UserAddressController::class, 'index'])->name('index');
     Route::get('/wards', [UserAddressController::class, 'getWards'])->name('wards');
+
+    Route::put('/info', [UserAddressController::class, 'updateInfo'])->name('info.update');
+
     Route::post('/addresses', [UserAddressController::class, 'store'])->name('store');
     Route::patch('/addresses/{id}', [UserAddressController::class, 'update'])->name('update');
     Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy'])->name('destroy');

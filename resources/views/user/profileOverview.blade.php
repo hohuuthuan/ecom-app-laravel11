@@ -34,8 +34,7 @@ $activeTab = 'info';
                             href="{{ route('user.profile.index', ['tab' => 'info']) }}"
                             class="profile-nav-link {{ $activeTab === 'info' ? 'active' : '' }}"
                             data-target="info"
-                            data-no-loading="1"
-                            >
+                            data-no-loading="1">
                             <i class="bi bi-person-lines-fill"></i>
                             <span>Thông tin cá nhân</span>
                         </a>
@@ -45,8 +44,7 @@ $activeTab = 'info';
                             href="{{ route('user.profile.index', ['tab' => 'orders']) }}"
                             class="profile-nav-link {{ $activeTab === 'orders' ? 'active' : '' }}"
                             data-target="orders"
-                            data-no-loading="1"
-                            >
+                            data-no-loading="1">
                             <i class="bi bi-receipt"></i>
                             <span>Lịch sử đơn hàng</span>
                         </a>
@@ -56,8 +54,7 @@ $activeTab = 'info';
                             href="{{ route('user.profile.index', ['tab' => 'addresses']) }}"
                             class="profile-nav-link {{ $activeTab === 'addresses' ? 'active' : '' }}"
                             data-target="addresses"
-                            data-no-loading="1"
-                            >
+                            data-no-loading="1">
                             <i class="bi bi-geo-alt-fill"></i>
                             <span>Sổ địa chỉ</span>
                         </a>
@@ -67,8 +64,7 @@ $activeTab = 'info';
                             href="{{ route('user.profile.index', ['tab' => 'password']) }}"
                             class="profile-nav-link {{ $activeTab === 'password' ? 'active' : '' }}"
                             data-target="password"
-                            data-no-loading="1"
-                            >
+                            data-no-loading="1">
                             <i class="bi bi-shield-lock-fill"></i>
                             <span>Đổi mật khẩu</span>
                         </a>
@@ -295,4 +291,17 @@ $activeTab = 'info';
 
 @push('scripts')
 @vite(['resources/js/pages/profileOverview.js'])
+
+@if ($errors->profile->any())
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var modalEl = document.getElementById('editProfileModal');
+        if (!modalEl) return;
+        var Modal = window.bootstrap && window.bootstrap.Modal ? window.bootstrap.Modal : null;
+        if (!Modal) return;
+        var modal = Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    });
+</script>
+@endif
 @endpush

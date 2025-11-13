@@ -77,7 +77,7 @@
 .profile-nav,
 .profile-main {
   background: rgb(255, 255, 255);
-  border-radius: 15px;
+  border-radius: 5px;
   padding: 30px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   min-height: 316px;
@@ -265,7 +265,7 @@
 
 /* Sổ địa chỉ */
 .address-wrapper {
-  border-radius: 16px;
+  border-radius: 5px;
   border: 1px solid #e2e8f0;
   padding: 20px 22px;
 }

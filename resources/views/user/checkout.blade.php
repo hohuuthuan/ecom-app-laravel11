@@ -4,13 +4,13 @@
 @section('content')
 <div class="container my-4 py-2 checkout-page">
   <div class="page-header">
-    <h1 class="pageTitle"><i class="bi bi-cart-fill"></i> THANH TOÁN </h1>
     <div class="page-nav">
       <a class="btn continue-shopping" href="{{ route('home') }}">
         <i class="bi bi-arrow-left"></i>
         Quay lại trang chủ
       </a>
     </div>
+    <h1 class="pageTitle"><i class="bi bi-cart-fill"></i> THANH TOÁN </h1>
   </div>
 
   <div id="checkoutPage"

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Models\Address;
 use App\Models\Province;
 use App\Models\Ward;
+use App\Models\Order;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -29,9 +30,21 @@ class UserAddressController extends Controller
   public function index(Request $request): View|RedirectResponse
   {
     try {
-      // $profileOverview = $this->addressService->getList();
-      // return view('user.profile.profileOverview', compact('userAddress'));
-       return view('user.profileOverview');
+      $user = Auth::user();
+      if ($user === null) {
+        return redirect()->route('login');
+      }
+      $recentOrders = Order::where('user_id', $user->id)
+        ->latest('placed_at')
+        ->limit(5)
+        ->get();
+      $addresses = $this->addressService->getList();
+
+      return view('user.profileOverview', [
+        'user'         => $user,
+        'addresses'    => $addresses,
+        'recentOrders' => $recentOrders,
+      ]);
     } catch (Throwable $e) {
       return back()->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
     }

@@ -4,13 +4,13 @@
 @section('content')
 <div class="container profile-overview-page">
     <div class="page-header">
-        <h1 class="pageTitle">HỒ SƠ CỦA BẠN </h1>
         <div class="page-nav">
             <a class="btn continue-shopping" href="{{ route('home') }}">
                 <i class="bi bi-arrow-left"></i>
                 Quay lại trang chủ
             </a>
         </div>
+        <h1 class="pageTitle">HỒ SƠ CỦA BẠN </h1>
     </div>
     <div id="profilePage">
         <div class="profile-layout">
@@ -58,27 +58,39 @@
                     <div class="profile-info-grid">
                         <div>
                             <div class="profile-info-item-label">Họ và tên</div>
-                            <div class="profile-info-item-value">Nguyễn Văn A</div>
+                            <div class="profile-info-item-value">
+                                {{ $user->name }}
+                            </div>
                         </div>
                         <div>
                             <div class="profile-info-item-label">Số điện thoại</div>
-                            <div class="profile-info-item-value">0901 234 567</div>
+                            <div class="profile-info-item-value">
+                                {{ $user->phone ?? 'Chưa cập nhật' }}
+                            </div>
                         </div>
                         <div>
                             <div class="profile-info-item-label">Email</div>
-                            <div class="profile-info-item-value">nguyenvana@example.com</div>
+                            <div class="profile-info-item-value">
+                                {{ $user->email }}
+                            </div>
                         </div>
                         <div>
                             <div class="profile-info-item-label">Ngày sinh</div>
-                            <div class="profile-info-item-value">01/01/1990</div>
+                            <div class="profile-info-item-value text-muted">
+                                Chưa cập nhật
+                            </div>
                         </div>
                         <div>
                             <div class="profile-info-item-label">Giới tính</div>
-                            <div class="profile-info-item-value">Nam</div>
+                            <div class="profile-info-item-value text-muted">
+                                Chưa cập nhật
+                            </div>
                         </div>
                         <div>
                             <div class="profile-info-item-label">Tham gia từ</div>
-                            <div class="profile-info-item-value">05/2024</div>
+                            <div class="profile-info-item-value">
+                                {{ optional($user->created_at)->format('m/Y') }}
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -99,134 +111,42 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>#HD123456</td>
-                                    <td>10/11/2025</td>
-                                    <td>350.000đ</td>
-                                    <td><span class="badge-status badge-status-success">Hoàn thành</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123455</td>
-                                    <td>05/11/2025</td>
-                                    <td>120.000đ</td>
-                                    <td><span class="badge-status badge-status-pending">Đang giao</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123454</td>
-                                    <td>30/10/2025</td>
-                                    <td>89.000đ</td>
-                                    <td><span class="badge-status badge-status-cancel">Đã hủy</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123456</td>
-                                    <td>10/11/2025</td>
-                                    <td>350.000đ</td>
-                                    <td><span class="badge-status badge-status-success">Hoàn thành</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123455</td>
-                                    <td>05/11/2025</td>
-                                    <td>120.000đ</td>
-                                    <td><span class="badge-status badge-status-pending">Đang giao</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123454</td>
-                                    <td>30/10/2025</td>
-                                    <td>89.000đ</td>
-                                    <td><span class="badge-status badge-status-cancel">Đã hủy</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123456</td>
-                                    <td>10/11/2025</td>
-                                    <td>350.000đ</td>
-                                    <td><span class="badge-status badge-status-success">Hoàn thành</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123455</td>
-                                    <td>05/11/2025</td>
-                                    <td>120.000đ</td>
-                                    <td><span class="badge-status badge-status-pending">Đang giao</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123454</td>
-                                    <td>30/10/2025</td>
-                                    <td>89.000đ</td>
-                                    <td><span class="badge-status badge-status-cancel">Đã hủy</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123456</td>
-                                    <td>10/11/2025</td>
-                                    <td>350.000đ</td>
-                                    <td><span class="badge-status badge-status-success">Hoàn thành</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123455</td>
-                                    <td>05/11/2025</td>
-                                    <td>120.000đ</td>
-                                    <td><span class="badge-status badge-status-pending">Đang giao</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123454</td>
-                                    <td>30/10/2025</td>
-                                    <td>89.000đ</td>
-                                    <td><span class="badge-status badge-status-cancel">Đã hủy</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123456</td>
-                                    <td>10/11/2025</td>
-                                    <td>350.000đ</td>
-                                    <td><span class="badge-status badge-status-success">Hoàn thành</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123455</td>
-                                    <td>05/11/2025</td>
-                                    <td>120.000đ</td>
-                                    <td><span class="badge-status badge-status-pending">Đang giao</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123454</td>
-                                    <td>30/10/2025</td>
-                                    <td>89.000đ</td>
-                                    <td><span class="badge-status badge-status-cancel">Đã hủy</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123456</td>
-                                    <td>10/11/2025</td>
-                                    <td>350.000đ</td>
-                                    <td><span class="badge-status badge-status-success">Hoàn thành</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123455</td>
-                                    <td>05/11/2025</td>
-                                    <td>120.000đ</td>
-                                    <td><span class="badge-status badge-status-pending">Đang giao</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123454</td>
-                                    <td>30/10/2025</td>
-                                    <td>89.000đ</td>
-                                    <td><span class="badge-status badge-status-cancel">Đã hủy</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123456</td>
-                                    <td>10/11/2025</td>
-                                    <td>350.000đ</td>
-                                    <td><span class="badge-status badge-status-success">Hoàn thành</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123455</td>
-                                    <td>05/11/2025</td>
-                                    <td>120.000đ</td>
-                                    <td><span class="badge-status badge-status-pending">Đang giao</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#HD123454</td>
-                                    <td>30/10/2025</td>
-                                    <td>89.000đ</td>
-                                    <td><span class="badge-status badge-status-cancel">Đã hủy</span></td>
-                                </tr>
+                                @forelse ($recentOrders as $order)
+                                @php
+                                $status = $order->status;
+                                $statusLabel = 'Không xác định';
+                                $badgeClass = 'badge-status-pending';
 
+                                if (in_array($status, ['pending', 'confirmed', 'picking', 'shipped'], true)) {
+                                $statusLabel = 'Đang xử lý';
+                                $badgeClass = 'badge-status-pending';
+                                } elseif ($status === 'delivered') {
+                                $statusLabel = 'Hoàn thành';
+                                $badgeClass = 'badge-status-success';
+                                } elseif (in_array($status, ['cancelled', 'returned'], true)) {
+                                $statusLabel = 'Đã hủy';
+                                $badgeClass = 'badge-status-cancel';
+                                }
+                                @endphp
+                                <tr>
+                                    <td>{{ $order->code }}</td>
+                                    <td>{{ optional($order->placed_at)->format('d/m/Y') }}</td>
+                                    <td>{{ number_format($order->grand_total_vnd, 0, ',', '.') }}đ</td>
+                                    <td>
+                                        <span class="badge-status {{ $badgeClass }}">
+                                            {{ $statusLabel }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">
+                                        Bạn chưa có đơn hàng nào.
+                                    </td>
+                                </tr>
+                                @endforelse
                             </tbody>
+
                         </table>
                     </div>
                 </section>
@@ -243,24 +163,44 @@
                             <span>Thêm địa chỉ</span>
                         </button>
                     </div>
-                    <div class="address-card">
-                        <div class="address-card-header">
-                            <div class="address-card-title">
-                                <i class="bi bi-geo-alt"></i>
-                                <span>Địa chỉ</span>
+                    <div class="address-wrapper">
+                        @forelse ($addresses as $address)
+                        <div class="address-card">
+                            <div class="address-card-header">
+                                <div class="address-card-title">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <span>{{ $address->address }}</span>
+                                    @if ($address->default)
+                                    <span class="badge bg-primary ms-2">Mặc định</span>
+                                    @endif
+                                </div>
+                                <div class="address-card-actions">
+                                    {{-- Sau này gắn route edit/destroy vào đây --}}
+                                    <button type="button" aria-label="Sửa địa chỉ">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button type="button" aria-label="Xóa địa chỉ">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="address-card-actions">
-                                <button type="button" aria-label="Sửa địa chỉ">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                                <button type="button" aria-label="Xóa địa chỉ">
-                                    <i class="bi bi-trash"></i>
-                                </button>
+                            <div class="address-card-body">
+                                {{ $address->address }}
+                                @if ($address->ward || $address->province)
+                                , {{ optional($address->ward)->name }},
+                                {{ optional($address->province)->name }}
+                                @endif
+                                @if (!empty($address->note))
+                                <br>
+                                <small class="text-muted">{{ $address->note }}</small>
+                                @endif
                             </div>
                         </div>
-                        <div class="address-card-body">
-                            Số 4, An Bình, Cần Thơ, Việt Nam
-                        </div>
+                        @empty
+                        <p class="text-muted mb-0">
+                            Bạn chưa có địa chỉ nào. Hãy thêm địa chỉ mới để đặt hàng nhanh hơn.
+                        </p>
+                        @endforelse
                     </div>
                 </section>
 
@@ -289,35 +229,8 @@
         </div>
     </div>
 </div>
-
-<script>
-    (function() {
-        var navLinks = document.querySelectorAll('.profile-nav-link');
-        var sections = document.querySelectorAll('.profile-section');
-
-        navLinks.forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                var target = link.getAttribute('data-target');
-
-                navLinks.forEach(function(item) {
-                    item.classList.remove('active');
-                });
-                sections.forEach(function(section) {
-                    section.classList.remove('active');
-                });
-
-                link.classList.add('active');
-                var section = document.querySelector('.profile-section[data-section="' + target + '"]');
-                if (section) {
-                    section.classList.add('active');
-                }
-            });
-        });
-    })();
-</script>
 @endsection
 
 @push('scripts')
-@vite(['resources/js/pages/cart-page.js'])
+@vite(['resources/js/pages/profileOverview.js'])
 @endpush

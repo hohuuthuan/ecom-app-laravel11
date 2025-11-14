@@ -198,7 +198,8 @@ class ProductService
   {
     $userId = Auth::id();
 
-    $product = Product::query()->select('products.*')
+    $product = Product::query()
+      ->select('products.*')
       ->selectSub(function ($q) {
         $q->from('reviews')
           ->selectRaw('COUNT(*)')
@@ -211,16 +212,16 @@ class ProductService
           ->whereColumn('reviews.product_id', 'products.id')
           ->where('is_active', true);
       }, 'rating_avg')
-      ->selectSub(function ($q) use ($userId) {
-        if ($userId) {
-          $q->from('favorites')
+      ->when($userId, function ($q) use ($userId) {
+        $q->selectSub(function ($sub) use ($userId) {
+          $sub->from('favorites')
             ->selectRaw('CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END')
             ->whereColumn('favorites.product_id', 'products.id')
             ->where('user_id', $userId);
-        } else {
-          $q->from('favorites')->selectRaw('0');
-        }
-      }, 'is_favorite')
+        }, 'is_favorite');
+      }, function ($q) {
+        $q->selectRaw('0 as is_favorite');
+      })
       ->selectSub(function ($q) {
         $q->from('stocks')
           ->selectRaw('COALESCE(SUM(on_hand - reserved), 0)')

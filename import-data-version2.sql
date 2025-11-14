@@ -927,7 +927,7 @@ CREATE TABLE `user_addresses` (
 
 LOCK TABLES `user_addresses` WRITE;
 /*!40000 ALTER TABLE `user_addresses` DISABLE KEYS */;
-INSERT INTO `user_addresses` VALUES ('a05885af-4f21-4dbf-a918-e2b06e0f43db','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','Ở đâu á hong có biết nữa',3857,17,'Ngủ giờ hành chính',0,'2025-11-13 07:56:44','2025-11-13 08:40:45'),('a058956d-f3c8-48e3-9adb-7ce707e07185','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','Ở đâu á hong có biết',9745,17,'cccc',1,'2025-11-13 08:40:45','2025-11-13 08:40:45');
+INSERT INTO `user_addresses` VALUES ('a05b3155-3b29-4e86-b3f8-46eef402e7c9','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','Ở đâu á hong có biết',2575,15,'',1,'2025-11-14 15:48:21','2025-11-14 15:48:21'),('a05b3979-bf50-42d1-9345-90ab9afe25b9','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','Ở đâu á hong có biết nữa',532,20,'',0,'2025-11-14 16:11:07','2025-11-14 16:11:07');
 /*!40000 ALTER TABLE `user_addresses` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -964,7 +964,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('9ffa3b13-7f5c-4535-a2e6-f42566c649c7','Hữu Thuận','hohuuthuan@gmail.com','0321654987','2003-11-11','male','vozvZ32VntXeWrBAkMdzA0VUSh6uTM9Fcjt1Yvcm.jpg',NULL,'$2y$12$V99NaFOi2mUrN7yqlnONd.4TTxjzBvZRrV1FdeXR66VUgql17TMfK','ACTIVE','sXAPNqkagXkwqPYsdBDUZcq8h6qsrKQS7ZeJfZytuKig7LPIgyZmqtzgKXEj','2025-09-27 11:00:17','2025-11-13 04:18:46'),('9ffb1565-f8fe-47b4-9d52-27cb054d4fb2','dev1','dev1@gmail.com','0321654987',NULL,NULL,NULL,NULL,'$2y$12$tXuRYT6JqZMuYEsy8vFk0uaCtWw8r8HWyGA/D/WGRwy0vvNdPCUbu','ACTIVE','9SMlKn4ENPUEESqDkE5d1qEg7lDceVALyGDR3loxdCVNIjJnkwx6iZHhq5bn','2025-09-27 21:10:46','2025-10-05 14:58:00'),('9ffb1ca9-a217-4833-bddf-7a4e335c0e4d','Ho Huu Thuan','hohuuthuan1@gmail.com','0321654987',NULL,NULL,'avatars/fFvuhj2KGkBrjEw92cJSzu8UtiUGDl9RKk2519zi.png',NULL,'$2y$12$D8.fcfDZ6iO96o503M7/DuBaRtLSMkQhkwNjY4EWmo.Y6JOE0MnNW','ACTIVE',NULL,'2025-09-27 21:31:04','2025-10-05 18:35:09');
+INSERT INTO `users` VALUES ('9ffa3b13-7f5c-4535-a2e6-f42566c649c7','Hữu Thuận','hohuuthuan@gmail.com','0321654987','2003-11-11','male','vozvZ32VntXeWrBAkMdzA0VUSh6uTM9Fcjt1Yvcm.jpg',NULL,'$2y$12$V99NaFOi2mUrN7yqlnONd.4TTxjzBvZRrV1FdeXR66VUgql17TMfK','ACTIVE','uvTkDPEzuGmPNIj70gZw5qCvBbItKjJFC5LK9t0GSfr629hLKtiOn6teSbgz','2025-09-27 11:00:17','2025-11-13 04:18:46'),('9ffb1565-f8fe-47b4-9d52-27cb054d4fb2','dev1','dev1@gmail.com','0321654987',NULL,NULL,NULL,NULL,'$2y$12$tXuRYT6JqZMuYEsy8vFk0uaCtWw8r8HWyGA/D/WGRwy0vvNdPCUbu','ACTIVE','9SMlKn4ENPUEESqDkE5d1qEg7lDceVALyGDR3loxdCVNIjJnkwx6iZHhq5bn','2025-09-27 21:10:46','2025-10-05 14:58:00'),('9ffb1ca9-a217-4833-bddf-7a4e335c0e4d','Ho Huu Thuan','hohuuthuan1@gmail.com','0321654987',NULL,NULL,'avatars/fFvuhj2KGkBrjEw92cJSzu8UtiUGDl9RKk2519zi.png',NULL,'$2y$12$D8.fcfDZ6iO96o503M7/DuBaRtLSMkQhkwNjY4EWmo.Y6JOE0MnNW','ACTIVE',NULL,'2025-09-27 21:31:04','2025-10-05 18:35:09');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1038,4 +1038,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-13 16:30:46
+-- Dump completed on 2025-11-14 23:44:22

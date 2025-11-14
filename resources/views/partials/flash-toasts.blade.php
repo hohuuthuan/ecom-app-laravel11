@@ -1,14 +1,12 @@
 @php
-  $success = session('toast_success');
-  $error   = session('toast_error');
-  $info    = session('toast_info');
-  $warn    = session('toast_warning');
+  $asArray = function ($v) {
+    return is_array($v) ? $v : ($v ? [$v] : []);
+  };
 
-  $asArray = fn($v) => is_array($v) ? $v : ($v ? [$v] : []);
-  $success = $asArray($success);
-  $error   = $asArray($error);
-  $info    = $asArray($info);
-  $warn    = $asArray($warn);
+  $success = $asArray(session()->pull('toast_success'));
+  $error   = $asArray(session()->pull('toast_error'));
+  $info    = $asArray(session()->pull('toast_info'));
+  $warn    = $asArray(session()->pull('toast_warning'));
 @endphp
 
 @if($success || $error || $info || $warn)

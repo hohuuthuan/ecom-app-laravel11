@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\User;
 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\User;
+use App\Models\Province;
 use App\Services\User\CartService;
 
 class CheckoutController extends Controller
@@ -49,10 +52,8 @@ class CheckoutController extends Controller
         return redirect()->route('checkout.page');
     }
 
-
     public function index(Request $request)
     {
-
         $pairs = $request->session()->get('checkout.items', []);
         if (!is_array($pairs) || count($pairs) === 0) {
             return redirect()->route('cart')->with('toast_error', 'Bạn cần chọn sản phẩm trước');
@@ -63,9 +64,10 @@ class CheckoutController extends Controller
         foreach ($pairs as $it) {
             if (!empty($it['id'])) {
                 $ids[] = $it['id'];
-                $qtyMap[$it['id']] = (int)($it['qty'] ?? 1);
+                $qtyMap[$it['id']] = (int) ($it['qty'] ?? 1);
             }
         }
+
         if (count($ids) === 0) {
             $request->session()->forget(['checkout.items', 'checkout.expires_at']);
             return redirect()->route('cart')->with('toast_error', 'Bạn cần chọn sản phẩm trước');
@@ -87,13 +89,13 @@ class CheckoutController extends Controller
         foreach ($ids as $pid) {
             $p = $rows[$pid];
             $qty = $qtyMap[$pid] ?? 1;
-            $price = (int)$p->selling_price_vnd;
+            $price = (int) $p->selling_price_vnd;
             $lineTotal = $price * $qty;
 
             $items[] = [
-                'id'         => (string)$p->id,
-                'title'      => (string)$p->title,
-                'image'      => (string)($p->image ?? ''),
+                'id'         => (string) $p->id,
+                'title'      => (string) $p->title,
+                'image'      => (string) ($p->image ?? ''),
                 'qty'        => $qty,
                 'price'      => $price,
                 'line_total' => $lineTotal,
@@ -105,9 +107,36 @@ class CheckoutController extends Controller
         $shipping = count($items) > 0 ? 30000 : 0;
         $total = $subtotal + $shipping;
 
-        return view('user.checkout', compact('items', 'subtotal', 'shipping', 'total'));
-    }
+        /** @var User|null $user */
+        $user = Auth::user();
 
+        $addresses = $user
+            ? $user->addresses()
+            ->with(['ward', 'province'])
+            ->orderByDesc('default')
+            ->get()
+            : collect();
+
+        $selectedAddress = $addresses->first();
+
+        $fullName = old('full_name', $user?->name ?? '');
+        $phone    = $user?->phone ?? '';
+        $email    = old('email', $user?->email ?? '');
+        $provinces = Province::orderBy('name')->get();
+
+        return view('user.checkout', compact(
+            'items',
+            'subtotal',
+            'shipping',
+            'total',
+            'addresses',
+            'selectedAddress',
+            'fullName',
+            'phone',
+            'email',
+            'provinces'
+        ));
+    }
 
     public function place(Request $request)
     {

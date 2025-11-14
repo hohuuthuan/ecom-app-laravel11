@@ -65,3 +65,102 @@ document.addEventListener('DOMContentLoaded', function () {
 
   setTotals(sub, ship, 0);
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+  var options   = document.querySelectorAll('.js-payment-option');
+  var methodInp = document.getElementById('paymentMethodInput');
+  var submitBtn = document.getElementById('paymentSubmitButton');
+
+  function updateButton(method) {
+    if (!submitBtn) return;
+
+    if (method === 'momo') {
+      submitBtn.innerHTML = 'Thanh toán với MOMO';
+    } else if (method === 'vnpay') {
+      submitBtn.innerHTML = 'Thanh toán VNPAY';
+    } else {
+      submitBtn.innerHTML = '<i class="bi bi-truck"></i> Thanh toán COD';
+    }
+  }
+
+  options.forEach(function (opt) {
+    opt.addEventListener('click', function () {
+      var method = opt.getAttribute('data-method') || 'cod';
+
+      options.forEach(function (o) {
+        o.classList.remove('selected');
+        var r = o.querySelector('.radio-custom');
+        var d = o.querySelector('.radio-dot');
+        if (r) r.classList.remove('checked');
+        if (d) d.classList.remove('show');
+      });
+
+      opt.classList.add('selected');
+      var radio = opt.querySelector('.radio-custom');
+      var dot   = opt.querySelector('.radio-dot');
+      if (radio) radio.classList.add('checked');
+      if (dot)   dot.classList.add('show');
+
+      if (methodInp) methodInp.value = method;
+      updateButton(method);
+    });
+  });
+
+  if (methodInp) {
+    updateButton(methodInp.value || 'cod');
+  }
+});
+
+
+(function () {
+  var modalEl = document.getElementById('selectAddressModal');
+  if (!modalEl) { return; }
+
+  var cards = modalEl.querySelectorAll('.js-address-select-card');
+  var hiddenInput = document.getElementById('shippingAddressId');
+  var selectedCard = document.getElementById('selectedAddressCard');
+  var selectedBody = document.getElementById('selectedAddressBody');
+  var selectedTitle = selectedCard
+    ? selectedCard.querySelector('.selected-address-text')
+    : null;
+
+  cards.forEach(function (card) {
+    card.addEventListener('click', function () {
+      var id = card.getAttribute('data-id');
+      if (!id) { return; }
+
+      if (hiddenInput) {
+        hiddenInput.value = id;
+      }
+
+      cards.forEach(function (c) {
+        c.classList.remove('is-active');
+      });
+      card.classList.add('is-active');
+
+      var text = card.getAttribute('data-text') || '';
+      var note = card.getAttribute('data-note') || '';
+
+      if (selectedTitle) {
+        selectedTitle.textContent = text;
+      }
+      if (selectedBody) {
+        selectedBody.textContent = text;
+        if (note) {
+          var br = document.createElement('br');
+          var small = document.createElement('small');
+          small.className = 'text-muted';
+          small.textContent = 'Ghi chú: ' + note;
+          selectedBody.appendChild(br);
+          selectedBody.appendChild(small);
+        }
+      }
+
+      if (window.bootstrap) {
+        var modal = window.bootstrap.Modal.getInstance(modalEl)
+          || window.bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.hide();
+      }
+    });
+  });
+})();

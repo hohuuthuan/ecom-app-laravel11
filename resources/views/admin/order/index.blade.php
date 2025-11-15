@@ -123,7 +123,7 @@
               <td>
                 <div class="fw-semibold">{{ $order->shipment->name ?? '—' }} \ {{ $order->shipment->phone ?? $order->shipment->email ?? '—' }}</div>
               </td>
-              <td>{{ $order->payment_method ?? '—' }}</td>
+              <td>{{ strtoupper($order->payment_method ?? '—') }}</td>
               <td>{{ $order->placed_at }}</td>
               <td>
                 @if(strtoupper($order->payment_status ?? '') === 'PAID')

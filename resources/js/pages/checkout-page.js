@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
     } else if (method === 'vnpay') {
       submitBtn.innerHTML = 'Thanh toán VNPAY';
     } else {
-      submitBtn.innerHTML = '<i class="bi bi-truck"></i> Thanh toán COD';
+      submitBtn.innerHTML = '<i class="bi bi-truck"></i> Đặt hàng';
     }
   }
 

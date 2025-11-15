@@ -339,7 +339,7 @@
             class="checkout-btn"
             id="paymentSubmitButton">
             <i class="bi bi-truck"></i>
-            Thanh toán COD
+            Đặt hàng
           </button>
         </div>
       </form>

@@ -251,7 +251,7 @@
                 </div>
                 <div class="flex-grow-1">
                   <div class="payment-option-name">
-                    Thanh toán COD
+                    COD
                   </div>
                   <div class="payment-option-desc">
                     Thanh toán khi nhận hàng

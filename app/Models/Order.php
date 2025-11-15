@@ -9,6 +9,12 @@ class Order extends Model
 {
     use HasUuids;
 
+     protected $casts = [
+        'placed_at'    => 'datetime',
+        'delivered_at' => 'datetime',
+        'cancelled_at' => 'datetime',
+    ];
+
     protected $guarded = [];
     public $incrementing = false;
     protected $keyType = 'string';

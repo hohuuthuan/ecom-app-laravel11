@@ -97,6 +97,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/order', [OrderPageController::class, 'index'])->name('order.index');
     Route::get('/order/detail/{id}', [OrderPageController::class, 'detail'])->name('order.detail');
+    Route::patch('/order/{id}/change-status', [OrderPageController::class, 'changeStatus'])->name('order.changeStatus');
   });
 });
 

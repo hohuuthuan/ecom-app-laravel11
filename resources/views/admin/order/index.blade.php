@@ -124,26 +124,64 @@
                 <div>{{ $order->shipment->name ?? '—' }} \ {{ $order->shipment->phone ?? $order->shipment->email ?? '—' }}</div>
               </td>
               <td>{{ strtoupper($order->payment_method ?? '—') }}</td>
-              <td>{{ $order->placed_at->format('d/m/Y h:i A') }}</td>
+              <td>{{ $order->placed_at?->format('d/m/Y h:i A') }}</td>
+
+              {{-- TRẠNG THÁI THANH TOÁN --}}
               <td>
-                @if(strtoupper($order->payment_status ?? '') === 'PAID')
-                <span class="badge bg-success">PAID</span>
-                @elseif(strtoupper($order->payment_status ?? '') === 'UNPAID')
-                <span class="badge bg-secondary">UNPAID</span>
+                @php($payStatus = strtoupper($order->payment_status ?? ''))
+
+                @if($payStatus === 'PAID')
+                <span class="badge rounded-pill badge-status badge-status--success">
+                  Đã thanh toán
+                </span>
+                @elseif($payStatus === 'UNPAID')
+                <span class="badge bg-secondary"">
+                  Chưa thanh toán
+                </span>
                 @else
-                <span class="badge bg-secondary">—</span>
+                <span class="badge rounded-pill badge-status badge-status--primary">
+                  Không xác định
+                </span>
                 @endif
               </td>
+              
+              {{-- TRẠNG THÁI ĐƠN HÀNG --}}
               <td>
-                @switch(strtoupper($order->status ?? ''))
-                @case('CONFIRMED') <span class="badge bg-warning text-dark">CONFIRMED</span> @break
-                @case('PICKING') <span class="badge bg-info text-dark">PICKING</span> @break
-                @case('SHIPPED') <span class="badge bg-primary">SHIPPED</span> @break
-                @case('DELIVERED') <span class="badge bg-success">DELIVERED</span> @break
-                @case('CANCELLED') <span class="badge bg-danger">CANCELLED</span> @break
-                @case('RETURNED') <span class="badge bg-dark">RETURNED</span> @break
-                @default <span class="badge bg-secondary">PENDING</span>
-                @endswitch
+                @php($status = strtolower($order->status ?? ''))
+
+                @if($status === 'pending')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Chờ xử lý
+                </span>
+                @elseif($status === 'confirmed')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Đã xác nhận
+                </span>
+                @elseif($status === 'processing')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Đang xử lý
+                </span>
+                @elseif($status === 'shipping')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Đang giao
+                </span>
+                @elseif($status === 'delivered')
+                <span class="badge rounded-pill badge-status badge-status--success">
+                  Đã giao hàng
+                </span>
+                @elseif($status === 'completed')
+                <span class="badge rounded-pill badge-status badge-status--success">
+                  Hoàn tất
+                </span>
+                @elseif($status === 'cancelled')
+                <span class="badge rounded-pill badge-status badge-status--danger">
+                  Đã hủy
+                </span>
+                @else
+                <span class="badge rounded-pill badge-status badge-status--primary">
+                  Không xác định
+                </span>
+                @endif
               </td>
 
               <td class="text-center">
@@ -159,6 +197,7 @@
             @endforelse
           </tbody>
         </table>
+
       </div>
       <div class="mt-3">
         {{ $orders->appends(request()->except('page'))->links('pagination::bootstrap-5') }}

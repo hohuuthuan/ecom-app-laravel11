@@ -1,78 +1,84 @@
+// ================== TÍNH TIỀN + MÃ GIẢM GIÁ ==================
 document.addEventListener('DOMContentLoaded', function () {
   function formatVND(n) {
-    try { return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n); }
-    catch { return (n || 0).toLocaleString('vi-VN') + '₫'; }
+    try {
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+      }).format(n);
+    } catch (e) {
+      return (n || 0).toLocaleString('vi-VN') + '₫';
+    }
   }
 
-  var root = document.getElementById('checkoutRoot');
+  // ID trong blade là "checkoutPage" (KHÔNG phải checkoutRoot)
+  var root = document.getElementById('checkoutPage');
   if (!root) { return; }
 
   var sub = parseInt(root.getAttribute('data-subtotal') || '0', 10);
   var ship = parseInt(root.getAttribute('data-shipping') || '0', 10);
 
   function setTotals(currSub, currShip, discount) {
-    document.getElementById('checkoutSubtotal').textContent = formatVND(currSub);
-    document.getElementById('checkoutShipping').textContent = formatVND(currShip);
-    document.getElementById('checkoutDiscount').textContent = '-' + formatVND(discount);
-    document.getElementById('checkoutTotal').textContent = formatVND(Math.max(0, currSub - discount + currShip));
+    var subtotalEl  = document.getElementById('checkoutSubtotal');
+    var shippingEl  = document.getElementById('checkoutShipping');
+    var discountEl  = document.getElementById('checkoutDiscount');
+    var totalEl     = document.getElementById('checkoutTotal');
 
-    var shipInput = document.getElementById('shipping_fee');
-    var totalInput = document.getElementById('total_client');
-    if (shipInput) { shipInput.value = String(currShip); }
-    if (totalInput) { totalInput.value = String(Math.max(0, currSub - discount + currShip)); }
+    if (subtotalEl) { subtotalEl.textContent = formatVND(currSub); }
+    if (shippingEl) { shippingEl.textContent = formatVND(currShip); }
+    if (discountEl) { discountEl.textContent = '-' + formatVND(discount); }
+    if (totalEl) {
+      var total = Math.max(0, currSub - discount + currShip);
+      totalEl.textContent = formatVND(total);
+    }
   }
 
+  // Dùng cho nút "Áp dụng" mã giảm giá (tạm time UI, chưa nối với backend)
   window.applyDiscount = function () {
-    var code = (document.getElementById('discountCode').value || '').trim().toUpperCase();
-    var msg = document.getElementById('discountMessage');
+    var inputEl  = document.getElementById('discountCode');
+    var msgEl    = document.getElementById('discountMessage');
+    var code     = (inputEl && inputEl.value ? inputEl.value : '').trim().toUpperCase();
     var discount = 0;
     var currShip = ship;
 
+    // Nếu xóa mã
     if (code === '') {
-      document.getElementById('discount_code').value = '';
-      if (msg) { msg.textContent = 'Đã xoá mã giảm giá.'; }
+      if (msgEl) { msgEl.textContent = 'Đã xoá mã giảm giá.'; }
       setTotals(sub, currShip, 0);
       return;
     }
+
+    // Demo một vài mã cứng
     if (code === 'HOMESTYLE10') {
       discount = Math.round(sub * 0.10);
-      document.getElementById('discount_code').value = code;
-      if (msg) { msg.textContent = 'Áp dụng mã HOMESTYLE10 thành công (-10%).'; }
+      if (msgEl) { msgEl.textContent = 'Áp dụng mã HOMESTYLE10 thành công (-10%).'; }
       setTotals(sub, currShip, discount);
       return;
     }
+
     if (code === 'FREESHIP') {
       currShip = 0;
-      document.getElementById('discount_code').value = code;
-      if (msg) { msg.textContent = 'Áp dụng mã FREESHIP thành công (miễn phí vận chuyển).'; }
+      if (msgEl) { msgEl.textContent = 'Áp dụng mã FREESHIP thành công (miễn phí vận chuyển).'; }
       setTotals(sub, currShip, 0);
       return;
     }
-    if (msg) { msg.textContent = 'Mã không hợp lệ. Dùng: HOMESTYLE10 hoặc FREESHIP.'; }
-  };
 
-  window.placeOrder = function () {
-    var need = ['full_name', 'phone', 'address', 'city', 'district', 'ward'];
-    for (var i = 0; i < need.length; i++) {
-      var el = document.querySelector('[name="'+need[i]+'"]');
-      if (!el || !el.value.trim()) { alert('Vui lòng điền đầy đủ thông tin bắt buộc.'); return; }
+    if (msgEl) {
+      msgEl.textContent = 'Mã không hợp lệ. Dùng thử: HOMESTYLE10 hoặc FREESHIP.';
     }
-    var phone = document.querySelector('[name="phone"]').value.trim();
-    if (!/^0[0-9]{9,10}$/.test(phone)) { alert('SĐT không hợp lệ.'); return; }
-
-    document.getElementById('placeOrderForm').submit();
   };
 
   setTotals(sub, ship, 0);
 });
 
+// ================== CHỌN PHƯƠNG THỨC THANH TOÁN ==================
 document.addEventListener('DOMContentLoaded', function () {
   var options   = document.querySelectorAll('.js-payment-option');
   var methodInp = document.getElementById('paymentMethodInput');
   var submitBtn = document.getElementById('paymentSubmitButton');
 
   function updateButton(method) {
-    if (!submitBtn) return;
+    if (!submitBtn) { return; }
 
     if (method === 'momo') {
       submitBtn.innerHTML = 'Thanh toán với MOMO';
@@ -91,17 +97,17 @@ document.addEventListener('DOMContentLoaded', function () {
         o.classList.remove('selected');
         var r = o.querySelector('.radio-custom');
         var d = o.querySelector('.radio-dot');
-        if (r) r.classList.remove('checked');
-        if (d) d.classList.remove('show');
+        if (r) { r.classList.remove('checked'); }
+        if (d) { d.classList.remove('show'); }
       });
 
       opt.classList.add('selected');
       var radio = opt.querySelector('.radio-custom');
       var dot   = opt.querySelector('.radio-dot');
-      if (radio) radio.classList.add('checked');
-      if (dot)   dot.classList.add('show');
+      if (radio) { radio.classList.add('checked'); }
+      if (dot)   { dot.classList.add('show'); }
 
-      if (methodInp) methodInp.value = method;
+      if (methodInp) { methodInp.value = method; }
       updateButton(method);
     });
   });
@@ -111,18 +117,45 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-
+// ================== CHỌN LẠI ĐỊA CHỈ (KHÔNG NỐI LẠI PROVINCE/WARD VÀO TITLE) ==================
 (function () {
-  var modalEl = document.getElementById('selectAddressModal');
+  var modalEl       = document.getElementById('selectAddressModal');
   if (!modalEl) { return; }
 
-  var cards = modalEl.querySelectorAll('.js-address-select-card');
-  var hiddenInput = document.getElementById('shippingAddressId');
-  var selectedCard = document.getElementById('selectedAddressCard');
-  var selectedBody = document.getElementById('selectedAddressBody');
+  var cards         = modalEl.querySelectorAll('.js-address-select-card');
+  var hiddenInput   = document.getElementById('shippingAddressId');
+  var selectedCard  = document.getElementById('selectedAddressCard');
+  var selectedBody  = document.getElementById('selectedAddressBody');
   var selectedTitle = selectedCard
     ? selectedCard.querySelector('.selected-address-text')
     : null;
+
+  function updateSelectedAddress(fullText, note) {
+    if (!selectedBody) { return; }
+
+    // Xóa sạch nội dung cũ (tránh nhân đôi "Ghi chú")
+    selectedBody.innerHTML = '';
+
+    // Nội dung chính: fullText từ data-text (thường là "địa chỉ, phường, tỉnh")
+    var mainNode = document.createTextNode(fullText);
+    selectedBody.appendChild(mainNode);
+
+    // Thêm note nếu có
+    if (note) {
+      var br = document.createElement('br');
+      var small = document.createElement('small');
+      small.className = 'text-muted';
+      small.textContent = 'Ghi chú: ' + note;
+      selectedBody.appendChild(br);
+      selectedBody.appendChild(small);
+    }
+
+    // TITLE (dòng trên) LUÔN CHỈ LÀ PHẦN ĐỊA CHỈ CHÍNH (phần trước dấu phẩy)
+    if (selectedTitle) {
+      var titleText = fullText.split(',')[0].trim();
+      selectedTitle.textContent = titleText;
+    }
+  }
 
   cards.forEach(function (card) {
     card.addEventListener('click', function () {
@@ -133,29 +166,19 @@ document.addEventListener('DOMContentLoaded', function () {
         hiddenInput.value = id;
       }
 
+      // Đánh dấu card đang chọn
       cards.forEach(function (c) {
         c.classList.remove('is-active');
       });
       card.classList.add('is-active');
 
-      var text = card.getAttribute('data-text') || '';
-      var note = card.getAttribute('data-note') || '';
+      // data-text: full string hiển thị (địa chỉ + ward + province)
+      var fullText = card.getAttribute('data-text') || '';
+      var note     = card.getAttribute('data-note') || '';
 
-      if (selectedTitle) {
-        selectedTitle.textContent = text;
-      }
-      if (selectedBody) {
-        selectedBody.textContent = text;
-        if (note) {
-          var br = document.createElement('br');
-          var small = document.createElement('small');
-          small.className = 'text-muted';
-          small.textContent = 'Ghi chú: ' + note;
-          selectedBody.appendChild(br);
-          selectedBody.appendChild(small);
-        }
-      }
+      updateSelectedAddress(fullText, note);
 
+      // Đóng modal
       if (window.bootstrap) {
         var modal = window.bootstrap.Modal.getInstance(modalEl)
           || window.bootstrap.Modal.getOrCreateInstance(modalEl);

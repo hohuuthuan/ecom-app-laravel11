@@ -23,6 +23,7 @@ Route::get('/', [HomePageController::class, 'index'])->name('home');
 Route::get('product/{slug}/{id}', [HomePageController::class, 'productDetail'])->name('product.detail');
 Route::get('/cart', [HomePageController::class, 'cartPage'])->name('cart');
 Route::post('/cart/add', [HomePageController::class, 'addItemToCart'])->name('cart.item.add');
+Route::get('/thank-you', [HomePageController::class, 'thanks'])->name('user.thanks');
 
 // === GUEST ===
 Route::middleware('guest')->group(function () {
@@ -41,14 +42,14 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/favorite', [HomeController::class, 'addFavoriteProduct'])->name('addFavoriteProduct');
   Route::delete('/favorite/{productId}', [HomeController::class, 'destroyFavoriteProduct'])->name('destroyFavoriteProduct');
 
-
   Route::patch('/cart/item/{key}', [HomePageController::class, 'updateQuantityItemInCart'])->name('cart.item.update');
   Route::delete('/cart/item/{key}', [HomePageController::class, 'removeItemInCart'])->name('cart.item.remove');
   Route::get('/cart/count', [HomePageController::class, 'countProductInCart'])->name('cart.count');
+  Route::delete('/cart/clear', [HomePageController::class, 'clearCart'])->name('cart.clear');
 
   Route::post('/checkout', [CheckoutController::class, 'enter'])->name('checkout.index');
   Route::get('/checkout', [CheckoutController::class, 'index'])->middleware(['checkout.valid'])->name('checkout.page');
-  Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
+  Route::post('/checkout/placeOrderMethodCOD', [CheckoutController::class, 'placeOrderMethodCOD'])->name('checkout.placeOrderMethodCOD');
 
   Route::prefix('profile')->name('user.profile.')->group(function () {
     Route::get('/', [UserAddressController::class, 'index'])->name('index');

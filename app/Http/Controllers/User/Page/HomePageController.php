@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User\Page;
 
 use App\Models\Product;
+use App\Models\Order;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\User\ProductService;
@@ -148,5 +149,44 @@ class HomePageController extends Controller
     }
 
     return back()->with('toast_success', 'Đã xoá sản phẩm khỏi giỏ hàng');
+  }
+
+  public function clearCart(Request $request)
+  {
+    $cart = $this->cartService->recalc();
+
+    if (!empty($cart['items']) && is_array($cart['items'])) {
+      foreach ($cart['items'] as $line) {
+        if (!empty($line['key'])) {
+          $this->cartService->removeItemInCart((string) $line['key']);
+        }
+      }
+    }
+
+    $cart = $this->cartService->recalc();
+
+    if ($request->ajax() || $request->expectsJson()) {
+      return response()->json([
+        'ok'    => true,
+        'count' => $this->cartService->countDistinct(),
+        'cart'  => $cart,
+      ]);
+    }
+
+    return back()->with('toast_success', 'Đã xóa tất cả sản phẩm khỏi giỏ hàng');
+  }
+
+  public function thanks(Request $request)
+  {
+    $code = $request->query('code');
+
+    $order = null;
+    if ($code) {
+      $order = Order::where('code', $code)->first();
+    }
+
+    return view('user.thanks', [
+      'order' => $order,
+    ]);
   }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Page;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Admin\Order\OrderService;
+use App\Models\Order;
 
 class OrderPageController extends Controller
 {
@@ -27,8 +28,15 @@ class OrderPageController extends Controller
     return view('admin.order.index', compact('orders'));
   }
 
-  public function detail()
+  public function detail(string $id)
   {
-    return view('admin.order.detail');
+    $order = Order::with([
+      'user',
+      'items.product',
+      'shipment',
+      'discount',
+    ])->findOrFail($id);
+
+    return view('admin.order.detail', compact('order'));
   }
 }

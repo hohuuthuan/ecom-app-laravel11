@@ -7,39 +7,82 @@
 @section('content')
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb mb-0">
-    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>
-    <li class="breadcrumb-item breadcrumb-active" aria-current="page">Chi tiết đơn hàng</li>
+    <li class="breadcrumb-item">
+      <a href="{{ route('admin.dashboard') }}">Admin</a>
+    </li>
+    <li class="breadcrumb-item breadcrumb-active" aria-current="page">
+      Chi tiết đơn hàng
+    </li>
   </ol>
 </nav>
+
+@php
+  /** @var \App\Models\Order $order */
+  $fmtVnd = fn($n) => number_format((int) $n, 0, ',', '.') . ' VNĐ';
+
+  $paymentStatus = strtolower((string) $order->payment_status);
+
+  $paymentStatusTextMap = [
+    'unpaid'   => 'Chưa thanh toán',
+    'pending'  => 'Chờ thanh toán',
+    'paid'     => 'Đã thanh toán',
+    'refunded' => 'Đã hoàn tiền',
+  ];
+
+  $paymentStatusClassMap = [
+    'unpaid'   => 'text-bg-secondary',
+    'pending'  => 'text-bg-warning',
+    'paid'     => 'text-bg-success',
+    'refunded' => 'text-bg-info',
+  ];
+
+  $paymentStatusText  = $paymentStatusTextMap[$paymentStatus]  ?? ucfirst($paymentStatus);
+  $paymentStatusClass = $paymentStatusClassMap[$paymentStatus] ?? 'text-bg-secondary';
+
+  $shipment = $order->shipment;
+  $user     = $order->user;
+@endphp
 
 <div class="card mb-3">
   <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
     <div>
-      <h1 class="h4 mb-1">Đơn hàng <span id="orderCode" class="copyable"
-          title="Nhấp để sao chép">#ORD-2025-000123</span></h1>
-      <div class="text-muted">Tạo lúc: <span>18/10/2025 10:24</span> • Cập nhật: <span>18/10/2025 19:02</span></div>
+      <h1 class="h4 mb-1">
+        Đơn hàng
+        <span id="orderCode" class="copyable" title="Nhấp để sao chép">
+          #{{ $order->code }}
+        </span>
+      </h1>
+      <div class="text-muted">
+        Tạo lúc:
+        <span>{{ optional($order->placed_at ?? $order->created_at)->format('d/m/Y H:i') }}</span>
+        •
+        Cập nhật:
+        <span>{{ optional($order->updated_at)->format('d/m/Y H:i') }}</span>
+      </div>
     </div>
     <div class="d-flex align-items-center gap-2">
-      <span class="badge rounded-pill text-bg-success badge-status" id="statusBadge">Đã thanh toán</span>
+      <span class="badge rounded-pill badge-status {{ $paymentStatusClass }}" id="statusBadge">
+        {{ $paymentStatusText }}
+      </span>
       <div class="dropdown no-print">
-        <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-          Đổi trạng thái
-        </button>
+        <select name="" id="" class="setupSelect2">
+          <option value="">{{ strtoupper($order->status) }}</option>
+        </select>
         <ul class="dropdown-menu dropdown-menu-end" id="statusMenu">
           <li><button class="dropdown-item" data-status="PENDING">Chờ xử lý</button></li>
           <li><button class="dropdown-item" data-status="PROCESSING">Đang xử lý</button></li>
           <li><button class="dropdown-item" data-status="SHIPPING">Đang giao</button></li>
           <li><button class="dropdown-item" data-status="DONE">Hoàn tất</button></li>
-          <li>
-            <hr class="dropdown-divider">
-          </li>
+          <li><hr class="dropdown-divider"></li>
           <li><button class="dropdown-item text-danger" data-status="CANCEL">Hủy</button></li>
         </ul>
       </div>
       <span class="vr d-none d-md-block"></span>
       <div class="text-end">
         <div class="mini text-muted">Tổng tiền</div>
-        <div class="h5 mb-0" id="grandTotal">1.250.000&nbsp;₫</div>
+        <div class="h5 mb-0" id="grandTotal">
+          {{ $fmtVnd($order->grand_total_vnd) }}
+        </div>
       </div>
     </div>
   </div>
@@ -47,7 +90,7 @@
 
 <!-- 3-column sections -->
 <div class="row g-3">
-  <div class="col-12 col-lg-4">
+  <div class="col-12 col-lg-6">
     <div class="card h-100">
       <div class="card-body">
         <div class="section-title mb-3">Khách hàng</div>
@@ -58,52 +101,86 @@
             <i class="bi bi-person-fill" style="font-size:1.25rem"></i>
           </div>
           <div>
-            <div class="fw-semibold">Nguyễn Văn A</div>
-            <div class="text-muted mini">user: nguyenvana</div>
+            <div class="fw-semibold">
+              {{ $user?->name ?? 'Khách hàng' }}
+            </div>
+            <div class="text-muted mini">
+              @if($user?->username)
+                user: {{ $user->username }}
+              @elseif($user?->email)
+                {{ $user->email }}
+              @else
+                ID: {{ $order->user_id }}
+              @endif
+            </div>
             <div class="mt-2">
-              <div class="mini"><i class="bi bi-envelope"></i> <a href="mailto:a@example.com">a@example.com</a>
-              </div>
-              <div class="mini"><i class="bi bi-telephone"></i> +84 912 345 678</div>
+              @if($user?->email)
+                <div class="mini">
+                  <i class="bi bi-envelope"></i>
+                  <a href="mailto:{{ $user->email }}">
+                    {{ $user->email }}
+                  </a>
+                </div>
+              @endif
+              @if($user?->phone)
+                <div class="mini">
+                  <i class="bi bi-telephone"></i>
+                  {{ $user->phone }}
+                </div>
+              @endif
             </div>
           </div>
         </div>
         <hr>
         <div class="section-title mb-2">Thanh toán</div>
-        <div class="mini">Phương thức: VNPAY</div>
-        <div class="mini">Mã giao dịch: <span class="copyable" id="txnId">VNP-23123123</span></div>
-        <div class="mini">Trạng thái: <span class="badge text-bg-success">Paid</span></div>
+        <div class="mini">
+          Phương thức:
+          {{ strtoupper($order->payment_method) }}
+        </div>
+        <div class="mini">
+          Mã giao dịch:
+          <span class="copyable" id="txnId">
+            {{-- hiện tại COD chưa có payment record, để trống hoặc TODO --}}
+            {{ $order->payment_method === 'cod' ? 'COD' : '—' }}
+          </span>
+        </div>
+        <div class="mini">
+          Trạng thái:
+          <span class="badge {{ $paymentStatusClass }}">
+            {{ $paymentStatusText }}
+          </span>
+        </div>
       </div>
     </div>
   </div>
-  <div class="col-12 col-lg-4">
+
+  <div class="col-12 col-lg-6">
     <div class="card h-100">
       <div class="card-body">
         <div class="section-title mb-3">Giao hàng</div>
         <div class="mini text-muted mb-2">Địa chỉ nhận</div>
-        <div>Anh Nguyễn Văn A</div>
-        <div>123 Lê Lợi, Phường Bến Thành</div>
-        <div>Quận 1, TP. Hồ Chí Minh</div>
-        <div>Việt Nam</div>
-        <div class="mini mt-2"><i class="bi bi-telephone"></i> 0912 345 678</div>
+
+        @if($shipment)
+          <div>{{ $shipment->name }}</div>
+          <div>{{ $shipment->address }}</div>
+          @if($shipment->phone)
+            <div class="mini mt-2">
+              <i class="bi bi-telephone"></i>
+              {{ $shipment->phone }}
+            </div>
+          @endif
+        @else
+          <div>Chưa có thông tin giao hàng</div>
+        @endif
+
         <hr>
-        <div class="mini">Phí vận chuyển: 30.000&nbsp;₫</div>
-        <div class="mini">Đơn vị VC: Giao Hàng Nhanh</div>
-        <div class="mini">Mã vận đơn: <span class="copyable" id="shipCode">GHN123456789</span></div>
-        <div class="mini">Dự kiến giao: 20/10/2025</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-lg-4">
-    <div class="card h-100">
-      <div class="card-body">
-        <div class="section-title mb-3">Ghi chú & thẻ</div>
-        <div class="mini text-muted mb-2">Ghi chú của khách</div>
-        <div class="p-2 bg-warning-soft border rounded">Vui lòng gọi trước khi giao.</div>
-        <div class="mini text-muted mt-3 mb-2">Thẻ</div>
-        <div class="d-flex flex-wrap gap-2">
-          <span class="badge rounded-pill text-bg-secondary">Ưu tiên</span>
-          <span class="badge rounded-pill text-bg-info">Khách mới</span>
-          <span class="badge rounded-pill text-bg-light border">COD-ok</span>
+        <div class="mini">
+          Phí vận chuyển:
+          {{ $fmtVnd($order->shipping_fee_vnd) }}
+        </div>
+        <div class="mini">
+          Đơn vị VC:
+          {{ $shipment?->courier_name ?? '—' }}
         </div>
       </div>
     </div>
@@ -119,64 +196,88 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Sản phẩm</th>
-            <th>Mã</th>
-            <th class="text-center">SL</th>
-            <th class="text-end">Đơn giá</th>
-            <th class="text-end">Giảm</th>
-            <th class="text-end">Tạm tính</th>
+            <th>TÊN SẢN PHẨM</th>
+            <th>MÃ ISBN13</th>
+            <th class="text-center">SỐ LƯỢNG</th>
+            <th class="text-end">ĐƠN GIÁ</th>
+            <th class="text-end">GIẢM</th>
+            <th class="text-end">TẠM TÍNH</th>
           </tr>
         </thead>
         <tbody id="itemBody">
-          <tr>
-            <td>1</td>
-            <td>
-              <div class="fw-semibold">Sách A: Laravel từ A-Z</div>
-              <div class="text-muted mini">Bìa cứng • NXB 2024</div>
-            </td>
-            <td>BK-LARA-001</td>
-            <td class="text-center">2</td>
-            <td class="text-end">300.000&nbsp;₫</td>
-            <td class="text-end">0&nbsp;₫</td>
-            <td class="text-end">600.000&nbsp;₫</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>
-              <div class="fw-semibold">Sách B: PHP nâng cao</div>
-              <div class="text-muted mini">Bìa mềm • Tái bản</div>
-            </td>
-            <td>BK-PHP-010</td>
-            <td class="text-center">1</td>
-            <td class="text-end">650.000&nbsp;₫</td>
-            <td class="text-end">0&nbsp;₫</td>
-            <td class="text-end">650.000&nbsp;₫</td>
-          </tr>
+          @forelse($order->items as $item)
+            <tr>
+              <td>{{ $loop->iteration }}</td>
+              <td>
+                <div class="fw-semibold">
+                  {{ $item->product_title_snapshot ?? $item->product->title ?? 'Sản phẩm' }}
+                </div>
+                <div class="text-muted mini">
+                  ID: {{ $item->product_id }}
+                </div>
+              </td>
+              <td>
+                {{ $item->isbn13_snapshot ?? $item->product_id }}
+              </td>
+              <td class="text-center">
+                {{ $item->quantity }}
+              </td>
+              <td class="text-end">
+                {{ $fmtVnd($item->unit_price_vnd) }}
+              </td>
+              <td class="text-end">
+                {{ $fmtVnd($item->discount_amount_vnd ?? 0) }}
+              </td>
+              <td class="text-end">
+                {{ $fmtVnd($item->total_price_vnd) }}
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="7" class="text-center text-muted mini">
+                Không có sản phẩm nào trong đơn hàng này.
+              </td>
+            </tr>
+          @endforelse
         </tbody>
         <tfoot>
           <tr>
             <td colspan="6" class="text-end">Tạm tính</td>
-            <td class="text-end">1.250.000&nbsp;₫</td>
+            <td class="text-end">
+              {{ $fmtVnd($order->subtotal_vnd) }}
+            </td>
           </tr>
           <tr>
             <td colspan="6" class="text-end">Phí vận chuyển</td>
-            <td class="text-end">30.000&nbsp;₫</td>
+            <td class="text-end">
+              {{ $fmtVnd($order->shipping_fee_vnd) }}
+            </td>
           </tr>
           <tr>
             <td colspan="6" class="text-end">Giảm giá</td>
-            <td class="text-end">0&nbsp;₫</td>
+            <td class="text-end">
+              {{ $fmtVnd($order->discount_vnd) }}
+            </td>
           </tr>
           <tr>
             <td colspan="6" class="text-end">Tổng cộng</td>
-            <td class="text-end h5 mb-0">1.280.000&nbsp;₫</td>
+            <td class="text-end h5 mb-0 text-success">
+              {{ $fmtVnd($order->grand_total_vnd) }}
+            </td>
           </tr>
         </tfoot>
       </table>
     </div>
     <div class="d-flex justify-content-end gap-2 no-print">
-      <button class="btn btn-outline-secondary"><i class="bi bi-filetype-csv"></i> Xuất CSV</button>
-      <button class="btn btn-outline-secondary"><i class="bi bi-receipt"></i> Hóa đơn</button>
-      <button class="btn btn-outline-danger"><i class="bi bi-box-arrow-in-left"></i> Hoàn/Trả</button>
+      <button class="btn btn-outline-secondary">
+        <i class="bi bi-filetype-csv"></i> Xuất CSV
+      </button>
+      <button class="btn btn-outline-secondary">
+        <i class="bi bi-receipt"></i> Hóa đơn
+      </button>
+      <button class="btn btn-outline-danger">
+        <i class="bi bi-box-arrow-in-left"></i> Hoàn/Trả
+      </button>
     </div>
   </div>
 </div>
@@ -187,104 +288,107 @@
     <div class="card h-100">
       <div class="card-body">
         <div class="section-title mb-3">Dòng thời gian</div>
-        <div class="timeline">
-          <div class="timeline-item">
-            <div class="fw-semibold">Đã thanh toán</div>
-            <div class="text-muted mini">18/10/2025 10:26 • VNPAY • IP 123.45.67.89</div>
+
+        @php
+          $timeline = [];
+
+          if ($order->placed_at) {
+            $timeline[] = [
+              'label' => 'Đã tạo đơn',
+              'desc'  => $order->placed_at->format('d/m/Y H:i') . ' • ' . strtoupper($order->payment_method),
+            ];
+          }
+
+          if ($shipment && $shipment->picked_at) {
+            $timeline[] = [
+              'label' => 'Đã lấy hàng',
+              'desc'  => $shipment->picked_at->format('d/m/Y H:i'),
+            ];
+          }
+
+          if ($shipment && $shipment->shipped_at) {
+            $timeline[] = [
+              'label' => 'Đang vận chuyển',
+              'desc'  => $shipment->shipped_at->format('d/m/Y H:i'),
+            ];
+          }
+
+          if ($shipment && $shipment->delivered_at) {
+            $timeline[] = [
+              'label' => 'Giao thành công',
+              'desc'  => $shipment->delivered_at->format('d/m/Y H:i'),
+            ];
+          }
+
+          if ($order->cancelled_at) {
+            $timeline[] = [
+              'label' => 'Đã hủy đơn',
+              'desc'  => $order->cancelled_at->format('d/m/Y H:i'),
+            ];
+          }
+        @endphp
+
+        @if(count($timeline) > 0)
+          <div class="timeline">
+            @foreach($timeline as $row)
+              <div class="timeline-item">
+                <div class="fw-semibold">{{ $row['label'] }}</div>
+                <div class="text-muted mini">{{ $row['desc'] }}</div>
+              </div>
+            @endforeach
           </div>
-          <div class="timeline-item">
-            <div class="fw-semibold">Xác nhận đơn</div>
-            <div class="text-muted mini">18/10/2025 10:30 • NV: admin</div>
+        @else
+          <div class="text-muted mini">
+            Chưa có log thời gian cho đơn hàng này.
           </div>
-          <div class="timeline-item">
-            <div class="fw-semibold">Bàn giao cho vận chuyển</div>
-            <div class="text-muted mini">18/10/2025 17:15 • GHN</div>
-          </div>
-        </div>
+        @endif
       </div>
     </div>
   </div>
+
   <div class="col-lg-5">
     <div class="card h-100">
       <div class="card-body">
         <div class="section-title mb-3">Ghi chú nội bộ</div>
         <div class="mb-2 mini text-muted">Chỉ hiển thị cho admin</div>
+
         <ul class="list-group mb-3" id="noteList">
-          <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div class="me-2">
-              Khách muốn gói kĩ.
-              <div class="mini text-muted">18/10/2025 10:35 • admin</div>
-            </div>
-            <button class="btn btn-sm btn-outline-danger no-print"><i class="bi bi-trash"></i></button>
-          </li>
+          @if($order->buyer_note)
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+              <div class="me-2">
+                {{ $order->buyer_note }}
+                <div class="mini text-muted">
+                  {{ optional($order->placed_at ?? $order->created_at)->format('d/m/Y H:i') }} • Khách hàng
+                </div>
+              </div>
+              <button class="btn btn-sm btn-outline-danger no-print" disabled>
+                <i class="bi bi-trash"></i>
+              </button>
+            </li>
+          @endif
         </ul>
+
+        @if(!$order->buyer_note)
+          <div class="mini text-muted mb-3">
+            Chưa có ghi chú từ khách hàng.
+          </div>
+        @endif
+
         <div class="input-group">
-          <input type="text" class="form-control" placeholder="Thêm ghi chú..." id="noteInput">
-          <button class="btn btn-primary" id="noteAdd"><i class="bi bi-plus-lg"></i></button>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Thêm ghi chú (TODO API)..."
+            id="noteInput"
+            disabled>
+          <button class="btn btn-primary" id="noteAdd" disabled>
+            <i class="bi bi-plus-lg"></i>
+          </button>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<!-- Footer actions -->
-<div class="d-flex justify-content-between align-items-center mt-3 no-print">
-  <div class="mini text-muted">ID hệ thống: <span class="copyable" id="sysId">1000123</span></div>
-  <div class="d-flex gap-2">
-    <button class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i> Hoàn tác</button>
-    <button class="btn btn-success"><i class="bi bi-check2-circle"></i> Lưu thay đổi</button>
-  </div>
-</div>
-
-  <script>
-    // Fake status mapping to badge styles
-    const statusMap = {
-      PENDING: { text: 'Chờ xử lý', cls: 'text-bg-secondary' },
-      PROCESSING: { text: 'Đang xử lý', cls: 'text-bg-warning' },
-      SHIPPING: { text: 'Đang giao', cls: 'text-bg-info' },
-      DONE: { text: 'Hoàn tất', cls: 'text-bg-success' },
-      CANCEL: { text: 'Đã hủy', cls: 'text-bg-danger' }
-    };
-
-    // Status change UI only (no API)
-    document.querySelectorAll('#statusMenu .dropdown-item').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const k = btn.dataset.status;
-        const badge = document.getElementById('statusBadge');
-        const { text, cls } = statusMap[k] ?? statusMap.PENDING;
-        badge.className = 'badge rounded-pill badge-status ' + cls;
-        badge.textContent = (k === 'DONE' ? 'Đã hoàn tất' : text);
-      });
-    });
-
-    // Copy helpers
-    function copyText(el) {
-      const txt = el.textContent.trim();
-      navigator.clipboard?.writeText(txt);
-      el.classList.add('text-success');
-      setTimeout(() => el.classList.remove('text-success'), 600);
-    }
-    document.getElementById('orderCode').addEventListener('click', e => copyText(e.target));
-    document.getElementById('txnId').addEventListener('click', e => copyText(e.target));
-    document.getElementById('shipCode').addEventListener('click', e => copyText(e.target));
-    document.getElementById('sysId').addEventListener('click', e => copyText(e.target));
-
-    // Notes add/remove (UI only)
-    document.getElementById('noteAdd').addEventListener('click', () => {
-      const ipt = document.getElementById('noteInput');
-      const v = ipt.value.trim();
-      if (!v) { return; }
-      const li = document.createElement('li');
-      li.className = 'list-group-item d-flex justify-content-between align-items-start';
-      li.innerHTML = '<div class="me-2">' +
-        v + '<div class="mini text-muted">' + new Date().toLocaleString('vi-VN') + ' • admin</div></div>' +
-        '<button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>';
-      li.querySelector('button').addEventListener('click', () => li.remove());
-      document.getElementById('noteList').prepend(li);
-      ipt.value = '';
-    });
-    document.querySelectorAll('#noteList .btn-outline-danger').forEach(b => b.addEventListener('click', e => e.currentTarget.closest('li').remove()));
-  </script>
 
 @include('partials.ui.confirm-modal')
 @endsection

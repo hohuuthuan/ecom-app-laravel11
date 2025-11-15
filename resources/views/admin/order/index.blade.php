@@ -98,15 +98,15 @@
         <table id="orderTable" class="table table-bordered table-striped align-middle">
           <thead class="table-light">
             <tr>
-              <th class="checkAllWidth"><input type="checkbox" id="order_check_all"></th>
-              <th class="STT_Width">#</th>
-              <th>MÃ ĐƠN HÀNG</th>
-              <th>TÊN KHÁCH HÀNG \ SĐT</th>
-              <th>PHƯƠNG THỨC</th>
-              <th>NGÀY TẠO</th>
-              <th class="statusWidth">TT THANH TOÁN</th>
-              <th class="statusWidth">TRẠNG THÁI ĐƠN</th>
-              <th class="actionWidth text-center">THAO TÁC</th>
+              <th class="th-order-table checkAllWidth"><input type="checkbox" id="order_check_all"></th>
+              <th class="th-order-table STT_Width">#</th>
+              <th class="th-order-table th-order-code">MÃ ĐƠN HÀNG</th>
+              <th class="th-order-table">TÊN KHÁCH HÀNG \ SĐT</th>
+              <th class="th-order-table th-order-method">PHƯƠNG THỨC</th>
+              <th class="th-order-table th-date-order">NGÀY TẠO</th>
+              <th class="th-order-table statusWidth">TRẠNG THÁI THANH TOÁN</th>
+              <th class="th-order-table statusWidth">TRẠNG THÁI ĐƠN HÀNG</th>
+              <th class="th-order-table actionWidth text-center">THAO TÁC</th>
             </tr>
           </thead>
 
@@ -121,10 +121,10 @@
                 </a>
               </td>
               <td>
-                <div class="fw-semibold">{{ $order->shipment->name ?? '—' }} \ {{ $order->shipment->phone ?? $order->shipment->email ?? '—' }}</div>
+                <div>{{ $order->shipment->name ?? '—' }} \ {{ $order->shipment->phone ?? $order->shipment->email ?? '—' }}</div>
               </td>
               <td>{{ strtoupper($order->payment_method ?? '—') }}</td>
-              <td>{{ $order->placed_at }}</td>
+              <td>{{ $order->placed_at->format('d/m/Y h:i A') }}</td>
               <td>
                 @if(strtoupper($order->payment_status ?? '') === 'PAID')
                 <span class="badge bg-success">PAID</span>
@@ -147,8 +147,8 @@
               </td>
 
               <td class="text-center">
-                <a href="{{ route('admin.order.detail', $order->id) }}" class="btn btn-sm btn-outline-primary">
-                  <i class="fa fa-eye"></i>
+                <a href="{{ route('admin.order.detail', $order->id) }}">
+                  <i class="fa fa-eye icon-eye-view-order-detail"></i>
                 </a>
               </td>
             </tr>

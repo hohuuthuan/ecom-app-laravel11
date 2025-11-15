@@ -8,8 +8,6 @@
     --chip-border-green: #b6f2ca;
     --chip-bg-remove: #f8d7da;
     --chip-border-remove: #f1b0b7;
-
-
 }
 
 body {
@@ -37,7 +35,7 @@ a:hover {
 }
 
 .statusWidth {
-    width: 140px;
+    width: 250px;
 }
 
 .createTimeWidth {
@@ -46,6 +44,27 @@ a:hover {
 
 .actionWidth {
     width: 140px;
+}
+
+.icon-eye-view-order-detail {
+    font-size: 30px;
+    color: #0065a8;
+}
+
+.th-order-code {
+    width: 180px;
+}
+
+.th-date-order {
+    width: 200px;
+}
+
+.th-order-method {
+    width: 100px;
+}
+
+.th-order-table {
+    color: #00455a !important;
 }
 
 .btn-admin:hover,

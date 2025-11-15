@@ -490,3 +490,168 @@ a {
     transform: rotate(360deg);
   }
 }
+
+/* ========================= THANKS PAGE ========================= */
+
+.thanks-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: stretch;
+}
+
+.thank-you-section {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+.thank-you-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.thank-you-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  animation: thanks-pulse 2s infinite;
+}
+
+@keyframes thanks-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.success-icon i {
+  color: #ffffff;
+  font-size: 2rem;
+}
+
+.thank-you-card .main-title {
+  color: #2c3e50;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+}
+
+.thank-you-card .subtitle {
+  color: #667eea;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+}
+
+.thank-you-card .description {
+  color: #6c757d;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.thank-you-card .order-info {
+  background: #f8f9fa;
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border-left: 4px solid #667eea;
+}
+
+.thank-you-card .order-number {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.thank-you-card .continue-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  padding: 12px 30px;
+  border-radius: 50px;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.thank-you-card .continue-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+  color: #ffffff;
+}
+
+.thank-you-card .book-icons {
+  position: absolute;
+  opacity: 0.08;
+  font-size: 3rem;
+  color: #667eea;
+}
+
+.thank-you-card .book-icon-1 {
+  top: 20px;
+  right: 30px;
+  transform: rotate(15deg);
+}
+
+.thank-you-card .book-icon-2 {
+  bottom: 30px;
+  left: 30px;
+  transform: rotate(-15deg);
+}
+
+.thank-you-card .features-list {
+  text-align: left;
+  margin: 2rem 0;
+}
+
+.thank-you-card .feature-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: #6c757d;
+}
+
+.thank-you-card .feature-item i {
+  margin-right: 0.75rem;
+  width: 20px;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .thank-you-card {
+    padding: 2rem 1.5rem;
+    margin: 1rem 0;
+  }
+
+  .thank-you-card .main-title {
+    font-size: 2rem;
+  }
+
+  .thank-you-card .book-icons {
+    display: none;
+  }
+}

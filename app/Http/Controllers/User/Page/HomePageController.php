@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User\Page;
 
 use App\Models\Product;
+use App\Models\Order;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\User\ProductService;
@@ -148,5 +149,19 @@ class HomePageController extends Controller
     }
 
     return back()->with('toast_success', 'Đã xoá sản phẩm khỏi giỏ hàng');
+  }
+
+  public function thanks(Request $request)
+  {
+    $code = $request->query('code');
+
+    $order = null;
+    if ($code) {
+      $order = Order::where('code', $code)->first();
+    }
+
+    return view('user.thanks', [
+      'order' => $order,
+    ]);
   }
 }

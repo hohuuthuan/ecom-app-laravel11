@@ -220,7 +220,7 @@ class CheckoutController extends Controller
         return $result;
     }
 
-    public function placeOrderMethodCOD(Request $request, CheckoutService $checkoutService)
+    public function placeOrderMethodCOD(Request $request, CheckoutService $checkoutService, CartService $cartService)
     {
         $data = $request->validate([
             'receiver_name'       => ['required', 'string', 'max:255'],
@@ -259,7 +259,7 @@ class CheckoutController extends Controller
                 ->withInput();
         }
 
-        $items      = $data['items'];
+        $items      = $data['items']; // items[product_id] = qty
         $productIds = array_keys($items);
 
         $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
@@ -343,7 +343,7 @@ class CheckoutController extends Controller
                 'order_id'                 => $orderId,
                 'product_id'               => $productId,
                 'product_title_snapshot'   => $product->title,
-                'isbn13_snapshot'          => $product->isbn ?? null, // hiện tại product chỉ có cột isbn
+                'isbn13_snapshot'          => $product->isbn ?? null,
                 'warehouse_id'             => $defaultWarehouse->id,
                 'quantity'                 => $quantity,
                 'unit_price_vnd'           => $unitPrice,
@@ -416,7 +416,7 @@ class CheckoutController extends Controller
             }
         }
 
-        // dd($orderData, $orderItemsData, $shipmentData, $orderBatchesData);
+        // Lưu DB qua service
         $order = $checkoutService->placeCodOrder(
             $orderData,
             $orderItemsData,
@@ -424,10 +424,20 @@ class CheckoutController extends Controller
             $orderBatchesData
         );
 
-        if($order) {
-            return back()
-            ->with('toast_success', 'Đặt hàng thành công');
+        if ($order) {
+            // 1) Clear session checkout (đúng key đang dùng trong enter/index)
+            $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+
+            // 2) Xóa những sản phẩm đã đặt khỏi giỏ hàng (dùng CartService cho thống nhất)
+            foreach (array_keys($items) as $productId) {
+                $cartService->removeItemInCart((string) $productId);
+            }
+
+            return redirect()
+                ->route('user.thanks', ['code' => $order->code])
+                ->with('toast_success', 'Đặt hàng thành công');
         }
+
         return back()
             ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
     }

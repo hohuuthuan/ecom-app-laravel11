@@ -42,7 +42,7 @@
           <div class="row">
             <div class="col-md-6 searchProduct">
               <label for="keyword" class="form-label mb-1 label-filter-admin-product">Tìm kiếm</label>
-              <input id="keyword" type="text" name="keyword" class="form-control" placeholder="Tìm mã / SDT / email / tên" value="{{ request('keyword') }}">
+              <input id="keyword" type="text" name="keyword" class="form-control" placeholder="Tìm theo mã / SDT / email / tên" value="{{ request('keyword') }}">
             </div>
             <div class="col-md-2">
               <label class="d-block mb-1">&nbsp;</label>

@@ -155,10 +155,10 @@ class CheckoutController extends Controller
             }
 
             $middle = str_pad((string) random_int(0, 99), 2, '0', STR_PAD_LEFT);
+            $suffix = Str::upper(Str::random(10)); // 10 ký tự chữ + số
 
-            $suffix = Str::upper(Str::random(10));
-
-            $code = $prefix . $middle . $suffix;
+            // Dạng: AB-12-XXXXXXXXXX
+            $code = $prefix . '-' . $middle . '-' . $suffix;
         } while (Order::where('code', $code)->exists());
 
         return $code;

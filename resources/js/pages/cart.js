@@ -405,3 +405,82 @@ if (window.CartUI && typeof window.CartUI.bindSelectionEvents === 'function') { 
   });
 })();
 
+(function () {
+  const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+  document.addEventListener('submit', async function (e) {
+    const form = e.target.closest('.clear-cart-form');
+    if (!form) { return; }
+    e.preventDefault();
+
+    const url = form.getAttribute('action') || '';
+    const btn = form.querySelector('button[type="submit"]');
+    const originalHtml = btn ? btn.innerHTML : '';
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    }
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': csrf
+        },
+        credentials: 'same-origin'
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data && data.ok) {
+        // Cập nhật badge giỏ hàng
+        if (window.CartUI && typeof data.count === 'number') {
+          window.CartUI.updateCartCount(data.count);
+        }
+
+        // Xóa toàn bộ item trong DOM
+        const container = document.getElementById('cartItems');
+        if (container) {
+          container.innerHTML = '';
+        }
+
+        // Thêm empty state
+        const itemsSection = document.querySelector('.items-section');
+        if (itemsSection) {
+          const emptyState = document.createElement('div');
+          emptyState.className = 'text-center text-muted py-5 empty-state';
+          emptyState.innerHTML =
+            '<i class="bi bi-cart-x" style="font-size:64px;"></i>' +
+            '<h3 class="mt-2">Giỏ hàng trống</h3>' +
+            '<p>Hãy thêm sản phẩm để tiếp tục mua sắm!</p>';
+          itemsSection.appendChild(emptyState);
+        }
+
+        // Reset lại tóm tắt đơn
+        if (window.CartUI && typeof window.CartUI.refreshSelectionUI === 'function') {
+          window.CartUI.refreshSelectionUI();
+        }
+
+        // Khôi phục nút + ẩn form "Xóa tất cả" đi
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
+        form.remove();
+      } else {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
+      }
+    } catch (err) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }
+  });
+})();

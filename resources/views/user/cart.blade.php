@@ -25,9 +25,25 @@
     <!-- LEFT: Items -->
     <div class="col-lg-8">
       <div class="card items-section">
-        <div class="select-all-section d-flex align-items-center gap-2 mb-3">
-          <input type="checkbox" id="selectAll" class="form-check-input select-all-checkbox">
-          <label for="selectAll" class="m-0 fw-semibold select-all-label">Chọn tất cả sản phẩm</label>
+        <div class="select-all-section d-flex align-items-center justify-content-between gap-2 mb-3">
+          <div class="d-flex align-items-center gap-2">
+            <input type="checkbox" id="selectAll" class="form-check-input select-all-checkbox">
+            <label for="selectAll" class="m-0 fw-semibold select-all-label">Chọn tất cả sản phẩm</label>
+          </div>
+
+          @if(!empty($cart['items']))
+          <form
+            action="{{ route('cart.clear') }}"
+            method="POST"
+            class="d-inline clear-cart-form"
+            data-no-loading>
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+              <i class="bi bi-trash3"></i> Xóa tất cả
+            </button>
+          </form>
+          @endif
         </div>
 
         @if(empty($cart['items']))

@@ -151,6 +151,31 @@ class HomePageController extends Controller
     return back()->with('toast_success', 'Đã xoá sản phẩm khỏi giỏ hàng');
   }
 
+  public function clearCart(Request $request)
+  {
+    $cart = $this->cartService->recalc();
+
+    if (!empty($cart['items']) && is_array($cart['items'])) {
+      foreach ($cart['items'] as $line) {
+        if (!empty($line['key'])) {
+          $this->cartService->removeItemInCart((string) $line['key']);
+        }
+      }
+    }
+
+    $cart = $this->cartService->recalc();
+
+    if ($request->ajax() || $request->expectsJson()) {
+      return response()->json([
+        'ok'    => true,
+        'count' => $this->cartService->countDistinct(),
+        'cart'  => $cart,
+      ]);
+    }
+
+    return back()->with('toast_success', 'Đã xóa tất cả sản phẩm khỏi giỏ hàng');
+  }
+
   public function thanks(Request $request)
   {
     $code = $request->query('code');

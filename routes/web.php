@@ -42,10 +42,10 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/favorite', [HomeController::class, 'addFavoriteProduct'])->name('addFavoriteProduct');
   Route::delete('/favorite/{productId}', [HomeController::class, 'destroyFavoriteProduct'])->name('destroyFavoriteProduct');
 
-
   Route::patch('/cart/item/{key}', [HomePageController::class, 'updateQuantityItemInCart'])->name('cart.item.update');
   Route::delete('/cart/item/{key}', [HomePageController::class, 'removeItemInCart'])->name('cart.item.remove');
   Route::get('/cart/count', [HomePageController::class, 'countProductInCart'])->name('cart.count');
+  Route::delete('/cart/clear', [HomePageController::class, 'clearCart'])->name('cart.clear');
 
   Route::post('/checkout', [CheckoutController::class, 'enter'])->name('checkout.index');
   Route::get('/checkout', [CheckoutController::class, 'index'])->middleware(['checkout.valid'])->name('checkout.page');

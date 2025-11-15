@@ -23,6 +23,7 @@ Route::get('/', [HomePageController::class, 'index'])->name('home');
 Route::get('product/{slug}/{id}', [HomePageController::class, 'productDetail'])->name('product.detail');
 Route::get('/cart', [HomePageController::class, 'cartPage'])->name('cart');
 Route::post('/cart/add', [HomePageController::class, 'addItemToCart'])->name('cart.item.add');
+Route::delete('/cart/clear', [HomePageController::class, 'clearCart'])->name('cart.clear');
 Route::get('/thank-you', [HomePageController::class, 'thanks'])->name('user.thanks');
 
 // === GUEST ===
@@ -45,7 +46,6 @@ Route::middleware(['auth'])->group(function () {
   Route::patch('/cart/item/{key}', [HomePageController::class, 'updateQuantityItemInCart'])->name('cart.item.update');
   Route::delete('/cart/item/{key}', [HomePageController::class, 'removeItemInCart'])->name('cart.item.remove');
   Route::get('/cart/count', [HomePageController::class, 'countProductInCart'])->name('cart.count');
-  Route::delete('/cart/clear', [HomePageController::class, 'clearCart'])->name('cart.clear');
 
   Route::post('/checkout', [CheckoutController::class, 'enter'])->name('checkout.index');
   Route::get('/checkout', [CheckoutController::class, 'index'])->middleware(['checkout.valid'])->name('checkout.page');

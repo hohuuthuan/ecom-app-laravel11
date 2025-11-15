@@ -45,19 +45,6 @@
                 </div>
               </div>
             </div>
-
-            {{-- ẨN: GỬI LÊN HỌ TÊN + SĐT --}}
-            <input
-              type="hidden"
-              name="receiver_name"
-              value="{{ $fullName }}"
-              form="placeOrderForm">
-            <input
-              type="hidden"
-              name="receiver_phone"
-              value="{{ $phone }}"
-              form="placeOrderForm">
-
             <div class="form-group mt-3">
               <label class="form-label" for="email">
                 <span class="checkout-inline-label">Email:</span>
@@ -151,6 +138,9 @@
               @endif
             </section>
           </div>
+
+
+
         </div>
 
         {{-- DANH SÁCH SẢN PHẨM --}}
@@ -182,23 +172,16 @@
               <div class="checkout-item-price">
                 {{ number_format($line['line_total'], 0, ',', '.') }}VNĐ
               </div>
-
-              {{-- ẨN: GỬI CẶP product_id => quantity --}}
-              <input
-                type="hidden"
-                name="items[{{ $line['id'] }}]"
-                value="{{ (int) $line['qty'] }}"
-                form="placeOrderForm">
             </div>
             @endforeach
           </div>
         </div>
       </div>
 
-      {{-- FORM ĐẶT HÀNG (COD) --}}
+      {{-- FORM ĐẶT HÀNG --}}
       <form
         id="placeOrderForm"
-        action="{{ route('checkout.placeOrderMethodCOD') }}"
+        action="{{ route('checkout.place') }}"
         method="POST">
         @csrf
         <div class="summary-section">
@@ -227,16 +210,14 @@
             </span>
           </div>
 
+          {{-- FORM NHẬP MÃ GIẢM GIÁ --}}
           <div class="discount-summary-block">
             <div class="discount-input-group">
               <input
                 type="text"
                 id="discountCode"
-                name="discount_code"
-                form="placeOrderForm"
                 class="form-input discount-input"
-                placeholder="Nhập mã giảm giá"
-                value="{{ old('discount_code') }}">
+                placeholder="Nhập mã giảm giá">
               <button
                 class="apply-btn"
                 type="button"
@@ -246,7 +227,6 @@
             </div>
             <div id="discountMessage" class="discount-message"></div>
           </div>
-
 
           <div class="summary-row total">
             <span>Tổng tiền:</span>

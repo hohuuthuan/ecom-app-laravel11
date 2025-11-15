@@ -48,7 +48,7 @@ Route::middleware(['auth'])->group(function () {
 
   Route::post('/checkout', [CheckoutController::class, 'enter'])->name('checkout.index');
   Route::get('/checkout', [CheckoutController::class, 'index'])->middleware(['checkout.valid'])->name('checkout.page');
-  Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
+  Route::post('/checkout/placeOrderMethodCOD', [CheckoutController::class, 'placeOrderMethodCOD'])->name('checkout.placeOrderMethodCOD');
 
   Route::prefix('profile')->name('user.profile.')->group(function () {
     Route::get('/', [UserAddressController::class, 'index'])->name('index');

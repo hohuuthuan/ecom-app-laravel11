@@ -121,6 +121,7 @@
               </button>
             </form>
 
+            @auth
             <button
               type="button"
               class="btn btn-lg {{ $isFav ? 'btn-danger' : 'btn-outline-danger' }} js-fav-toggle"
@@ -132,6 +133,16 @@
               <i class="{{ $isFav ? 'fas fa-heart' : 'far fa-heart' }} me-2" aria-hidden="true"></i>
               <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Yêu thích' }}</span>
             </button>
+            @else
+            <button
+              type="button"
+              class="btn btn-lg btn-outline-danger js-fav-login-required"
+              id="btnFavoriteGuest">
+              <i class="far fa-heart me-2" aria-hidden="true"></i>
+              <span>Yêu thích</span>
+            </button>
+            @endauth
+
           </div>
 
           <input type="hidden" id="productId" value="{{ $product->id }}">
@@ -193,4 +204,5 @@
       </section>
   </div>
 </div>
+@include('partials.ui.productDetail.noti-modal')
 @endsection

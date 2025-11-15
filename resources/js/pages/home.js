@@ -62,53 +62,109 @@ function formatNumber(n) {
 
 /* =============================== FAVORITE PRODUCT =============================== */
 (function () {
-  const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-  const loginUrl = '/login';
+  const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+  const csrf = csrfMeta ? csrfMeta.getAttribute('content') || '' : '';
 
-  async function api(url, { method = 'POST', body = null } = {}) {
-    const opt = { method, headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf } };
-    if (body && method !== 'DELETE') { opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
-    const res = await fetch(url, opt);
-    if (res.status === 401) { window.location.href = loginUrl; return { ok: false, status: 401 }; }
-    let data = null; try { data = await res.json(); } catch { }
-    return { ok: res.ok && (data?.ok ?? true), status: res.status, data };
+  function showLoginRequiredModal() {
+    const el = document.getElementById('loginRequiredModal');
+    if (!el || !window.bootstrap || !bootstrap.Modal) {
+      return;
+    }
+    const modal = bootstrap.Modal.getOrCreateInstance(el);
+    modal.show();
+  }
+
+  async function api(url, options) {
+    const method = options && options.method ? options.method : 'POST';
+    let body = options && options.body ? options.body : null;
+
+    const headers = { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf };
+    if (body && method !== 'DELETE') {
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify(body);
+    }
+
+    const res = await fetch(url, { method: method, headers: headers, body: body });
+    let data = null;
+    try { data = await res.json(); } catch { }
+
+    const okFlag = data && typeof data.ok === 'boolean' ? data.ok : res.ok;
+    return { ok: okFlag, status: res.status, data: data };
   }
 
   function bumpWishlist(delta) {
-    const el = document.getElementById('wishlistCount'); if (!el) return;
-    const n = parseInt(String(el.textContent).replace(/[^\d]/g, '')) || 0;
-    el.textContent = String(Math.max(0, n + delta));
+    const el = document.getElementById('wishlistCount');
+    if (!el) { return; }
+    const current = parseInt(String(el.textContent).replace(/[^\d]/g, '')) || 0;
+    el.textContent = String(Math.max(0, current + delta));
   }
+
   function setWishlist(count) {
-    const el = document.getElementById('wishlistCount'); if (!el) return;
+    const el = document.getElementById('wishlistCount');
+    if (!el) { return; }
     el.textContent = String(Math.max(0, parseInt(count) || 0));
   }
 
   function setBtnState(btn, on) {
     btn.classList.toggle('btn-danger', on);
     btn.classList.toggle('btn-outline-danger', !on);
+
     const icon = btn.querySelector('i');
-    if (icon) { icon.className = on ? 'fas fa-heart me-2' : 'far fa-heart me-2'; }
+    if (icon) {
+      icon.className = on ? 'fas fa-heart me-2' : 'far fa-heart me-2';
+    }
+
     const label = btn.querySelector('.js-fav-label');
-    if (label) { label.textContent = on ? 'Bỏ thích' : 'Yêu thích'; }
+    if (label) {
+      label.textContent = on ? 'Bỏ thích' : 'Yêu thích';
+    }
+
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
 
-  document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('.js-fav-toggle'); if (!btn) return;
+  document.addEventListener('click', async function (e) {
+    // Guest: chỉ hiện modal
+    const guestBtn = e.target.closest('.js-fav-login-required');
+    if (guestBtn) {
+      e.preventDefault();
+      showLoginRequiredModal();
+      return;
+    }
+
+    // User đã login: xử lý toggle
+    const btn = e.target.closest('.js-fav-toggle');
+    if (!btn) { return; }
+
     const id = btn.dataset.id;
     const addUrl = btn.dataset.addUrl;
-    const delUrl = btn.dataset.delUrl?.replace('__ID__', id);
+    const rawDelUrl = btn.dataset.delUrl || '';
+    const delUrl = rawDelUrl.replace('__ID__', id);
     const isOn = btn.getAttribute('aria-pressed') === 'true';
+
+    if (!id || (!addUrl && !delUrl)) { return; }
 
     btn.disabled = true;
     try {
       if (!isOn) {
-        const { ok, data } = await api(addUrl, { method: 'POST', body: { product_id: id } });
-        if (ok) { setBtnState(btn, true); if (data?.count !== undefined) setWishlist(data.count); else bumpWishlist(+1); }
+        const res = await api(addUrl, { method: 'POST', body: { product_id: id } });
+        if (res.ok) {
+          setBtnState(btn, true);
+          if (res.data && res.data.count !== undefined) {
+            setWishlist(res.data.count);
+          } else {
+            bumpWishlist(1);
+          }
+        }
       } else {
-        const { ok, data } = await api(delUrl, { method: 'DELETE' });
-        if (ok) { setBtnState(btn, false); if (data?.count !== undefined) setWishlist(data.count); else bumpWishlist(-1); }
+        const res = await api(delUrl, { method: 'DELETE' });
+        if (res.ok) {
+          setBtnState(btn, false);
+          if (res.data && res.data.count !== undefined) {
+            setWishlist(res.data.count);
+          } else {
+            bumpWishlist(-1);
+          }
+        }
       }
     } finally {
       btn.disabled = false;

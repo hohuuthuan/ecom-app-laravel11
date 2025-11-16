@@ -42,7 +42,7 @@
           <div class="row">
             <div class="col-md-6 searchProduct">
               <label for="keyword" class="form-label mb-1 label-filter-admin-product">Tìm kiếm</label>
-              <input id="keyword" type="text" name="keyword" class="form-control" placeholder="Tìm mã / SDT / email / tên" value="{{ request('keyword') }}">
+              <input id="keyword" type="text" name="keyword" class="form-control" placeholder="Tìm theo mã / SDT / email / tên" value="{{ request('keyword') }}">
             </div>
             <div class="col-md-2">
               <label class="d-block mb-1">&nbsp;</label>
@@ -98,15 +98,15 @@
         <table id="orderTable" class="table table-bordered table-striped align-middle">
           <thead class="table-light">
             <tr>
-              <th class="checkAllWidth"><input type="checkbox" id="order_check_all"></th>
-              <th class="STT_Width">#</th>
-              <th>MÃ ĐƠN HÀNG</th>
-              <th>TÊN KHÁCH HÀNG \ SĐT</th>
-              <th>PHƯƠNG THỨC</th>
-              <th>NGÀY TẠO</th>
-              <th class="statusWidth">TT THANH TOÁN</th>
-              <th class="statusWidth">TRẠNG THÁI ĐƠN</th>
-              <th class="actionWidth text-center">THAO TÁC</th>
+              <th class="th-order-table checkAllWidth"><input type="checkbox" id="order_check_all"></th>
+              <th class="th-order-table STT_Width">#</th>
+              <th class="th-order-table th-order-code">MÃ ĐƠN HÀNG</th>
+              <th class="th-order-table">TÊN KHÁCH HÀNG \ SĐT</th>
+              <th class="th-order-table th-order-method">PHƯƠNG THỨC</th>
+              <th class="th-order-table th-date-order">NGÀY TẠO</th>
+              <th class="th-order-table statusWidth">TRẠNG THÁI THANH TOÁN</th>
+              <th class="th-order-table statusWidth">TRẠNG THÁI ĐƠN HÀNG</th>
+              <th class="th-order-table actionWidth text-center">THAO TÁC</th>
             </tr>
           </thead>
 
@@ -121,34 +121,72 @@
                 </a>
               </td>
               <td>
-                <div class="fw-semibold">{{ $order->shipment->name ?? '—' }} \ {{ $order->shipment->phone ?? $order->shipment->email ?? '—' }}</div>
+                <div>{{ $order->shipment->name ?? '—' }} \ {{ $order->shipment->phone ?? $order->shipment->email ?? '—' }}</div>
               </td>
-              <td>{{ $order->payment_method ?? '—' }}</td>
-              <td>{{ $order->placed_at }}</td>
+              <td>{{ strtoupper($order->payment_method ?? '—') }}</td>
+              <td>{{ $order->placed_at?->format('d/m/Y h:i A') }}</td>
+
+              {{-- TRẠNG THÁI THANH TOÁN --}}
               <td>
-                @if(strtoupper($order->payment_status ?? '') === 'PAID')
-                <span class="badge bg-success">PAID</span>
-                @elseif(strtoupper($order->payment_status ?? '') === 'UNPAID')
-                <span class="badge bg-secondary">UNPAID</span>
+                @php($payStatus = strtoupper($order->payment_status ?? ''))
+
+                @if($payStatus === 'PAID')
+                <span class="badge rounded-pill badge-status badge-status--success">
+                  Đã thanh toán
+                </span>
+                @elseif($payStatus === 'UNPAID')
+                <span class="badge bg-secondary"">
+                  Chưa thanh toán
+                </span>
                 @else
-                <span class="badge bg-secondary">—</span>
+                <span class="badge rounded-pill badge-status badge-status--primary">
+                  Không xác định
+                </span>
                 @endif
               </td>
+              
+              {{-- TRẠNG THÁI ĐƠN HÀNG --}}
               <td>
-                @switch(strtoupper($order->status ?? ''))
-                @case('CONFIRMED') <span class="badge bg-warning text-dark">CONFIRMED</span> @break
-                @case('PICKING') <span class="badge bg-info text-dark">PICKING</span> @break
-                @case('SHIPPED') <span class="badge bg-primary">SHIPPED</span> @break
-                @case('DELIVERED') <span class="badge bg-success">DELIVERED</span> @break
-                @case('CANCELLED') <span class="badge bg-danger">CANCELLED</span> @break
-                @case('RETURNED') <span class="badge bg-dark">RETURNED</span> @break
-                @default <span class="badge bg-secondary">PENDING</span>
-                @endswitch
+                @php($status = strtolower($order->status ?? ''))
+
+                @if($status === 'pending')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Chờ xử lý
+                </span>
+                @elseif($status === 'confirmed')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Đã xác nhận
+                </span>
+                @elseif($status === 'processing')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Đang xử lý
+                </span>
+                @elseif($status === 'shipping')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Đang giao
+                </span>
+                @elseif($status === 'delivered')
+                <span class="badge rounded-pill badge-status badge-status--success">
+                  Đã giao hàng
+                </span>
+                @elseif($status === 'completed')
+                <span class="badge rounded-pill badge-status badge-status--success">
+                  Hoàn tất
+                </span>
+                @elseif($status === 'cancelled')
+                <span class="badge rounded-pill badge-status badge-status--danger">
+                  Đã hủy
+                </span>
+                @else
+                <span class="badge rounded-pill badge-status badge-status--primary">
+                  Không xác định
+                </span>
+                @endif
               </td>
 
               <td class="text-center">
-                <a href="{{ route('admin.order.detail', $order->id) }}" class="btn btn-sm btn-outline-primary">
-                  <i class="fa fa-eye"></i>
+                <a href="{{ route('admin.order.detail', $order->id) }}">
+                  <i class="fa fa-eye icon-eye-view-order-detail"></i>
                 </a>
               </td>
             </tr>
@@ -159,6 +197,7 @@
             @endforelse
           </tbody>
         </table>
+
       </div>
       <div class="mt-3">
         {{ $orders->appends(request()->except('page'))->links('pagination::bootstrap-5') }}

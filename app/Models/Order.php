@@ -9,13 +9,38 @@ class Order extends Model
 {
     use HasUuids;
 
+    protected $casts = [
+        'placed_at'    => 'datetime',
+        'delivered_at' => 'datetime',
+        'cancelled_at' => 'datetime',
+    ];
+
     protected $guarded = [];
     public $incrementing = false;
     protected $keyType = 'string';
 
-    public function user()      { return $this->belongsTo(User::class); }
-    public function items()     { return $this->hasMany(OrderItem::class); }
-    public function shipment()  { return $this->hasOne(Shipment::class); } // 1 đơn = 1 shipment
-    public function payments()  { return $this->hasMany(Payment::class); }
-    public function discount()  { return $this->belongsTo(Discount::class); }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+    public function shipment()
+    {
+        return $this->hasOne(Shipment::class);
+    }
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+    public function discount()
+    {
+        return $this->belongsTo(Discount::class);
+    }
+    public function statusHistories()
+    {
+        return $this->hasMany(OrderStatusHistory::class);
+    }
 }

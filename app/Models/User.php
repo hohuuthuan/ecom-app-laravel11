@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -22,9 +23,9 @@ class User extends Authenticatable
   {
     return $this->belongsToMany(Role::class, 'role_user');
   }
-  public function addresses()
+  public function addresses(): HasMany
   {
-    return $this->hasMany(Address::class);
+    return $this->hasMany(Address::class, 'user_id');
   }
   public function reviews()
   {

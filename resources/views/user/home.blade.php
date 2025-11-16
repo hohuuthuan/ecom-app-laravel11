@@ -138,6 +138,7 @@
           Xem thêm <i class="fas fa-arrow-right ms-2"></i>
         </button>
       </div>
+
       @php
       $favIds = auth()->check()
       ? auth()->user()->favorites()->pluck('products.id')->all()
@@ -148,8 +149,9 @@
         @forelse($products as $product)
         @php
         $isFav = auth()->check()
-        ? in_array($product->id, auth()->user()->favorites()->pluck('products.id')->all(), true)
+        ? in_array($product->id, $favIds, true)
         : false;
+        $authorNames = optional($product->authors)->pluck('name')->join(', ');
         @endphp
 
         <div class="col-lg-4 col-md-6">
@@ -163,8 +165,6 @@
 
             <div class="card-body d-flex flex-column">
               <h6 class="card-title line-clamp-2 mb-1">{{ $product->title }}</h6>
-
-              @php $authorNames = optional($product->authors)->pluck('name')->join(', '); @endphp
               <p class="card-text text-muted mb-3">{{ $authorNames ?: 'Không rõ tác giả' }}</p>
 
               <div class="d-flex justify-content-between align-items-center mb-3">
@@ -179,7 +179,10 @@
                   @endif
                 </div>
 
+                @auth
+                {{-- Đã đăng nhập: toggle yêu thích bằng AJAX --}}
                 <button
+                  type="button"
                   class="btn btn-sm {{ $isFav ? 'btn-danger' : 'btn-outline-danger' }} js-fav-toggle"
                   data-id="{{ $product->id }}"
                   data-add-url="{{ route('addFavoriteProduct') }}"
@@ -188,10 +191,21 @@
                   <i class="bi {{ $isFav ? 'bi-heart-fill' : 'bi-heart' }}"></i>
                   <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Yêu thích' }}</span>
                 </button>
+                @else
+                {{-- Chưa đăng nhập: chỉ mở modal yêu cầu đăng nhập --}}
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger js-fav-login-required">
+                  <i class="bi bi-heart"></i>
+                  <span>Yêu thích</span>
+                </button>
+                @endauth
               </div>
 
               <div class="mt-auto d-grid gap-2">
-                <a href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}" class="btn btn-outline-primary">
+                <a
+                  href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
+                  class="btn btn-outline-primary">
                   <i class="fas fa-eye me-2"></i>Xem chi tiết
                 </a>
 
@@ -213,9 +227,9 @@
         </div>
         @endforelse
       </div>
-
     </div>
   </section>
+
 
   <!-- Testimonials Section -->
   <section class="py-5 bg-light">
@@ -326,6 +340,5 @@
     </div>
   </section>
 </div>
-
-
+@include('partials.ui.productDetail.noti-modal')
 @endsection

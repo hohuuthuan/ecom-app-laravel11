@@ -8,8 +8,6 @@
     --chip-border-green: #b6f2ca;
     --chip-bg-remove: #f8d7da;
     --chip-border-remove: #f1b0b7;
-
-
 }
 
 body {
@@ -37,7 +35,7 @@ a:hover {
 }
 
 .statusWidth {
-    width: 140px;
+    width: 250px;
 }
 
 .createTimeWidth {
@@ -46,6 +44,27 @@ a:hover {
 
 .actionWidth {
     width: 140px;
+}
+
+.icon-eye-view-order-detail {
+    font-size: 30px;
+    color: #0065a8;
+}
+
+.th-order-code {
+    width: 180px;
+}
+
+.th-date-order {
+    width: 200px;
+}
+
+.th-order-method {
+    width: 100px;
+}
+
+.th-order-table {
+    color: #00455a !important;
 }
 
 .btn-admin:hover,
@@ -167,6 +186,11 @@ textarea#ac_address {
 
 .select2-container--default .select2-selection--single.select2-invalid {
     border-color: #dc3545 !important;
+}
+
+.select2-container--default .select2-results>.select2-results__options {
+    max-height: 600px;
+    overflow-y: auto;
 }
 
 
@@ -1204,6 +1228,7 @@ table tbody td:first-child {
 }
 
 .copyable {
+    color: #017901;
     cursor: pointer
 }
 
@@ -1218,6 +1243,118 @@ table tbody td:first-child {
     color: #6b7280;
     letter-spacing: .04em
 }
+
+.order-detail-grand-total-title {
+    font-size: 25px;
+    font-weight: 700;
+    color: #006308;
+}
+
+.order-detail-grand-total-number {
+    color: #c90000;
+}
+
+.order-detail-icon-user {
+    font-size: 30px;
+}
+
+i.icon-delivery-address {
+    font-size: 20px;
+    color: #eb0000;
+}
+
+i.icon-telephone {
+    font-size: 20px;
+    color: #017901;
+}
+
+.order-detail-shipment-address {
+    padding-left: 19px;
+}
+
+/* Base timeline */
+
+
+.timeline-item {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 0.75rem;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 0.4rem;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: #0d6efd;
+}
+
+.timeline-item--primary::before {
+  background-color: #0d6efd;
+}
+
+.timeline-item--warning::before {
+  background-color: #ffc107;
+}
+
+.timeline-item--success::before {
+  background-color: #198754;
+}
+
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+/* Chấm tròn nhỏ phía trước */
+.badge-status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+/* Xanh biển – fallback (nếu có trạng thái lạ) */
+.badge-status--primary {
+  color: #0d6efd;
+  background-color: #e7f1ff;
+  border-color: rgba(13, 110, 253, 0.25);
+}
+
+/* Vàng – các trạng thái ở giữa flow */
+.badge-status--warning {
+  color: #b58100;
+  background-color: #fff5d6;
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+/* Xanh lá – đã giao / hoàn tất */
+.badge-status--success {
+  color: #0f5132;
+  background-color: #d1e7dd;
+  border-color: rgba(25, 135, 84, 0.35);
+}
+
+/* Đỏ – đơn bị hủy */
+.badge-status--danger {
+  color: #842029;
+  background-color: #f8d7da;
+  border-color: rgba(220, 53, 69, 0.35);
+}
+
 
 @media print {
     .no-print {

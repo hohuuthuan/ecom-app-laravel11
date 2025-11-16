@@ -231,3 +231,79 @@ function formatNumber(n) {
   applyClamp();
 })();
 /* ======================= END CHANGE QUANTITY (PRODUCT DETAIL) ======================= */
+
+/* ======================= LOAD IMAGE ======================= */
+document.addEventListener('DOMContentLoaded', function () {
+  var covers = document.querySelectorAll('.book-cover');
+
+  covers.forEach(function (cover) {
+    var img = cover.querySelector('.book-cover-img');
+    if (!img) { return; }
+
+    function markLoaded() {
+      cover.classList.add('is-loaded');
+    }
+
+    if (img.complete && img.naturalWidth > 0) {
+      markLoaded();
+      return;
+    }
+
+    img.addEventListener('load', markLoaded);
+    img.addEventListener('error', markLoaded);
+  });
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  var minInput = document.getElementById('priceRangeMin');
+  var maxInput = document.getElementById('priceRangeMax');
+  var bubbleMin = document.getElementById('priceBubbleMin');
+  var bubbleMax = document.getElementById('priceBubbleMax');
+  var selected = document.getElementById('priceRangeSelected');
+  var hiddenMin = document.querySelector('input[name="price_min"]');
+  var hiddenMax = document.querySelector('input[name="price_max"]');
+
+  if (!minInput || !maxInput || !bubbleMin || !bubbleMax || !selected) {
+    return;
+  }
+
+  var min = parseInt(minInput.min) || 0;
+  var max = parseInt(minInput.max) || 1;
+
+  function fmt(v) {
+    return Number(v || 0).toLocaleString('vi-VN') + 'đ';
+  }
+
+  function sync() {
+    var vMin = parseInt(minInput.value) || 0;
+    var vMax = parseInt(maxInput.value) || 0;
+
+    if (vMin > vMax) {
+      var tmp = vMin;
+      vMin = vMax;
+      vMax = tmp;
+    }
+
+    minInput.value = vMin;
+    maxInput.value = vMax;
+
+    var pMin = (vMin - min) * 100 / (max - min);
+    var pMax = (vMax - min) * 100 / (max - min);
+
+    bubbleMin.style.left = pMin + '%';
+    bubbleMax.style.left = pMax + '%';
+    bubbleMin.textContent = fmt(vMin);
+    bubbleMax.textContent = fmt(vMax);
+
+    selected.style.left = pMin + '%';
+    selected.style.right = (100 - pMax) + '%';
+
+    if (hiddenMin) hiddenMin.value = vMin;
+    if (hiddenMax) hiddenMax.value = vMax;
+  }
+
+  minInput.addEventListener('input', sync);
+  maxInput.addEventListener('input', sync);
+  sync();
+});

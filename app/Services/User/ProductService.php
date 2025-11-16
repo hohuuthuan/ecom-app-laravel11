@@ -83,16 +83,16 @@ class ProductService
     if (!empty($filters['publisher_id'])) {
       $query->where('publisher_id', (string)$filters['publisher_id']);
     }
-    if ($filters['price_min'] !== null && $filters['price_min'] !== '') {
+    if (!empty($filters['price_min']) && ($filters['price_min'] !== null && $filters['price_min'] !== '')) {
       $query->where('price', '>=', (int)$filters['price_min']);
     }
-    if ($filters['price_max'] !== null && $filters['price_max'] !== '') {
+    if (!empty($filters['price_max']) && ($filters['price_max'] !== null && $filters['price_max'] !== '')) {
       $query->where('price', '<=', (int)$filters['price_max']);
     }
-    if ($filters['stock_min'] !== null && $filters['stock_min'] !== '') {
+    if (!empty($filters['stock_min']) && ($filters['stock_min'] !== null && $filters['stock_min'] !== '')) {
       $query->where('stock', '>=', (int)$filters['stock_min']);
     }
-    if ($filters['stock_max'] !== null && $filters['stock_max'] !== '') {
+    if (!empty($filters['stock_max']) && ($filters['stock_max'] !== null && $filters['stock_max'] !== '')) {
       $query->where('stock', '<=', (int)$filters['stock_max']);
     }
 
@@ -107,6 +107,73 @@ class ProductService
     $products = $query->orderByDesc('created_at')->paginate($perPage);
 
     return PaginationHelper::appendQuery($products);
+  }
+
+  public function listProduct(array $filters = [])
+  {
+    $query = Product::query()
+      ->select(['id', 'title', 'image', 'slug', 'isbn', 'selling_price_vnd', 'status', 'publisher_id', 'created_at'])
+      ->with([
+        'categories:id,name',
+        'authors:id,name',
+        'publisher:id,name',
+        'stocks:product_id,on_hand,reserved',
+      ]);
+
+    if (!empty($filters['keyword'])) {
+      $kw = trim((string) $filters['keyword']);
+      $query->where(function ($q) use ($kw) {
+        $q->where('title', 'LIKE', "%{$kw}%")
+          ->orWhere('slug', 'LIKE', "%{$kw}%")
+          ->orWhere('isbn', 'LIKE', "%{$kw}%");
+      });
+    }
+
+    if (!empty($filters['category_id'])) {
+      $categoryId = (string) $filters['category_id'];
+      $query->whereHas('categories', function ($q) use ($categoryId) {
+        $q->where('categories.id', $categoryId);
+      });
+    }
+
+    if (!empty($filters['author_id'])) {
+      $authorId = (string) $filters['author_id'];
+      $query->whereHas('authors', function ($q) use ($authorId) {
+        $q->where('authors.id', $authorId);
+      });
+    }
+
+    if (!empty($filters['publisher_id'])) {
+      $query->where('publisher_id', (string) $filters['publisher_id']);
+    }
+
+    $priceMin = $filters['price_min'] ?? null;
+    if ($priceMin !== null && $priceMin !== '') {
+      $query->where('selling_price_vnd', '>=', (int) $priceMin);
+    }
+
+    $priceMax = $filters['price_max'] ?? null;
+    if ($priceMax !== null && $priceMax !== '') {
+      $query->where('selling_price_vnd', '<=', (int) $priceMax);
+    }
+
+    $perPage = (int) ($filters['per_page'] ?? 9);
+    if ($perPage <= 0) {
+      $perPage = 9;
+    }
+    if ($perPage > 200) {
+      $perPage = 200;
+    }
+
+    $products = $query->orderByDesc('created_at')->paginate($perPage);
+
+    return PaginationHelper::appendQuery($products);
+  }
+
+
+  public function getMaxSellingPrice(): int
+  {
+    return (int) Product::query()->max('selling_price_vnd');
   }
 
   public function create(array $data, UploadedFile $image): bool

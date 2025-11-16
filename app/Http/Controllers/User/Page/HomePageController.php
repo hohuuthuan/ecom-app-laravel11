@@ -189,4 +189,26 @@ class HomePageController extends Controller
       'order' => $order,
     ]);
   }
+
+  public function listProduct(Request $request)
+  {
+    $filters = [
+      'per_page'     => (int)$request->query('per_page_product', 9),
+      'keyword'      => $request->query('keyword'),
+      'status'       => $request->query('status'),
+      'category_id'  => $request->query('category_id'),
+      'author_id'    => $request->query('author_id'),
+      'publisher_id' => $request->query('publisher_id'),
+      'price_min'    => $request->query('price_min'),
+      'price_max'    => $request->query('price_max'),
+    ];
+
+    $categories = $this->productService->getListCategory();
+    $authors    = $this->productService->getListAuthor();
+    $publishers = $this->productService->getListPublisher();
+    $products   = $this->productService->listProduct($filters);
+    $maxPrice   = $this->productService->getMaxSellingPrice();
+
+    return view('user.listProduct', compact('categories', 'authors', 'publishers', 'products', 'maxPrice'));
+  }
 }

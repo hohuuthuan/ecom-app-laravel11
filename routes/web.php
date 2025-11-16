@@ -20,7 +20,8 @@ use App\Http\Controllers\Admin\ProductController;
 
 // === PUBLIC ===
 Route::get('/', [HomePageController::class, 'index'])->name('home');
-Route::get('product/{slug}/{id}', [HomePageController::class, 'productDetail'])->name('product.detail');
+Route::get('/product', [HomePageController::class, 'listProduct'])->name('product.list');
+Route::get('/product/{slug}/{id}', [HomePageController::class, 'productDetail'])->name('product.detail');
 Route::get('/cart', [HomePageController::class, 'cartPage'])->name('cart');
 Route::post('/cart/add', [HomePageController::class, 'addItemToCart'])->name('cart.item.add');
 Route::patch('/cart/item/{key}', [HomePageController::class, 'updateQuantityItemInCart'])->name('cart.item.update');

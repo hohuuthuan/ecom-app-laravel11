@@ -54,11 +54,11 @@
 
           <div class="mb-4">
             <span class="h2 text-danger me-3">
-              {{ number_format((int)($product->selling_price_vnd ?? 0), 0, ',', '.') }}đ
+              {{ number_format((int)($product->selling_price_vnd ?? 0), 0, ',', '.') }} VNĐ
             </span>
             @if(!empty($product->original_price_vnd) && (int)$product->original_price_vnd > (int)($product->selling_price_vnd ?? 0))
             <span class="h5 text-muted text-decoration-line-through">
-              {{ number_format((int)$product->original_price_vnd, 0, ',', '.') }}đ
+              {{ number_format((int)$product->original_price_vnd, 0, ',', '.') }} VNĐ
             </span>
             @endif
           </div>

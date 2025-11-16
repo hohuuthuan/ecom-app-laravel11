@@ -13,22 +13,8 @@
         <li class="nav-item">
           <a class="nav-link active" href="{{ route('home') }}">Trang chủ</a>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-            Danh mục
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#"><i class="fas fa-heart me-2"></i>Tiểu thuyết</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-briefcase me-2"></i>Kinh doanh</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-brain me-2"></i>Tâm lý</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-child me-2"></i>Thiếu nhi</a></li>
-          </ul>
-        </li>
         <li class="nav-item">
-          <a class="nav-link" href="#bestsellers">Bán chạy</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#contact">Liên hệ</a>
+          <a class="nav-link active" href="{{ route('product.list') }}">Sản phẩm</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#" onclick="navigateToPage('about')">Giới thiệu</a>

@@ -156,25 +156,32 @@
 
         <div class="col-lg-4 col-md-6">
           <div class="card book-card h-100">
-            <div class="book-cover p-0">
+            <div class="book-cover">
               <img
                 src="{{ asset('storage/products/'.$product->image) }}"
                 alt="{{ $product->title }}"
-                class="w-100">
+                class="book-cover-img"
+                loading="lazy">
             </div>
 
             <div class="card-body d-flex flex-column">
-              <h6 class="card-title line-clamp-2 mb-1">{{ $product->title }}</h6>
+              <h6 class="card-title line-clamp-2 mb-1">
+                <a
+                  href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
+                  class="text-body text-decoration-none">
+                  {{ $product->title }}
+                </a>
+              </h6>
               <p class="card-text text-muted mb-3">{{ $authorNames ?: 'Không rõ tác giả' }}</p>
 
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
                   <span class="price">
-                    {{ number_format((int)$product->selling_price_vnd, 0, ',', '.') }}đ
+                    {{ number_format((int)$product->selling_price_vnd, 0, ',', '.') }} VNĐ
                   </span>
                   @if(!empty($product->listed_price_vnd) && (int)$product->listed_price_vnd > (int)$product->selling_price_vnd)
                   <small class="text-muted text-decoration-line-through ms-2">
-                    {{ number_format((int)$product->listed_price_vnd, 0, ',', '.') }}đ
+                    {{ number_format((int)$product->listed_price_vnd, 0, ',', '.') }} VNĐ
                   </small>
                   @endif
                 </div>

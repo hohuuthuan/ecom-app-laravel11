@@ -3,10 +3,9 @@
 /public/build
 /public/hot
 /public/storage
-/storage/*.key
-/storage/pail
-/vendor
 /storage
+/vendor
+bun.lock
 .env
 .env.backup
 .env.production

@@ -165,7 +165,27 @@ class ProductService
       $perPage = 200;
     }
 
-    $products = $query->orderByDesc('created_at')->paginate($perPage);
+    $sortBy = $filters['sort_by'] ?? 'latest';
+    switch ($sortBy) {
+      case 'price_asc':
+        $query->orderBy('selling_price_vnd', 'asc');
+        break;
+      case 'price_desc':
+        $query->orderBy('selling_price_vnd', 'desc');
+        break;
+      case 'title_asc':
+        $query->orderBy('title', 'asc');
+        break;
+      case 'title_desc':
+        $query->orderBy('title', 'desc');
+        break;
+      case 'latest':
+      default:
+        $query->orderByDesc('created_at');
+        break;
+    }
+
+    $products = $query->paginate($perPage);
 
     return PaginationHelper::appendQuery($products);
   }

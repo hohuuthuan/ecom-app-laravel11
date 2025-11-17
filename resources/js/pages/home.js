@@ -231,28 +231,166 @@ function formatNumber(n) {
   applyClamp();
 })();
 /* ======================= END CHANGE QUANTITY (PRODUCT DETAIL) ======================= */
-
-/* ======================= LOAD IMAGE ======================= */
+/* ======================= LOAD IMAGE + SORT/FILTER/PAGINATION ======================= */
 document.addEventListener('DOMContentLoaded', function () {
-  var covers = document.querySelectorAll('.book-cover');
+  // ================== HÀM KHỞI TẠO SKELETON ẢNH ==================
+  function initBookCovers(root) {
+    var scope = root || document;
+    var imgs = scope.querySelectorAll('.book-cover .book-cover-img');
 
-  covers.forEach(function (cover) {
-    var img = cover.querySelector('.book-cover-img');
-    if (!img) { return; }
+    imgs.forEach(function (img) {
+      if (img.dataset.skeletonBound === '1') {
+        return;
+      }
+      img.dataset.skeletonBound = '1';
 
-    function markLoaded() {
-      cover.classList.add('is-loaded');
+      function markLoaded() {
+        var wrapper = img.closest('.book-cover');
+        if (wrapper && !wrapper.classList.contains('is-loaded')) {
+          wrapper.classList.add('is-loaded');
+        }
+      }
+
+      if (img.complete && img.naturalWidth > 0) {
+        markLoaded();
+      } else {
+        img.addEventListener('load', markLoaded, { once: true });
+        img.addEventListener('error', markLoaded, { once: true });
+      }
+    });
+  }
+
+  // Gọi lần đầu cho DOM hiện tại
+  initBookCovers(document);
+
+  // ================== PHẦN SORT / FILTER / PAGINATION ==================
+  var productListWrapper = document.getElementById('product-list-wrapper');
+  var sortBySelect = document.getElementById('sort_by');
+  var filterForm = document.getElementById('product-filter-form');
+  var listUrlBase = productListWrapper
+    ? productListWrapper.getAttribute('data-list-url') || ''
+    : '';
+
+  function buildUrlFromParams(params) {
+    var qs = params.toString();
+    if (!listUrlBase) {
+      // fallback: dùng URL hiện tại
+      return qs ? (window.location.pathname + '?' + qs) : window.location.pathname;
+    }
+    return qs ? (listUrlBase + '?' + qs) : listUrlBase;
+  }
+
+  function getCurrentFilters() {
+    var params = new URLSearchParams(window.location.search);
+
+    if (filterForm) {
+      var formData = new FormData(filterForm);
+      formData.forEach(function (value, key) {
+        if (value) {
+          params.set(key, value);
+        } else {
+          params.delete(key);
+        }
+      });
     }
 
-    if (img.complete && img.naturalWidth > 0) {
-      markLoaded();
+    if (sortBySelect) {
+      params.set('sort_by', sortBySelect.value);
+    }
+
+    return params;
+  }
+
+  async function fetchProducts(url, isPagination) {
+    if (!productListWrapper) {
       return;
     }
 
-    img.addEventListener('load', markLoaded);
-    img.addEventListener('error', markLoaded);
-  });
+    productListWrapper.style.opacity = '0.5';
+
+    try {
+      var response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'text/html'
+        }
+      });
+
+      if (!response.ok) {
+        console.error('fetchProducts status:', response.status, response.statusText);
+        throw new Error('Network response was not ok');
+      }
+
+      var html = await response.text();
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(html, 'text/html');
+
+      var newWrapper = doc.getElementById('product-list-wrapper');
+
+      if (newWrapper) {
+        productListWrapper.innerHTML = newWrapper.innerHTML;
+        window.history.pushState({}, '', url);
+        initBookCovers(productListWrapper);
+      } else {
+        var container = doc.querySelector('.container');
+        if (container) {
+          productListWrapper.innerHTML = container.innerHTML;
+          window.history.pushState({}, '', url);
+          initBookCovers(productListWrapper);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      alert('Đã xảy ra lỗi khi tải sản phẩm. Vui lòng thử lại.');
+    } finally {
+      productListWrapper.style.opacity = '1';
+      if (!isPagination) {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }
+
+  // 1. Sắp xếp
+  if (sortBySelect) {
+    sortBySelect.addEventListener('change', function () {
+      var params = getCurrentFilters();
+      params.delete('page');
+      var url = buildUrlFromParams(params);
+      fetchProducts(url, false);
+    });
+  }
+
+  // 2. Phân trang (event delegation)
+  if (productListWrapper) {
+    productListWrapper.addEventListener('click', function (e) {
+      var paginationLink = e.target.closest('.pagination a');
+      if (!paginationLink) {
+        return;
+      }
+      e.preventDefault();
+      var pageUrl = paginationLink.href;
+      if (pageUrl) {
+        fetchProducts(pageUrl, true);
+      }
+    });
+  }
+
+  // 3. Filter form
+  if (filterForm) {
+    filterForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var params = getCurrentFilters();
+      params.delete('page');
+      var url = buildUrlFromParams(params);
+      fetchProducts(url, false);
+    });
+  }
 });
+/* ======================= END LOAD IMAGE + SORT/FILTER/PAGINATION ======================= */
 
 
 document.addEventListener('DOMContentLoaded', function () {

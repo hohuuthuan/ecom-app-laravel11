@@ -25,8 +25,9 @@ $favIds = auth()->check()
       <form
         method="GET"
         action="{{ route('product.list') }}"
-        class="row g-3 align-items-end">
-
+        class="row g-3 align-items-end"
+        id="product-filter-form" data-no-loading>
+    
         {{-- THỂ LOẠI --}}
         <div class="col-lg-2 col-md-6">
           <label class="form-label mb-1">Thể loại</label>
@@ -150,94 +151,118 @@ $favIds = auth()->check()
     </div>
     {{-- HẾT BỘ LỌC --}}
 
+    {{-- BẮT ĐẦU: THANH SẮP XẾP --}}
+    <div class="d-flex justify-content-end mb-3">
+      <div class="col-lg-3 col-md-6">
+        <label for="sort_by" class="form-label mb-1">Sắp xếp theo</label>
+        <select class="form-select" id="sort_by" name="sort_by">
+          <option value="latest" @selected(request('sort_by')=='latest' || !request('sort_by'))>Mới nhất</option>
+          <option value="price_asc" @selected(request('sort_by')=='price_asc' )>Giá: Tăng dần</option>
+          <option value="price_desc" @selected(request('sort_by')=='price_desc' )>Giá: Giảm dần</option>
+          <option value="title_asc" @selected(request('sort_by')=='title_asc' )>Tên: A-Z</option>
+          <option value="title_desc" @selected(request('sort_by')=='title_desc' )>Tên: Z-A</option>
+        </select>
+      </div>
+    </div>
+    {{-- KẾT THÚC: THANH SẮP XẾP --}}
+
+
     @if($products->isEmpty())
-    <div class="text-center py-5">
+    <div
+      class="text-center py-5"
+      id="product-list-wrapper"
+      data-list-url="{{ route('product.list') }}">
       <h5 class="mb-3">Chưa có sản phẩm</h5>
       <a href="{{ route('home') }}" class="btn btn-primary">Về trang chủ</a>
     </div>
     @else
-    <div class="row g-4" id="booksContainer">
-      @forelse($products as $product)
-      @php $isFav = in_array($product->id, $favIds, true); @endphp
-      <div class="col-lg-4 col-md-6">
-        <div class="card book-card h-100">
-          <div class="book-cover">
-            <img
-              src="{{ asset('storage/products/'.$product->image) }}"
-              alt="{{ $product->title }}"
-              class="book-cover-img"
-              loading="lazy">
-          </div>
-
-          <div class="card-body d-flex flex-column">
-            <h6 class="card-title line-clamp-2 mb-1">
-              <a
-                href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
-                class="text-body text-decoration-none">
-                {{ $product->title }}
-              </a>
-            </h6>
-
-            @php
-            $authorNames = optional($product->authors)->pluck('name')->join(', ');
-            @endphp
-            <p class="card-text text-muted mb-3">{{ $authorNames ?: 'Không rõ tác giả' }}</p>
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <div>
-                <span class="price">
-                  {{ number_format($product->selling_price_vnd, 0, ',', '.') }} VNĐ
-                </span>
-                @if(!empty($product->listed_price_vnd) && $product->listed_price_vnd > $product->selling_price_vnd)
-                <small class="text-muted text-decoration-line-through ms-2">
-                  {{ number_format($product->listed_price_vnd, 0, ',', '.') }} VNĐ
-                </small>
-                @endif
-              </div>
-
-              <button
-                class="btn btn-sm {{ $isFav ? 'btn-danger' : 'btn-outline-danger' }} js-fav-toggle"
-                data-id="{{ $product->id }}"
-                data-add-url="{{ route('addFavoriteProduct') }}"
-                data-del-url="{{ route('destroyFavoriteProduct', '__ID__') }}"
-                aria-pressed="{{ $isFav ? 'true' : 'false' }}">
-                <i class="bi {{ $isFav ? 'bi-heart-fill' : 'bi-heart' }}"></i>
-                <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Thích' }}</span>
-              </button>
+    {{-- BẮT ĐẦU: WRAPPER CHO SẢN PHẨM VÀ PHÂN TRANG (CHO AJAX) --}}
+    <div id="product-list-wrapper">
+      <div class="row g-4" id="booksContainer">
+        @forelse($products as $product)
+        @php $isFav = in_array($product->id, $favIds, true); @endphp
+        <div class="col-lg-4 col-md-6">
+          <div class="card book-card h-100">
+            <div class="book-cover">
+              <img
+                src="{{ asset('storage/products/'.$product->image) }}"
+                alt="{{ $product->title }}"
+                class="book-cover-img" {{-- <-- PHẢI CÓ CLASS NÀY --}}
+                loading="lazy">
             </div>
 
-            <div class="mt-auto d-grid gap-2">
-              <a href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}" class="btn btn-outline-primary">
-                <i class="fas fa-eye me-2"></i>Xem chi tiết
-              </a>
+            <div class="card-body d-flex flex-column">
+              <h6 class="card-title line-clamp-2 mb-1">
+                <a
+                  href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
+                  class="text-body text-decoration-none">
+                  {{ $product->title }}
+                </a>
+              </h6>
 
-              <form
-                action="{{ route('cart.item.add') }}"
-                method="POST"
-                class="flex-fill d-flex add-to-cart-form"
-                data-no-loading>
-                @csrf
-                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                <input type="hidden" name="qty" value="1">
+              @php
+              $authorNames = optional($product->authors)->pluck('name')->join(', ');
+              @endphp
+              <p class="card-text text-muted mb-3">{{ $authorNames ?: 'Không rõ tác giả' }}</p>
+
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <span class="price">
+                    {{ number_format($product->selling_price_vnd, 0, ',', '.') }} VNĐ
+                  </span>
+                  @if(!empty($product->listed_price_vnd) && $product->listed_price_vnd > $product->selling_price_vnd)
+                  <small class="text-muted text-decoration-line-through ms-2">
+                    {{ number_format($product->listed_price_vnd, 0, ',', '.') }} VNĐ
+                  </small>
+                  @endif
+                </div>
+
                 <button
-                  type="submit"
-                  class="btn btn-primary btn-lg w-100">
-                  <i class="fas fa-cart-plus me-2" aria-hidden="true"></i>Thêm vào giỏ
+                  class="btn btn-sm {{ $isFav ? 'btn-danger' : 'btn-outline-danger' }} js-fav-toggle"
+                  data-id="{{ $product->id }}"
+                  data-add-url="{{ route('addFavoriteProduct') }}"
+                  data-del-url="{{ route('destroyFavoriteProduct', '__ID__') }}"
+                  aria-pressed="{{ $isFav ? 'true' : 'false' }}">
+                  <i class="bi {{ $isFav ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                  <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Thích' }}</span>
                 </button>
-              </form>
+              </div>
+
+              <div class="mt-auto d-grid gap-2">
+                <a href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}" class="btn btn-outline-primary">
+                  <i class="fas fa-eye me-2"></i>Xem chi tiết
+                </a>
+
+                <form
+                  action="{{ route('cart.item.add') }}"
+                  method="POST"
+                  class="flex-fill d-flex add-to-cart-form"
+                  data-no-loading>
+                  @csrf
+                  <input type="hidden" name="product_id" value="{{ $product->id }}">
+                  <input type="hidden" name="qty" value="1">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-lg w-100">
+                    <i class="fas fa-cart-plus me-2" aria-hidden="true"></i>Thêm vào giỏ
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         </div>
+        @empty
+        <div class="col-12">
+          <p class="text-muted mb-0">Chưa có sản phẩm.</p>
+        </div>
+        @endforelse
       </div>
-      @empty
-      <div class="col-12">
-        <p class="text-muted mb-0">Chưa có sản phẩm.</p>
+
+      <div class="mt-3" id="pagination-links">
+        {{ $products->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
       </div>
-      @endforelse
     </div>
-    <div class="mt-3">
-      {{ $products->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
-    </div>
+    {{-- KẾT THÚC: WRAPPER --}}
     @endif
   </div>
 </section>

@@ -201,6 +201,7 @@ class HomePageController extends Controller
       'publisher_id' => $request->query('publisher_id'),
       'price_min'    => $request->query('price_min'),
       'price_max'    => $request->query('price_max'),
+      'sort_by'      => $request->query('sort_by'),
     ];
 
     $categories = $this->productService->getListCategory();

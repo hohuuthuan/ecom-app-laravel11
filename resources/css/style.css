@@ -29,6 +29,31 @@ a {
   --dark-text: #2c3e50;
 }
 
+.header-search{
+  width: 400px;
+}
+
+.header-search .form-control{
+  border-radius: 0px !important;
+}
+
+.header-search .form-control:focus {
+    border-color: #0b99c4 !important;
+    box-shadow: 0 0 0 1px rgba(54, 155, 153, 0.922) !important;
+}
+
+.header-search button {
+  border-color: rgba(54, 155, 153, 0.922);
+}
+
+.header-search button:hover {
+  border-color: rgba(54, 155, 153, 0.922);
+}
+
+.header-search i.search-icon{
+  color: rgba(54, 155, 153, 0.922);
+}
+
 .navbar-brand {
   font-weight: 700;
   font-size: 1.8rem;

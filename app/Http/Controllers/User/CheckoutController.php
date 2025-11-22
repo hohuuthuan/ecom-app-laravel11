@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Services\Payments\MomoGateway;
+
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -220,7 +222,7 @@ class CheckoutController extends Controller
         return $result;
     }
 
-    public function placeOrderMethodCOD(Request $request, CheckoutService $checkoutService, CartService $cartService)
+    public function placeOrder(Request $request, CheckoutService $checkoutService, CartService $cartService)
     {
         $data = $request->validate([
             'receiver_name'       => ['required', 'string', 'max:255'],
@@ -234,10 +236,9 @@ class CheckoutController extends Controller
             // 'buyer_note'          => ['nullable', 'string', 'max:1000'],
         ]);
 
-        // Tạm thời chỉ cho COD
-        if ($data['payment_method'] !== 'cod') {
+        if ($data['payment_method'] === 'vnpay') {
             return back()
-                ->with('toast_error', 'Phương thức thanh toán này hiện chưa được hỗ trợ')
+                ->with('toast_error', 'Thanh toán VNPAY hiện chưa được hỗ trợ')
                 ->withInput();
         }
 
@@ -416,6 +417,28 @@ class CheckoutController extends Controller
             }
         }
 
+        if ($data['payment_method'] === 'momo') {
+            $orderData['payment_method'] = 'momo';
+            $orderData['payment_status'] = 'pending';
+
+            $request->session()->put('checkout.momo_pending', [
+                'orderData'       => $orderData,
+                'orderItemsData'  => $orderItemsData,
+                'shipmentData'    => $shipmentData,
+                'orderBatchesData' => $orderBatchesData,
+                'items'           => $items,
+            ]);
+
+            $gateway = new MomoGateway(config('payment.momo'));
+            $payUrl  = $gateway->createPaymentUrl(
+                $orderData['code'],
+                (int) $orderData['grand_total_vnd'],
+                'Thanh toán đơn hàng #' . $orderData['code']
+            );
+
+            return redirect()->away($payUrl);
+        }
+
         // Lưu DB qua service
         $order = $checkoutService->placeCodOrder(
             $orderData,
@@ -425,10 +448,8 @@ class CheckoutController extends Controller
         );
 
         if ($order) {
-            // 1) Clear session checkout (đúng key đang dùng trong enter/index)
             $request->session()->forget(['checkout.items', 'checkout.expires_at']);
 
-            // 2) Xóa những sản phẩm đã đặt khỏi giỏ hàng (dùng CartService cho thống nhất)
             foreach (array_keys($items) as $productId) {
                 $cartService->removeItemInCart((string) $productId);
             }
@@ -440,5 +461,59 @@ class CheckoutController extends Controller
 
         return back()
             ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
+    }
+
+    public function momoReturn(Request $request, CheckoutService $checkoutService, CartService $cartService)
+    {
+        $pending = $request->session()->get('checkout.momo_pending');
+
+        if (!$pending) {
+            return redirect()
+                ->route('cart')
+                ->with('toast_error', 'Không tìm thấy thông tin đơn hàng chờ thanh toán.');
+        }
+
+        $resultCode = (int) $request->input('resultCode', -1);
+        if ($resultCode !== 0) {
+            $request->session()->forget('checkout.momo_pending');
+
+            return redirect()
+                ->route('checkout')
+                ->with('toast_error', 'Thanh toán MoMo thất bại hoặc bị hủy.');
+        }
+
+        $orderData        = $pending['orderData'];
+        $orderItemsData   = $pending['orderItemsData'];
+        $shipmentData     = $pending['shipmentData'];
+        $orderBatchesData = $pending['orderBatchesData'];
+        $items            = $pending['items'];
+
+        // Cập nhật trạng thái thanh toán trước khi insert
+        $orderData['payment_method'] = 'momo';
+        $orderData['payment_status'] = 'paid';
+
+        $order = $checkoutService->placeCodOrder(
+            $orderData,
+            $orderItemsData,
+            $shipmentData,
+            $orderBatchesData
+        );
+
+        $request->session()->forget('checkout.momo_pending');
+        $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+
+        if ($order) {
+            foreach (array_keys($items) as $productId) {
+                $cartService->removeItemInCart((string) $productId);
+            }
+
+            return redirect()
+                ->route('user.thanks', ['code' => $order->code])
+                ->with('toast_success', 'Thanh toán MoMo thành công, đơn hàng đã được tạo.');
+        }
+
+        return redirect()
+            ->route('checkout')
+            ->with('toast_error', 'Có lỗi xảy ra khi tạo đơn sau khi thanh toán MoMo.');
     }
 }

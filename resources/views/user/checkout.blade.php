@@ -198,7 +198,7 @@
       {{-- FORM ĐẶT HÀNG (COD) --}}
       <form
         id="placeOrderForm"
-        action="{{ route('checkout.placeOrderMethodCOD') }}"
+        action="{{ route('checkout.placeOrder') }}"
         method="POST">
         @csrf
         <div class="summary-section">

@@ -10,4 +10,12 @@ return [
         'ipn_url'      => env('MOMO_IPN_URL'),
         'endpoint'     => env('MOMO_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create'),
     ],
+
+    'vnpay' => [
+        'tmn_code'    => env('VNPAY_TMN_CODE'),
+        'hash_secret' => env('VNPAY_HASH_SECRET'),
+        'return_url'  => env('VNPAY_RETURN_URL'),
+        'payment_url' => env('VNPAY_PAYMENT_URL', 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'),
+        'bank_code'   => env('VNPAY_BANK_CODE'),
+    ],
 ];

@@ -59,6 +59,54 @@ function formatNumber(n) {
 }
 /*  ====================================================================== END HOME ANIMATE NUMBER ====================================================================== */
 
+/*  ====================================================================== ANIMATED ROTATING PLACEHOLDER ====================================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+  const input = document.getElementById('searchInput');
+  if (!input) return;
+
+  const phrases = [
+    'Tìm kiếm sách...',
+    'Nhập tên sách bạn muốn tìm...',
+    'Ví dụ: Dế Mèn Phiêu Lưu Ký',
+    'Hoặc nhập tên tác giả, thể loại...'
+  ];
+
+  let phraseIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+
+  const typeSpeed = 30; // tốc độ gõ
+  const eraseSpeed = 30; // tốc độ xoá
+  const delayBetween = 1200; // dừng lại khi gõ xong 1 câu
+
+  function typeLoop() {
+    const phrase = phrases[phraseIndex];
+
+    if (!isDeleting) {
+      charIndex++;
+      input.placeholder = phrase.slice(0, charIndex);
+
+      if (charIndex === phrase.length) {
+        isDeleting = true;
+        setTimeout(typeLoop, delayBetween);
+        return;
+      }
+    } else {
+      charIndex--;
+      input.placeholder = phrase.slice(0, charIndex);
+
+      if (charIndex === 0) {
+        isDeleting = false;
+        phraseIndex = (phraseIndex + 1) % phrases.length;
+      }
+    }
+
+    setTimeout(typeLoop, isDeleting ? eraseSpeed : typeSpeed);
+  }
+
+  typeLoop();
+});
+
 
 /* =============================== FAVORITE PRODUCT =============================== */
 (function () {

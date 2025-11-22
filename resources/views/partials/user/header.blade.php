@@ -17,18 +17,19 @@
           <a class="nav-link active" href="{{ route('product.list') }}">Sản phẩm</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" onclick="navigateToPage('about')">Giới thiệu</a>
+          <a class="nav-link" href="#">Giới thiệu</a>
         </li>
       </ul>
 
       <div class="d-flex align-items-center">
-        <div class="input-group me-3" style="width: 300px;">
-          <input type="text" class="form-control" placeholder="Tìm kiếm sách..." id="searchInput">
-          <button class="btn btn-outline-primary" type="button" onclick="performSearch()">
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
-
+        <form action="{{ route('product.list') }}">
+          <div class="input-group me-3 header-search">
+            <input name="keyword" value="{{ request('keyword') }}" type="text" class="form-control" placeholder="Tìm kiếm sách..." id="searchInput" required>
+            <button class="btn" type="submit">
+              <i class="search-icon fas fa-search"></i>
+            </button>
+          </div>
+        </form>
         <div class="d-flex align-items-center">
           <!-- Wishlist -->
           @php

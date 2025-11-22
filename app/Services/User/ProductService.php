@@ -123,9 +123,17 @@ class ProductService
     if (!empty($filters['keyword'])) {
       $kw = trim((string) $filters['keyword']);
       $query->where(function ($q) use ($kw) {
-        $q->where('title', 'LIKE', "%{$kw}%")
-          ->orWhere('slug', 'LIKE', "%{$kw}%")
-          ->orWhere('isbn', 'LIKE', "%{$kw}%");
+        $like = "%{$kw}%";
+
+        $q->where('title', 'LIKE', $like)
+          ->orWhere('slug', 'LIKE', $like)
+          ->orWhere('isbn', 'LIKE', $like)
+          ->orWhereHas('authors', function ($qa) use ($like) {
+            $qa->where('name', 'LIKE', $like);
+          })
+          ->orWhereHas('categories', function ($qc) use ($like) {
+            $qc->where('name', 'LIKE', $like);
+          });
       });
     }
 
@@ -189,7 +197,6 @@ class ProductService
 
     return PaginationHelper::appendQuery($products);
   }
-
 
   public function getMaxSellingPrice(): int
   {

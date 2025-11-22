@@ -58,6 +58,7 @@
               <select id="payment_method" name="payment_method" class="form-select setupSelect2">
                 <option value="">-- Tất cả phương thức --</option>
                 <option value="COD" {{ request('payment_method')==='COD'?'selected':'' }}>COD</option>
+                <option value="MOMO" {{ request('payment_method')==='MOMO'?'selected':'' }}>MOMO</option>
                 <option value="VNPAY" {{ request('payment_method')==='VNPAY'?'selected':'' }}>VNPAY</option>
               </select>
             </div>

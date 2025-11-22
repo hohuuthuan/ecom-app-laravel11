@@ -49,8 +49,10 @@ Route::middleware(['auth'])->group(function () {
 
   Route::post('/checkout', [CheckoutController::class, 'enter'])->name('checkout.index');
   Route::get('/checkout', [CheckoutController::class, 'index'])->middleware(['checkout.valid'])->name('checkout.page');
-  Route::post('/checkout/placeOrderMethodCOD', [CheckoutController::class, 'placeOrderMethodCOD'])->name('checkout.placeOrderMethodCOD');
-
+  Route::post('/checkout/placeOrder', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
+  Route::get('/checkout/momo/return', [CheckoutController::class, 'momoReturn'])->name('checkout.momoReturn');
+  Route::get('/checkout/vnpay/return', [CheckoutController::class, 'vnpayReturn'])->name('checkout.vnpayReturn');
+  
   Route::prefix('profile')->name('user.profile.')->group(function () {
     Route::get('/', [UserAddressController::class, 'index'])->name('index');
     Route::get('/wards', [UserAddressController::class, 'getWards'])->name('wards');

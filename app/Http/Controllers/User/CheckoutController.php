@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Services\Payments\MomoGateway;
+use App\Services\Payments\VnpayGateway;
+
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -15,6 +18,7 @@ use App\Services\User\CartService;
 use App\Services\User\CheckoutService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
 {
@@ -220,7 +224,7 @@ class CheckoutController extends Controller
         return $result;
     }
 
-    public function placeOrderMethodCOD(Request $request, CheckoutService $checkoutService, CartService $cartService)
+    public function placeOrder(Request $request, CheckoutService $checkoutService, CartService $cartService)
     {
         $data = $request->validate([
             'receiver_name'       => ['required', 'string', 'max:255'],
@@ -233,13 +237,6 @@ class CheckoutController extends Controller
             'discount_code'       => ['nullable', 'string', 'max:50'],
             // 'buyer_note'          => ['nullable', 'string', 'max:1000'],
         ]);
-
-        // Tạm thời chỉ cho COD
-        if ($data['payment_method'] !== 'cod') {
-            return back()
-                ->with('toast_error', 'Phương thức thanh toán này hiện chưa được hỗ trợ')
-                ->withInput();
-        }
 
         $discountCode = trim((string) ($data['discount_code'] ?? ''));
         if ($discountCode !== '' && !$this->isActiveDiscountCode($discountCode)) {
@@ -416,7 +413,104 @@ class CheckoutController extends Controller
             }
         }
 
-        // Lưu DB qua service
+        if ($data['payment_method'] === 'momo') {
+            $orderData['payment_method'] = 'momo';
+            $orderData['payment_status'] = 'pending';
+
+            $request->session()->put('checkout.momo_pending', [
+                'orderData'       => $orderData,
+                'orderItemsData'  => $orderItemsData,
+                'shipmentData'    => $shipmentData,
+                'orderBatchesData' => $orderBatchesData,
+                'items'           => $items,
+            ]);
+
+            $gateway = new MomoGateway(config('payment.momo'));
+            $payUrl  = $gateway->createPaymentUrl(
+                $orderData['code'],
+                (int) $orderData['grand_total_vnd'],
+                'Thanh toán đơn hàng #' . $orderData['code']
+            );
+
+            return redirect()->away($payUrl);
+        }
+
+        if ($data['payment_method'] === 'vnpay') {
+            $orderData['payment_method'] = 'vnpay';
+            $orderData['payment_status'] = 'pending';
+
+            $request->session()->put('checkout.vnpay_pending', [
+                'orderData'        => $orderData,
+                'orderItemsData'   => $orderItemsData,
+                'shipmentData'     => $shipmentData,
+                'orderBatchesData' => $orderBatchesData,
+                'items'            => $items,
+            ]);
+
+            $gateway = new VnpayGateway(config('payment.vnpay'));
+            $payUrl  = $gateway->createPaymentUrl(
+                $orderData['code'],
+                (int) $orderData['grand_total_vnd'],
+                'Thanh toán đơn hàng #' . $orderData['code'],
+                $request->ip()
+            );
+
+            return redirect()->away($payUrl);
+        }
+        if ($data['payment_method'] === 'cod') {
+            $order = $checkoutService->placeCodOrder(
+                $orderData,
+                $orderItemsData,
+                $shipmentData,
+                $orderBatchesData
+            );
+
+            if ($order) {
+                $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+
+                foreach (array_keys($items) as $productId) {
+                    $cartService->removeItemInCart((string) $productId);
+                }
+
+                return redirect()
+                    ->route('user.thanks', ['code' => $order->code])
+                    ->with('toast_success', 'Đặt hàng thành công');
+            }
+
+            return back()
+                ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
+        }
+    }
+
+    public function momoReturn(Request $request, CheckoutService $checkoutService, CartService $cartService)
+    {
+        $pending = $request->session()->get('checkout.momo_pending');
+
+        if (!$pending) {
+            return redirect()
+                ->route('cart')
+                ->with('toast_error', 'Không tìm thấy thông tin đơn hàng chờ thanh toán.');
+        }
+
+        $resultCode = (int) $request->input('resultCode', -1);
+        if ($resultCode !== 0) {
+            $request->session()->forget('checkout.momo_pending');
+
+            return redirect()
+                ->route('checkout.page')
+                ->with('toast_error', 'Thanh toán MoMo thất bại hoặc bị hủy.');
+        }
+
+        $orderData        = $pending['orderData'];
+        $orderItemsData   = $pending['orderItemsData'];
+        $shipmentData     = $pending['shipmentData'];
+        $orderBatchesData = $pending['orderBatchesData'];
+        $items            = $pending['items'];
+
+        // Cập nhật trạng thái thanh toán trước khi insert
+        $orderData['payment_method'] = 'momo';
+        $orderData['payment_status'] = 'paid';
+
         $order = $checkoutService->placeCodOrder(
             $orderData,
             $orderItemsData,
@@ -424,21 +518,112 @@ class CheckoutController extends Controller
             $orderBatchesData
         );
 
-        if ($order) {
-            // 1) Clear session checkout (đúng key đang dùng trong enter/index)
-            $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+        $request->session()->forget('checkout.momo_pending');
+        $request->session()->forget(['checkout.items', 'checkout.expires_at']);
 
-            // 2) Xóa những sản phẩm đã đặt khỏi giỏ hàng (dùng CartService cho thống nhất)
+        if ($order) {
             foreach (array_keys($items) as $productId) {
                 $cartService->removeItemInCart((string) $productId);
             }
 
             return redirect()
                 ->route('user.thanks', ['code' => $order->code])
-                ->with('toast_success', 'Đặt hàng thành công');
+                ->with('toast_success', 'Thanh toán MoMo thành công, đơn hàng đã được tạo.');
         }
 
-        return back()
-            ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
+        return redirect()
+            ->route('checkout.page')
+            ->with('toast_error', 'Có lỗi xảy ra khi tạo đơn sau khi thanh toán MoMo.');
+    }
+
+    public function vnpayReturn(Request $request, CheckoutService $checkoutService, CartService $cartService)
+    {
+        $pending = $request->session()->get('checkout.vnpay_pending');
+
+        if (!$pending) {
+            return redirect()
+                ->route('cart')
+                ->with('toast_error', 'Không tìm thấy thông tin đơn hàng chờ thanh toán VNPAY.');
+        }
+
+        // ==== VERIFY CHỮ KÝ VNPAY ====
+        $inputData = [];
+        foreach ($request->all() as $key => $value) {
+            if (strpos($key, 'vnp_') === 0) {
+                $inputData[$key] = $value;
+            }
+        }
+
+        $vnpSecureHash = $inputData['vnp_SecureHash'] ?? '';
+        unset($inputData['vnp_SecureHash'], $inputData['vnp_SecureHashType']);
+
+        ksort($inputData);
+
+        $hashParts = [];
+        foreach ($inputData as $key => $value) {
+            $hashParts[] = urlencode($key) . '=' . urlencode((string) $value);
+        }
+        $hashData = implode('&', $hashParts);
+
+        $hashSecret = (string) config('payment.vnpay.hash_secret');
+        $calcHash   = hash_hmac('sha512', $hashData, $hashSecret);
+
+        if ($calcHash !== $vnpSecureHash) {
+            Log::warning('VNPay invalid signature', [
+                'hashData'      => $hashData,
+                'calcHash'      => $calcHash,
+                'vnpSecureHash' => $vnpSecureHash,
+            ]);
+
+            $request->session()->forget('checkout.vnpay_pending');
+
+            return redirect()
+                ->route('checkout.page')
+                ->with('toast_error', 'Chữ ký VNPAY không hợp lệ.');
+        }
+
+
+        // ==== CHECK KẾT QUẢ THANH TOÁN ====
+        $responseCode = $request->input('vnp_ResponseCode');
+        if ($responseCode !== '00') {
+            $request->session()->forget('checkout.vnpay_pending');
+
+            return redirect()
+                ->route('checkout.page')
+                ->with('toast_error', 'Thanh toán VNPAY thất bại hoặc đã bị hủy.');
+        }
+
+        $orderData        = $pending['orderData'];
+        $orderItemsData   = $pending['orderItemsData'];
+        $shipmentData     = $pending['shipmentData'];
+        $orderBatchesData = $pending['orderBatchesData'];
+        $items            = $pending['items'];
+
+        $orderData['payment_method'] = 'vnpay';
+        $orderData['payment_status'] = 'paid';
+
+        $order = $checkoutService->placeCodOrder(
+            $orderData,
+            $orderItemsData,
+            $shipmentData,
+            $orderBatchesData
+        );
+
+        $request->session()->forget('checkout.vnpay_pending');
+        $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+
+        if ($order) {
+            foreach (array_keys($items) as $productId) {
+                $cartService->removeItemInCart((string) $productId);
+            }
+
+            return redirect()
+                ->route('user.thanks', ['code' => $order->code])
+                ->with('toast_success', 'Thanh toán VNPAY thành công, đơn hàng đã được tạo.');
+        }
+
+        return redirect()
+            ->route('checkout.page')
+            ->with('toast_error', 'Có lỗi xảy ra khi tạo đơn sau khi thanh toán VNPAY.');
     }
 }

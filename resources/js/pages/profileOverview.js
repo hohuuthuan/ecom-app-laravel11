@@ -1,10 +1,13 @@
 (function () {
+  // ==== TAB HỒ SƠ (TRÁI) ====
   var navLinks = document.querySelectorAll('.profile-nav-link');
   var sections = document.querySelectorAll('.profile-section');
 
   if (navLinks.length && sections.length) {
     function setActiveTab(target) {
-      if (!target) return;
+      if (!target) {
+        return;
+      }
 
       navLinks.forEach(function (link) {
         var isActive = link.getAttribute('data-target') === target;
@@ -20,7 +23,9 @@
     navLinks.forEach(function (link) {
       link.addEventListener('click', function (e) {
         var target = link.getAttribute('data-target');
-        if (!target) return;
+        if (!target) {
+          return;
+        }
 
         e.preventDefault();
 
@@ -75,12 +80,18 @@
 
       // clear các field để lần sau mở lại sẽ fill theo data-* của nút Sửa
       var addrInput = updateAddressModalEl.querySelector('#updateShippingAddress');
-      if (addrInput) { addrInput.value = ''; }
+      if (addrInput) {
+        addrInput.value = '';
+      }
 
       var provinceSelect = updateAddressModalEl.querySelector('#updateShippingProvince');
       if (provinceSelect) {
         provinceSelect.value = '';
-        if (window.jQuery && jQuery.fn.select2 && jQuery(provinceSelect).hasClass('select2-hidden-accessible')) {
+        if (
+          window.jQuery &&
+          jQuery.fn.select2 &&
+          jQuery(provinceSelect).hasClass('select2-hidden-accessible')
+        ) {
           jQuery(provinceSelect).val('').trigger('change.select2');
         }
       }
@@ -88,20 +99,135 @@
       var wardSelect = updateAddressModalEl.querySelector('#updateShippingWard');
       if (wardSelect) {
         wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
-        if (window.jQuery && jQuery.fn.select2 && jQuery(wardSelect).hasClass('select2-hidden-accessible')) {
+        if (
+          window.jQuery &&
+          jQuery.fn.select2 &&
+          jQuery(wardSelect).hasClass('select2-hidden-accessible')
+        ) {
           jQuery(wardSelect).val('').trigger('change.select2');
         }
       }
 
       var noteTextarea = updateAddressModalEl.querySelector('#updateAddressNote');
-      if (noteTextarea) { noteTextarea.value = ''; }
+      if (noteTextarea) {
+        noteTextarea.value = '';
+      }
 
       var defaultCheckbox = updateAddressModalEl.querySelector('#updateAddressDefault');
-      if (defaultCheckbox) { defaultCheckbox.checked = false; }
+      if (defaultCheckbox) {
+        defaultCheckbox.checked = false;
+      }
 
       var hiddenId = updateAddressModalEl.querySelector('#updateAddressId');
-      if (hiddenId) { hiddenId.value = ''; }
+      if (hiddenId) {
+        hiddenId.value = '';
+      }
     });
+
+    // ==== HANDLE ĐỔI TỈNH TRONG MODAL UPDATE (DÙNG SELECT2) ====
+    if (window.jQuery) {
+      jQuery(document).on('change', '#updateShippingProvince', function () {
+        if (!updateAddressModalEl) {
+          return;
+        }
+
+        var provinceSelect = this;
+        var wardSelect = updateAddressModalEl.querySelector('#updateShippingWard');
+        if (!wardSelect) {
+          return;
+        }
+
+        var provinceId = provinceSelect.value;
+        var wardsUrl = provinceSelect.getAttribute('data-wards-url');
+
+        // wardId ban đầu (khi mở modal lần đầu), để chọn đúng phường hiện tại
+        var initialWardId = provinceSelect.getAttribute('data-initial-ward-id') || '';
+
+        // Sau lần đầu, không dùng lại ward cũ nữa
+        provinceSelect.removeAttribute('data-initial-ward-id');
+
+        // B1: reset phường ngay lập tức
+        wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+        if (
+          window.jQuery &&
+          jQuery.fn.select2 &&
+          jQuery(wardSelect).hasClass('select2-hidden-accessible')
+        ) {
+          jQuery(wardSelect).val('').trigger('change.select2');
+        }
+
+        // Không có tỉnh hoặc URL -> dừng
+        if (!provinceId || !wardsUrl) {
+          return;
+        }
+
+        // B2: hiển thị trạng thái loading
+        wardSelect.innerHTML = '<option value="">Đang tải...</option>';
+        if (
+          window.jQuery &&
+          jQuery.fn.select2 &&
+          jQuery(wardSelect).hasClass('select2-hidden-accessible')
+        ) {
+          jQuery(wardSelect).val('').trigger('change.select2');
+        }
+
+        // B3: gọi API lấy danh sách phường/xã
+        fetch(wardsUrl + '?province_id=' + encodeURIComponent(provinceId))
+          .then(function (res) {
+            if (!res.ok) {
+              return null;
+            }
+            return res.json();
+          })
+          .then(function (data) {
+            wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+
+            if (!data || !data.wards) {
+              if (
+                window.jQuery &&
+                jQuery.fn.select2 &&
+                jQuery(wardSelect).hasClass('select2-hidden-accessible')
+              ) {
+                jQuery(wardSelect).val('').trigger('change.select2');
+              }
+              return;
+            }
+
+            data.wards.forEach(function (ward) {
+              var opt = document.createElement('option');
+              opt.value = ward.id;
+              opt.textContent = ward.name_with_type || ward.name;
+              if (initialWardId && String(ward.id) === String(initialWardId)) {
+                opt.selected = true;
+              }
+              wardSelect.appendChild(opt);
+            });
+
+            if (
+              window.jQuery &&
+              jQuery.fn.select2 &&
+              jQuery(wardSelect).hasClass('select2-hidden-accessible')
+            ) {
+              if (initialWardId) {
+                jQuery(wardSelect).val(initialWardId).trigger('change.select2');
+              } else {
+                // Khi user tự đổi tỉnh, không chọn sẵn phường
+                jQuery(wardSelect).val('').trigger('change.select2');
+              }
+            }
+          })
+          .catch(function () {
+            wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+            if (
+              window.jQuery &&
+              jQuery.fn.select2 &&
+              jQuery(wardSelect).hasClass('select2-hidden-accessible')
+            ) {
+              jQuery(wardSelect).val('').trigger('change.select2');
+            }
+          });
+      });
+    }
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -182,46 +308,24 @@
         noteTextarea.value = btn.getAttribute('data-note') || '';
       }
 
-      // Fill Tỉnh/Thành + load Phường/Xã
+      // Fill tỉnh + set ward ban đầu (để handler change lo load ward)
       var provinceSelect = modalEl.querySelector('select[name="address_province_id"]');
-      var wardSelect = modalEl.querySelector('select[name="address_ward_id"]');
-      var provinceId = btn.getAttribute('data-province-id') || '';
       var wardId = btn.getAttribute('data-ward-id') || '';
+      var provinceId = btn.getAttribute('data-province-id') || '';
 
-      if (provinceSelect && !provinceSelect.value && provinceId) {
+      if (provinceSelect && provinceId) {
+        // set value và đánh dấu ward ban đầu
         provinceSelect.value = provinceId;
-        if (window.jQuery && jQuery.fn.select2 && jQuery(provinceSelect).hasClass('select2-hidden-accessible')) {
+        provinceSelect.setAttribute('data-initial-ward-id', wardId);
+
+        if (
+          window.jQuery &&
+          jQuery.fn.select2 &&
+          jQuery(provinceSelect).hasClass('select2-hidden-accessible')
+        ) {
+          // Trigger để Select2 update + handler change sẽ lo load ward
           jQuery(provinceSelect).val(provinceId).trigger('change.select2');
         }
-      }
-
-      var wardsUrl = provinceSelect ? provinceSelect.getAttribute('data-wards-url') : '';
-      if (wardsUrl && provinceId && wardSelect) {
-        fetch(wardsUrl + '?province_id=' + encodeURIComponent(provinceId))
-          .then(function (res) {
-            if (!res.ok) { return null; }
-            return res.json();
-          })
-          .then(function (data) {
-            if (!data || !data.wards) { return; }
-
-            wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
-
-            data.wards.forEach(function (ward) {
-              var opt = document.createElement('option');
-              opt.value = ward.id;
-              opt.textContent = ward.name_with_type || ward.name;
-              if (String(ward.id) === String(wardId)) {
-                opt.selected = true;
-              }
-              wardSelect.appendChild(opt);
-            });
-
-            if (window.jQuery && jQuery.fn.select2 && jQuery(wardSelect).hasClass('select2-hidden-accessible')) {
-              jQuery(wardSelect).val(wardId).trigger('change.select2');
-            }
-          })
-          .catch(function () { });
       }
 
       var modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);

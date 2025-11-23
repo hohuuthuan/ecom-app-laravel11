@@ -160,6 +160,7 @@ $activeTab = 'info';
                                     <th>Ngày đặt</th>
                                     <th>Tổng tiền</th>
                                     <th>Trạng thái</th>
+                                    <th class="text-center">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -182,17 +183,22 @@ $activeTab = 'info';
                                 @endphp
                                 <tr>
                                     <td>{{ $order->code }}</td>
-                                    <td>{{ optional($order->placed_at)->format('d/m/Y') }}</td>
+                                    <td>{{ optional($order->placed_at)->format('d/m/Y, A') }}</td>
                                     <td>{{ number_format($order->grand_total_vnd, 0, ',', '.') }}đ</td>
                                     <td>
                                         <span class="badge-status {{ $badgeClass }}">
                                             {{ $statusLabel }}
                                         </span>
                                     </td>
+                                    <td class="text-center">
+                                        <a href="{{ route('admin.order.detail', $order->id) }}">
+                                            <i class="fa fa-eye icon-eye-view-order-detail"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted">
+                                    <td colspan="5" class="text-center text-muted">
                                         Bạn chưa có đơn hàng nào.
                                     </td>
                                 </tr>

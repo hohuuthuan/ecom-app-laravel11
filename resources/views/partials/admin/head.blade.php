@@ -12,3 +12,4 @@
 @vite(['resources/css/toast.css'])
 @vite(['resources/css/style-admin.css'])
 @vite(['resources/css/custom.css'])
+@vite(['resources/css/warehouse.css'])

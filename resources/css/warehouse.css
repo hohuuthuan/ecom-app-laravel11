@@ -1,0 +1,462 @@
+body.warehouse-page {
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #e3f2fd 0%, #e8eaf6 100%);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sidebar trái */
+.warehouse-sidebar {
+  min-height: 100vh;
+  width: 235px;
+  flex: 0 0 235px;
+  background: #ffffff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+}
+
+
+/* Nút bên sidebar */
+.warehouse-nav-btn {
+  border: none;
+  background: none;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+  font-weight: 500;
+}
+
+.warehouse-nav-btn:hover {
+  background-color: #e3f2fd !important;
+  color: #1976d2 !important;
+}
+
+.warehouse-nav-btn.active {
+  background-color: #e3f2fd !important;
+  color: #1976d2 !important;
+}
+
+/* Card chung */
+.warehouse-card {
+  border: none;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+  background-color: #ffffff;
+}
+
+/* Card thống kê */
+.stats-card {
+  border-left: 4px solid transparent;
+}
+
+.stats-card.blue {
+  border-left-color: #2196f3;
+}
+
+.stats-card.green {
+  border-left-color: #4caf50;
+}
+
+.stats-card.yellow {
+  border-left-color: #ff9800;
+}
+
+.stats-card.red {
+  border-left-color: #f44336;
+}
+
+/* Animation section */
+.warehouse-section {
+  animation-duration: 0.25s;
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: warehouseFadeIn;
+}
+
+@keyframes warehouseFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-down {
+  animation-name: warehouseSlideDown;
+}
+
+@keyframes warehouseSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button chung */
+.btn-custom {
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-custom:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.35);
+}
+
+/* Table */
+.warehouse-table th {
+  background-color: #f8f9fa;
+  border: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  color: #6c757d;
+}
+
+/* Badge tồn kho */
+.badge-stock {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+}
+
+/* Activity item */
+.activity-item {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.activity-item:hover {
+  background-color: #e9ecef;
+}
+
+/* Form control riêng của kho */
+.warehouse-form-control,
+.warehouse-form-select {
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.warehouse-form-control:focus,
+.warehouse-form-select:focus {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+}
+
+/* Alert */
+.alert-custom {
+  border: none;
+  border-radius: 10px;
+}
+
+/* Notification toast */
+.warehouse-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1090;
+  min-width: 260px;
+  max-width: 360px;
+  border-radius: 10px;
+  animation: warehouseSlideInRight 0.3s ease-out;
+}
+
+@keyframes warehouseSlideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Import / Export item card */
+.warehouse-import-item,
+.warehouse-export-item {
+  border-radius: 12px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 991.98px) {
+  .warehouse-sidebar {
+    min-height: auto;
+  }
+}
+
+
+
+
+/* Phiếu nhập kho */
+.import-card {
+  font-size: 0.9rem;
+}
+
+.import-header-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #047adb;
+}
+
+.import-logo-box {
+  border: 1px solid #dee2e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 40px;
+}
+
+.import-logo-text {
+  font-size: 0.75rem;
+}
+
+.dotted-field-line {
+  border: none;
+  border-bottom: 1px dotted #999;
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.dotted-field-line:focus {
+  box-shadow: none;
+  border-bottom-style: solid;
+}
+
+/* Columns width hint, giống layout trong hình */
+.import-table th,
+.import-table td {
+  font-size: 0.85rem;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.import-table th.text-start,
+.import-table td.text-start {
+  text-align: left;
+}
+
+.col-stt {
+  width: 40px;
+}
+
+.col-product-name {
+  min-width: 220px;
+}
+
+.col-sku,
+.col-unit {
+  min-width: 110px;
+}
+
+.col-price,
+.col-expired,
+.col-qty-doc,
+.col-qty-real {
+  min-width: 130px;
+}
+
+.col-note {
+  min-width: 160px;
+}
+
+.col-actions {
+  width: 90px;
+}
+
+.import-total-label {
+  width: 50%;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.import-signature-block .signature-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.import-signature-block .signature-note {
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+.import-actions-cell {
+  text-align: center;
+  vertical-align: middle !important;
+  padding: 0.35rem;
+  white-space: nowrap;
+}
+
+.import-actions-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.import-btn-icon {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+  line-height: 1;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .03);
+}
+
+.import-btn-icon i {
+  font-size: 27px;
+  pointer-events: none;
+}
+
+.import-btn-add {
+  background-color: #0188b1;
+  border-color: #0188b1;
+  color: #fff;
+}
+
+.import-btn-add:hover {
+  background-color: #007ea5;
+  border-color: #007ea5;
+  color: #fff;
+}
+
+.import-btn-remove {
+  background-color: #e95b69;
+  border-color: #e95b69;
+  color: #fff;
+}
+
+.import-btn-remove:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+  color: #fff;
+}
+
+.import-btn-icon i {
+  pointer-events: none;
+}
+
+.warehouse-receive-goods-title {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+
+.import-header-date {
+  position: relative;
+  display: inline-block;
+}
+
+.import-date-toggle {
+  font-size: 0.875rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.import-date-toggle:focus,
+.import-date-toggle:active {
+  text-decoration: none;
+  color: inherit;
+  box-shadow: none;
+}
+
+.import-date-input {
+  position: absolute;
+  top: 100%;
+  right: 0px;
+  margin-top: 4px;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+/* ====== Căn lại Select2 trong bảng phiếu nhập ====== */
+.import-table .select2-container {
+  width: 100% !important;
+}
+
+.import-table .select2-container--default .select2-selection--single {
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 2rem 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.2rem;
+  display: flex;
+  align-items: center;
+}
+
+/* (Tuỳ chọn) Căn lại mũi tên cho đẹp */
+.import-table .select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 100%;
+  right: 0.35rem;
+}
+
+/* Chỉ áp dụng trong trang nhập kho */
+#warehouse-import .btn-warehouse-save {
+  padding: 0.5rem 1.5rem;
+  border-radius: 5px;
+  border: 1px solid #0188b1;
+  background: linear-gradient(135deg, #03a8c7, #0188b1);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 14px rgba(1, 136, 177, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.12s ease-out,
+    box-shadow 0.12s ease-out,
+    background 0.12s ease-out,
+    border-color 0.12s ease-out;
+}
+
+#warehouse-import .btn-warehouse-save i {
+  font-size: 1rem;
+}
+
+#warehouse-import .btn-warehouse-save:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(1, 136, 177, 0.45);
+  background: linear-gradient(135deg, #04b4d6, #01779b);
+  border-color: #01779b;
+  color: #ffffff;
+}
+
+#warehouse-import .btn-warehouse-save:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(1, 136, 177, 0.5);
+  background: linear-gradient(135deg, #0188b1, #016684);
+  border-color: #016684;
+}
+
+#warehouse-import .btn-warehouse-save:disabled,
+#warehouse-import .btn-warehouse-save.disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}

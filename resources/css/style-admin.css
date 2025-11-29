@@ -1220,11 +1220,12 @@ table tbody td:first-child {
 }
 
 .table thead th {
-    white-space: nowrap
+    white-space: nowrap;
+    font-weight: 600;
 }
 
 .table tfoot td {
-    font-weight: 700
+    font-weight: 00
 }
 
 .copyable {

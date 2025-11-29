@@ -59,7 +59,7 @@ class StoreWarehouseImportRequest extends FormRequest
             'items.min' => 'Phiếu nhập phải có ít nhất một sản phẩm.',
 
             'items.*.product_id.required' => 'Vui lòng chọn sản phẩm.',
-            'items.*.product_id.integer' => 'Sản phẩm không hợp lệ.',
+            'items.*.product_id.uuid' => 'Sản phẩm không hợp lệ.',
             'items.*.product_id.exists' => 'Có sản phẩm không hợp lệ.',
 
             'items.*.price.required' => 'Thiếu giá nhập',

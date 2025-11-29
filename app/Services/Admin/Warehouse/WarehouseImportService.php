@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services\Admin\Warehouse;
 
 use App\Models\Warehouse;
@@ -12,6 +11,7 @@ use Carbon\Carbon;
 class WarehouseImportService
 {
   /**
+   * Tạo phiếu nhập kho từ dữ liệu đã validate
    *
    * @param  array  $data
    * @return bool
@@ -21,8 +21,6 @@ class WarehouseImportService
     try {
       DB::transaction(function () use ($data) {
         $items = $data['items'];
-
-        // Lấy user & thời gian hiện tại
         $userId = Auth::id();
         $now = now();
 
@@ -48,7 +46,8 @@ class WarehouseImportService
         $stockTotalsByProduct = [];
 
         foreach ($items as $item) {
-          $productId = (int) $item['product_id'];
+          // product_id là uuid, KHÔNG ép int
+          $productId = $item['product_id'];
           $qtyDoc = (int) $item['qty_document'];
           $qtyActual = (int) $item['qty_real'];
           $unitPrice = (int) $item['price'];
@@ -140,16 +139,20 @@ class WarehouseImportService
 
         // ================== INSERT THEO THỨ TỰ ==================
         DB::table('purchase_receipts')->insert($receiptRow);
+
         if (!empty($receiptItemsRows)) {
           DB::table('purchase_receipt_items')->insert($receiptItemsRows);
         }
+
         if (!empty($batchRows)) {
           DB::table('batches')->insert($batchRows);
         }
+
         if (!empty($batchStockRows)) {
           DB::table('batch_stocks')->insert($batchStockRows);
         }
 
+        // -------- cập nhật bảng stocks tổng theo product/warehouse --------
         foreach ($stockTotalsByProduct as $productId => $qtyIncrease) {
           $stock = DB::table('stocks')
             ->where('product_id', $productId)

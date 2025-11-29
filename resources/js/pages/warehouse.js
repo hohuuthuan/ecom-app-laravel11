@@ -343,36 +343,45 @@ document.addEventListener('DOMContentLoaded', function () {
       var addBtn = e.target.closest('.import-row-add');
       if (addBtn) {
         var rows = getAllRows();
+        if (!rows.length) {
+          return;
+        }
+
         var lastRow = rows[rows.length - 1];
         var newRow = lastRow.cloneNode(true);
 
-        var clonedSelect = newRow.querySelector('.import-product-select');
-        if (clonedSelect) {
-          var selectCell = clonedSelect.closest('.import-product-cell');
+        // --- DỌN RÁC SELECT2 VÀ RESET SELECT SẢN PHẨM ---
+        var select = newRow.querySelector('.import-product-select');
+        if (select) {
+          var selectCell = select.closest('.import-product-cell');
           if (selectCell) {
             selectCell.querySelectorAll('.select2-container').forEach(function (container) {
               container.remove();
             });
           }
 
-          clonedSelect.value = '';
-          clonedSelect.removeAttribute('data-old-value');
-          clonedSelect.removeAttribute('data-select2-id');
-          clonedSelect.classList.remove('select2-hidden-accessible');
-          clonedSelect.classList.remove('is-invalid');
-          clonedSelect.classList.remove('d-none');
+          select.value = '';
+          select.removeAttribute('data-old-value');
+          select.removeAttribute('data-select2-id');
+          select.classList.remove('select2-hidden-accessible');
+          select.classList.remove('is-invalid');
+          select.classList.remove('d-none');
         }
 
+        // Ẩn message "Bạn cần chọn nhà xuất bản"
         var message = newRow.querySelector('.import-product-message');
         if (message) {
           message.classList.add('d-none');
         }
 
+        // --- RESET CÁC INPUT GIÁ + SỐ LƯỢNG + HIDDEN PRICE ---
         var inputs = newRow.querySelectorAll('input');
         inputs.forEach(function (inp) {
           inp.value = '';
+          inp.classList.remove('is-invalid');
         });
 
+        // --- RESET TEXT MÃ SP / ĐƠN VỊ ---
         var codeSpan = newRow.querySelector('.import-product-code');
         if (codeSpan) {
           codeSpan.textContent = 'Mã sản phẩm';
@@ -382,22 +391,17 @@ document.addEventListener('DOMContentLoaded', function () {
           unitSpan.textContent = 'Đơn vị tính';
         }
 
-        var rowsCount = rows.length;
-        newRow.innerHTML = newRow.innerHTML.replace(/items\[\d+\]/g, 'items[' + rowsCount + ']');
-
-        var stt = newRow.querySelector('td:first-child');
-        if (stt) {
-          stt.textContent = rowsCount + 1;
-        }
-
+        // Thêm dòng mới vào bảng
         tbody.appendChild(newRow);
 
-        if (clonedSelect) {
-          initProductSelect(clonedSelect);
-          applyProductsToAllSelects();
-        }
+        // Đánh lại STT + name="items[index]..."
+        reIndexRows();
 
+        // Đảm bảo có nút xoá cho dòng mới
         ensureRemoveButton(newRow);
+
+        // Fill lại options select sản phẩm (và loại sp đã chọn ở dòng trên)
+        applyProductsToAllSelects();
       }
 
       var removeBtn = e.target.closest('.import-row-remove');

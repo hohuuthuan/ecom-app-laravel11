@@ -24,8 +24,14 @@ body.warehouse-page {
   margin-right: 0;
 }
 
+.warehouse_sidebar a{
+  text-decoration: none;
+}
 
-/* Nút bên sidebar */
+.warehouse-main a {
+  text-decoration: none;
+}
+
 .warehouse-nav-btn {
   border: none;
   background: none;

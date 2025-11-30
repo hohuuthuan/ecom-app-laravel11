@@ -4,6 +4,8 @@ namespace App\Services\Admin\Warehouse;
 
 use App\Models\Warehouse;
 use App\Models\PurchaseReceipt;
+use App\Models\Stock;
+use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -278,13 +280,6 @@ class WarehouseImportService
       ->find($id);
   }
 
-  /**
-   * Sinh mã phiếu nhập dạng: AA-11-HDUAN789HD
-   * - 2 ký tự chữ in hoa
-   * - 2 ký tự số
-   * - 10 ký tự chữ/số in hoa
-   * Lặp lại nếu mã đã tồn tại trong bảng purchase_receipts.
-   */
   private function generateUniqueReceiptCode(): string
   {
     $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -308,10 +303,106 @@ class WarehouseImportService
       $code = $prefix . '-' . $mid . '-' . $suffix;
     } while (
       PurchaseReceipt::query()
-        ->where('receipt_code', $code)
-        ->exists()
+      ->where('receipt_code', $code)
+      ->exists()
     );
 
     return $code;
+  }
+
+  public function getInventoryOverview(array $filters = []): array
+  {
+    $outOfStocks = Product::query()
+      ->where('status', 'ACTIVE')
+      ->where(function ($q) {
+        $q->whereDoesntHave('stocks')
+          ->orWhereHas('stocks', function ($q2) {
+            $q2->select('product_id', DB::raw('SUM(on_hand) as total_on_hand'))
+              ->groupBy('product_id')
+              ->havingRaw('SUM(on_hand) <= 0');
+          });
+      })
+      ->with(['stocks.warehouse:id,name'])
+      ->orderBy('title')
+      ->limit(50)
+      ->get();
+
+    $lowStocks = Stock::query()
+      ->with([
+        'product:id,code,title',
+        'warehouse:id,name',
+      ])
+      ->where('on_hand', '>', 0)
+      ->where(function ($q) {
+        $q->where(function ($q2) {
+          $q2->whereNotNull('reorder_point')
+            ->whereColumn('on_hand', '<=', 'reorder_point');
+        })
+          ->orWhere(function ($q2) {
+            $q2->whereNull('reorder_point')
+              ->where('on_hand', '<=', 50);
+          });
+      })
+      ->orderBy('on_hand')
+      ->limit(50)
+      ->get();
+
+    $perPage = (int) ($filters['per_page'] ?? 20);
+    if ($perPage <= 0) {
+      $perPage = 20;
+    }
+    if ($perPage > 200) {
+      $perPage = 200;
+    }
+
+    $inventoryQuery = Product::query()
+      ->where('status', 'ACTIVE')
+      ->withSum('stocks as total_on_hand', 'on_hand')
+      ->withSum('stocks as total_reserved', 'reserved')
+      ->with(['stocks.warehouse:id,name']);
+
+    if (!empty($filters['keyword'])) {
+      $kw = trim((string) $filters['keyword']);
+      $inventoryQuery->where(function ($q) use ($kw) {
+        $q->where('code', 'LIKE', "%{$kw}%")
+          ->orWhere('title', 'LIKE', "%{$kw}%");
+      });
+    }
+
+    $status = $filters['status'] ?? null;
+    $threshold = 50;
+
+    if ($status === 'out') {
+      $inventoryQuery->where(function ($q) {
+        $q->whereDoesntHave('stocks')
+          ->orWhereHas('stocks', function ($q2) {
+            $q2->select('product_id', DB::raw('SUM(on_hand) as total_on_hand'))
+              ->groupBy('product_id')
+              ->havingRaw('SUM(on_hand) <= 0');
+          });
+      });
+    } elseif ($status === 'low') {
+      $inventoryQuery->whereHas('stocks', function ($q2) use ($threshold) {
+        $q2->select('product_id', DB::raw('SUM(on_hand) as total_on_hand'))
+          ->groupBy('product_id')
+          ->havingRaw('SUM(on_hand) > 0 AND SUM(on_hand) <= ?', [$threshold]);
+      });
+    } elseif ($status === 'normal') {
+      $inventoryQuery->whereHas('stocks', function ($q2) use ($threshold) {
+        $q2->select('product_id', DB::raw('SUM(on_hand) as total_on_hand'))
+          ->groupBy('product_id')
+          ->havingRaw('SUM(on_hand) > ?', [$threshold]);
+      });
+    }
+
+    $inventoryProducts = $inventoryQuery
+      ->orderBy('title')
+      ->paginate($perPage);
+
+    return [
+      'lowStocks'         => $lowStocks,
+      'outOfStocks'       => $outOfStocks,
+      'inventoryProducts' => $inventoryProducts,
+    ];
   }
 }

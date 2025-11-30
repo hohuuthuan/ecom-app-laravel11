@@ -13,13 +13,12 @@ body.warehouse-page {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
 }
 
-#warehouse-receipts .warehouse-card {
+.warehouse-card {
   max-width: 100%;
   overflow-x: hidden;
 }
 
-/* Row trong card filter không dùng margin âm để thò ra ngoài card */
-#warehouse-receipts .warehouse-card .row {
+.warehouse-card .row {
   margin-left: 0;
   margin-right: 0;
 }
@@ -476,4 +475,95 @@ body.warehouse-page {
   opacity: 0.65;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+
+/* ====== INVENTORY ALERT LIST (SẮP HẾT + HẾT HÀNG) ====== */
+
+#warehouse-inventory .warehouse-card {
+  min-height: 300px;
+}
+
+#warehouse-inventory .inventory-table {
+  min-height: 500px;
+}
+
+
+#warehouse-inventory .inventory-alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom scrollbar nhẹ cho khu vực cảnh báo */
+#warehouse-inventory .inventory-alert-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+#warehouse-inventory .inventory-alert-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#warehouse-inventory .inventory-alert-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 999px;
+}
+
+/* Item cảnh báo */
+#warehouse-inventory .inventory-alert-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 0;
+}
+
+/* Khối text bên trái */
+#warehouse-inventory .inventory-alert-main {
+  min-width: 0;
+}
+
+/* Tên sản phẩm: một dòng, nếu dài thì ... */
+#warehouse-inventory .inventory-alert-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dòng meta dưới: mã + kho */
+#warehouse-inventory .inventory-alert-meta {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* Badge bên phải giữ kích thước ổn định */
+#warehouse-inventory .inventory-alert-badge {
+  margin-left: 0.75rem;
+  flex-shrink: 0;
+}
+
+#warehouse-inventory .inventory-alert-badge .badge {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.6rem;
+}
+
+/* Mobile: hạ chiều cao list để không chiếm hết màn hình */
+@media (max-width: 767.98px) {
+  #warehouse-inventory .inventory-alert-list {
+    max-height: 200px;
+  }
+
+  #warehouse-inventory .inventory-alert-item {
+    align-items: flex-start;
+  }
+
+  #warehouse-inventory .inventory-alert-title {
+    white-space: normal;
+  }
 }

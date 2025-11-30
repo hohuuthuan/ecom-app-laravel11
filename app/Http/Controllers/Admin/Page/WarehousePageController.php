@@ -30,7 +30,20 @@ class WarehousePageController extends Controller
 
   public function inventory(Request $r)
   {
-    return view('admin.warehouse.inventory');
+    $filters = [
+      'keyword'  => $r->query('keyword'),
+      'status'   => $r->query('status'),
+      'per_page' => (int) $r->query('per_page', 20),
+    ];
+
+    $overview = $this->warehouseImportService->getInventoryOverview($filters);
+
+    return view('admin.warehouse.inventory', [
+      'lowStocks'         => $overview['lowStocks'],
+      'outOfStocks'       => $overview['outOfStocks'],
+      'inventoryProducts' => $overview['inventoryProducts'],
+      'filters'           => $filters,
+    ]);
   }
 
   public function import(Request $r)

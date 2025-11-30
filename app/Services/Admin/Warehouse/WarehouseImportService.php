@@ -310,8 +310,105 @@ class WarehouseImportService
     return $code;
   }
 
+  // public function getInventoryOverview(array $filters = []): array
+  // {
+  //   $outOfStocks = Product::query()
+  //     ->where('status', 'ACTIVE')
+  //     ->where(function ($q) {
+  //       $q->whereDoesntHave('stocks')
+  //         ->orWhereHas('stocks', function ($q2) {
+  //           $q2->select('product_id', DB::raw('SUM(on_hand) as total_on_hand'))
+  //             ->groupBy('product_id')
+  //             ->havingRaw('SUM(on_hand) <= 0');
+  //         });
+  //     })
+  //     ->with(['stocks.warehouse:id,name'])
+  //     ->orderBy('title')
+  //     ->limit(50)
+  //     ->get();
+
+  //   $lowStocks = Stock::query()
+  //     ->with([
+  //       'product:id,code,title',
+  //       'warehouse:id,name',
+  //     ])
+  //     ->where('on_hand', '>', 0)
+  //     ->where(function ($q) {
+  //       $q->where(function ($q2) {
+  //         $q2->whereNotNull('reorder_point')
+  //           ->whereColumn('on_hand', '<=', 'reorder_point');
+  //       })
+  //         ->orWhere(function ($q2) {
+  //           $q2->whereNull('reorder_point')
+  //             ->where('on_hand', '<=', 50);
+  //         });
+  //     })
+  //     ->orderBy('on_hand')
+  //     ->limit(50)
+  //     ->get();
+
+  //   $perPage = (int) ($filters['per_page'] ?? 20);
+  //   if ($perPage <= 0) {
+  //     $perPage = 20;
+  //   }
+  //   if ($perPage > 200) {
+  //     $perPage = 200;
+  //   }
+
+  //   $inventoryQuery = Product::query()
+  //     ->where('status', 'ACTIVE')
+  //     ->withSum('stocks as total_on_hand', 'on_hand')
+  //     ->withSum('stocks as total_reserved', 'reserved')
+  //     ->with(['stocks.warehouse:id,name']);
+
+  //   if (!empty($filters['keyword'])) {
+  //     $kw = trim((string) $filters['keyword']);
+  //     $inventoryQuery->where(function ($q) use ($kw) {
+  //       $q->where('code', 'LIKE', "%{$kw}%")
+  //         ->orWhere('title', 'LIKE', "%{$kw}%");
+  //     });
+  //   }
+
+  //   $status = $filters['status'] ?? null;
+  //   $threshold = 50;
+
+  //   if ($status === 'out') {
+  //     $inventoryQuery->where(function ($q) {
+  //       $q->whereDoesntHave('stocks')
+  //         ->orWhereHas('stocks', function ($q2) {
+  //           $q2->select('product_id', DB::raw('SUM(on_hand) as total_on_hand'))
+  //             ->groupBy('product_id')
+  //             ->havingRaw('SUM(on_hand) <= 0');
+  //         });
+  //     });
+  //   } elseif ($status === 'low') {
+  //     $inventoryQuery->whereHas('stocks', function ($q2) use ($threshold) {
+  //       $q2->select('product_id', DB::raw('SUM(on_hand) as total_on_hand'))
+  //         ->groupBy('product_id')
+  //         ->havingRaw('SUM(on_hand) > 0 AND SUM(on_hand) <= ?', [$threshold]);
+  //     });
+  //   } elseif ($status === 'normal') {
+  //     $inventoryQuery->whereHas('stocks', function ($q2) use ($threshold) {
+  //       $q2->select('product_id', DB::raw('SUM(on_hand) as total_on_hand'))
+  //         ->groupBy('product_id')
+  //         ->havingRaw('SUM(on_hand) > ?', [$threshold]);
+  //     });
+  //   }
+
+  //   $inventoryProducts = $inventoryQuery
+  //     ->orderBy('title')
+  //     ->paginate($perPage);
+
+  //   return [
+  //     'lowStocks'         => $lowStocks,
+  //     'outOfStocks'       => $outOfStocks,
+  //     'inventoryProducts' => $inventoryProducts,
+  //   ];
+  // }
+
   public function getInventoryOverview(array $filters = []): array
   {
+    // ========== SẢN PHẨM HẾT HÀNG ==========
     $outOfStocks = Product::query()
       ->where('status', 'ACTIVE')
       ->where(function ($q) {
@@ -327,6 +424,7 @@ class WarehouseImportService
       ->limit(50)
       ->get();
 
+    // ========== SẢN PHẨM SẮP HẾT ==========
     $lowStocks = Stock::query()
       ->with([
         'product:id,code,title',
@@ -347,6 +445,7 @@ class WarehouseImportService
       ->limit(50)
       ->get();
 
+    // ========== PHÂN TRANG BẢNG CHI TIẾT TỒN ==========
     $perPage = (int) ($filters['per_page'] ?? 20);
     if ($perPage <= 0) {
       $perPage = 20;
@@ -358,7 +457,6 @@ class WarehouseImportService
     $inventoryQuery = Product::query()
       ->where('status', 'ACTIVE')
       ->withSum('stocks as total_on_hand', 'on_hand')
-      ->withSum('stocks as total_reserved', 'reserved')
       ->with(['stocks.warehouse:id,name']);
 
     if (!empty($filters['keyword'])) {
@@ -369,7 +467,7 @@ class WarehouseImportService
       });
     }
 
-    $status = $filters['status'] ?? null;
+    $status    = $filters['status'] ?? null;
     $threshold = 50;
 
     if ($status === 'out') {

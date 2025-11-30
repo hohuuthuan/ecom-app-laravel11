@@ -58,21 +58,25 @@ class OrderPageController extends Controller
     $input = strtoupper(trim($request->input('status')));
 
     $map = [
-      'PENDING'    => 'pending', 
+      'PENDING'    => 'pending',
       'PROCESSING' => 'processing',
       'CANCELLED'  => 'cancelled',
     ];
+
     if (!isset($map[$input])) {
       return back()->with('toast_error', 'Trạng thái không hợp lệ');
     }
+
     $current = strtolower((string) $order->status);
-    $target = $map[$input];
+    $target  = $map[$input];
+
     if (!$this->canChangeStatus($current, $target)) {
       return back()->with(
         'toast_error',
         'Không thể chuyển trạng thái từ ' . strtoupper($current) . ' sang ' . $input . '.'
       );
     }
+
     if ($current === $target) {
       return back()->with('toast_info', 'Trạng thái không thay đổi');
     }

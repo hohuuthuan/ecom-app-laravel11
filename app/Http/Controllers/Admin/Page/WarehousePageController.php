@@ -6,15 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Warehouse\StoreWarehouseImportRequest;
 use App\Models\Product;
 use App\Models\Publisher;
+use App\Models\Order;
 use App\Services\Admin\Warehouse\WarehouseImportService;
+use App\Services\Admin\Order\OrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 
 class WarehousePageController extends Controller
 {
   public function __construct(
+    private OrderService $orderService,
     private WarehouseImportService $warehouseImportService
   ) {}
 
@@ -25,7 +29,73 @@ class WarehousePageController extends Controller
 
   public function orders(Request $r)
   {
-    return view('admin.warehouse.orders');
+    $filters = [
+      'keyword'        => $r->input('keyword'),
+      'payment_method' => $r->input('payment_method'),
+      'payment_status' => $r->input('payment_status'),
+      'status'         => $r->input('status'),
+      'created_from'   => $r->input('created_from'),
+      'created_to'     => $r->input('created_to'),
+      'per_page'       => $r->input('per_page_order'),
+    ];
+
+    $orders = $this->orderService->getWarehouseOrders($filters);
+
+    return view('admin.warehouse.order.index', compact('orders'));
+  }
+
+  public function orderDetail(string $id)
+  {
+    [$order, $stockMap, $itemBatches] = $this->orderService->getWarehouseOrderDetail($id);
+    
+    return view('admin.warehouse.order.detail', compact('order', 'stockMap', 'itemBatches'));
+  }
+
+  public function changeOrderStatus(Request $r, string $id)
+  {
+    $validated = $r->validate([
+      'warehouse_status' => [
+        'required',
+        'string',
+        Rule::in([
+          'RECEIVING_PROCESS',
+          'PREPARING_ITEMS',
+          'HANDED_OVER_CARRIER',
+        ]),
+      ],
+    ]);
+
+    $order = Order::findOrFail($id);
+
+    $mapToOrderStatus = [
+      'RECEIVING_PROCESS'   => 'PROCESSING',
+      'PREPARING_ITEMS'     => 'SHIPPING',
+      'HANDED_OVER_CARRIER' => 'DELIVERED',
+    ];
+
+    $targetStatus = $mapToOrderStatus[$validated['warehouse_status']];
+
+    $levelMap = [
+      'PROCESSING' => 1,
+      'SHIPPING'   => 2,
+      'DELIVERED'  => 3,
+    ];
+
+    $currentStatus = strtoupper((string) $order->status);
+    if (!isset($levelMap[$currentStatus])) {
+      return back()->with('toast_error', 'Trạng thái đơn hiện tại không thể cập nhật từ giao diện kho.');
+    }
+    if ($levelMap[$targetStatus] < $levelMap[$currentStatus]) {
+      return back()->with('toast_error', 'Không thể chuyển trạng thái lùi về bước trước đó.');
+    }
+    if ($currentStatus === $targetStatus) {
+      return back()->with('toast_info', 'Trạng thái đơn hàng không thay đổi.');
+    }
+
+    $order->status = $targetStatus;
+    $order->save();
+
+    return back()->with('toast_success', 'Cập nhật trạng thái đơn hàng thành công');
   }
 
   public function inventory(Request $r)

@@ -108,6 +108,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', [WarehousePageController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/orders', [WarehousePageController::class, 'orders'])->name('orders');
+    Route::get('/orders/detail/{id}', [WarehousePageController::class, 'orderDetail'])->name('order.detail');
+    Route::patch('/orders/{id}/status', [WarehousePageController::class, 'changeOrderStatus'])->name('order.changeStatus');
 
     Route::get('/inventory', [WarehousePageController::class, 'inventory'])->name('inventory');
 

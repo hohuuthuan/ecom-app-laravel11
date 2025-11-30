@@ -163,7 +163,6 @@
               <th class="px-3 py-2 text-start">Mã SP</th>
               <th class="px-3 py-2 text-start">Tên sản phẩm</th>
               <th class="px-3 py-2 text-end">Tồn thực tế</th>
-              <th class="px-3 py-2 text-end">Đã giữ chỗ</th>
               <th class="px-3 py-2 text-center">Trạng thái</th>
             </tr>
           </thead>
@@ -171,7 +170,6 @@
             @forelse($inventoryProducts as $product)
             @php
             $onHand = (int) ($product->total_on_hand ?? 0);
-            $reserved = (int) ($product->total_reserved ?? 0);
 
             $statusLabel = 'Ổn định';
             $statusClass = 'bg-success';
@@ -197,9 +195,6 @@
               <td class="px-3 py-2 text-end">
                 {{ $onHand }} SP
               </td>
-              <td class="px-3 py-2 text-end">
-                {{ $reserved }} SP
-              </td>
               <td class="px-3 py-2 text-center">
                 <span class="badge {{ $statusClass }}">
                   {{ $statusLabel }}
@@ -208,12 +203,13 @@
               </tr>
               @empty
               <tr>
-                <td colspan="5" class="text-center py-3 text-muted">
+                <td colspan="4" class="text-center py-3 text-muted">
                   Chưa có sản phẩm nào đang bán
                 </td>
               </tr>
               @endforelse
           </tbody>
+
         </table>
       </div>
 

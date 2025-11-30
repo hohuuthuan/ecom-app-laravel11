@@ -37,6 +37,7 @@ class WarehouseImportService
 
         $receiptId = (string) Str::uuid();
         $receivedAt = Carbon::parse($data['receipt_date'])->startOfDay();
+        $receiptCode = $this->generateUniqueReceiptCode();
 
         // ================== TÍNH TỔNG & CHUẨN BỊ ARRAYS ==================
         $subTotalVnd = 0;
@@ -48,7 +49,6 @@ class WarehouseImportService
         $stockTotalsByProduct = [];
 
         foreach ($items as $item) {
-          // product_id là uuid, KHÔNG ép int
           $productId = $item['product_id'];
           $qtyDoc = (int) $item['qty_document'];
           $qtyActual = (int) $item['qty_real'];
@@ -125,6 +125,7 @@ class WarehouseImportService
         // ================== purchase_receipts (header phiếu) ==================
         $receiptRow = [
           'id' => $receiptId,
+          'receipt_code' => $receiptCode,
           'publisher_id' => $data['publisher_id'],
           'warehouse_id' => $warehouseId,
           'received_at' => $receivedAt,
@@ -275,5 +276,42 @@ class WarehouseImportService
         },
       ])
       ->find($id);
+  }
+
+  /**
+   * Sinh mã phiếu nhập dạng: AA-11-HDUAN789HD
+   * - 2 ký tự chữ in hoa
+   * - 2 ký tự số
+   * - 10 ký tự chữ/số in hoa
+   * Lặp lại nếu mã đã tồn tại trong bảng purchase_receipts.
+   */
+  private function generateUniqueReceiptCode(): string
+  {
+    $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $digits = '0123456789';
+    $alnum = $letters . $digits;
+
+    do {
+      $prefix =
+        $letters[random_int(0, strlen($letters) - 1)] .
+        $letters[random_int(0, strlen($letters) - 1)];
+
+      $mid =
+        $digits[random_int(0, strlen($digits) - 1)] .
+        $digits[random_int(0, strlen($digits) - 1)];
+
+      $suffix = '';
+      for ($i = 0; $i < 10; $i++) {
+        $suffix .= $alnum[random_int(0, strlen($alnum) - 1)];
+      }
+
+      $code = $prefix . '-' . $mid . '-' . $suffix;
+    } while (
+      PurchaseReceipt::query()
+        ->where('receipt_code', $code)
+        ->exists()
+    );
+
+    return $code;
   }
 }

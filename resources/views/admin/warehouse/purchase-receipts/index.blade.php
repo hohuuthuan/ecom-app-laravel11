@@ -76,6 +76,7 @@
               <th class="px-4 py-3">Mã Phiếu</th>
               <th class="px-4 py-3">Nhà Xuất Bản</th>
               <th class="px-4 py-3">Ngày Nhập</th>
+              <th class="px-4 py-3">Người lập phiếu</th>
               <th class="px-4 py-3">Người Giao</th>
               <th class="px-4 py-3">Tổng Tiền</th>
               <th class="px-4 py-3">Thao Tác</th>
@@ -88,6 +89,9 @@
               <td class="px-4 py-3">{{ optional($r->publisher)->name }}</td>
               <td class="px-4 py-3">
                 {{ $r->created_at ? $r->created_at->format('d/m/Y, A') : '' }}
+              </td>
+              <td class="px-4 py-3 text-muted">
+                {{ optional($r->createdBy)->name }}
               </td>
               <td class="px-4 py-3 text-muted">
                 {{ $r->name_of_delivery_person }}

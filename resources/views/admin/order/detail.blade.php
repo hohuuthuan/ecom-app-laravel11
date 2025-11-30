@@ -61,27 +61,17 @@ $user = $order->user;
     </div>
     <div class="d-flex align-items-center gap-2">
       @php
-      // Trạng thái hiện tại (dạng thường)
       $status = strtolower($order->status);
-
-      // Class màu theo trạng thái
       $statusClass = match ($status) {
-      'cancelled' => 'badge-status--danger', // đỏ
-      'delivered', 'completed' => 'badge-status--success', // xanh lá
-      'pending',
-      'confirmed',
-      'processing',
-      'shipping' => 'badge-status--warning', // vàng
-      default => 'badge-status--primary', // xanh biển mặc định
+      'cancelled' => 'badge-status--danger',
+      'processing' => 'badge-status--primary',
+      'pending' => 'badge-status--warning',
+      default => 'badge-status--secondary',
       };
       $statusLabel = match ($status) {
       'pending' => 'Chờ xử lý',
-      'confirmed' => 'Đã xác nhận',
-      'processing' => 'Đang xử lý',
-      'shipping' => 'Đang giao',
-      'delivered' => 'Đã giao hàng',
-      'completed' => 'Hoàn tất',
-      'cancelled' => 'Đã hủy',
+      'processing' => 'Tiếp nhận đơn, chuyển đơn sang đơn vị kho',
+      'cancelled' => 'Hủy đơn hàng',
       default => strtoupper($order->status),
       };
       @endphp
@@ -100,42 +90,29 @@ $user = $order->user;
         @method('PATCH')
 
         @php
-        $current = strtolower($order->status);
+        // Đưa trạng thái hiện tại về UPPERCASE để so sánh cho tiện
+        $current = strtoupper($order->status ?? '');
         @endphp
 
-        <select name="status" class="form-select form-select-sm setupSelect2">
-          {{-- Nhóm đầu: trước vận chuyển --}}
-          <option value="PENDING" @selected($current==='pending' )>
-            Chờ xử lý
-          </option>
-          <option value="CONFIRMED" @selected($current==='confirmed' )>
-            Đã xác nhận
-          </option>
-          <option value="PROCESSING" @selected($current==='processing' )>
-            Đang xử lý
-          </option>
-
-          {{-- Nhóm vận chuyển / sau vận chuyển --}}
-          <option value="SHIPPING" @selected($current==='shipping' )>
-            Đang giao
-          </option>
-          <option value="DELIVERED" @selected($current==='delivered' )>
-            Đã giao
-          </option>
-          <option value="COMPLETED" @selected($current==='completed' )>
-            Hoàn tất
-          </option>
-
-          {{-- Hủy --}}
-          <option value="CANCELLED" @selected($current==='cancelled' )>
-            Đã hủy
-          </option>
-        </select>
+        <div class="admin-select-status-order">
+          <select name="status" class="form-select form-select-sm setupSelect2">
+            <option value="PENDING" @selected($current==='PENDING' )>
+              Chờ xử lý
+            </option>
+            <option value="PROCESSING" @selected($current==='PROCESSING' )>
+              Tiếp nhận đơn, chuyển đơn sang đơn vị kho
+            </option>
+            <option value="CANCELLED" @selected($current==='CANCELLED' )>
+              Hủy đơn hàng
+            </option>
+          </select>
+        </div>
 
         <button type="submit" class="btn btn-primary btn-admin">
           Cập nhật
         </button>
       </form>
+
 
       <span class="vr d-none d-md-block"></span>
       <div class="text-end">

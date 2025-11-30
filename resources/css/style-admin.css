@@ -1174,7 +1174,9 @@ table tbody td:first-child {
     color: #00455a;
 }
 
-
+.admin-select-status-order {
+    min-width: 300px;
+}
 
 /* ==== ORDER DETAIL ==== */
 .order-detail-page.card {

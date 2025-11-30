@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Services\Admin\Warehouse;
 
 use App\Models\Warehouse;
+use App\Models\PurchaseReceipt;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -196,5 +198,82 @@ class WarehouseImportService
 
       return false;
     }
+  }
+
+  public function getReceiptList(array $filters = [])
+  {
+    $query = PurchaseReceipt::query()
+      ->select([
+        'id',
+        'receipt_code',
+        'publisher_id',
+        'warehouse_id',
+        'received_at',
+        'delivery_note_number',
+        'name_of_delivery_person',
+        'sub_total_vnd',
+        'created_by',
+        'created_at',
+      ])
+      ->with([
+        'publisher:id,name',
+        'warehouse:id,name',
+        'createdBy:id,name',
+      ]);
+
+    if (!empty($filters['keyword'])) {
+      $kw = trim((string) $filters['keyword']);
+      $query->where(function ($q) use ($kw) {
+        $q->where('delivery_note_number', 'LIKE', "%{$kw}%")
+          ->orWhere('name_of_delivery_person', 'LIKE', "%{$kw}%");
+      });
+    }
+
+    if (!empty($filters['publisher_id'])) {
+      $query->where('publisher_id', (string) $filters['publisher_id']);
+    }
+
+    if (!empty($filters['warehouse_id'])) {
+      $query->where('warehouse_id', (string) $filters['warehouse_id']);
+    }
+
+    $perPage = (int)($filters['per_page'] ?? 20);
+    if ($perPage <= 0) {
+      $perPage = 20;
+    }
+    if ($perPage > 200) {
+      $perPage = 200;
+    }
+
+    $receipts = $query
+      ->orderByDesc('received_at')
+      ->orderByDesc('created_at')
+      ->paginate($perPage);
+
+    return \App\Helpers\PaginationHelper::appendQuery($receipts);
+  }
+
+  public function getReceiptDetail(string $id): ?PurchaseReceipt
+  {
+    return PurchaseReceipt::query()
+      ->with([
+        'publisher:id,name',
+        'warehouse:id,name',
+        'createdBy:id,name',
+        'items' => function ($q) {
+          $q->select([
+            'id',
+            'purchase_receipt_id',
+            'product_id',
+            'import_price_vnd',
+            'qty_doc',
+            'qty_actual',
+            'notes',
+          ])->with([
+            'product:id,code,title,unit',
+          ]);
+        },
+      ])
+      ->find($id);
   }
 }

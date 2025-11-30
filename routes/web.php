@@ -106,7 +106,7 @@ Route::middleware(['auth'])->group(function () {
 
   Route::middleware(['auth', 'role:Admin,Warehouse Manager'])->prefix('warehouse')->name('warehouse.')->group(function () {
     Route::get('/', [WarehousePageController::class, 'dashboard'])->name('dashboard');
-    
+
     Route::get('/orders', [WarehousePageController::class, 'orders'])->name('orders');
 
     Route::get('/inventory', [WarehousePageController::class, 'inventory'])->name('inventory');
@@ -114,6 +114,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/import', [WarehousePageController::class, 'import'])->name('import');
     Route::get('/import/products', [WarehousePageController::class, 'productsByPublisher'])->name('import.products');
     Route::post('/import', [WarehousePageController::class, 'handleImport'])->name('import.handle');
+    Route::get('/purchase-receipts', [WarehousePageController::class, 'purchaseReceiptIndex'])->name('purchase_receipts.index');
+    Route::get('/purchase-receipts/{id}', [WarehousePageController::class, 'purchaseReceiptShow'])->name('purchase_receipts.show');
   });
 });
 

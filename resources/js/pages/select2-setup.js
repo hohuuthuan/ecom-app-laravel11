@@ -8,9 +8,11 @@ var HHT = {};
       const $el = $(this);
       if ($el.hasClass('select2-hidden-accessible')) return;
       const $parent = $el.closest('.modal');
+      const width = $el.data('width') || '100%';
+
       $el.select2({
         dropdownParent: $parent.length ? $parent : $(document.body),
-        width: $el.data('width') || 'resolve'
+        width: width
       });
     });
   };

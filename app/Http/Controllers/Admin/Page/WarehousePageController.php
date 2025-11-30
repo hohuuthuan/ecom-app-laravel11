@@ -10,6 +10,7 @@ use App\Services\Admin\Warehouse\WarehouseImportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class WarehousePageController extends Controller
 {
@@ -147,5 +148,40 @@ class WarehousePageController extends Controller
     return redirect()
       ->back()
       ->with('toast_success', 'Tạo phiếu nhập kho thành công.');
+  }
+
+  public function purchaseReceiptIndex(Request $r): View
+  {
+    $filters = [
+      'per_page'     => (int) $r->query('per_page', 20),
+      'keyword'      => $r->query('keyword'),
+      'publisher_id' => $r->query('publisher_id'),
+      'warehouse_id' => $r->query('warehouse_id'),
+    ];
+
+    $receipts = $this->warehouseImportService->getReceiptList($filters);
+
+    $publishers = Publisher::query()
+      ->orderBy('name')
+      ->get(['id', 'name']);
+
+    return view('admin.warehouse.purchase-receipts.index', compact(
+      'receipts',
+      'filters',
+      'publishers',
+    ));
+  }
+
+  public function purchaseReceiptShow(string $id): View|RedirectResponse
+  {
+    $receipt = $this->warehouseImportService->getReceiptDetail($id);
+
+    if (!$receipt) {
+      return redirect()
+        ->route('warehouse.purchase_receipts.index')
+        ->with('toast_error', 'Không tìm thấy phiếu nhập kho');
+    }
+
+    return view('admin.warehouse.purchase-receipts.show', compact('receipt'));
   }
 }

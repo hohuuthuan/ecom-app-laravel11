@@ -13,6 +13,17 @@ body.warehouse-page {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
 }
 
+#warehouse-receipts .warehouse-card {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Row trong card filter không dùng margin âm để thò ra ngoài card */
+#warehouse-receipts .warehouse-card .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
 
 /* Nút bên sidebar */
 .warehouse-nav-btn {

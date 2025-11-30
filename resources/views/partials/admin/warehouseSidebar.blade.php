@@ -1,7 +1,7 @@
 <div class="p-4 border-bottom">
   <h2 class="h4 mb-0 fw-bold text-dark">📦 Quản Lý Kho</h2>
 </div>
-<nav class="mt-4">
+<nav class="mt-4 warehouse_sidebar">
   <div class="px-3">
     <a
       href="{{ route('warehouse.dashboard') }}"
@@ -13,7 +13,7 @@
     <a
       href="{{ route('warehouse.orders') }}"
       class="warehouse-nav-btn btn w-100 text-start p-3 mb-2 d-flex align-items-center {{ request()->routeIs('warehouse.orders') ? 'active' : '' }}">
-      <span class="me-3">📋</span>
+      <span class="me-3">🧾</span>
       <span>Đơn hàng</span>
     </a>
 
@@ -27,8 +27,15 @@
     <a
       href="{{ route('warehouse.import') }}"
       class="warehouse-nav-btn btn w-100 text-start p-3 mb-2 d-flex align-items-center {{ request()->routeIs('warehouse.import') ? 'active' : '' }}">
-      <span class="me-3">⬇️</span>
+      <span class="me-3">📥</span>
       <span>Nhập Kho</span>
+    </a>
+
+    <a
+      href="{{ route('warehouse.purchase_receipts.index') }}"
+      class="warehouse-nav-btn btn w-100 text-start p-3 mb-2 d-flex align-items-center {{ request()->routeIs('warehouse.purchase_receipts.index') ? 'active' : '' }}">
+      <span class="me-3">📑</span>
+      <span>DS phiếu nhập</span>
     </a>
   </div>
 </nav>

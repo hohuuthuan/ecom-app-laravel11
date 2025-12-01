@@ -11,6 +11,7 @@ use App\Http\Controllers\User\UserAddressController;
 use App\Http\Controllers\Admin\Page\CatalogPageController;
 use App\Http\Controllers\Admin\Page\ProductPageController;
 use App\Http\Controllers\Admin\Page\OrderPageController;
+use App\Http\Controllers\Admin\Page\WarehousePageController;
 
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\AuthorController;
@@ -52,7 +53,7 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/checkout/placeOrder', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
   Route::get('/checkout/momo/return', [CheckoutController::class, 'momoReturn'])->name('checkout.momoReturn');
   Route::get('/checkout/vnpay/return', [CheckoutController::class, 'vnpayReturn'])->name('checkout.vnpayReturn');
-  
+
   Route::prefix('profile')->name('user.profile.')->group(function () {
     Route::get('/', [UserAddressController::class, 'index'])->name('index');
     Route::get('/wards', [UserAddressController::class, 'getWards'])->name('wards');
@@ -101,6 +102,22 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/order', [OrderPageController::class, 'index'])->name('order.index');
     Route::get('/order/detail/{id}', [OrderPageController::class, 'detail'])->name('order.detail');
     Route::patch('/order/{id}/change-status', [OrderPageController::class, 'changeStatus'])->name('order.changeStatus');
+  });
+
+  Route::middleware(['auth', 'role:Admin,Warehouse Manager'])->prefix('warehouse')->name('warehouse.')->group(function () {
+    Route::get('/', [WarehousePageController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('/orders', [WarehousePageController::class, 'orders'])->name('orders');
+    Route::get('/orders/detail/{id}', [WarehousePageController::class, 'orderDetail'])->name('order.detail');
+    Route::patch('/orders/{id}/status', [WarehousePageController::class, 'changeOrderStatus'])->name('order.changeStatus');
+
+    Route::get('/inventory', [WarehousePageController::class, 'inventory'])->name('inventory');
+
+    Route::get('/import', [WarehousePageController::class, 'import'])->name('import');
+    Route::get('/import/products', [WarehousePageController::class, 'productsByPublisher'])->name('import.products');
+    Route::post('/import', [WarehousePageController::class, 'handleImport'])->name('import.handle');
+    Route::get('/purchase-receipts', [WarehousePageController::class, 'purchaseReceiptIndex'])->name('purchase_receipts.index');
+    Route::get('/purchase-receipts/{id}', [WarehousePageController::class, 'purchaseReceiptShow'])->name('purchase_receipts.show');
   });
 });
 

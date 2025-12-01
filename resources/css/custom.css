@@ -97,6 +97,17 @@
   right: 6px;
 }
 
+/* Làm cho <select>.setupSelect2 trước khi init gần giống box Select2 */
+.setupSelect2 {
+  height: 38px;
+  border: 1px solid #ced4da;
+  border-radius: 0;
+  padding: 6px 30px 6px 8px;
+  font-size: 13px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
 /* Label nằm trên, select full-width trong modal chỉnh sửa tài khoản */
 #uiAccountEditModal .form-label{
   display:block;

@@ -206,13 +206,14 @@ textarea#ac_address {
 
 /* SIDEBAR ANIMATION */
 .sidebar-box {
-    background: #233646;
+    background: #2f4050;
     color: #cbd5e1;
-    min-height: 100vh;
+    height: 100vh;
     position: sticky;
     top: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
 }
 
 .sidebar-box a {
@@ -222,6 +223,10 @@ textarea#ac_address {
 
 .sidebar-box .nav-section {
     padding: 0.5rem 0.5rem 1rem;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    min-height: 0;
 }
 
 .sidebar-box .nav-item>.nav-link {
@@ -229,13 +234,12 @@ textarea#ac_address {
     align-items: center;
     gap: 0.75rem;
     padding: 0.5rem 0.75rem;
-    border-radius: 0.5rem;
     color: #e5e7eb;
     transition: background 0.2s ease;
 }
 
 .sidebar-box .nav-item>.nav-link:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(196, 62, 62, 0.959);
 }
 
 .sidebar-box .nav-item.active>.nav-link {
@@ -296,11 +300,9 @@ textarea#ac_address {
     }
 
     #sidebarCol.sidebar-mini .name-role,
-    #sidebarCol.sidebar-mini .nav-label,
     #sidebarCol.sidebar-mini .caret {
         opacity: 0;
         max-width: 0;
-        transform: translateX(-6px);
     }
 
     /* hide all submenus smoothly in mini */
@@ -342,7 +344,6 @@ textarea#ac_address {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    border-radius: 0.5rem;
     color: #adb5bd;
     text-decoration: none;
     transition: background-color 0.15s, color 0.15s;
@@ -356,8 +357,15 @@ textarea#ac_address {
 }
 
 #sidebarCol .sidebar-link.active {
-    background: #0d6efd;
+    background: linear-gradient(135deg, #0c7c69e3, #1793a3a2);
     color: #fff;
+}
+
+#sidebarCol .sidebar-link.active:hover,
+#sidebarCol .sidebar-link.active:focus {
+    color: #ffffff;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.55);
+    background: linear-gradient(135deg, #0c7c69, #1793a3);
 }
 
 /* Icon gọn, căn đều */
@@ -376,6 +384,82 @@ textarea#ac_address {
     text-overflow: ellipsis;
     flex: 1 1 auto;
     min-width: 0;
+}
+
+.sidebar-switch-wrapper {
+    padding: 0.75rem 0.75rem 1rem 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-warehouse-switch {
+    border: none;
+    border-radius: 0px;
+    background: linear-gradient(135deg, #0c7c69e3, #1793a3a2);
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.45);
+    transition:
+        transform 0.15s ease-out,
+        box-shadow 0.15s ease-out,
+        background 0.15s ease-out,
+        opacity 0.15s ease-out;
+    padding: 0.55rem 0.75rem;
+}
+
+.btn-warehouse-switch .switch-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.25);
+    font-size: 0.9rem;
+}
+
+.btn-warehouse-switch .switch-icon i {
+    transform: translateY(0.5px);
+}
+
+.btn-warehouse-switch .switch-label {
+    white-space: nowrap;
+}
+
+/* Hover / focus */
+.btn-warehouse-switch:hover,
+.btn-warehouse-switch:focus {
+    color: #ffffff;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.55);
+    background: linear-gradient(135deg, #0c7c69, #1793a3);
+}
+
+/* Active (click) */
+.btn-warehouse-switch:active {
+    transform: translateY(0px) scale(0.98);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.35);
+}
+
+/* Trạng thái disabled (phòng khi dùng sau này) */
+.btn-warehouse-switch:disabled,
+.btn-warehouse-switch.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Tối ưu cho chế độ sidebar-mini: chỉ hiện icon, ẩn text */
+.sidebar-mini .sidebar-switch-wrapper {
+    padding-inline: 0.25rem;
+}
+
+.sidebar-mini .btn-warehouse-switch {
+    padding-inline: 0;
+    justify-content: start;
+}
+
+.sidebar-mini .btn-warehouse-switch .switch-icon {
+    width: 32px;
+    height: 32px;
 }
 
 .table-in-clip {
@@ -846,8 +930,8 @@ table tbody td:first-child {
 
     #sidebarCol.sidebar-mini .nav-item>.nav-link {
         justify-content: center;
-        padding: 10px !important;
-        gap: 0 !important;
+        padding: 12px !important;
+        gap: 10px !important;
     }
 
     #sidebarCol .sidebar-icon {
@@ -1174,7 +1258,9 @@ table tbody td:first-child {
     color: #00455a;
 }
 
-
+.admin-select-status-order {
+    min-width: 300px;
+}
 
 /* ==== ORDER DETAIL ==== */
 .order-detail-page.card {
@@ -1220,11 +1306,12 @@ table tbody td:first-child {
 }
 
 .table thead th {
-    white-space: nowrap
+    white-space: nowrap;
+    font-weight: 600;
 }
 
 .table tfoot td {
-    font-weight: 700
+    font-weight: 00
 }
 
 .copyable {
@@ -1276,83 +1363,83 @@ i.icon-telephone {
 
 
 .timeline-item {
-  position: relative;
-  padding-left: 16px;
-  margin-bottom: 0.75rem;
+    position: relative;
+    padding-left: 16px;
+    margin-bottom: 0.75rem;
 }
 
 .timeline-item::before {
-  content: "";
-  position: absolute;
-  left: -5px;
-  top: 0.4rem;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background-color: #0d6efd;
+    content: "";
+    position: absolute;
+    left: -5px;
+    top: 0.4rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: #0d6efd;
 }
 
 .timeline-item--primary::before {
-  background-color: #0d6efd;
+    background-color: #0d6efd;
 }
 
 .timeline-item--warning::before {
-  background-color: #ffc107;
+    background-color: #ffc107;
 }
 
 .timeline-item--success::before {
-  background-color: #198754;
+    background-color: #198754;
 }
 
 .badge-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.9rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 /* Chấm tròn nhỏ phía trước */
 .badge-status::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: currentColor;
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
 }
 
 /* Xanh biển – fallback (nếu có trạng thái lạ) */
 .badge-status--primary {
-  color: #0d6efd;
-  background-color: #e7f1ff;
-  border-color: rgba(13, 110, 253, 0.25);
+    color: #0d6efd;
+    background-color: #e7f1ff;
+    border-color: rgba(13, 110, 253, 0.25);
 }
 
 /* Vàng – các trạng thái ở giữa flow */
 .badge-status--warning {
-  color: #b58100;
-  background-color: #fff5d6;
-  border-color: rgba(255, 193, 7, 0.3);
+    color: #b58100;
+    background-color: #fff5d6;
+    border-color: rgba(255, 193, 7, 0.3);
 }
 
 /* Xanh lá – đã giao / hoàn tất */
 .badge-status--success {
-  color: #0f5132;
-  background-color: #d1e7dd;
-  border-color: rgba(25, 135, 84, 0.35);
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: rgba(25, 135, 84, 0.35);
 }
 
 /* Đỏ – đơn bị hủy */
 .badge-status--danger {
-  color: #842029;
-  background-color: #f8d7da;
-  border-color: rgba(220, 53, 69, 0.35);
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: rgba(220, 53, 69, 0.35);
 }
 
 

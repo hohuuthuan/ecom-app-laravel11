@@ -14,8 +14,27 @@ class RoleSeeder extends Seeder
 
     DB::table('roles')->upsert(
       [
-        ['id' => (string) Str::orderedUuid(), 'name' => 'Admin',    'description' => 'Full access', 'created_at' => $now, 'updated_at' => $now],
-        ['id' => (string) Str::orderedUuid(), 'name' => 'Customer', 'description' => 'Customer',    'created_at' => $now, 'updated_at' => $now],
+        [
+          'id' => (string) Str::orderedUuid(),
+          'name' => 'Admin',
+          'description' => 'Full access',
+          'created_at' => $now,
+          'updated_at' => $now,
+        ],
+        [
+          'id' => (string) Str::orderedUuid(),
+          'name' => 'Customer',
+          'description' => 'Customer',
+          'created_at' => $now,
+          'updated_at' => $now,
+        ],
+        [
+          'id' => (string) Str::orderedUuid(),
+          'name' => 'Warehouse Manager',
+          'description' => 'Manage warehouse and stocks',
+          'created_at' => $now,
+          'updated_at' => $now,
+        ],
       ],
       ['name'],
       ['description', 'updated_at']

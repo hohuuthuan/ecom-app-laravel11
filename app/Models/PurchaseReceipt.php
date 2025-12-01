@@ -13,8 +13,24 @@ class PurchaseReceipt extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    public function items()     { return $this->hasMany(PurchaseReceiptItem::class); }
-    public function warehouse() { return $this->belongsTo(Warehouse::class); }
-    public function publisher() { return $this->belongsTo(Publisher::class); }
-    public function creator()   { return $this->belongsTo(User::class, 'created_by'); }
+    public function items()
+    {
+        return $this->hasMany(PurchaseReceiptItem::class);
+    }
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+    public function publisher()
+    {
+        return $this->belongsTo(Publisher::class);
+    }
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

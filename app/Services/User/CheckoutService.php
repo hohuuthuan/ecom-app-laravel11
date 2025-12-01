@@ -12,10 +12,10 @@ class CheckoutService
     public function placeCodOrder(
         array $orderData,
         array $orderItemsData,
-        array $shipmentData,
-        array $orderBatchesData
-    ): Order {
-        return DB::transaction(function () use ($orderData, $orderItemsData, $shipmentData, $orderBatchesData) {
+        array $shipmentData
+    ): ?Order {
+        return DB::transaction(function () use ($orderData, $orderItemsData, $shipmentData) {
+            /** @var Order $order */
             $order = Order::query()->create($orderData);
 
             if (!empty($orderItemsData)) {
@@ -23,10 +23,6 @@ class CheckoutService
             }
 
             Shipment::query()->create($shipmentData);
-
-            if (!empty($orderBatchesData)) {
-                DB::table('order_batches')->insert($orderBatchesData);
-            }
 
             return $order;
         });

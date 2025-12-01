@@ -7,8 +7,12 @@
 @section('content')
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb mb-0">
-    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Admin</a></li>
-    <li class="breadcrumb-item"><a href="{{ route('admin.order.index') }}">Danh sách đơn hàng</a></li>
+    <li class="breadcrumb-item">
+      <a href="{{ route('admin.dashboard') }}">Admin</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{{ route('admin.order.index') }}">Danh sách đơn hàng</a>
+    </li>
     <li class="breadcrumb-item breadcrumb-active" aria-current="page">
       Chi tiết đơn hàng
     </li>
@@ -16,30 +20,56 @@
 </nav>
 
 @php
-/** @var \App\Models\Order $order */
-$fmtVnd = fn($n) => number_format((int) $n, 0, ',', '.') . ' VNĐ';
+  /** @var \App\Models\Order $order */
+  $fmtVnd = fn($n) => number_format((int) $n, 0, ',', '.') . ' VNĐ';
 
-$paymentStatus = strtolower((string) $order->payment_status);
+  $paymentStatus = strtolower((string) $order->payment_status);
 
-$paymentStatusTextMap = [
-'unpaid' => 'Chưa thanh toán',
-'pending' => 'Chờ thanh toán',
-'paid' => 'Đã thanh toán',
-'refunded' => 'Đã hoàn tiền',
-];
+  $paymentStatusTextMap = [
+    'unpaid'   => 'Chưa thanh toán',
+    'pending'  => 'Chờ thanh toán',
+    'paid'     => 'Đã thanh toán',
+    'refunded' => 'Đã hoàn tiền',
+  ];
 
-$paymentStatusClassMap = [
-'unpaid' => 'text-bg-secondary',
-'pending' => 'text-bg-warning',
-'paid' => 'text-bg-success',
-'refunded' => 'text-bg-info',
-];
+  $paymentStatusClassMap = [
+    'unpaid'   => 'text-bg-secondary',
+    'pending'  => 'text-bg-warning',
+    'paid'     => 'text-bg-success',
+    'refunded' => 'text-bg-info',
+  ];
 
-$paymentStatusText = $paymentStatusTextMap[$paymentStatus] ?? ucfirst($paymentStatus);
-$paymentStatusClass = $paymentStatusClassMap[$paymentStatus] ?? 'text-bg-secondary';
+  $paymentStatusText  = $paymentStatusTextMap[$paymentStatus] ?? ucfirst($paymentStatus);
+  $paymentStatusClass = $paymentStatusClassMap[$paymentStatus] ?? 'text-bg-secondary';
 
-$shipment = $order->shipment;
-$user = $order->user;
+  $shipment = $order->shipment;
+  $user     = $order->user;
+
+  $status = strtolower((string) $order->status);
+
+  // Nhãn hiển thị theo bộ status chuẩn
+  $statusLabel = match ($status) {
+    'pending'   => 'Chờ xử lý',
+    'processing'=> 'Tiếp nhận đơn, chuyển đơn sang đơn vị kho',
+    'shipping'  => 'Đang chuẩn bị hàng',
+    'delivered' => 'Đã giao cho đơn vị vận chuyển',
+    'completed' => 'Hoàn tất đơn hàng',
+    'cancelled' => 'Hủy đơn hàng',
+    default     => strtoupper((string) $order->status),
+  };
+
+  // Màu badge theo trạng thái
+  $statusClass = match ($status) {
+    'pending'   => 'badge-status--warning',
+    'processing',
+    'shipping',
+    'delivered' => 'badge-status--primary',
+    'completed' => 'badge-status--success',
+    'cancelled' => 'badge-status--danger',
+    default     => 'badge-status--secondary',
+  };
+
+  $current = strtoupper((string) $order->status);
 @endphp
 
 <div class="card mb-3">
@@ -59,33 +89,8 @@ $user = $order->user;
         <span>{{ optional($order->updated_at)->format('d/m/Y H:i A') }}</span>
       </div>
     </div>
+
     <div class="d-flex align-items-center gap-2">
-      @php
-      // Trạng thái hiện tại (dạng thường)
-      $status = strtolower($order->status);
-
-      // Class màu theo trạng thái
-      $statusClass = match ($status) {
-      'cancelled' => 'badge-status--danger', // đỏ
-      'delivered', 'completed' => 'badge-status--success', // xanh lá
-      'pending',
-      'confirmed',
-      'processing',
-      'shipping' => 'badge-status--warning', // vàng
-      default => 'badge-status--primary', // xanh biển mặc định
-      };
-      $statusLabel = match ($status) {
-      'pending' => 'Chờ xử lý',
-      'confirmed' => 'Đã xác nhận',
-      'processing' => 'Đang xử lý',
-      'shipping' => 'Đang giao',
-      'delivered' => 'Đã giao hàng',
-      'completed' => 'Hoàn tất',
-      'cancelled' => 'Đã hủy',
-      default => strtoupper($order->status),
-      };
-      @endphp
-
       <span
         id="statusBadge"
         class="badge rounded-pill badge-status {{ $statusClass }}">
@@ -99,38 +104,19 @@ $user = $order->user;
         @csrf
         @method('PATCH')
 
-        @php
-        $current = strtolower($order->status);
-        @endphp
-
-        <select name="status" class="form-select form-select-sm setupSelect2">
-          {{-- Nhóm đầu: trước vận chuyển --}}
-          <option value="PENDING" @selected($current==='pending' )>
-            Chờ xử lý
-          </option>
-          <option value="CONFIRMED" @selected($current==='confirmed' )>
-            Đã xác nhận
-          </option>
-          <option value="PROCESSING" @selected($current==='processing' )>
-            Đang xử lý
-          </option>
-
-          {{-- Nhóm vận chuyển / sau vận chuyển --}}
-          <option value="SHIPPING" @selected($current==='shipping' )>
-            Đang giao
-          </option>
-          <option value="DELIVERED" @selected($current==='delivered' )>
-            Đã giao
-          </option>
-          <option value="COMPLETED" @selected($current==='completed' )>
-            Hoàn tất
-          </option>
-
-          {{-- Hủy --}}
-          <option value="CANCELLED" @selected($current==='cancelled' )>
-            Đã hủy
-          </option>
-        </select>
+        <div class="admin-select-status-order">
+          <select name="status" class="form-select form-select-sm setupSelect2">
+            <option value="PENDING" @selected($current === 'PENDING')>
+              Chờ xử lý
+            </option>
+            <option value="PROCESSING" @selected($current === 'PROCESSING')>
+              Tiếp nhận đơn, chuyển đơn sang đơn vị kho
+            </option>
+            <option value="CANCELLED" @selected($current === 'CANCELLED')>
+              Hủy đơn hàng
+            </option>
+          </select>
+        </div>
 
         <button type="submit" class="btn btn-primary btn-admin">
           Cập nhật
@@ -148,7 +134,7 @@ $user = $order->user;
   </div>
 </div>
 
-<!-- 3-column sections -->
+{{-- 2 KHỐI: KHÁCH HÀNG + GIAO HÀNG --}}
 <div class="row g-3">
   <div class="col-12 col-lg-6">
     <div class="card h-100">
@@ -175,19 +161,19 @@ $user = $order->user;
             </div>
             <div class="mt-2">
               @if($user?->email)
-              <div class="mini">
-                <i class="bi bi-envelope"></i>
-                <a href="mailto:{{ $user->email }}">
-                  {{ $user->email }}
-                </a>
-              </div>
+                <div class="mini">
+                  <i class="bi bi-envelope"></i>
+                  <a href="mailto:{{ $user->email }}">
+                    {{ $user->email }}
+                  </a>
+                </div>
               @endif
 
               @if($user?->phone)
-              <div class="mini">
-                <i class="bi bi-telephone"></i>
-                {{ $user->phone }}
-              </div>
+                <div class="mini">
+                  <i class="bi bi-telephone"></i>
+                  {{ $user->phone }}
+                </div>
               @endif
             </div>
           </div>
@@ -201,7 +187,6 @@ $user = $order->user;
           <b>{{ strtoupper($order->payment_method) }}</b>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -209,18 +194,21 @@ $user = $order->user;
     <div class="card h-100">
       <div class="card-body">
         <div class="section-title mb-3">THÔNG TIN GIAO HÀNG</div>
-        <h5><i class="icon-delivery-address bi bi-geo-alt-fill"></i>Địa chỉ nhận hàng:</h5>
+        <h5>
+          <i class="icon-delivery-address bi bi-geo-alt-fill"></i>
+          Địa chỉ nhận hàng:
+        </h5>
 
         @if($shipment)
-        <div class="order-detail-shipment-address">{{ $shipment->address }}</div>
-        @if($shipment->phone)
-        <div class="mini mt-2">
-          <i class="icon-telephone bi bi-telephone-fill"></i>
-          {{ $shipment->phone }}
-        </div>
-        @endif
+          <div class="order-detail-shipment-address">{{ $shipment->address }}</div>
+          @if($shipment->phone)
+            <div class="mini mt-2">
+              <i class="icon-telephone bi bi-telephone-fill"></i>
+              {{ $shipment->phone }}
+            </div>
+          @endif
         @else
-        <div>Chưa có thông tin giao hàng</div>
+          <div>Chưa có thông tin giao hàng</div>
         @endif
 
         <hr>
@@ -228,16 +216,16 @@ $user = $order->user;
           Phí vận chuyển:
           {{ $fmtVnd($order->shipping_fee_vnd) }}
         </div>
-        <!-- <div class="mini">
+        {{-- <div class="mini">
           Đơn vị VC:
           {{ $shipment?->courier_name ?? '—' }}
-        </div> -->
+        </div> --}}
       </div>
     </div>
   </div>
 </div>
 
-<!-- Items -->
+{{-- SẢN PHẨM --}}
 <div class="card mt-3">
   <div class="card-body">
     <div class="section-title mb-3">Sản phẩm</div>
@@ -256,38 +244,38 @@ $user = $order->user;
         </thead>
         <tbody id="itemBody">
           @forelse($order->items as $item)
-          <tr>
-            <td>{{ $loop->iteration }}</td>
-            <td>
-              <div class="fw-semibold">
-                {{ $item->product_title_snapshot ?? $item->product->title ?? 'Sản phẩm' }}
-              </div>
-              <div class="text-muted mini">
-                ID: {{ $item->product_id }}
-              </div>
-            </td>
-            <td>
-              {{ $item->isbn13_snapshot ?? $item->product_id }}
-            </td>
-            <td class="text-center">
-              {{ $item->quantity }}
-            </td>
-            <td class="text-end">
-              {{ $fmtVnd($item->unit_price_vnd) }}
-            </td>
-            <td class="text-end">
-              {{ $fmtVnd($item->discount_amount_vnd ?? 0) }}
-            </td>
-            <td class="text-end">
-              {{ $fmtVnd($item->total_price_vnd) }}
-            </td>
-          </tr>
+            <tr>
+              <td>{{ $loop->iteration }}</td>
+              <td>
+                <div class="fw-semibold">
+                  {{ $item->product_title_snapshot ?? $item->product->title ?? 'Sản phẩm' }}
+                </div>
+                <div class="text-muted mini">
+                  ID: {{ $item->product_id }}
+                </div>
+              </td>
+              <td>
+                {{ $item->isbn13_snapshot ?? $item->product_id }}
+              </td>
+              <td class="text-center">
+                {{ $item->quantity }}
+              </td>
+              <td class="text-end">
+                {{ $fmtVnd($item->unit_price_vnd) }}
+              </td>
+              <td class="text-end">
+                {{ $fmtVnd($item->discount_amount_vnd ?? 0) }}
+              </td>
+              <td class="text-end">
+                {{ $fmtVnd($item->total_price_vnd) }}
+              </td>
+            </tr>
           @empty
-          <tr>
-            <td colspan="7" class="text-center text-muted mini">
-              Không có sản phẩm nào trong đơn hàng này.
-            </td>
-          </tr>
+            <tr>
+              <td colspan="7" class="text-center text-muted mini">
+                Không có sản phẩm nào trong đơn hàng này.
+              </td>
+            </tr>
           @endforelse
         </tbody>
         <tfoot>
@@ -318,21 +306,10 @@ $user = $order->user;
         </tfoot>
       </table>
     </div>
-    <!-- <div class="d-flex justify-content-end gap-2 no-print">
-      <button class="btn btn-outline-secondary">
-        <i class="bi bi-filetype-csv"></i> Xuất CSV
-      </button>
-      <button class="btn btn-outline-secondary">
-        <i class="bi bi-receipt"></i> Hóa đơn
-      </button>
-      <button class="btn btn-outline-danger">
-        <i class="bi bi-box-arrow-in-left"></i> Hoàn/Trả
-      </button>
-    </div> -->
   </div>
 </div>
 
-<!-- Timeline + Internal notes -->
+{{-- TIMELINE + GHI CHÚ --}}
 <div class="row g-3 mt-1">
   <div class="col-lg-7">
     <div class="card h-100">
@@ -340,67 +317,66 @@ $user = $order->user;
         <div class="section-title mb-3">Dòng thời gian</div>
 
         @php
-        $items = collect();
-        $createdAt = $order->placed_at ?? $order->created_at;
+          $timelineItems = collect();
+          $createdAt = $order->placed_at ?? $order->created_at;
 
-        if ($createdAt) {
-        $items->push([
-        'label' => 'Đã tạo đơn hàng',
-        'time' => $createdAt,
-        ]);
-        }
+          if ($createdAt) {
+            $timelineItems->push([
+              'label' => 'Đã tạo đơn hàng',
+              'time'  => $createdAt,
+            ]);
+          }
 
-        foreach ($order->statusHistories as $log) {
-        $label = match ($log->status) {
-        'pending' => 'Chờ xử lý',
-        'confirmed' => 'Đã xác nhận đơn',
-        'processing' => 'Đang xử lý',
-        'shipping' => 'Đang vận chuyển',
-        'delivered' => 'Đã giao hàng',
-        'completed' => 'Hoàn tất đơn hàng',
-        'cancelled' => 'Đã hủy đơn',
-        default => ucfirst($log->status),
-        };
+          foreach ($order->statusHistories as $log) {
+            $label = match ($log->status) {
+              'pending'   => 'Chờ xử lý',
+              'confirmed' => 'Đã xác nhận đơn',
+              'processing'=> 'Tiếp nhận đơn, chuyển đơn sang đơn vị kho',
+              'shipping'  => 'Đang chuẩn bị hàng',
+              'delivered' => 'Đã giao cho đơn vị vận chuyển',
+              'completed' => 'Hoàn tất đơn hàng',
+              'cancelled' => 'Đã hủy đơn',
+              default     => ucfirst($log->status),
+            };
 
-        $items->push([
-        'label' => $label,
-        'time' => $log->created_at,
-        ]);
-        }
+            $timelineItems->push([
+              'label' => $label,
+              'time'  => $log->created_at,
+            ]);
+          }
 
-        // Mới nhất ở trên
-        $items = $items->sortByDesc('time')->values();
+          $timelineItems = $timelineItems->sortByDesc('time')->values();
         @endphp
 
-        @if($items->isNotEmpty())
-        <div class="timeline">
-          @foreach($items as $row)
-          @php
-          $dotClass = match ($row['label']) {
-          'Đã tạo đơn hàng' => 'timeline-item--primary', // xanh biển
-          'Đã giao hàng',
-          'Hoàn tất đơn hàng' => 'timeline-item--success', // xanh lá
-          default => 'timeline-item--warning', // vàng
-          };
-          @endphp
+        @if($timelineItems->isNotEmpty())
+          <div class="timeline">
+            @foreach($timelineItems as $row)
+              @php
+                $dotClass = match ($row['label']) {
+                  'Đã tạo đơn hàng'                    => 'timeline-item--primary',
+                  'Đã giao cho đơn vị vận chuyển',
+                  'Hoàn tất đơn hàng'                  => 'timeline-item--success',
+                  'Đã hủy đơn'                         => 'timeline-item--danger',
+                  default                              => 'timeline-item--warning',
+                };
+              @endphp
 
-          <div class="timeline-item {{ $dotClass }}">
-            <div class="fw-semibold">{{ $row['label'] }}</div>
-            <div class="text-muted mini">
-              {{ $row['time']?->format('d/m/Y h:i A') }}
-            </div>
+              <div class="timeline-item {{ $dotClass }}">
+                <div class="fw-semibold">{{ $row['label'] }}</div>
+                <div class="text-muted mini">
+                  {{ $row['time']?->format('d/m/Y h:i A') }}
+                </div>
+              </div>
+            @endforeach
           </div>
-          @endforeach
-        </div>
         @else
-        <div class="text-muted mini">
-          Chưa có lịch sử trạng thái cho đơn hàng này.
-        </div>
+          <div class="text-muted mini">
+            Chưa có lịch sử trạng thái cho đơn hàng này.
+          </div>
         @endif
       </div>
     </div>
   </div>
-
 
   <div class="col-lg-5">
     <div class="card h-100">
@@ -410,24 +386,24 @@ $user = $order->user;
 
         <ul class="list-group mb-3" id="noteList">
           @if($order->buyer_note)
-          <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div class="me-2">
-              {{ $order->buyer_note }}
-              <div class="mini text-muted">
-                {{ optional($order->placed_at ?? $order->created_at)->format('d/m/Y H:i') }} • Khách hàng
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+              <div class="me-2">
+                {{ $order->buyer_note }}
+                <div class="mini text-muted">
+                  {{ optional($order->placed_at ?? $order->created_at)->format('d/m/Y H:i') }} • Khách hàng
+                </div>
               </div>
-            </div>
-            <button class="btn btn-sm btn-outline-danger no-print" disabled>
-              <i class="bi bi-trash"></i>
-            </button>
-          </li>
+              <button class="btn btn-sm btn-outline-danger no-print" disabled>
+                <i class="bi bi-trash"></i>
+              </button>
+            </li>
           @endif
         </ul>
 
         @if(!$order->buyer_note)
-        <div class="mini text-muted mb-3">
-          Chưa có ghi chú từ khách hàng.
-        </div>
+          <div class="mini text-muted mb-3">
+            Chưa có ghi chú từ khách hàng.
+          </div>
         @endif
 
         <div class="input-group">

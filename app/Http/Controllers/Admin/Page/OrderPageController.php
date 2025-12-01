@@ -55,16 +55,11 @@ class OrderPageController extends Controller
 
     $order = Order::findOrFail($id);
 
-    // Giá trị gửi từ form: PENDING / CONFIRMED / PROCESSING / SHIPPING / DELIVERED / COMPLETED / CANCELLED
     $input = strtoupper(trim($request->input('status')));
 
     $map = [
       'PENDING'    => 'pending',
-      'CONFIRMED'  => 'confirmed',
       'PROCESSING' => 'processing',
-      'SHIPPING'   => 'shipping',
-      'DELIVERED'  => 'delivered',
-      'COMPLETED'  => 'completed',
       'CANCELLED'  => 'cancelled',
     ];
 
@@ -83,42 +78,28 @@ class OrderPageController extends Controller
     }
 
     if ($current === $target) {
-      return back()->with('toast_info', 'Trạng thái đơn hàng không thay đổi');
+      return back()->with('toast_info', 'Trạng thái không thay đổi');
     }
 
     $this->orderStatusService->changeStatus($order, $target);
 
-    return back()->with('toast_success', 'Cập nhật trạng thái đơn hàng thành công');
+    return back()->with('toast_success', 'Cập nhật trạng thái thành công');
   }
 
   private function canChangeStatus(string $current, string $target): bool
   {
+    $current = strtolower($current);
+    $target = strtolower($target);
     if ($current === $target) {
       return true;
     }
-    if ($current === 'cancelled') {
+    $editable = ['pending', 'processing', 'cancelled'];
+
+    if (!in_array($current, $editable, true)) {
       return false;
     }
+    $allowedTargets = ['pending', 'processing', 'cancelled'];
 
-    $early = ['pending', 'confirmed', 'processing'];
-    if (in_array($current, $early, true) && in_array($target, $early, true)) {
-      return true;
-    }
-    if ($target === 'cancelled') {
-      return in_array($current, $early, true);
-    }
-
-    $flow = ['shipping', 'delivered', 'completed'];
-
-    $currentIndex = array_search($current, $flow, true);
-    $targetIndex  = array_search($target, $flow, true);
-    if ($currentIndex !== false && $targetIndex !== false) {
-      return $targetIndex >= $currentIndex;
-    }
-    if (in_array($current, $early, true) && $target === 'shipping') {
-      return true;
-    }
-
-    return false;
+    return in_array($target, $allowedTargets, true);
   }
 }

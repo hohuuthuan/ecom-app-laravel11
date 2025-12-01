@@ -7,6 +7,9 @@ use App\Http\Requests\Admin\Warehouse\StoreWarehouseImportRequest;
 use App\Models\Product;
 use App\Models\Publisher;
 use App\Models\Order;
+use App\Models\Stock;
+use App\Models\PurchaseReceipt;
+use Illuminate\Support\Facades\DB;
 use App\Services\Admin\Warehouse\WarehouseImportService;
 use App\Services\Admin\Order\OrderService;
 use Illuminate\Http\JsonResponse;
@@ -24,7 +27,57 @@ class WarehousePageController extends Controller
 
   public function dashboard(Request $r)
   {
-    return view('admin.warehouse.dashboard');
+    $totalProducts = Product::query()
+      ->where('status', 'ACTIVE')
+      ->count();
+
+    $pendingOrders = Order::query()
+      ->whereIn('status', ['PROCESSING'])
+      ->count();
+
+    $lowStockItems = Stock::query()
+      ->where('on_hand', '>', 0)
+      ->where(function ($q) {
+        $q->where(function ($q2) {
+          $q2->whereNotNull('reorder_point')
+            ->whereColumn('on_hand', '<=', 'reorder_point');
+        })
+          ->orWhere(function ($q2) {
+            $q2->whereNull('reorder_point')
+              ->where('on_hand', '<=', 50);
+          });
+      })
+      ->count();
+
+    $outOfStockItems = Product::query()
+      ->where('status', 'ACTIVE')
+      ->where(function ($q) {
+        $q->whereDoesntHave('stocks')
+          ->orWhereHas('stocks', function ($q2) {
+            $q2->select('product_id', DB::raw('SUM(on_hand) as total_on_hand'))
+              ->groupBy('product_id')
+              ->havingRaw('SUM(on_hand) <= 0');
+          });
+      })
+      ->count();
+
+    $stats = [
+      'total_products'     => $totalProducts,
+      'pending_orders'     => $pendingOrders,
+      'low_stock_items'    => $lowStockItems,
+      'out_of_stock_items' => $outOfStockItems,
+    ];
+
+    $recentReceipts = PurchaseReceipt::query()
+      ->orderByDesc('received_at')
+      ->orderByDesc('created_at')
+      ->limit(5)
+      ->get();
+
+    return view('admin.warehouse.dashboard', [
+      'stats'          => $stats,
+      'recentReceipts' => $recentReceipts,
+    ]);
   }
 
   public function orders(Request $r)
@@ -47,7 +100,7 @@ class WarehousePageController extends Controller
   public function orderDetail(string $id)
   {
     [$order, $stockMap, $itemBatches] = $this->orderService->getWarehouseOrderDetail($id);
-    
+
     return view('admin.warehouse.order.detail', compact('order', 'stockMap', 'itemBatches'));
   }
 

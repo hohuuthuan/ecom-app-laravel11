@@ -5,7 +5,7 @@
 @section('content')
 <div id="warehouse-inventory" class="warehouse-section">
   <div class="mb-3 ">
-    <h1 class="display-6 fw-bold text-dark mb-2">Báo Cáo Tồn Kho</h1>
+    <h1 class="display-6 fw-bold text-dark mb-2">Báo cáo tồn kho</h1>
     <p class="text-muted">Theo dõi số lượng tồn kho theo thời gian thực</p>
   </div>
 

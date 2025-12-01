@@ -8,10 +8,10 @@ use App\Models\Product;
 use App\Models\Publisher;
 use App\Models\Order;
 use App\Models\Stock;
-use App\Models\PurchaseReceipt;
 use Illuminate\Support\Facades\DB;
 use App\Services\Admin\Warehouse\WarehouseImportService;
 use App\Services\Admin\Order\OrderService;
+use App\Services\Admin\Warehouse\WarehouseActivityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,10 +22,11 @@ class WarehousePageController extends Controller
 {
   public function __construct(
     private OrderService $orderService,
-    private WarehouseImportService $warehouseImportService
+    private WarehouseImportService $warehouseImportService,
+    private WarehouseActivityService $warehouseActivityService,
   ) {}
 
-  public function dashboard(Request $r)
+  public function dashboard(Request $r): View
   {
     $totalProducts = Product::query()
       ->where('status', 'ACTIVE')
@@ -68,19 +69,17 @@ class WarehousePageController extends Controller
       'out_of_stock_items' => $outOfStockItems,
     ];
 
-    $recentReceipts = PurchaseReceipt::query()
-      ->orderByDesc('received_at')
-      ->orderByDesc('created_at')
-      ->limit(5)
-      ->get();
+    $recentActivities = $this->warehouseActivityService->getTodayActivityList([
+      'per_page' => 5,
+    ]);
 
     return view('admin.warehouse.dashboard', [
-      'stats'          => $stats,
-      'recentReceipts' => $recentReceipts,
+      'stats'            => $stats,
+      'recentActivities' => $recentActivities,
     ]);
   }
 
-  public function orders(Request $r)
+  public function orders(Request $r): View
   {
     $filters = [
       'keyword'        => $r->input('keyword'),
@@ -97,14 +96,14 @@ class WarehousePageController extends Controller
     return view('admin.warehouse.order.index', compact('orders'));
   }
 
-  public function orderDetail(string $id)
+  public function orderDetail(string $id): View
   {
     [$order, $stockMap, $itemBatches] = $this->orderService->getWarehouseOrderDetail($id);
 
     return view('admin.warehouse.order.detail', compact('order', 'stockMap', 'itemBatches'));
   }
 
-  public function changeOrderStatus(Request $r, string $id)
+  public function changeOrderStatus(Request $r, string $id): RedirectResponse
   {
     $validated = $r->validate([
       'warehouse_status' => [
@@ -126,7 +125,14 @@ class WarehousePageController extends Controller
       'HANDED_OVER_CARRIER' => 'DELIVERED',
     ];
 
+    $warehouseStatusLabels = [
+      'RECEIVING_PROCESS'   => 'Tiếp nhận đơn',
+      'PREPARING_ITEMS'     => 'Đang chuẩn bị hàng',
+      'HANDED_OVER_CARRIER' => 'Đã giao cho đơn vị vận chuyển',
+    ];
+
     $targetStatus = $mapToOrderStatus[$validated['warehouse_status']];
+    $statusLabel  = $warehouseStatusLabels[$validated['warehouse_status']] ?? $targetStatus;
 
     $levelMap = [
       'PROCESSING' => 1,
@@ -148,10 +154,12 @@ class WarehousePageController extends Controller
     $order->status = $targetStatus;
     $order->save();
 
-    return back()->with('toast_success', 'Cập nhật trạng thái đơn hàng thành công');
+    WarehouseActivityService::log('Đơn #' . $order->code . ' - ' . $statusLabel);
+
+    return back()->with('toast_success', 'Cập nhật trạng thái đơn hàng: ' . $statusLabel);
   }
 
-  public function inventory(Request $r)
+  public function inventory(Request $r): View
   {
     $filters = [
       'keyword'  => $r->query('keyword'),
@@ -169,7 +177,7 @@ class WarehousePageController extends Controller
     ]);
   }
 
-  public function import(Request $r)
+  public function import(Request $r): View
   {
     $publishers = Publisher::query()
       ->where('status', 'ACTIVE')
@@ -194,7 +202,7 @@ class WarehousePageController extends Controller
     }
 
     return view('admin.warehouse.warehouse-import', [
-      'publishers' => $publishers,
+      'publishers'      => $publishers,
       'initialProducts' => $initialProducts,
     ]);
   }

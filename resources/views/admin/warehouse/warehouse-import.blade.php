@@ -11,7 +11,7 @@ $hasOldItems = is_array($oldItems) && count($oldItems) > 0;
 
 <div id="warehouse-import" class="warehouse-section">
   <div class="mb-3">
-    <h1 class="display-6 fw-bold text-dark mb-2">Nhập Kho</h1>
+    <h1 class="display-6 fw-bold text-dark mb-2">Nhập kho</h1>
     <p class="text-muted mb-0">Tạo phiếu nhập kho mới</p>
   </div>
 

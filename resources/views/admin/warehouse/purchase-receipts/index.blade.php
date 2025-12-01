@@ -7,7 +7,7 @@
 
   <div class="d-flex justify-content-between align-items-center mb-5">
     <div>
-      <h1 class="display-6 fw-bold text-dark mb-2">Danh Sách Phiếu Nhập Kho</h1>
+      <h1 class="display-6 fw-bold text-dark mb-2">Danh sách phiếu nhập kho</h1>
       <p class="text-muted">Xem, lọc và truy cập chi tiết các phiếu nhập</p>
     </div>
     <a href="{{ route('warehouse.import') }}" class="btn btn-primary btn-new-purchase-receipt">

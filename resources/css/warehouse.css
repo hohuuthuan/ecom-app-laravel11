@@ -23,6 +23,11 @@ body.warehouse-page {
   margin-right: 0;
 }
 
+.warehouse-dashboard-recentActivities,
+.warehouse-dashboard-quick-action {
+  max-height: 690px;
+}
+
 .warehouse_sidebar a{
   text-decoration: none;
 }

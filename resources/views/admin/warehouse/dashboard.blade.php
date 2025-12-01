@@ -6,7 +6,7 @@
 <div id="warehouse-dashboard" class="warehouse-section">
   <div class="mb-5 d-flex justify-content-between align-items-end flex-wrap gap-3">
     <div>
-      <h1 class="display-6 fw-bold text-dark mb-2">Tổng Quan Kho</h1>
+      <h1 class="display-6 fw-bold text-dark mb-2">Tổng quan kho</h1>
       <p class="text-muted mb-0">Thống kê nhanh tình hình tồn kho và đơn hàng.</p>
     </div>
     <div class="text-end">
@@ -21,7 +21,7 @@
 
   <div class="row g-4 mb-5">
     <div class="col-xl-3 col-md-6">
-      <div class="warehouse-card stats-card blue h-100">
+      <div class="warehouse-card stats-card blue">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -38,7 +38,7 @@
 
     <div class="col-xl-3 col-md-6">
       <a href="{{ route('warehouse.orders', ['status' => 'PROCESSING']) }}" class="text-decoration-none text-reset">
-        <div class="warehouse-card stats-card green h-100">
+        <div class="warehouse-card stats-card green">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
               <div>
@@ -93,50 +93,49 @@
 
   <div class="row g-4">
     <div class="col-lg-7">
-      <div class="warehouse-card card h-100">
+      <div class="warehouse-dashboard-recentActivities warehouse-card card">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="card-title fw-semibold mb-0">Hoạt Động Nhập Kho Gần Đây</h4>
-            <a href="{{ route('warehouse.purchase_receipts.index') }}" class="small text-decoration-none">
+            <!-- <a href="{{ route('warehouse.purchase_receipts.index') }}" class="small text-decoration-none">
               Xem tất cả
-            </a>
+            </a> -->
           </div>
 
-          @if($recentReceipts->isEmpty())
-          <p class="text-muted mb-0">Chưa có phiếu nhập nào gần đây.</p>
+          @if($recentActivities->count() === 0)
+          <p class="text-muted mb-0">Chưa có hoạt động nào trong ngày hôm nay.</p>
           @else
           <div class="d-flex flex-column gap-3">
-            @foreach($recentReceipts as $receipt)
+            @foreach($recentActivities as $activity)
             <div class="activity-item p-3 d-flex align-items-center border rounded-3">
-              <div class="fs-4 me-3">⬇️</div>
+              <div class="fs-4 me-3">🧾</div>
               <div class="flex-grow-1">
                 <p class="mb-1 fw-medium">
-                  Phiếu nhập
-                  <span class="fw-semibold">{{ $receipt->receipt_code }}</span>
-                  @if(!empty($receipt->delivery_unit))
-                  - {{ $receipt->delivery_unit }}
-                  @endif
+                  {{ $activity->title }}
                 </p>
-                @php
-                $displayDate = $receipt->received_at ?? $receipt->created_at;
-                @endphp
                 <small class="text-muted">
-                  {{ $displayDate ? \Illuminate\Support\Carbon::parse($displayDate)->diffForHumans() : '' }}
+                  {{ $activity->occurred_at?->diffForHumans() }}
                 </small>
               </div>
               <div class="text-end small text-muted ms-3">
-                {{ $displayDate ? \Illuminate\Support\Carbon::parse($displayDate)->format('d/m/Y') : '' }}
+                {{ $activity->occurred_at?->format('d/m/Y H:i') }}
               </div>
             </div>
             @endforeach
           </div>
+
+          @if($recentActivities->hasPages())
+          <div class="mt-3">
+            {{ $recentActivities->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
+          </div>
+          @endif
           @endif
         </div>
       </div>
     </div>
 
     <div class="col-lg-5">
-      <div class="warehouse-card card h-100">
+      <div class="warehouse-dashboard-quick-action warehouse-card card">
         <div class="card-body">
           <h4 class="card-title fw-semibold mb-3">Thao Tác Nhanh</h4>
           <div class="list-group list-group-flush">

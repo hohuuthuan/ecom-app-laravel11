@@ -392,8 +392,8 @@ textarea#ac_address {
 }
 
 .btn-warehouse-switch {
-    border-radius: 999px;
     border: none;
+    border-radius: 0px;
     background: linear-gradient(135deg, #0c7c69e3, #1793a3a2);
     color: #ffffff;
     font-size: 0.85rem;

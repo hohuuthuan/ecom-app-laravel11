@@ -1,19 +1,32 @@
 @props([
-'route',
-'icon' => null,
-'label',
-'href' => null,
+  'route',
+  'icon' => null,
+  'label',
+  'href' => null,
+  'active' => null,
 ])
 
 @php
-$routes = (array) $route;
-$isActive = collect($routes)->contains(fn($r) => request()->routeIs($r));
-$url = $href ?: (is_string($route) ? route($route) : route($routes[0]));
+  $patterns = (array) ($active ?? $route);
+  $isActive = collect($patterns)->contains(function ($pattern) {
+    return request()->routeIs($pattern);
+  });
+
+  if ($href) {
+    $url = $href;
+  } else {
+    $routeName = is_array($route) ? $route[0] : $route;
+    $url = route($routeName);
+  }
 @endphp
 
 <li class="nav-item">
-  <a class="nav-link sidebar-link {{ $isActive ? 'active' : '' }}" href="{{ $url }}">
-    @if($icon)<i class="fa {{ $icon }} fa-fw sidebar-icon"></i>@endif
+  <a
+    class="nav-link sidebar-link {{ $isActive ? 'active' : '' }}"
+    href="{{ $url }}">
+    @if ($icon)
+      <i class="fa {{ $icon }} fa-fw sidebar-icon"></i>
+    @endif
     <span class="nav-label">{{ $label }}</span>
   </a>
 </li>

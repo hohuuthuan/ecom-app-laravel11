@@ -238,6 +238,7 @@
                 placeholder="Nhập mã giảm giá"
                 value="{{ old('discount_code') }}">
               <button
+                id="discountApplyButton"
                 class="apply-btn"
                 type="button"
                 onclick="applyDiscount()">

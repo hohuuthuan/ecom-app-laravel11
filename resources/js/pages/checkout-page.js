@@ -19,10 +19,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var ship = parseInt(root.getAttribute('data-shipping') || '0', 10);
 
   function setTotals(currSub, currShip, discount) {
-    var subtotalEl  = document.getElementById('checkoutSubtotal');
-    var shippingEl  = document.getElementById('checkoutShipping');
-    var discountEl  = document.getElementById('checkoutDiscount');
-    var totalEl     = document.getElementById('checkoutTotal');
+    var subtotalEl = document.getElementById('checkoutSubtotal');
+    var shippingEl = document.getElementById('checkoutShipping');
+    var discountEl = document.getElementById('checkoutDiscount');
+    var totalEl = document.getElementById('checkoutTotal');
 
     if (subtotalEl) { subtotalEl.textContent = formatVND(currSub); }
     if (shippingEl) { shippingEl.textContent = formatVND(currShip); }
@@ -33,39 +33,139 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Dùng cho nút "Áp dụng" mã giảm giá (tạm time UI, chưa nối với backend)
   window.applyDiscount = function () {
-    var inputEl  = document.getElementById('discountCode');
-    var msgEl    = document.getElementById('discountMessage');
-    var code     = (inputEl && inputEl.value ? inputEl.value : '').trim().toUpperCase();
-    var discount = 0;
-    var currShip = ship;
+    var inputEl = document.getElementById('discountCode');
+    var msgEl = document.getElementById('discountMessage');
+    var rootEl = document.getElementById('checkoutPage');
+    var btnEl = document.getElementById('discountApplyButton');
 
-    // Nếu xóa mã
+    if (!inputEl || !msgEl || !rootEl || !btnEl) {
+      return;
+    }
+
+    var code = inputEl.value.trim();
+    msgEl.textContent = '';
+    msgEl.classList.remove('discount-message-error');
+
     if (code === '') {
-      if (msgEl) { msgEl.textContent = 'Đã xoá mã giảm giá.'; }
-      setTotals(sub, currShip, 0);
+      var tokenDelete = document.querySelector('meta[name="csrf-token"]');
+      var csrfDelete = tokenDelete ? tokenDelete.getAttribute('content') : '';
+
+      btnEl.disabled = true;
+      btnEl.classList.remove('apply-btn-success');
+      btnEl.innerHTML = 'Đang xoá...';
+
+      fetch('/checkout/discount', {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': csrfDelete,
+          'Accept': 'application/json',
+        },
+      })
+        .then(function (res) {
+          return res.json().catch(function () {
+            return { ok: false };
+          });
+        })
+        .then(function (res) {
+          setTotals(sub, ship, 0);
+          rootEl.setAttribute('data-subtotal', String(sub));
+          rootEl.setAttribute('data-shipping', String(ship));
+          msgEl.textContent = res.ok ? (res.message || 'Đã xoá mã giảm giá.') : 'Đã xoá mã giảm giá.';
+        })
+        .catch(function () {
+          setTotals(sub, ship, 0);
+          rootEl.setAttribute('data-subtotal', String(sub));
+          rootEl.setAttribute('data-shipping', String(ship));
+          msgEl.textContent = 'Đã xoá mã giảm giá.';
+        })
+        .finally(function () {
+          btnEl.disabled = false;
+          btnEl.classList.remove('apply-btn-success');
+          btnEl.innerHTML = 'Áp Dụng';
+        });
+
       return;
     }
 
-    // Demo một vài mã cứng
-    if (code === 'HOMESTYLE10') {
-      discount = Math.round(sub * 0.10);
-      if (msgEl) { msgEl.textContent = 'Áp dụng mã HOMESTYLE10 thành công (-10%).'; }
-      setTotals(sub, currShip, discount);
-      return;
-    }
+    var subtotal = parseInt(rootEl.getAttribute('data-subtotal') || '0', 10);
+    var shipping = parseInt(rootEl.getAttribute('data-shipping') || '0', 10);
+    var token = document.querySelector('meta[name="csrf-token"]');
+    var csrf = token ? token.getAttribute('content') : '';
 
-    if (code === 'FREESHIP') {
-      currShip = 0;
-      if (msgEl) { msgEl.textContent = 'Áp dụng mã FREESHIP thành công (miễn phí vận chuyển).'; }
-      setTotals(sub, currShip, 0);
-      return;
-    }
+    btnEl.disabled = true;
+    btnEl.classList.remove('apply-btn-success');
+    btnEl.innerHTML = 'Đang áp dụng...';
 
-    if (msgEl) {
-      msgEl.textContent = 'Mã không hợp lệ. Dùng thử: HOMESTYLE10 hoặc FREESHIP.';
-    }
+    fetch('/checkout/apply-discount', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrf,
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        code: code,
+        subtotal: subtotal,
+        shipping: shipping,
+      }),
+    })
+      .then(function (res) {
+        return res.json().then(function (json) {
+          return { status: res.status, body: json };
+        }).catch(function () {
+          return { status: res.status, body: null };
+        });
+      })
+      .then(function (res) {
+        if (!res.body) {
+          msgEl.textContent = 'Không thể áp dụng mã giảm giá. Vui lòng thử lại.';
+          msgEl.classList.add('discount-message-error');
+          setTotals(subtotal, shipping, 0);
+          rootEl.setAttribute('data-subtotal', String(subtotal));
+          rootEl.setAttribute('data-shipping', String(shipping));
+          btnEl.disabled = false;
+          btnEl.classList.remove('apply-btn-success');
+          btnEl.innerHTML = 'Áp Dụng';
+          return;
+        }
+
+        if (!res.body.ok) {
+          msgEl.textContent = res.body.message || 'Mã giảm giá không hợp lệ.';
+          msgEl.classList.add('discount-message-error');
+          setTotals(subtotal, shipping, 0);
+          rootEl.setAttribute('data-subtotal', String(subtotal));
+          rootEl.setAttribute('data-shipping', String(shipping));
+          btnEl.disabled = false;
+          btnEl.classList.remove('apply-btn-success');
+          btnEl.innerHTML = 'Áp Dụng';
+          return;
+        }
+
+        var data = res.body.data || {};
+        var newSubtotal = typeof data.subtotal_vnd === 'number' ? data.subtotal_vnd : subtotal;
+        var newShipping = typeof data.shipping_vnd === 'number' ? data.shipping_vnd : shipping;
+        var discountVnd = (data.discount_vnd || 0) + (data.shipping_discount_vnd || 0);
+
+        setTotals(newSubtotal, newShipping, discountVnd);
+        rootEl.setAttribute('data-subtotal', String(newSubtotal));
+        rootEl.setAttribute('data-shipping', String(newShipping));
+
+        msgEl.textContent = res.body.message || 'Áp dụng mã giảm giá thành công.';
+        btnEl.disabled = false;
+        btnEl.classList.add('apply-btn-success');
+        btnEl.innerHTML = '<i class="bi bi-check-circle-fill"></i>';
+      })
+      .catch(function () {
+        msgEl.textContent = 'Có lỗi xảy ra khi áp dụng mã. Vui lòng thử lại.';
+        msgEl.classList.add('discount-message-error');
+        setTotals(subtotal, shipping, 0);
+        rootEl.setAttribute('data-subtotal', String(subtotal));
+        rootEl.setAttribute('data-shipping', String(shipping));
+        btnEl.disabled = false;
+        btnEl.classList.remove('apply-btn-success');
+        btnEl.innerHTML = 'Áp Dụng';
+      });
   };
 
   setTotals(sub, ship, 0);
@@ -73,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ================== CHỌN PHƯƠNG THỨC THANH TOÁN ==================
 document.addEventListener('DOMContentLoaded', function () {
-  var options   = document.querySelectorAll('.js-payment-option');
+  var options = document.querySelectorAll('.js-payment-option');
   var methodInp = document.getElementById('paymentMethodInput');
   var submitBtn = document.getElementById('paymentSubmitButton');
 
@@ -103,9 +203,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
       opt.classList.add('selected');
       var radio = opt.querySelector('.radio-custom');
-      var dot   = opt.querySelector('.radio-dot');
+      var dot = opt.querySelector('.radio-dot');
       if (radio) { radio.classList.add('checked'); }
-      if (dot)   { dot.classList.add('show'); }
+      if (dot) { dot.classList.add('show'); }
 
       if (methodInp) { methodInp.value = method; }
       updateButton(method);
@@ -119,13 +219,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ================== CHỌN LẠI ĐỊA CHỈ (KHÔNG NỐI LẠI PROVINCE/WARD VÀO TITLE) ==================
 (function () {
-  var modalEl       = document.getElementById('selectAddressModal');
+  var modalEl = document.getElementById('selectAddressModal');
   if (!modalEl) { return; }
 
-  var cards         = modalEl.querySelectorAll('.js-address-select-card');
-  var hiddenInput   = document.getElementById('shippingAddressId');
-  var selectedCard  = document.getElementById('selectedAddressCard');
-  var selectedBody  = document.getElementById('selectedAddressBody');
+  var cards = modalEl.querySelectorAll('.js-address-select-card');
+  var hiddenInput = document.getElementById('shippingAddressId');
+  var selectedCard = document.getElementById('selectedAddressCard');
+  var selectedBody = document.getElementById('selectedAddressBody');
   var selectedTitle = selectedCard
     ? selectedCard.querySelector('.selected-address-text')
     : null;
@@ -174,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // data-text: full string hiển thị (địa chỉ + ward + province)
       var fullText = card.getAttribute('data-text') || '';
-      var note     = card.getAttribute('data-note') || '';
+      var note = card.getAttribute('data-note') || '';
 
       updateSelectedAddress(fullText, note);
 

@@ -392,3 +392,18 @@ i.icon-selected-product {
     text-align: center;
   }
 }
+
+.discount-message {
+  margin-top: 4px;
+  font-size: 0.875rem;
+}
+
+.discount-message-error {
+  color: #dc3545; /* đỏ kiểu Bootstrap */
+}
+
+.apply-btn-success {
+  background-color: #198754;
+  border-color: #198754;
+  color: #ffffff;
+}

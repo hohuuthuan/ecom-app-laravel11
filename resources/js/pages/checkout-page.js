@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', function () {
   var sub = parseInt(root.getAttribute('data-subtotal') || '0', 10);
   var ship = parseInt(root.getAttribute('data-shipping') || '0', 10);
 
-  function setTotals(currSub, currShip, discount) {
+  // THAY ĐỔI: thêm tham số total (tổng tiền đã tính sẵn từ backend)
+  function setTotals(currSub, currShip, discount, total) {
     var subtotalEl = document.getElementById('checkoutSubtotal');
     var shippingEl = document.getElementById('checkoutShipping');
     var discountEl = document.getElementById('checkoutDiscount');
@@ -34,8 +35,14 @@ document.addEventListener('DOMContentLoaded', function () {
       discountEl.textContent = '-' + formatVND(discount);
     }
     if (totalEl) {
-      var total = Math.max(0, currSub - discount + currShip);
-      totalEl.textContent = formatVND(total);
+      // Nếu backend gửi total_vnd thì ưu tiên dùng,
+      // tránh double-subtract giảm phí ship.
+      if (typeof total === 'number') {
+        totalEl.textContent = formatVND(Math.max(0, total));
+      } else {
+        var calcTotal = Math.max(0, currSub - discount + currShip);
+        totalEl.textContent = formatVND(calcTotal);
+      }
     }
   }
 
@@ -66,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (state === 'success') {
-      // Giữ icon tick, KHÔNG quay lại chữ "Áp Dụng"
       btn.disabled = false;
       btn.classList.add('apply-btn-success');
 
@@ -82,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // state === 'idle' => trạng thái mặc định (khi chưa dùng mã / đã xoá mã)
     btn.disabled = false;
     btn.classList.remove('apply-btn-success');
 
@@ -134,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
           });
         })
         .then(function (res) {
+          // Không còn mã => quay về subtotal + shipping gốc, giảm giá = 0
           setTotals(baseSubtotal, baseShipping, 0);
 
           var msg = res.ok
@@ -143,7 +149,6 @@ document.addEventListener('DOMContentLoaded', function () {
           msgEl.classList.remove('discount-message-error');
           msgEl.classList.add('discount-message-success');
 
-          // Xoá mã => quay về trạng thái nút mặc định
           setApplyButtonState('idle');
         })
         .catch(function () {
@@ -214,15 +219,22 @@ document.addEventListener('DOMContentLoaded', function () {
         var newShipping = typeof data.shipping_vnd === 'number'
           ? data.shipping_vnd
           : baseShipping;
-        var discountVnd = (data.discount_vnd || 0) + (data.shipping_discount_vnd || 0);
 
-        setTotals(newSubtotal, newShipping, discountVnd);
+        // THAY ĐỔI: tách rõ giá trị giảm dùng để hiển thị,
+        // còn tổng tiền thì dùng total_vnd từ backend.
+        var discountDisplay = (data.discount_vnd || 0) + (data.shipping_discount_vnd || 0);
+
+        setTotals(
+          newSubtotal,
+          newShipping,
+          discountDisplay,
+          data.total_vnd
+        );
 
         msgEl.textContent = res.body.message || 'Áp dụng mã giảm giá thành công.';
         msgEl.classList.remove('discount-message-error');
         msgEl.classList.add('discount-message-success');
 
-        // Giữ nút ở trạng thái tick xanh
         setApplyButtonState('success');
       })
       .catch(function () {
@@ -235,6 +247,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   };
 
+  // Lần đầu vào trang: hiển thị lại theo subtotal + shipping gốc
   setTotals(sub, ship, 0);
 });
 

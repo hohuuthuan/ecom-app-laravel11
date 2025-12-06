@@ -165,8 +165,38 @@
                 Để trống nếu không giới hạn số lần trên mỗi tài khoản.
               </div>
             </div>
-
-            {{-- Trạng thái --}}
+            <div class="col-md-6">
+              <label for="edit_discount_start" class="form-label">
+                <b>Ngày bắt đầu</b>
+              </label>
+              <input
+                type="datetime-local"
+                id="edit_discount_start"
+                name="start_date"
+                class="form-control {{ $editErrors->has('start_date') ? 'is-invalid' : '' }}"
+                value="{{ old('start_date') }}">
+              <div
+                class="invalid-feedback {{ $editErrors->has('start_date') ? 'd-block' : 'd-none' }}"
+                data-err="start_date">
+                {{ $editErrors->first('start_date') }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="edit_discount_end" class="form-label">
+                <b>Ngày kết thúc</b>
+              </label>
+              <input
+                type="datetime-local"
+                id="edit_discount_end"
+                name="end_date"
+                class="form-control {{ $editErrors->has('end_date') ? 'is-invalid' : '' }}"
+                value="{{ old('end_date') }}">
+              <div
+                class="invalid-feedback {{ $editErrors->has('end_date') ? 'd-block' : 'd-none' }}"
+                data-err="end_date">
+                {{ $editErrors->first('end_date') }}
+              </div>
+            </div>
             <div class="col-md-4">
               <label for="edit_discount_status" class="form-label">
                 <b>Trạng thái</b> <span class="text-danger">*</span>
@@ -184,42 +214,6 @@
                 class="invalid-feedback {{ $editErrors->has('status') ? 'd-block' : 'd-none' }}"
                 data-err="status">
                 {{ $editErrors->first('status') }}
-              </div>
-            </div>
-
-            {{-- Ngày bắt đầu --}}
-            <div class="col-md-6">
-              <label for="edit_discount_start" class="form-label">
-                <b>Ngày bắt đầu</b>
-              </label>
-              <input
-                type="datetime-local"
-                id="edit_discount_start"
-                name="start_date"
-                class="form-control {{ $editErrors->has('start_date') ? 'is-invalid' : '' }}"
-                value="{{ old('start_date') }}">
-              <div
-                class="invalid-feedback {{ $editErrors->has('start_date') ? 'd-block' : 'd-none' }}"
-                data-err="start_date">
-                {{ $editErrors->first('start_date') }}
-              </div>
-            </div>
-
-            {{-- Ngày kết thúc --}}
-            <div class="col-md-6">
-              <label for="edit_discount_end" class="form-label">
-                <b>Ngày kết thúc</b>
-              </label>
-              <input
-                type="datetime-local"
-                id="edit_discount_end"
-                name="end_date"
-                class="form-control {{ $editErrors->has('end_date') ? 'is-invalid' : '' }}"
-                value="{{ old('end_date') }}">
-              <div
-                class="invalid-feedback {{ $editErrors->has('end_date') ? 'd-block' : 'd-none' }}"
-                data-err="end_date">
-                {{ $editErrors->first('end_date') }}
               </div>
             </div>
           </div>

@@ -14,7 +14,7 @@
       @csrf
 
       @php
-        $createErrors = $errors->discountCreate ?? $errors;
+      $createErrors = $errors->discountCreate ?? $errors;
       @endphp
 
       <div class="modal-header">
@@ -161,8 +161,38 @@
               Để trống nếu không giới hạn số lần trên mỗi tài khoản.
             </div>
           </div>
-
-          {{-- Trạng thái --}}
+          <div class="col-md-6">
+            <label for="create_discount_start" class="form-label">
+              <b>Ngày bắt đầu</b>
+            </label>
+            <input
+              type="datetime-local"
+              id="create_discount_start"
+              name="start_date"
+              class="form-control {{ $createErrors->has('start_date') ? 'is-invalid' : '' }}"
+              value="{{ old('start_date') }}">
+            <div
+              class="invalid-feedback {{ $createErrors->has('start_date') ? 'd-block' : 'd-none' }}"
+              data-err="start_date">
+              {{ $createErrors->first('start_date') }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="create_discount_end" class="form-label">
+              <b>Ngày kết thúc</b>
+            </label>
+            <input
+              type="datetime-local"
+              id="create_discount_end"
+              name="end_date"
+              class="form-control {{ $createErrors->has('end_date') ? 'is-invalid' : '' }}"
+              value="{{ old('end_date') }}">
+            <div
+              class="invalid-feedback {{ $createErrors->has('end_date') ? 'd-block' : 'd-none' }}"
+              data-err="end_date">
+              {{ $createErrors->first('end_date') }}
+            </div>
+          </div>
           <div class="col-md-4">
             <label for="create_discount_status" class="form-label">
               <b>Trạng thái</b> <span class="text-danger">*</span>
@@ -180,42 +210,6 @@
               class="invalid-feedback {{ $createErrors->has('status') ? 'd-block' : 'd-none' }}"
               data-err="status">
               {{ $createErrors->first('status') }}
-            </div>
-          </div>
-
-          {{-- Ngày bắt đầu --}}
-          <div class="col-md-6">
-            <label for="create_discount_start" class="form-label">
-              <b>Ngày bắt đầu</b>
-            </label>
-            <input
-              type="datetime-local"
-              id="create_discount_start"
-              name="start_date"
-              class="form-control {{ $createErrors->has('start_date') ? 'is-invalid' : '' }}"
-              value="{{ old('start_date') }}">
-            <div
-              class="invalid-feedback {{ $createErrors->has('start_date') ? 'd-block' : 'd-none' }}"
-              data-err="start_date">
-              {{ $createErrors->first('start_date') }}
-            </div>
-          </div>
-
-          {{-- Ngày kết thúc --}}
-          <div class="col-md-6">
-            <label for="create_discount_end" class="form-label">
-              <b>Ngày kết thúc</b>
-            </label>
-            <input
-              type="datetime-local"
-              id="create_discount_end"
-              name="end_date"
-              class="form-control {{ $createErrors->has('end_date') ? 'is-invalid' : '' }}"
-              value="{{ old('end_date') }}">
-            <div
-              class="invalid-feedback {{ $createErrors->has('end_date') ? 'd-block' : 'd-none' }}"
-              data-err="end_date">
-              {{ $createErrors->first('end_date') }}
             </div>
           </div>
         </div>

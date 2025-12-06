@@ -10,8 +10,10 @@
         <div class="col-lg-6">
           <div class="hero-content">
             <h1 class="display-4 fw-bold mb-4">Khám phá thế giới tri thức</h1>
-            <p class="lead mb-4">Hàng nghìn cuốn sách hay đang chờ bạn khám phá. Từ tiểu thuyết đến sách
-              chuyên môn, tất cả đều có tại BookStore.</p>
+            <p class="lead mb-4">
+              Hàng nghìn cuốn sách hay đang chờ bạn khám phá. Từ tiểu thuyết đến sách
+              chuyên môn, tất cả đều có tại BookStore.
+            </p>
             <div class="d-flex flex-wrap gap-3">
               <button class="btn btn-primary btn-lg" onclick="scrollToSection('categories')">
                 <i class="fas fa-compass me-2"></i>Khám phá ngay
@@ -28,12 +30,10 @@
               <i class="fas fa-book-open" style="font-size: 15rem; opacity: 0.3;"></i>
               <div class="position-absolute top-50 start-50 translate-middle">
                 <div class="d-flex justify-content-center">
-                  <div
-                    class="bg-white rounded-circle p-3 shadow me-3 animate__animated animate__fadeInUp">
+                  <div class="bg-white rounded-circle p-3 shadow me-3 animate__animated animate__fadeInUp">
                     <i class="fas fa-star text-warning" style="font-size: 2rem;"></i>
                   </div>
-                  <div
-                    class="bg-white rounded-circle p-3 shadow animate__animated animate__fadeInUp animate__delay-1s">
+                  <div class="bg-white rounded-circle p-3 shadow animate__animated animate__fadeInUp animate__delay-1s">
                     <i class="fas fa-heart text-danger" style="font-size: 2rem;"></i>
                   </div>
                 </div>
@@ -134,109 +134,109 @@
           <h2 class="display-5 fw-bold text-primary">Sách bán chạy</h2>
           <p class="lead text-muted">Những cuốn sách được yêu thích nhất</p>
         </div>
-        <button class="btn btn-outline-primary" onclick="loadMoreBooks()">
-          Xem thêm <i class="fas fa-arrow-right ms-2"></i>
-        </button>
       </div>
 
       @php
-      $favIds = auth()->check()
-      ? auth()->user()->favorites()->pluck('products.id')->all()
-      : [];
+        $favIds = auth()->check()
+          ? auth()->user()->favorites()->pluck('products.id')->all()
+          : [];
       @endphp
 
       <div class="row g-4" id="booksContainer">
         @forelse($products as $product)
-        @php
-        $isFav = auth()->check()
-        ? in_array($product->id, $favIds, true)
-        : false;
-        $authorNames = optional($product->authors)->pluck('name')->join(', ');
-        @endphp
+          @php
+            $isFav = auth()->check()
+              ? in_array($product->id, $favIds, true)
+              : false;
+            $authorNames = optional($product->authors)->pluck('name')->join(', ');
+          @endphp
 
-        <div class="col-lg-4 col-md-6">
-          <div class="card book-card h-100">
-            <div class="book-cover">
-              <img
-                src="{{ asset('storage/products/'.$product->image) }}"
-                alt="{{ $product->title }}"
-                class="book-cover-img"
-                loading="lazy">
-            </div>
-
-            <div class="card-body d-flex flex-column">
-              <h6 class="card-title line-clamp-2 mb-1">
-                <a
-                  href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
-                  class="text-body text-decoration-none">
-                  {{ $product->title }}
-                </a>
-              </h6>
-              <p class="card-text text-muted mb-3">{{ $authorNames ?: 'Không rõ tác giả' }}</p>
-
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                  <span class="price">
-                    {{ number_format((int)$product->selling_price_vnd, 0, ',', '.') }} VNĐ
-                  </span>
-                  @if(!empty($product->listed_price_vnd) && (int)$product->listed_price_vnd > (int)$product->selling_price_vnd)
-                  <small class="text-muted text-decoration-line-through ms-2">
-                    {{ number_format((int)$product->listed_price_vnd, 0, ',', '.') }} VNĐ
-                  </small>
-                  @endif
-                </div>
-
-                @auth
-                {{-- Đã đăng nhập: toggle yêu thích bằng AJAX --}}
-                <button
-                  type="button"
-                  class="btn btn-sm {{ $isFav ? 'btn-danger' : 'btn-outline-danger' }} js-fav-toggle"
-                  data-id="{{ $product->id }}"
-                  data-add-url="{{ route('addFavoriteProduct') }}"
-                  data-del-url="{{ route('destroyFavoriteProduct', '__ID__') }}"
-                  aria-pressed="{{ $isFav ? 'true' : 'false' }}">
-                  <i class="bi {{ $isFav ? 'bi-heart-fill' : 'bi-heart' }}"></i>
-                  <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Yêu thích' }}</span>
-                </button>
-                @else
-                {{-- Chưa đăng nhập: chỉ mở modal yêu cầu đăng nhập --}}
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-danger js-fav-login-required">
-                  <i class="bi bi-heart"></i>
-                  <span>Yêu thích</span>
-                </button>
-                @endauth
+          <div class="col-lg-4 col-md-6">
+            <div class="card book-card h-100">
+              <div class="book-cover">
+                <img
+                  src="{{ asset('storage/products/'.$product->image) }}"
+                  alt="{{ $product->title }}"
+                  class="book-cover-img"
+                  loading="lazy">
               </div>
 
-              <div class="mt-auto d-grid gap-2">
-                <a
-                  href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
-                  class="btn btn-outline-primary">
-                  <i class="fas fa-eye me-2"></i>Xem chi tiết
-                </a>
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title line-clamp-2 mb-1">
+                  <a
+                    href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
+                    class="text-body text-decoration-none">
+                    {{ $product->title }}
+                  </a>
+                </h6>
+                <p class="card-text text-muted mb-3">{{ $authorNames ?: 'Không rõ tác giả' }}</p>
 
-                <form action="{{ route('cart.item.add') }}" method="post" class="add-to-cart-form" data-no-loading>
-                  @csrf
-                  <input type="hidden" name="product_id" value="{{ $product->id }}">
-                  <input type="hidden" name="qty" value="1">
-                  <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
-                  </button>
-                </form>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <span class="price">
+                      {{ number_format((int)$product->selling_price_vnd, 0, ',', '.') }} VNĐ
+                    </span>
+                    @if(!empty($product->listed_price_vnd) && (int)$product->listed_price_vnd > (int)$product->selling_price_vnd)
+                      <small class="text-muted text-decoration-line-through ms-2">
+                        {{ number_format((int)$product->listed_price_vnd, 0, ',', '.') }} VNĐ
+                      </small>
+                    @endif
+                  </div>
+
+                  @auth
+                    <button
+                      type="button"
+                      class="btn btn-sm {{ $isFav ? 'btn-danger' : 'btn-outline-danger' }} js-fav-toggle"
+                      data-id="{{ $product->id }}"
+                      data-add-url="{{ route('addFavoriteProduct') }}"
+                      data-del-url="{{ route('destroyFavoriteProduct', '__ID__') }}"
+                      aria-pressed="{{ $isFav ? 'true' : 'false' }}">
+                      <i class="bi {{ $isFav ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                      <span class="js-fav-label">{{ $isFav ? 'Bỏ thích' : 'Yêu thích' }}</span>
+                    </button>
+                  @else
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger js-fav-login-required">
+                      <i class="bi bi-heart"></i>
+                      <span>Yêu thích</span>
+                    </button>
+                  @endauth
+                </div>
+
+                <div class="mt-auto d-grid gap-2">
+                  <a
+                    href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
+                    class="btn btn-outline-primary">
+                    <i class="fas fa-eye me-2"></i>Xem chi tiết
+                  </a>
+
+                  <form action="{{ route('cart.item.add') }}" method="post" class="add-to-cart-form" data-no-loading>
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <input type="hidden" name="qty" value="1">
+                    <button type="submit" class="btn btn-primary w-100">
+                      <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
-        </div>
         @empty
-        <div class="col-12">
-          <p class="text-muted mb-0">Chưa có sản phẩm.</p>
-        </div>
+          <div class="col-12">
+            <p class="text-muted mb-0">Chưa có sản phẩm.</p>
+          </div>
         @endforelse
       </div>
+
+      @if($products instanceof \Illuminate\Pagination\LengthAwarePaginator && $products->hasPages())
+        <div class="mt-3 d-flex justify-content-center" data-bestseller-pagination>
+          {{ $products->onEachSide(1)->links('pagination::bootstrap-5') }}
+        </div>
+      @endif
     </div>
   </section>
-
 
   <!-- Testimonials Section -->
   <section class="py-5 bg-light">
@@ -256,8 +256,10 @@
               <i class="fas fa-star"></i>
               <i class="fas fa-star"></i>
             </div>
-            <p class="mb-4">"BookStore có bộ sưu tập sách rất phong phú. Giao hàng nhanh, đóng gói cẩn
-              thận. Tôi đã tìm được nhiều cuốn sách hay ở đây!"</p>
+            <p class="mb-4">
+              "BookStore có bộ sưu tập sách rất phong phú. Giao hàng nhanh, đóng gói cẩn
+              thận. Tôi đã tìm được nhiều cuốn sách hay ở đây!"
+            </p>
             <div class="d-flex align-items-center">
               <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3"
                 style="width: 50px; height: 50px;">
@@ -280,8 +282,10 @@
               <i class="fas fa-star"></i>
               <i class="fas fa-star"></i>
             </div>
-            <p class="mb-4">"Website dễ sử dụng, tìm kiếm sách rất tiện lợi. Giá cả hợp lý, chất lượng
-              sách tốt. Sẽ tiếp tục ủng hộ BookStore!"</p>
+            <p class="mb-4">
+              "Website dễ sử dụng, tìm kiếm sách rất tiện lợi. Giá cả hợp lý, chất lượng
+              sách tốt. Sẽ tiếp tục ủng hộ BookStore!"
+            </p>
             <div class="d-flex align-items-center">
               <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3"
                 style="width: 50px; height: 50px;">
@@ -304,8 +308,10 @@
               <i class="fas fa-star"></i>
               <i class="fas fa-star"></i>
             </div>
-            <p class="mb-4">"Dịch vụ khách hàng tuyệt vời! Nhân viên tư vấn nhiệt tình, giúp tôi chọn
-              được những cuốn sách phù hợp với nhu cầu."</p>
+            <p class="mb-4">
+              "Dịch vụ khách hàng tuyệt vời! Nhân viên tư vấn nhiệt tình, giúp tôi chọn
+              được những cuốn sách phù hợp với nhu cầu."
+            </p>
             <div class="d-flex align-items-center">
               <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3"
                 style="width: 50px; height: 50px;">
@@ -347,5 +353,103 @@
     </div>
   </section>
 </div>
+
 @include('partials.ui.productDetail.noti-modal')
 @endsection
+@push('scripts')
+<script>
+  function initBookCovers(root, disableSkeleton) {
+    var scope = root || document;
+
+    scope.querySelectorAll('.book-cover').forEach(function (cover) {
+      if (cover.classList.contains('js-cover-initialized')) {
+        return;
+      }
+      cover.classList.add('js-cover-initialized');
+
+      if (disableSkeleton) {
+        cover.classList.add('no-skeleton', 'is-loaded');
+        return;
+      }
+
+      var img = cover.querySelector('.book-cover-img');
+      if (!img) {
+        return;
+      }
+
+      function markLoaded() {
+        cover.classList.add('is-loaded');
+      }
+
+      if (img.complete && img.naturalWidth !== 0) {
+        markLoaded();
+      } else {
+        img.addEventListener('load', markLoaded, { once: true });
+        img.addEventListener('error', markLoaded, { once: true });
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Lần load đầu: cho skeleton chạy bình thường
+    initBookCovers(document, false);
+
+    var bestSection = document.getElementById('bestsellers');
+    if (!bestSection) {
+      return;
+    }
+
+    var booksContainer = document.getElementById('booksContainer');
+    if (!booksContainer) {
+      return;
+    }
+
+    bestSection.addEventListener('click', function (event) {
+      var link = event.target.closest('.pagination a');
+      if (!link) {
+        return;
+      }
+
+      event.preventDefault();
+
+      var url = link.getAttribute('href');
+      if (!url) {
+        return;
+      }
+
+      fetch(url, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+        .then(function (res) {
+          return res.text();
+        })
+        .then(function (html) {
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(html, 'text/html');
+          var newSection = doc.getElementById('bestsellers');
+          if (!newSection) {
+            return;
+          }
+
+          var newBooksContainer = newSection.querySelector('#booksContainer');
+          if (newBooksContainer) {
+            booksContainer.innerHTML = newBooksContainer.innerHTML;
+            // Phân trang: tắt skeleton, cho ảnh hiện ngay
+            initBookCovers(booksContainer, true);
+          }
+
+          var pagWrapper = bestSection.querySelector('[data-bestseller-pagination]');
+          var newPagWrapper = newSection.querySelector('[data-bestseller-pagination]');
+          if (pagWrapper && newPagWrapper) {
+            pagWrapper.innerHTML = newPagWrapper.innerHTML;
+          }
+        })
+        .catch(function (error) {
+          console.error(error);
+        });
+    });
+  });
+</script>
+@endpush

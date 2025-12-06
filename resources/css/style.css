@@ -9,6 +9,10 @@ a {
   color: inherit;
 }
 
+#bestsellers [data-bestseller-pagination] p.small.text-muted {
+  display: none;
+}
+
 .breadcrumb {
   font-size: 20px;
   font-weight: 500;
@@ -116,6 +120,16 @@ a {
   opacity: 1;
   transform: scale(1);
   transition: opacity 1s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.book-cover.no-skeleton::after {
+  content: none;
+  animation: none;
+}
+
+.book-cover.no-skeleton .book-cover-img {
+  opacity: 1;
+  transition: transform 0.3s ease-in-out;
 }
 
 .book-cover:not(.is-loaded) .book-cover-img {

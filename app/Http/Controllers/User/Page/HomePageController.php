@@ -31,6 +31,7 @@ class HomePageController extends Controller
       'price_max'     => $r->query('price_max'),
       'stock_min'     => $r->query('stock_min'),
       'stock_max'     => $r->query('stock_max'),
+      'sort' => 'best_seller',
     ];
 
     $categories = $this->productService->getListCategory();

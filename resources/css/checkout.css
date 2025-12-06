@@ -1,3 +1,4 @@
+/* ============ HEADER & LAYOUT ============ */
 .checkout-page .page-header {
   background: #fff;
   border-radius: 5px;
@@ -10,18 +11,17 @@
 }
 
 .checkout-page .page-header h1 {
-  color: #667eea;
-  font-weight: 700;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 15px;
+  color: #667eea;
+  font-weight: 700;
 }
 
 .checkout-page .page-header h1 i {
   color: #667eea;
 }
-
 
 .checkout-page .page-content {
   display: grid;
@@ -29,15 +29,7 @@
   gap: 30px;
 }
 
-.checkout-page .book-image {
-  width: 100px;
-  height: 130px;
-  border-radius: 8px;
-  object-fit: cover;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, .15);
-  flex-shrink: 0;
-}
-
+/* ============ SUMMARY / THANH TOÁN ============ */
 .checkout-page .summary-section {
   background: #fff;
   border-radius: 5px;
@@ -69,8 +61,7 @@
   font-size: 21px;
   font-weight: 700;
   color: #2d3748;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding: 20px 0;
   border-top: 2px solid #e2e8f0;
   border-bottom: 2px solid #e2e8f0;
   margin-top: 20px;
@@ -84,22 +75,23 @@
 .checkout-page .checkout-btn {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, #0fbe1e 0%, #0e8803 100%);
-  color: #fff;
+  margin-top: 25px;
   border: none;
   border-radius: 5px;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 25px;
+  color: #fff;
+  background: linear-gradient(135deg, #0fbe1e 0%, #0e8803 100%);
   transition: all .3s ease;
   box-shadow: 0 4px 15px rgba(102, 126, 234, .4);
 }
 
-
+/* ============ NÚT QUAY LẠI GIỎ HÀNG ============ */
 .checkout-page .continue-shopping {
   width: 100%;
   padding: 14px;
+  margin-top: 15px;
   background: #fff;
   color: #667eea;
   border: 2px solid #667eea;
@@ -107,7 +99,6 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 15px;
   transition: all .3s ease;
 }
 
@@ -116,6 +107,7 @@
   color: #fff;
 }
 
+/* Focus checkboxes */
 .checkout-page #selectAll:focus-visible,
 .checkout-page .item-checkbox:focus-visible {
   outline: 2px solid #3b82f6;
@@ -123,13 +115,13 @@
   border-radius: 4px;
 }
 
-
+/* ============ FORM THÔNG TIN ============ */
 .checkout-page .checkout-form {
-  background: white;
+  background: #fff;
   border-radius: 15px;
   padding: 30px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .checkout-page .form-section {
@@ -170,45 +162,24 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.checkout-page .discount-section {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 10px;
-  border: 2px solid #e2e8f0;
-}
-
-.checkout-page .discount-input-group {
-  display: flex;
-  gap: 10px;
-}
-
-.checkout-page .discount-input {
-  flex: 1;
-}
-
-.checkout-page .apply-btn {
-  padding: 12px 20px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+.checkout-inline-label {
   font-weight: 600;
-  transition: all 0.3s ease;
+  margin-right: 4px;
 }
 
-.checkout-page .apply-btn:hover {
-  background: #5568d3;
+.checkout-form hr {
+  opacity: 1;
+  border-top: 2px solid;
+  color: #667eea;
 }
 
+/* ============ DANH SÁCH SẢN PHẨM ============ */
 .checkout-page .checkout-items {
-  background: white;
+  background: #fff;
   border-radius: 15px;
   padding: 30px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-
-  /* Tạm thời để cách xa footer */
-  margin-bottom: 400px;
+  margin-bottom: 400px; /* tạm cho cách footer */
 }
 
 .checkout-page .checkout-item {
@@ -257,17 +228,7 @@
   text-align: right;
 }
 
-.checkout-inline-label {
-  font-weight: 600;
-  margin-right: 4px;
-}
-
-.checkout-form hr {
-  opacity: 1;
-  border-top: 2px solid;
-  color: #667eea;
-}
-
+/* ============ PHƯƠNG THỨC THANH TOÁN ============ */
 .payment-method-section {
   margin-top: 1rem;
 }
@@ -305,9 +266,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
   font-weight: 600;
   font-size: 1.05rem;
+  color: #ffffff;
 }
 
 .payment-option-name {
@@ -345,6 +306,7 @@
   display: block;
 }
 
+/* ============ CHỌN ĐỊA CHỈ ============ */
 .address-select-card {
   border: 1px solid #e2e8f0;
   border-radius: 0.75rem;
@@ -362,6 +324,7 @@
   background-color: #eff6ff;
 }
 
+/* ============ ICON MÀU MÈ ============ */
 i.icon-info-person {
   font-size: 45px;
   color: #3b82f6;
@@ -377,6 +340,112 @@ i.icon-selected-product {
   color: #00a508;
 }
 
+/* ============ MÃ GIẢM GIÁ ============ */
+.checkout-page .discount-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.checkout-page .discount-input {
+  flex: 1;
+}
+
+/* Nút Áp dụng */
+.checkout-page .apply-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 20px;
+  background: #667eea;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  min-width: 130px;
+  white-space: nowrap;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    opacity 0.2s ease;
+}
+
+.checkout-page .apply-btn:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(85, 104, 211, 0.35);
+}
+
+.checkout-page .apply-btn:disabled {
+  opacity: 0.8;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Trạng thái thành công: đổi màu + giữ tick */
+.checkout-page .apply-btn-success {
+  background: #16a34a;
+  box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4);
+}
+
+/* Label, spinner, icon check */
+.apply-btn-label,
+.apply-btn-spinner,
+.apply-btn-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.apply-btn-check i {
+  font-size: 18px;
+  color: #ffffff;
+  animation: checkout-check-pop 0.25s ease-out;
+}
+
+/* Spinner tròn */
+.apply-btn-spinner-dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  animation: checkout-spin 0.6s linear infinite;
+}
+
+@keyframes checkout-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes checkout-check-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Thông báo mã giảm giá */
+.discount-message {
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.discount-message-success {
+  color: #198754;
+}
+
+.discount-message-error {
+  color: #dc3545;
+}
+
+/* ============ RESPONSIVE ============ */
 @media (max-width: 992px) {
   .checkout-page .page-content {
     grid-template-columns: 1fr;
@@ -391,19 +460,4 @@ i.icon-selected-product {
     gap: 20px;
     text-align: center;
   }
-}
-
-.discount-message {
-  margin-top: 4px;
-  font-size: 0.875rem;
-}
-
-.discount-message-error {
-  color: #dc3545; /* đỏ kiểu Bootstrap */
-}
-
-.apply-btn-success {
-  background-color: #198754;
-  border-color: #198754;
-  color: #ffffff;
 }

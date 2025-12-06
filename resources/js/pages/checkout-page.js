@@ -1,4 +1,3 @@
-// ================== TÍNH TIỀN + MÃ GIẢM GIÁ ==================
 document.addEventListener('DOMContentLoaded', function () {
   function formatVND(n) {
     try {
@@ -11,9 +10,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // ID trong blade là "checkoutPage" (KHÔNG phải checkoutRoot)
   var root = document.getElementById('checkoutPage');
-  if (!root) { return; }
+  if (!root) {
+    return;
+  }
 
   var sub = parseInt(root.getAttribute('data-subtotal') || '0', 10);
   var ship = parseInt(root.getAttribute('data-shipping') || '0', 10);
@@ -24,12 +24,76 @@ document.addEventListener('DOMContentLoaded', function () {
     var discountEl = document.getElementById('checkoutDiscount');
     var totalEl = document.getElementById('checkoutTotal');
 
-    if (subtotalEl) { subtotalEl.textContent = formatVND(currSub); }
-    if (shippingEl) { shippingEl.textContent = formatVND(currShip); }
-    if (discountEl) { discountEl.textContent = '-' + formatVND(discount); }
+    if (subtotalEl) {
+      subtotalEl.textContent = formatVND(currSub);
+    }
+    if (shippingEl) {
+      shippingEl.textContent = formatVND(currShip);
+    }
+    if (discountEl) {
+      discountEl.textContent = '-' + formatVND(discount);
+    }
     if (totalEl) {
       var total = Math.max(0, currSub - discount + currShip);
       totalEl.textContent = formatVND(total);
+    }
+  }
+
+  function setApplyButtonState(state) {
+    var btn = document.getElementById('discountApplyButton');
+    if (!btn) {
+      return;
+    }
+
+    var label = btn.querySelector('.apply-btn-label');
+    var spinner = btn.querySelector('.apply-btn-spinner');
+    var check = btn.querySelector('.apply-btn-check');
+
+    if (state === 'loading') {
+      btn.disabled = true;
+      btn.classList.remove('apply-btn-success');
+
+      if (label) {
+        label.classList.add('d-none');
+      }
+      if (spinner) {
+        spinner.classList.remove('d-none');
+      }
+      if (check) {
+        check.classList.add('d-none');
+      }
+      return;
+    }
+
+    if (state === 'success') {
+      // Giữ icon tick, KHÔNG quay lại chữ "Áp Dụng"
+      btn.disabled = false;
+      btn.classList.add('apply-btn-success');
+
+      if (label) {
+        label.classList.add('d-none');
+      }
+      if (spinner) {
+        spinner.classList.add('d-none');
+      }
+      if (check) {
+        check.classList.remove('d-none');
+      }
+      return;
+    }
+
+    // state === 'idle' => trạng thái mặc định (khi chưa dùng mã / đã xoá mã)
+    btn.disabled = false;
+    btn.classList.remove('apply-btn-success');
+
+    if (label) {
+      label.classList.remove('d-none');
+    }
+    if (spinner) {
+      spinner.classList.add('d-none');
+    }
+    if (check) {
+      check.classList.add('d-none');
     }
   }
 
@@ -37,30 +101,32 @@ document.addEventListener('DOMContentLoaded', function () {
     var inputEl = document.getElementById('discountCode');
     var msgEl = document.getElementById('discountMessage');
     var rootEl = document.getElementById('checkoutPage');
-    var btnEl = document.getElementById('discountApplyButton');
 
-    if (!inputEl || !msgEl || !rootEl || !btnEl) {
+    if (!inputEl || !msgEl || !rootEl) {
       return;
     }
 
+    var baseSubtotal = parseInt(rootEl.getAttribute('data-subtotal') || '0', 10);
+    var baseShipping = parseInt(rootEl.getAttribute('data-shipping') || '0', 10);
     var code = inputEl.value.trim();
+
     msgEl.textContent = '';
     msgEl.classList.remove('discount-message-error');
+    msgEl.classList.remove('discount-message-success');
 
+    // ====== XOÁ MÃ (code rỗng) ======
     if (code === '') {
       var tokenDelete = document.querySelector('meta[name="csrf-token"]');
       var csrfDelete = tokenDelete ? tokenDelete.getAttribute('content') : '';
 
-      btnEl.disabled = true;
-      btnEl.classList.remove('apply-btn-success');
-      btnEl.innerHTML = 'Đang xoá...';
+      setApplyButtonState('loading');
 
       fetch('/checkout/discount', {
         method: 'DELETE',
         headers: {
           'X-CSRF-TOKEN': csrfDelete,
-          'Accept': 'application/json',
-        },
+          'Accept': 'application/json'
+        }
       })
         .then(function (res) {
           return res.json().catch(function () {
@@ -68,103 +134,104 @@ document.addEventListener('DOMContentLoaded', function () {
           });
         })
         .then(function (res) {
-          setTotals(sub, ship, 0);
-          rootEl.setAttribute('data-subtotal', String(sub));
-          rootEl.setAttribute('data-shipping', String(ship));
-          msgEl.textContent = res.ok ? (res.message || 'Đã xoá mã giảm giá.') : 'Đã xoá mã giảm giá.';
+          setTotals(baseSubtotal, baseShipping, 0);
+
+          var msg = res.ok
+            ? (res.message || 'Đã xoá mã giảm giá.')
+            : 'Đã xoá mã giảm giá.';
+          msgEl.textContent = msg;
+          msgEl.classList.remove('discount-message-error');
+          msgEl.classList.add('discount-message-success');
+
+          // Xoá mã => quay về trạng thái nút mặc định
+          setApplyButtonState('idle');
         })
         .catch(function () {
-          setTotals(sub, ship, 0);
-          rootEl.setAttribute('data-subtotal', String(sub));
-          rootEl.setAttribute('data-shipping', String(ship));
-          msgEl.textContent = 'Đã xoá mã giảm giá.';
-        })
-        .finally(function () {
-          btnEl.disabled = false;
-          btnEl.classList.remove('apply-btn-success');
-          btnEl.innerHTML = 'Áp Dụng';
+          setTotals(baseSubtotal, baseShipping, 0);
+          msgEl.textContent = 'Không thể xoá mã giảm giá. Vui lòng thử lại.';
+          msgEl.classList.remove('discount-message-success');
+          msgEl.classList.add('discount-message-error');
+          setApplyButtonState('idle');
         });
 
       return;
     }
 
-    var subtotal = parseInt(rootEl.getAttribute('data-subtotal') || '0', 10);
-    var shipping = parseInt(rootEl.getAttribute('data-shipping') || '0', 10);
+    // ====== ÁP DỤNG MÃ ======
     var token = document.querySelector('meta[name="csrf-token"]');
     var csrf = token ? token.getAttribute('content') : '';
 
-    btnEl.disabled = true;
-    btnEl.classList.remove('apply-btn-success');
-    btnEl.innerHTML = 'Đang áp dụng...';
+    setApplyButtonState('loading');
 
     fetch('/checkout/apply-discount', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': csrf,
-        'Accept': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
         code: code,
-        subtotal: subtotal,
-        shipping: shipping,
-      }),
+        subtotal: baseSubtotal,
+        shipping: baseShipping
+      })
     })
       .then(function (res) {
-        return res.json().then(function (json) {
-          return { status: res.status, body: json };
-        }).catch(function () {
-          return { status: res.status, body: null };
-        });
+        return res
+          .json()
+          .then(function (json) {
+            return { status: res.status, body: json };
+          })
+          .catch(function () {
+            return { status: res.status, body: null };
+          });
       })
       .then(function (res) {
         if (!res.body) {
           msgEl.textContent = 'Không thể áp dụng mã giảm giá. Vui lòng thử lại.';
+          msgEl.classList.remove('discount-message-success');
           msgEl.classList.add('discount-message-error');
-          setTotals(subtotal, shipping, 0);
-          rootEl.setAttribute('data-subtotal', String(subtotal));
-          rootEl.setAttribute('data-shipping', String(shipping));
-          btnEl.disabled = false;
-          btnEl.classList.remove('apply-btn-success');
-          btnEl.innerHTML = 'Áp Dụng';
+
+          setTotals(baseSubtotal, baseShipping, 0);
+          setApplyButtonState('idle');
           return;
         }
 
         if (!res.body.ok) {
           msgEl.textContent = res.body.message || 'Mã giảm giá không hợp lệ.';
+          msgEl.classList.remove('discount-message-success');
           msgEl.classList.add('discount-message-error');
-          setTotals(subtotal, shipping, 0);
-          rootEl.setAttribute('data-subtotal', String(subtotal));
-          rootEl.setAttribute('data-shipping', String(shipping));
-          btnEl.disabled = false;
-          btnEl.classList.remove('apply-btn-success');
-          btnEl.innerHTML = 'Áp Dụng';
+
+          setTotals(baseSubtotal, baseShipping, 0);
+          setApplyButtonState('idle');
           return;
         }
 
         var data = res.body.data || {};
-        var newSubtotal = typeof data.subtotal_vnd === 'number' ? data.subtotal_vnd : subtotal;
-        var newShipping = typeof data.shipping_vnd === 'number' ? data.shipping_vnd : shipping;
+        var newSubtotal = typeof data.subtotal_vnd === 'number'
+          ? data.subtotal_vnd
+          : baseSubtotal;
+        var newShipping = typeof data.shipping_vnd === 'number'
+          ? data.shipping_vnd
+          : baseShipping;
         var discountVnd = (data.discount_vnd || 0) + (data.shipping_discount_vnd || 0);
 
         setTotals(newSubtotal, newShipping, discountVnd);
-        rootEl.setAttribute('data-subtotal', String(newSubtotal));
-        rootEl.setAttribute('data-shipping', String(newShipping));
 
         msgEl.textContent = res.body.message || 'Áp dụng mã giảm giá thành công.';
-        btnEl.disabled = false;
-        btnEl.classList.add('apply-btn-success');
-        btnEl.innerHTML = '<i class="bi bi-check-circle-fill"></i>';
+        msgEl.classList.remove('discount-message-error');
+        msgEl.classList.add('discount-message-success');
+
+        // Giữ nút ở trạng thái tick xanh
+        setApplyButtonState('success');
       })
       .catch(function () {
         msgEl.textContent = 'Có lỗi xảy ra khi áp dụng mã. Vui lòng thử lại.';
+        msgEl.classList.remove('discount-message-success');
         msgEl.classList.add('discount-message-error');
-        setTotals(subtotal, shipping, 0);
-        rootEl.setAttribute('data-subtotal', String(subtotal));
-        rootEl.setAttribute('data-shipping', String(shipping));
-        btnEl.disabled = false;
-        btnEl.classList.remove('apply-btn-success');
-        btnEl.innerHTML = 'Áp Dụng';
+
+        setTotals(baseSubtotal, baseShipping, 0);
+        setApplyButtonState('idle');
       });
   };
 

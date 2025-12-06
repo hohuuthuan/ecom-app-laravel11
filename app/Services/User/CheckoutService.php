@@ -5,6 +5,7 @@ namespace App\Services\User;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Shipment;
+use App\Models\DiscountUsage;
 use Illuminate\Support\Facades\DB;
 
 class CheckoutService
@@ -23,6 +24,15 @@ class CheckoutService
             }
 
             Shipment::query()->create($shipmentData);
+
+            if (!empty($orderData['discount_id']) && !empty($orderData['user_id'])) {
+                DiscountUsage::query()->create([
+                    'discount_id' => $orderData['discount_id'],
+                    'user_id'     => $orderData['user_id'],
+                    'order_id'    => $order->id,
+                    'used_at'     => now(),
+                ]);
+            }
 
             return $order;
         });

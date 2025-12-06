@@ -318,7 +318,7 @@ class CheckoutController extends Controller
         }
 
         // ================== BUILD DATA CHO BẢNG orders ==================
-        $itemsCount  = array_sum($items);
+        $itemsCount = array_sum($items);
         $subtotalVnd = 0;
 
         foreach ($items as $productId => $qty) {
@@ -329,11 +329,39 @@ class CheckoutController extends Controller
             $subtotalVnd += $productPrice * (int) $qty;
         }
 
-        $shippingFeeVnd = 30000;
-        $discountVnd    = 0;
-        $taxVnd         = 0;
+        // === ÁP DỤNG MÃ GIẢM GIÁ TỪ SESSION (nếu có) ===
+        $shippingBaseVnd = 30000;
+        $discountVnd = 0;
+        $shippingFeeVnd = $shippingBaseVnd;
+        $taxVnd = 0;
+        $discountId = null;
+
+        $discountSession = $request->session()->get('checkout_discount');
+        if (is_array($discountSession)) {
+            $discountVnd = (int) ($discountSession['discount_vnd'] ?? 0);
+            $shippingDiscountVnd = (int) ($discountSession['shipping_discount_vnd'] ?? 0);
+
+            if ($discountVnd < 0) {
+                $discountVnd = 0;
+            }
+            if ($shippingDiscountVnd < 0) {
+                $shippingDiscountVnd = 0;
+            }
+
+            $shippingFeeVnd = $shippingBaseVnd - $shippingDiscountVnd;
+            if ($shippingFeeVnd < 0) {
+                $shippingFeeVnd = 0;
+            }
+
+            if (!empty($discountSession['discount_id'])) {
+                $discountId = $discountSession['discount_id'];
+            }
+        }
 
         $grandTotalVnd = $subtotalVnd - $discountVnd + $taxVnd + $shippingFeeVnd;
+        if ($grandTotalVnd < 0) {
+            $grandTotalVnd = 0;
+        }
 
         $orderId = (string) Str::uuid();
 
@@ -342,15 +370,15 @@ class CheckoutController extends Controller
             'code'              => $this->generateOrderCode(),
             'user_id'           => $user->id,
             'status'            => 'pending',
-            'payment_method'    => 'cod',
-            'payment_status'    => 'unpaid',
+            'payment_method'    => 'cod',      // sẽ override lại phía dưới theo payment_method
+            'payment_status'    => 'unpaid',   // với momo/vnpay sẽ là pending
             'items_count'       => $itemsCount,
             'subtotal_vnd'      => $subtotalVnd,
             'discount_vnd'      => $discountVnd,
             'tax_vnd'           => $taxVnd,
             'shipping_fee_vnd'  => $shippingFeeVnd,
             'grand_total_vnd'   => $grandTotalVnd,
-            'discount_id'       => null,
+            'discount_id'       => $discountId,
             'buyer_note'        => $request->input('buyer_note') ?? null,
             'placed_at'         => now(),
             'delivered_at'      => null,
@@ -480,7 +508,15 @@ class CheckoutController extends Controller
             );
 
             if ($order) {
-                $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+                if (!empty($discountId)) {
+                    $this->recordDiscountUsage((string) $discountId, (string) $user->id, (string) $order->id);
+                }
+
+                $request->session()->forget([
+                    'checkout.items',
+                    'checkout.expires_at',
+                    'checkout_discount',
+                ]);
 
                 foreach (array_keys($items) as $productId) {
                     $cartService->removeItemInCart((string) $productId);
@@ -494,6 +530,7 @@ class CheckoutController extends Controller
             return back()
                 ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
         }
+
 
         return back()
             ->with('toast_error', 'Phương thức thanh toán không hợp lệ');
@@ -513,10 +550,11 @@ class CheckoutController extends Controller
         $resultCode = (int) $request->input('resultCode', -1);
         if ($resultCode !== 0) {
             $request->session()->forget('checkout.momo_pending');
+            $request->session()->forget('checkout_discount');
 
             return redirect()
                 ->route('checkout.page')
-                ->with('toast_error', 'Thanh toán MoMo thất bại hoặc bị hủy.');
+                ->with('toast_error', 'Thanh toán MoMo thất bại hoặc bị hủy');
         }
 
         $orderData      = $pending['orderData'];
@@ -524,11 +562,9 @@ class CheckoutController extends Controller
         $shipmentData   = $pending['shipmentData'];
         $items          = $pending['items'];
 
-        // Cập nhật trạng thái thanh toán trước khi insert
         $orderData['payment_method'] = 'momo';
         $orderData['payment_status'] = 'paid';
 
-        // placeCodOrder mới: chỉ còn 3 tham số
         $order = $checkoutService->placeCodOrder(
             $orderData,
             $orderItemsData,
@@ -536,9 +572,18 @@ class CheckoutController extends Controller
         );
 
         $request->session()->forget('checkout.momo_pending');
-        $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+        $request->session()->forget([
+            'checkout.items',
+            'checkout.expires_at',
+            'checkout_discount',
+        ]);
 
         if ($order) {
+            $discountId = $orderData['discount_id'] ?? null;
+            if (!empty($discountId)) {
+                $this->recordDiscountUsage((string) $discountId, (string) $order->user_id, (string) $order->id);
+            }
+
             foreach (array_keys($items) as $productId) {
                 $cartService->removeItemInCart((string) $productId);
             }
@@ -547,6 +592,7 @@ class CheckoutController extends Controller
                 ->route('user.thanks', ['code' => $order->code])
                 ->with('toast_success', 'Thanh toán MoMo thành công, đơn hàng đã được tạo.');
         }
+
 
         return redirect()
             ->route('checkout.page')
@@ -603,10 +649,11 @@ class CheckoutController extends Controller
         $responseCode = $request->input('vnp_ResponseCode');
         if ($responseCode !== '00') {
             $request->session()->forget('checkout.vnpay_pending');
+            $request->session()->forget('checkout_discount');
 
             return redirect()
                 ->route('checkout.page')
-                ->with('toast_error', 'Thanh toán VNPAY thất bại hoặc đã bị hủy.');
+                ->with('toast_error', 'Thanh toán VNPAY thất bại hoặc đã bị hủy');
         }
 
         $orderData      = $pending['orderData'];
@@ -624,9 +671,18 @@ class CheckoutController extends Controller
         );
 
         $request->session()->forget('checkout.vnpay_pending');
-        $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+        $request->session()->forget([
+            'checkout.items',
+            'checkout.expires_at',
+            'checkout_discount',
+        ]);
 
         if ($order) {
+            $discountId = $orderData['discount_id'] ?? null;
+            if (!empty($discountId)) {
+                $this->recordDiscountUsage((string) $discountId, (string) $order->user_id, (string) $order->id);
+            }
+
             foreach (array_keys($items) as $productId) {
                 $cartService->removeItemInCart((string) $productId);
             }
@@ -636,6 +692,7 @@ class CheckoutController extends Controller
                 ->with('toast_success', 'Thanh toán VNPAY thành công, đơn hàng đã được tạo.');
         }
 
+
         return redirect()
             ->route('checkout.page')
             ->with('toast_error', 'Có lỗi xảy ra khi tạo đơn sau khi thanh toán VNPAY.');
@@ -644,13 +701,21 @@ class CheckoutController extends Controller
     public function applyDiscount(Request $request): JsonResponse
     {
         $request->validate([
-            'code' => ['required', 'string', 'max:64'],
+            'code'     => ['required', 'string', 'max:64'],
             'subtotal' => ['required', 'integer', 'min:0'],
             'shipping' => ['required', 'integer', 'min:0'],
         ]);
 
+        /** @var \App\Models\User|null $user */
         $user = $request->user();
-        $code = strtoupper(trim($request->input('code')));
+        if (!$user) {
+            return response()->json([
+                'ok'      => false,
+                'message' => 'Bạn cần đăng nhập để sử dụng mã giảm giá.',
+            ], 401);
+        }
+
+        $code = strtoupper(trim((string) $request->input('code')));
         $subtotal = $request->integer('subtotal');
         $shipping = $request->integer('shipping');
 
@@ -658,59 +723,88 @@ class CheckoutController extends Controller
             ->where('code', $code)
             ->where('status', 'ACTIVE')
             ->first();
+
         if (!$discount) {
             return response()->json([
-                'ok' => false,
-                'message' => 'Mã giảm giá không hợp lệ',
+                'ok'      => false,
+                'message' => 'Mã giảm giá không hợp lệ.',
             ], 404);
         }
 
-        $now = now();
         if ($discount->start_date && $discount->start_date->isFuture()) {
             return response()->json([
-                'ok' => false,
+                'ok'      => false,
                 'message' => 'Mã giảm giá này chưa bắt đầu áp dụng.',
             ], 422);
         }
+
         if ($discount->end_date && $discount->end_date->isPast()) {
             return response()->json([
-                'ok' => false,
+                'ok'      => false,
                 'message' => 'Mã giảm giá đã hết hạn.',
             ], 422);
         }
-        if ($discount->min_order_value_vnd && $subtotal < $discount->min_order_value_vnd) {
+
+        if (
+            !is_null($discount->min_order_value_vnd)
+            && $discount->min_order_value_vnd > 0
+            && $subtotal < $discount->min_order_value_vnd
+        ) {
             return response()->json([
-                'ok' => false,
-                'message' => 'Đơn hàng chưa đạt giá trị tối thiểu để dùng mã giảm giá.',
+                'ok'      => false,
+                'message' => 'Đơn hàng chưa đạt giá trị tối thiểu để áp dụng mã giảm giá.',
             ], 422);
         }
 
-        $used = DiscountUsage::query()
-            ->where('discount_id', $discount->id)
-            ->where('user_id', $user->id)
-            ->whereNotNull('used_at')
-            ->exists();
-        if ($used) {
-            return response()->json([
-                'ok' => false,
-                'message' => 'Bạn đã sử dụng mã này trước đó rồi.',
-            ], 422);
+        // ====== GIỚI HẠN THEO USER (per_user_limit) ======
+        if (!is_null($discount->per_user_limit)) {
+            $userUsedCount = DiscountUsage::query()
+                ->where('discount_id', $discount->id)
+                ->where('user_id', $user->id)
+                ->whereNotNull('used_at')
+                ->count();
+
+            if ($userUsedCount >= $discount->per_user_limit) {
+                return response()->json([
+                    'ok'      => false,
+                    'message' => 'Bạn đã sử dụng mã này tối đa ' . $discount->per_user_limit . ' lần.',
+                ], 422);
+            }
+        }
+
+        // ====== GIỚI HẠN TỔNG SỐ LƯỢT (usage_limit) ======
+        if (!is_null($discount->usage_limit)) {
+            $totalUsed = DiscountUsage::query()
+                ->where('discount_id', $discount->id)
+                ->whereNotNull('used_at')
+                ->count();
+
+            if ($totalUsed >= $discount->usage_limit) {
+                return response()->json([
+                    'ok'      => false,
+                    'message' => 'Mã giảm giá đã được sử dụng hết lượt.',
+                ], 422);
+            }
         }
 
         $discountAmount = 0;
         $shippingDiscount = 0;
+
         if ($discount->type === 'percent') {
             $discountAmount = (int) floor($subtotal * $discount->value / 100);
             if ($discountAmount > $subtotal) {
                 $discountAmount = $subtotal;
             }
         } elseif ($discount->type === 'fixed') {
-            $discountAmount = $discount->value;
+            $discountAmount = (int) $discount->value;
             if ($discountAmount > $subtotal) {
                 $discountAmount = $subtotal;
             }
         } elseif ($discount->type === 'shipping') {
-            $shippingDiscount = $discount->value > 0 ? $discount->value : $shipping;
+            $shippingDiscount = $discount->value > 0
+                ? (int) $discount->value
+                : $shipping;
+
             if ($shippingDiscount > $shipping) {
                 $shippingDiscount = $shipping;
             }
@@ -719,6 +813,7 @@ class CheckoutController extends Controller
         if ($discountAmount < 0) {
             $discountAmount = 0;
         }
+
         if ($shippingDiscount < 0) {
             $shippingDiscount = 0;
         }
@@ -734,27 +829,52 @@ class CheckoutController extends Controller
         }
 
         $request->session()->put('checkout_discount', [
-            'discount_id' => $discount->id,
-            'code' => $discount->code,
-            'type' => $discount->type,
-            'value' => $discount->value,
-            'discount_vnd' => $discountAmount,
+            'discount_id'           => $discount->id,
+            'code'                  => $discount->code,
+            'type'                  => $discount->type,
+            'value'                 => $discount->value,
+            'discount_vnd'          => $discountAmount,
             'shipping_discount_vnd' => $shippingDiscount,
         ]);
 
         return response()->json([
-            'ok' => true,
-            'message' => 'Áp dụng mã giảm giá thành công',
-            'data' => [
-                'code' => $discount->code,
-                'discount_vnd' => $discountAmount,
+            'ok'      => true,
+            'message' => 'Áp dụng mã giảm giá thành công.',
+            'data'    => [
+                'code'                  => $discount->code,
+                'discount_vnd'          => $discountAmount,
                 'shipping_discount_vnd' => $shippingDiscount,
-                'subtotal_vnd' => $subtotal,
-                'shipping_vnd' => $newShipping,
-                'total_vnd' => $total,
+                'subtotal_vnd'          => $subtotal,
+                'shipping_vnd'          => $newShipping,
+                'total_vnd'             => $total,
             ],
         ]);
     }
+
+
+    protected function recordDiscountUsage(string $discountId, string $userId, string $orderId): void
+    {
+        if ($discountId === '') {
+            return;
+        }
+
+        try {
+            DiscountUsage::create([
+                'discount_id' => $discountId,
+                'user_id'     => $userId,
+                'order_id'    => $orderId,
+                'used_at'     => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('Cannot record discount usage', [
+                'discount_id' => $discountId,
+                'user_id'     => $userId,
+                'order_id'    => $orderId,
+                'error'       => $e->getMessage(),
+            ]);
+        }
+    }
+
 
     public function removeDiscount(Request $request): JsonResponse
     {

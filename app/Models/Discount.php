@@ -19,6 +19,8 @@ class Discount extends Model
         'type',
         'value',
         'min_order_value_vnd',
+        'usage_limit',
+        'per_user_limit',
         'start_date',
         'end_date',
         'status',
@@ -29,6 +31,8 @@ class Discount extends Model
         'end_date' => 'datetime',
         'min_order_value_vnd' => 'integer',
         'value' => 'integer',
+        'usage_limit' => 'integer',
+        'per_user_limit' => 'integer',
     ];
 
     protected static function booted(): void

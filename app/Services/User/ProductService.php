@@ -47,15 +47,30 @@ class ProductService
   public function getList(array $filters = [])
   {
     $query = Product::query()
-      ->select(['id', 'title', 'image', 'slug', 'isbn', 'selling_price_vnd', 'status', 'publisher_id', 'created_at'])
+      ->select([
+        'id',
+        'title',
+        'image',
+        'slug',
+        'isbn',
+        'selling_price_vnd',
+        'status',
+        'publisher_id',
+        'created_at',
+      ])
       ->with([
         'categories:id,name',
         'authors:id,name',
         'publisher:id,name',
         'stocks:product_id,on_hand,reserved',
-      ])->withExists([
-        'favoredBy as is_favorited' => fn($q) => $q->where('users.id', Auth::user())
       ]);
+
+    if (Auth::check()) {
+      $userId = Auth::id();
+      $query->withExists([
+        'favoredBy as is_favorited' => fn($q) => $q->where('users.id', $userId),
+      ]);
+    }
 
     if (!empty($filters['keyword'])) {
       $kw = trim((string)$filters['keyword']);
@@ -104,7 +119,24 @@ class ProductService
       $perPage = 200;
     }
 
-    $products = $query->orderByDesc('created_at')->paginate($perPage);
+    if (!empty($filters['sort']) && $filters['sort'] === 'best_seller') {
+      $validStatuses = ['confirmed', 'processing', 'shipping', 'delivered', 'completed'];
+
+      $query->withSum([
+        'orderItems as sold_qty' => function ($q) use ($validStatuses) {
+          $q->whereHas('order', function ($orderQuery) use ($validStatuses) {
+            $orderQuery->where('payment_status', 'paid')
+              ->whereIn('status', $validStatuses);
+          });
+        },
+      ], 'quantity')
+        ->orderByDesc('sold_qty')
+        ->orderByDesc('created_at');
+    } else {
+      $query->orderByDesc('created_at');
+    }
+
+    $products = $query->paginate($perPage);
 
     return PaginationHelper::appendQuery($products);
   }

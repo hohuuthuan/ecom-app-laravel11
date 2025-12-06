@@ -55,6 +55,7 @@ body.warehouse-page {
 .warehouse-dashboard-recentActivities,
 .warehouse-dashboard-quick-action {
   max-height: 690px;
+  min-height: 312px;
 }
 
 .warehouse_sidebar a{

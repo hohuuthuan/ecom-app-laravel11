@@ -269,17 +269,17 @@ textarea#ac_address {
     transform: rotate(90deg);
 }
 
-@media (min-width: 992px) {
+/* @media (min-width: 992px) {
 
     #sidebarCol,
     #contentCol {
         transition: width 0.28s cubic-bezier(0.2, 0.6, 0.2, 1),
             flex-basis 0.28s cubic-bezier(0.2, 0.6, 0.2, 1);
     }
-}
+} */
 
 /* MINI SIDEBAR */
-@media (min-width: 992px) {
+/* @media (min-width: 992px) {
 
     #sidebarCol .name-role,
     #sidebarCol .nav-label,
@@ -293,7 +293,6 @@ textarea#ac_address {
         overflow: hidden;
     }
 
-    /* when mini */
     #sidebarCol.sidebar-mini .nav-item>.nav-link {
         justify-content: center;
         gap: 0;
@@ -304,13 +303,11 @@ textarea#ac_address {
         opacity: 0;
         max-width: 0;
     }
-
-    /* hide all submenus smoothly in mini */
     #sidebarCol.sidebar-mini .submenu {
         max-height: 0 !important;
         opacity: 0;
     }
-}
+} */
 
 /* spacing */
 .wrapper-content {
@@ -328,11 +325,11 @@ textarea#ac_address {
 }
 
 /* Accessibility: respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
+/* @media (prefers-reduced-motion: reduce) {
     * {
         transition: none !important;
     }
-}
+} */
 
 .offcanvas {
     max-width: 70% !important;
@@ -891,7 +888,7 @@ table tbody td:first-child {
     will-change: opacity, width, max-width, transform;
 }
 
-@media (min-width: 992px) {
+/* @media (min-width: 992px) {
     #sidebarCol.sidebar-mini .sidebar-box>.border-bottom {
         display: grid !important;
         justify-items: center;
@@ -940,7 +937,7 @@ table tbody td:first-child {
         display: grid;
         place-items: center;
     }
-}
+} */
 
 #sidebarCol.sidebar-mini .nav-label {
     display: initial !important;

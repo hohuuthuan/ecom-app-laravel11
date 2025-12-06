@@ -572,7 +572,7 @@
   font-weight: 500;
 }
 
-@media (max-width: 992px) {
+/* @media (max-width: 992px) {
   .profile-layout {
     grid-template-columns: 1fr;
   }
@@ -591,4 +591,4 @@
   .address-wrapper {
     padding: 16px;
   }
-}
+} */

@@ -14,11 +14,14 @@ use App\Models\Province;
 use App\Models\Order;
 use App\Models\Address;
 use App\Models\Warehouse;
+use App\Models\Discount;
+use App\Models\DiscountUsage;
 use App\Services\User\CartService;
 use App\Services\User\CheckoutService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 
 class CheckoutController extends Controller
 {
@@ -315,7 +318,7 @@ class CheckoutController extends Controller
         }
 
         // ================== BUILD DATA CHO BẢNG orders ==================
-        $itemsCount  = array_sum($items);
+        $itemsCount = array_sum($items);
         $subtotalVnd = 0;
 
         foreach ($items as $productId => $qty) {
@@ -326,11 +329,39 @@ class CheckoutController extends Controller
             $subtotalVnd += $productPrice * (int) $qty;
         }
 
-        $shippingFeeVnd = 30000;
-        $discountVnd    = 0;
-        $taxVnd         = 0;
+        // === ÁP DỤNG MÃ GIẢM GIÁ TỪ SESSION (nếu có) ===
+        $shippingBaseVnd = 30000;
+        $discountVnd = 0;
+        $shippingFeeVnd = $shippingBaseVnd;
+        $taxVnd = 0;
+        $discountId = null;
+
+        $discountSession = $request->session()->get('checkout_discount');
+        if (is_array($discountSession)) {
+            $discountVnd = (int) ($discountSession['discount_vnd'] ?? 0);
+            $shippingDiscountVnd = (int) ($discountSession['shipping_discount_vnd'] ?? 0);
+
+            if ($discountVnd < 0) {
+                $discountVnd = 0;
+            }
+            if ($shippingDiscountVnd < 0) {
+                $shippingDiscountVnd = 0;
+            }
+
+            $shippingFeeVnd = $shippingBaseVnd - $shippingDiscountVnd;
+            if ($shippingFeeVnd < 0) {
+                $shippingFeeVnd = 0;
+            }
+
+            if (!empty($discountSession['discount_id'])) {
+                $discountId = $discountSession['discount_id'];
+            }
+        }
 
         $grandTotalVnd = $subtotalVnd - $discountVnd + $taxVnd + $shippingFeeVnd;
+        if ($grandTotalVnd < 0) {
+            $grandTotalVnd = 0;
+        }
 
         $orderId = (string) Str::uuid();
 
@@ -339,15 +370,15 @@ class CheckoutController extends Controller
             'code'              => $this->generateOrderCode(),
             'user_id'           => $user->id,
             'status'            => 'pending',
-            'payment_method'    => 'cod',
-            'payment_status'    => 'unpaid',
+            'payment_method'    => 'cod',      // sẽ override lại phía dưới theo payment_method
+            'payment_status'    => 'unpaid',   // với momo/vnpay sẽ là pending
             'items_count'       => $itemsCount,
             'subtotal_vnd'      => $subtotalVnd,
             'discount_vnd'      => $discountVnd,
             'tax_vnd'           => $taxVnd,
             'shipping_fee_vnd'  => $shippingFeeVnd,
             'grand_total_vnd'   => $grandTotalVnd,
-            'discount_id'       => null,
+            'discount_id'       => $discountId,
             'buyer_note'        => $request->input('buyer_note') ?? null,
             'placed_at'         => now(),
             'delivered_at'      => null,
@@ -477,7 +508,15 @@ class CheckoutController extends Controller
             );
 
             if ($order) {
-                $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+                if (!empty($discountId)) {
+                    $this->recordDiscountUsage((string) $discountId, (string) $user->id, (string) $order->id);
+                }
+
+                $request->session()->forget([
+                    'checkout.items',
+                    'checkout.expires_at',
+                    'checkout_discount',
+                ]);
 
                 foreach (array_keys($items) as $productId) {
                     $cartService->removeItemInCart((string) $productId);
@@ -492,10 +531,10 @@ class CheckoutController extends Controller
                 ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
         }
 
+
         return back()
             ->with('toast_error', 'Phương thức thanh toán không hợp lệ');
     }
-
 
     public function momoReturn(Request $request, CheckoutService $checkoutService, CartService $cartService)
     {
@@ -511,10 +550,11 @@ class CheckoutController extends Controller
         $resultCode = (int) $request->input('resultCode', -1);
         if ($resultCode !== 0) {
             $request->session()->forget('checkout.momo_pending');
+            $request->session()->forget('checkout_discount');
 
             return redirect()
                 ->route('checkout.page')
-                ->with('toast_error', 'Thanh toán MoMo thất bại hoặc bị hủy.');
+                ->with('toast_error', 'Thanh toán MoMo thất bại hoặc bị hủy');
         }
 
         $orderData      = $pending['orderData'];
@@ -522,11 +562,9 @@ class CheckoutController extends Controller
         $shipmentData   = $pending['shipmentData'];
         $items          = $pending['items'];
 
-        // Cập nhật trạng thái thanh toán trước khi insert
         $orderData['payment_method'] = 'momo';
         $orderData['payment_status'] = 'paid';
 
-        // placeCodOrder mới: chỉ còn 3 tham số
         $order = $checkoutService->placeCodOrder(
             $orderData,
             $orderItemsData,
@@ -534,9 +572,18 @@ class CheckoutController extends Controller
         );
 
         $request->session()->forget('checkout.momo_pending');
-        $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+        $request->session()->forget([
+            'checkout.items',
+            'checkout.expires_at',
+            'checkout_discount',
+        ]);
 
         if ($order) {
+            $discountId = $orderData['discount_id'] ?? null;
+            if (!empty($discountId)) {
+                $this->recordDiscountUsage((string) $discountId, (string) $order->user_id, (string) $order->id);
+            }
+
             foreach (array_keys($items) as $productId) {
                 $cartService->removeItemInCart((string) $productId);
             }
@@ -546,11 +593,11 @@ class CheckoutController extends Controller
                 ->with('toast_success', 'Thanh toán MoMo thành công, đơn hàng đã được tạo.');
         }
 
+
         return redirect()
             ->route('checkout.page')
             ->with('toast_error', 'Có lỗi xảy ra khi tạo đơn sau khi thanh toán MoMo.');
     }
-
 
     public function vnpayReturn(Request $request, CheckoutService $checkoutService, CartService $cartService)
     {
@@ -602,10 +649,11 @@ class CheckoutController extends Controller
         $responseCode = $request->input('vnp_ResponseCode');
         if ($responseCode !== '00') {
             $request->session()->forget('checkout.vnpay_pending');
+            $request->session()->forget('checkout_discount');
 
             return redirect()
                 ->route('checkout.page')
-                ->with('toast_error', 'Thanh toán VNPAY thất bại hoặc đã bị hủy.');
+                ->with('toast_error', 'Thanh toán VNPAY thất bại hoặc đã bị hủy');
         }
 
         $orderData      = $pending['orderData'];
@@ -623,9 +671,18 @@ class CheckoutController extends Controller
         );
 
         $request->session()->forget('checkout.vnpay_pending');
-        $request->session()->forget(['checkout.items', 'checkout.expires_at']);
+        $request->session()->forget([
+            'checkout.items',
+            'checkout.expires_at',
+            'checkout_discount',
+        ]);
 
         if ($order) {
+            $discountId = $orderData['discount_id'] ?? null;
+            if (!empty($discountId)) {
+                $this->recordDiscountUsage((string) $discountId, (string) $order->user_id, (string) $order->id);
+            }
+
             foreach (array_keys($items) as $productId) {
                 $cartService->removeItemInCart((string) $productId);
             }
@@ -635,413 +692,197 @@ class CheckoutController extends Controller
                 ->with('toast_success', 'Thanh toán VNPAY thành công, đơn hàng đã được tạo.');
         }
 
+
         return redirect()
             ->route('checkout.page')
             ->with('toast_error', 'Có lỗi xảy ra khi tạo đơn sau khi thanh toán VNPAY.');
     }
 
-
-
-    // public function placeOrder(Request $request, CheckoutService $checkoutService, CartService $cartService)
-    // {
-    //     $data = $request->validate([
-    //         'receiver_name'       => ['required', 'string', 'max:255'],
-    //         'receiver_phone'      => ['required', 'string', 'max:20'],
-    //         'email'               => ['nullable', 'email'],
-    //         'shipping_address_id' => ['required', 'string', 'uuid'],
-    //         'payment_method'      => ['required', 'in:cod,momo,vnpay'],
-    //         'items'               => ['required', 'array', 'min:1'],
-    //         'items.*'             => ['required', 'integer', 'min:1'],
-    //         'discount_code'       => ['nullable', 'string', 'max:50'],
-    //         // 'buyer_note'          => ['nullable', 'string', 'max:1000'],
-    //     ]);
-
-    //     $discountCode = trim((string) ($data['discount_code'] ?? ''));
-    //     if ($discountCode !== '' && !$this->isActiveDiscountCode($discountCode)) {
-    //         return back()
-    //             ->with('toast_error', 'Mã giảm giá không hợp lệ hoặc đã hết hạn.')
-    //             ->withInput();
-    //     }
-
-    //     $user = Auth::user();
-    //     $address = Address::where('id', $data['shipping_address_id'])
-    //         ->where('user_id', $user->id)
-    //         ->first();
-
-    //     if (!$address) {
-    //         return back()
-    //             ->with('toast_error', 'Địa chỉ giao hàng không hợp lệ')
-    //             ->withInput();
-    //     }
-
-    //     $items      = $data['items']; // items[product_id] = qty
-    //     $productIds = array_keys($items);
-
-    //     $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
-    //     if ($products->count() !== count($productIds)) {
-    //         return back()
-    //             ->with('toast_error', 'Một hoặc nhiều sản phẩm trong đơn hàng không còn tồn tại')
-    //             ->withInput();
-    //     }
-
-    //     if ($products->contains(fn($p) => strtoupper($p->status) !== 'ACTIVE')) {
-    //         return back()
-    //             ->with('toast_error', 'Đơn hàng chứa sản phẩm tạm thời ngừng kinh doanh')
-    //             ->withInput();
-    //     }
-
-    //     $defaultWarehouse = Warehouse::first();
-    //     if (!$defaultWarehouse) {
-    //         return back()
-    //             ->with('toast_error', 'Chưa cấu hình kho hàng, không thể đặt đơn')
-    //             ->withInput();
-    //     }
-
-    //     // ================== BUILD DATA CHO BẢNG orders ==================
-    //     $itemsCount  = array_sum($items);
-    //     $subtotalVnd = 0;
-
-    //     foreach ($items as $productId => $qty) {
-    //         /** @var \App\Models\Product $product */
-    //         $product = $products[$productId];
-
-    //         $productPrice = (int) $product->selling_price_vnd;
-    //         $subtotalVnd += $productPrice * (int) $qty;
-    //     }
-
-    //     $shippingFeeVnd = 30000; // tạm thời fix 30k
-    //     $discountVnd    = 0;     // chưa áp mã giảm giá vào tiền
-    //     $taxVnd         = 0;     // chưa dùng VAT
-
-    //     $grandTotalVnd = $subtotalVnd - $discountVnd + $taxVnd + $shippingFeeVnd;
-
-    //     $orderId = (string) Str::uuid();
-
-    //     $orderData = [
-    //         'id'                => $orderId,
-    //         'code'              => $this->generateOrderCode(),
-    //         'user_id'           => $user->id,
-    //         'status'            => 'pending',
-    //         'payment_method'    => 'cod',
-    //         'payment_status'    => 'unpaid',
-    //         'items_count'       => $itemsCount,
-    //         'subtotal_vnd'      => $subtotalVnd,
-    //         'discount_vnd'      => $discountVnd,
-    //         'tax_vnd'           => $taxVnd,
-    //         'shipping_fee_vnd'  => $shippingFeeVnd,
-    //         'grand_total_vnd'   => $grandTotalVnd,
-    //         'discount_id'       => null, // sau này map từ bảng discounts theo $discountCode
-    //         'buyer_note'        => $request->input('buyer_note') ?? null,
-    //         'placed_at'         => now(),
-    //         'delivered_at'      => null,
-    //         'cancelled_at'      => null,
-    //     ];
-
-    //     // ================== BUILD DATA CHO BẢNG order_items ==================
-    //     $orderItemsData = [];
-
-    //     foreach ($items as $productId => $qty) {
-    //         /** @var \App\Models\Product $product */
-    //         $product = $products[$productId];
-
-    //         $quantity  = (int) $qty;
-    //         $unitPrice = (int) $product->selling_price_vnd;
-
-    //         $discountAmountVnd   = 0;    // chưa chia giảm giá theo từng dòng
-    //         $taxRate             = null; // chưa dùng VAT
-    //         $taxAmountVnd        = 0;
-    //         $unitCostSnapshotVnd = 0;    // TODO: sau này tính từ order_batches
-    //         $totalPriceVnd       = $quantity * $unitPrice - $discountAmountVnd + $taxAmountVnd;
-
-    //         $orderItemsData[] = [
-    //             'id'                       => (string) Str::uuid(),
-    //             'order_id'                 => $orderId,
-    //             'product_id'               => $productId,
-    //             'product_title_snapshot'   => $product->title,
-    //             'isbn13_snapshot'          => $product->isbn ?? null,
-    //             'warehouse_id'             => $defaultWarehouse->id,
-    //             'quantity'                 => $quantity,
-    //             'unit_price_vnd'           => $unitPrice,
-    //             'discount_amount_vnd'      => $discountAmountVnd,
-    //             'tax_rate'                 => $taxRate,
-    //             'tax_amount_vnd'           => $taxAmountVnd,
-    //             'unit_cost_snapshot_vnd'   => $unitCostSnapshotVnd,
-    //             'total_price_vnd'          => $totalPriceVnd,
-    //             'created_at'               => now(),
-    //             'updated_at'               => now(),
-    //         ];
-    //     }
-
-    //     // ================== BUILD DATA CHO BẢNG shipments ==================
-    //     $shipmentAddress = $address->address;
-
-    //     if ($address->ward || $address->province) {
-    //         $parts = [$address->address];
-
-    //         if ($address->ward) {
-    //             $parts[] = $address->ward->name;
-    //         }
-
-    //         if ($address->province) {
-    //             $parts[] = $address->province->name;
-    //         }
-
-    //         $shipmentAddress = implode(', ', $parts);
-    //     }
-
-    //     $shipmentData = [
-    //         'id'           => (string) Str::uuid(),
-    //         'order_id'     => $orderId,
-    //         'status'       => 'pending',
-    //         'name'         => $data['receiver_name'],
-    //         'phone'        => $data['receiver_phone'],
-    //         'email'        => $data['email'] ?? null,
-    //         'address'      => $shipmentAddress,
-    //         'picked_at'    => null,
-    //         'shipped_at'   => null,
-    //         'delivered_at' => null,
-    //         'created_at'   => now(),
-    //         'updated_at'   => now(),
-    //     ];
-
-    //     // ================== BUILD DATA CHO BẢNG order_batches ==================
-    //     $orderBatchesData = [];
-
-    //     foreach ($orderItemsData as $itemRow) {
-    //         $allocations = $this->allocateBatchesForItem(
-    //             $itemRow['product_id'],
-    //             $itemRow['warehouse_id'],
-    //             $itemRow['quantity']
-    //         );
-
-    //         if ($allocations === null) {
-    //             $productTitle = $products[$itemRow['product_id']]->title ?? 'Sản phẩm';
-    //             return back()
-    //                 ->with('toast_error', 'Sản phẩm "' . $productTitle . '" không đủ tồn kho theo lô hàng.')
-    //                 ->withInput();
-    //         }
-
-    //         foreach ($allocations as $alloc) {
-    //             $orderBatchesData[] = [
-    //                 'order_item_id' => $itemRow['id'],
-    //                 'batch_id'      => $alloc['batch_id'],
-    //                 'quantity'      => $alloc['quantity'],
-    //                 'unit_cost_vnd' => $alloc['unit_cost_vnd'],
-    //             ];
-    //         }
-    //     }
-
-    //     if ($data['payment_method'] === 'momo') {
-    //         $orderData['payment_method'] = 'momo';
-    //         $orderData['payment_status'] = 'pending';
-
-    //         $request->session()->put('checkout.momo_pending', [
-    //             'orderData'       => $orderData,
-    //             'orderItemsData'  => $orderItemsData,
-    //             'shipmentData'    => $shipmentData,
-    //             'orderBatchesData' => $orderBatchesData,
-    //             'items'           => $items,
-    //         ]);
-
-    //         $gateway = new MomoGateway(config('payment.momo'));
-    //         $payUrl  = $gateway->createPaymentUrl(
-    //             $orderData['code'],
-    //             (int) $orderData['grand_total_vnd'],
-    //             'Thanh toán đơn hàng #' . $orderData['code']
-    //         );
-
-    //         return redirect()->away($payUrl);
-    //     }
-
-    //     if ($data['payment_method'] === 'vnpay') {
-    //         $orderData['payment_method'] = 'vnpay';
-    //         $orderData['payment_status'] = 'pending';
-
-    //         $request->session()->put('checkout.vnpay_pending', [
-    //             'orderData'        => $orderData,
-    //             'orderItemsData'   => $orderItemsData,
-    //             'shipmentData'     => $shipmentData,
-    //             'orderBatchesData' => $orderBatchesData,
-    //             'items'            => $items,
-    //         ]);
-
-    //         $gateway = new VnpayGateway(config('payment.vnpay'));
-    //         $payUrl  = $gateway->createPaymentUrl(
-    //             $orderData['code'],
-    //             (int) $orderData['grand_total_vnd'],
-    //             'Thanh toán đơn hàng #' . $orderData['code'],
-    //             $request->ip()
-    //         );
-
-    //         return redirect()->away($payUrl);
-    //     }
-    //     if ($data['payment_method'] === 'cod') {
-    //         $order = $checkoutService->placeCodOrder(
-    //             $orderData,
-    //             $orderItemsData,
-    //             $shipmentData,
-    //             $orderBatchesData
-    //         );
-
-    //         if ($order) {
-    //             $request->session()->forget(['checkout.items', 'checkout.expires_at']);
-
-    //             foreach (array_keys($items) as $productId) {
-    //                 $cartService->removeItemInCart((string) $productId);
-    //             }
-
-    //             return redirect()
-    //                 ->route('user.thanks', ['code' => $order->code])
-    //                 ->with('toast_success', 'Đặt hàng thành công');
-    //         }
-
-    //         return back()
-    //             ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
-    //     }
-    // }
-
-    // public function momoReturn(Request $request, CheckoutService $checkoutService, CartService $cartService)
-    // {
-    //     $pending = $request->session()->get('checkout.momo_pending');
-
-    //     if (!$pending) {
-    //         return redirect()
-    //             ->route('cart')
-    //             ->with('toast_error', 'Không tìm thấy thông tin đơn hàng chờ thanh toán.');
-    //     }
-
-    //     $resultCode = (int) $request->input('resultCode', -1);
-    //     if ($resultCode !== 0) {
-    //         $request->session()->forget('checkout.momo_pending');
-
-    //         return redirect()
-    //             ->route('checkout.page')
-    //             ->with('toast_error', 'Thanh toán MoMo thất bại hoặc bị hủy.');
-    //     }
-
-    //     $orderData        = $pending['orderData'];
-    //     $orderItemsData   = $pending['orderItemsData'];
-    //     $shipmentData     = $pending['shipmentData'];
-    //     $orderBatchesData = $pending['orderBatchesData'];
-    //     $items            = $pending['items'];
-
-    //     // Cập nhật trạng thái thanh toán trước khi insert
-    //     $orderData['payment_method'] = 'momo';
-    //     $orderData['payment_status'] = 'paid';
-
-    //     $order = $checkoutService->placeCodOrder(
-    //         $orderData,
-    //         $orderItemsData,
-    //         $shipmentData,
-    //         $orderBatchesData
-    //     );
-
-    //     $request->session()->forget('checkout.momo_pending');
-    //     $request->session()->forget(['checkout.items', 'checkout.expires_at']);
-
-    //     if ($order) {
-    //         foreach (array_keys($items) as $productId) {
-    //             $cartService->removeItemInCart((string) $productId);
-    //         }
-
-    //         return redirect()
-    //             ->route('user.thanks', ['code' => $order->code])
-    //             ->with('toast_success', 'Thanh toán MoMo thành công, đơn hàng đã được tạo.');
-    //     }
-
-    //     return redirect()
-    //         ->route('checkout.page')
-    //         ->with('toast_error', 'Có lỗi xảy ra khi tạo đơn sau khi thanh toán MoMo.');
-    // }
-
-    // public function vnpayReturn(Request $request, CheckoutService $checkoutService, CartService $cartService)
-    // {
-    //     $pending = $request->session()->get('checkout.vnpay_pending');
-
-    //     if (!$pending) {
-    //         return redirect()
-    //             ->route('cart')
-    //             ->with('toast_error', 'Không tìm thấy thông tin đơn hàng chờ thanh toán VNPAY.');
-    //     }
-
-    //     // ==== VERIFY CHỮ KÝ VNPAY ====
-    //     $inputData = [];
-    //     foreach ($request->all() as $key => $value) {
-    //         if (strpos($key, 'vnp_') === 0) {
-    //             $inputData[$key] = $value;
-    //         }
-    //     }
-
-    //     $vnpSecureHash = $inputData['vnp_SecureHash'] ?? '';
-    //     unset($inputData['vnp_SecureHash'], $inputData['vnp_SecureHashType']);
-
-    //     ksort($inputData);
-
-    //     $hashParts = [];
-    //     foreach ($inputData as $key => $value) {
-    //         $hashParts[] = urlencode($key) . '=' . urlencode((string) $value);
-    //     }
-    //     $hashData = implode('&', $hashParts);
-
-    //     $hashSecret = (string) config('payment.vnpay.hash_secret');
-    //     $calcHash   = hash_hmac('sha512', $hashData, $hashSecret);
-
-    //     if ($calcHash !== $vnpSecureHash) {
-    //         Log::warning('VNPay invalid signature', [
-    //             'hashData'      => $hashData,
-    //             'calcHash'      => $calcHash,
-    //             'vnpSecureHash' => $vnpSecureHash,
-    //         ]);
-
-    //         $request->session()->forget('checkout.vnpay_pending');
-
-    //         return redirect()
-    //             ->route('checkout.page')
-    //             ->with('toast_error', 'Chữ ký VNPAY không hợp lệ.');
-    //     }
-
-
-    //     // ==== CHECK KẾT QUẢ THANH TOÁN ====
-    //     $responseCode = $request->input('vnp_ResponseCode');
-    //     if ($responseCode !== '00') {
-    //         $request->session()->forget('checkout.vnpay_pending');
-
-    //         return redirect()
-    //             ->route('checkout.page')
-    //             ->with('toast_error', 'Thanh toán VNPAY thất bại hoặc đã bị hủy.');
-    //     }
-
-    //     $orderData        = $pending['orderData'];
-    //     $orderItemsData   = $pending['orderItemsData'];
-    //     $shipmentData     = $pending['shipmentData'];
-    //     $orderBatchesData = $pending['orderBatchesData'];
-    //     $items            = $pending['items'];
-
-    //     $orderData['payment_method'] = 'vnpay';
-    //     $orderData['payment_status'] = 'paid';
-
-    //     $order = $checkoutService->placeCodOrder(
-    //         $orderData,
-    //         $orderItemsData,
-    //         $shipmentData,
-    //         $orderBatchesData
-    //     );
-
-    //     $request->session()->forget('checkout.vnpay_pending');
-    //     $request->session()->forget(['checkout.items', 'checkout.expires_at']);
-
-    //     if ($order) {
-    //         foreach (array_keys($items) as $productId) {
-    //             $cartService->removeItemInCart((string) $productId);
-    //         }
-
-    //         return redirect()
-    //             ->route('user.thanks', ['code' => $order->code])
-    //             ->with('toast_success', 'Thanh toán VNPAY thành công, đơn hàng đã được tạo.');
-    //     }
-
-    //     return redirect()
-    //         ->route('checkout.page')
-    //         ->with('toast_error', 'Có lỗi xảy ra khi tạo đơn sau khi thanh toán VNPAY.');
-    // }
+    public function applyDiscount(Request $request): JsonResponse
+    {
+        $request->validate([
+            'code'     => ['required', 'string', 'max:64'],
+            'subtotal' => ['required', 'integer', 'min:0'],
+            'shipping' => ['required', 'integer', 'min:0'],
+        ]);
+
+        /** @var \App\Models\User|null $user */
+        $user = $request->user();
+        if (!$user) {
+            return response()->json([
+                'ok'      => false,
+                'message' => 'Bạn cần đăng nhập để sử dụng mã giảm giá.',
+            ], 401);
+        }
+
+        $code = strtoupper(trim((string) $request->input('code')));
+        $subtotal = $request->integer('subtotal');
+        $shipping = $request->integer('shipping');
+
+        $discount = Discount::query()
+            ->where('code', $code)
+            ->where('status', 'ACTIVE')
+            ->first();
+
+        if (!$discount) {
+            return response()->json([
+                'ok'      => false,
+                'message' => 'Mã giảm giá không hợp lệ.',
+            ], 404);
+        }
+
+        if ($discount->start_date && $discount->start_date->isFuture()) {
+            return response()->json([
+                'ok'      => false,
+                'message' => 'Mã giảm giá này chưa bắt đầu áp dụng.',
+            ], 422);
+        }
+
+        if ($discount->end_date && $discount->end_date->isPast()) {
+            return response()->json([
+                'ok'      => false,
+                'message' => 'Mã giảm giá đã hết hạn.',
+            ], 422);
+        }
+
+        if (
+            !is_null($discount->min_order_value_vnd)
+            && $discount->min_order_value_vnd > 0
+            && $subtotal < $discount->min_order_value_vnd
+        ) {
+            return response()->json([
+                'ok'      => false,
+                'message' => 'Đơn hàng chưa đạt giá trị tối thiểu để áp dụng mã giảm giá.',
+            ], 422);
+        }
+
+        // ====== GIỚI HẠN THEO USER (per_user_limit) ======
+        if (!is_null($discount->per_user_limit)) {
+            $userUsedCount = DiscountUsage::query()
+                ->where('discount_id', $discount->id)
+                ->where('user_id', $user->id)
+                ->whereNotNull('used_at')
+                ->count();
+
+            if ($userUsedCount >= $discount->per_user_limit) {
+                return response()->json([
+                    'ok'      => false,
+                    'message' => 'Bạn đã sử dụng mã này tối đa ' . $discount->per_user_limit . ' lần.',
+                ], 422);
+            }
+        }
+
+        // ====== GIỚI HẠN TỔNG SỐ LƯỢT (usage_limit) ======
+        if (!is_null($discount->usage_limit)) {
+            $totalUsed = DiscountUsage::query()
+                ->where('discount_id', $discount->id)
+                ->whereNotNull('used_at')
+                ->count();
+
+            if ($totalUsed >= $discount->usage_limit) {
+                return response()->json([
+                    'ok'      => false,
+                    'message' => 'Mã giảm giá đã được sử dụng hết lượt.',
+                ], 422);
+            }
+        }
+
+        $discountAmount = 0;
+        $shippingDiscount = 0;
+
+        if ($discount->type === 'percent') {
+            $discountAmount = (int) floor($subtotal * $discount->value / 100);
+            if ($discountAmount > $subtotal) {
+                $discountAmount = $subtotal;
+            }
+        } elseif ($discount->type === 'fixed') {
+            $discountAmount = (int) $discount->value;
+            if ($discountAmount > $subtotal) {
+                $discountAmount = $subtotal;
+            }
+        } elseif ($discount->type === 'shipping') {
+            $shippingDiscount = $discount->value > 0
+                ? (int) $discount->value
+                : $shipping;
+
+            if ($shippingDiscount > $shipping) {
+                $shippingDiscount = $shipping;
+            }
+        }
+
+        if ($discountAmount < 0) {
+            $discountAmount = 0;
+        }
+
+        if ($shippingDiscount < 0) {
+            $shippingDiscount = 0;
+        }
+
+        $newShipping = $shipping - $shippingDiscount;
+        if ($newShipping < 0) {
+            $newShipping = 0;
+        }
+
+        $total = $subtotal - $discountAmount + $newShipping;
+        if ($total < 0) {
+            $total = 0;
+        }
+
+        $request->session()->put('checkout_discount', [
+            'discount_id'           => $discount->id,
+            'code'                  => $discount->code,
+            'type'                  => $discount->type,
+            'value'                 => $discount->value,
+            'discount_vnd'          => $discountAmount,
+            'shipping_discount_vnd' => $shippingDiscount,
+        ]);
+
+        return response()->json([
+            'ok'      => true,
+            'message' => 'Áp dụng mã giảm giá thành công.',
+            'data'    => [
+                'code'                  => $discount->code,
+                'discount_vnd'          => $discountAmount,
+                'shipping_discount_vnd' => $shippingDiscount,
+                'subtotal_vnd'          => $subtotal,
+                'shipping_vnd'          => $newShipping,
+                'total_vnd'             => $total,
+            ],
+        ]);
+    }
+
+
+    protected function recordDiscountUsage(string $discountId, string $userId, string $orderId): void
+    {
+        if ($discountId === '') {
+            return;
+        }
+
+        try {
+            DiscountUsage::create([
+                'discount_id' => $discountId,
+                'user_id'     => $userId,
+                'order_id'    => $orderId,
+                'used_at'     => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('Cannot record discount usage', [
+                'discount_id' => $discountId,
+                'user_id'     => $userId,
+                'order_id'    => $orderId,
+                'error'       => $e->getMessage(),
+            ]);
+        }
+    }
+
+
+    public function removeDiscount(Request $request): JsonResponse
+    {
+        $request->session()->forget('checkout_discount');
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Đã xoá mã giảm giá.',
+        ]);
+    }
 }

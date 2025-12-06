@@ -238,10 +238,17 @@
                 placeholder="Nhập mã giảm giá"
                 value="{{ old('discount_code') }}">
               <button
+                id="discountApplyButton"
                 class="apply-btn"
                 type="button"
                 onclick="applyDiscount()">
-                Áp Dụng
+                <span class="apply-btn-label">Áp Dụng</span>
+                <span class="apply-btn-spinner d-none">
+                  <span class="apply-btn-spinner-dot"></span>
+                </span>
+                <span class="apply-btn-check d-none">
+                  <i class="bi bi-patch-check-fill"></i>
+                </span>
               </button>
             </div>
             <div id="discountMessage" class="discount-message"></div>

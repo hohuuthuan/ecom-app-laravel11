@@ -12,12 +12,14 @@ use App\Http\Controllers\Admin\Page\CatalogPageController;
 use App\Http\Controllers\Admin\Page\ProductPageController;
 use App\Http\Controllers\Admin\Page\OrderPageController;
 use App\Http\Controllers\Admin\Page\WarehousePageController;
+use App\Http\Controllers\Admin\Page\DiscountPageController;
 
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PublisherController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\DiscountController;
 
 // === PUBLIC ===
 Route::get('/', [HomePageController::class, 'index'])->name('home');
@@ -53,6 +55,8 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/checkout/placeOrder', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
   Route::get('/checkout/momo/return', [CheckoutController::class, 'momoReturn'])->name('checkout.momoReturn');
   Route::get('/checkout/vnpay/return', [CheckoutController::class, 'vnpayReturn'])->name('checkout.vnpayReturn');
+  Route::post('/checkout/apply-discount', [CheckoutController::class, 'applyDiscount'])->name('checkout.applyDiscount');
+  Route::delete('/checkout/discount', [CheckoutController::class, 'removeDiscount'])->name('checkout.removeDiscount');
 
   Route::prefix('profile')->name('user.profile.')->group(function () {
     Route::get('/', [UserAddressController::class, 'index'])->name('index');
@@ -69,24 +73,19 @@ Route::middleware(['auth'])->group(function () {
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
     Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
 
-    // Accounts
     Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
     Route::post('/accounts/bulk-update', [AccountController::class, 'bulkUpdate'])->name('accounts.bulk-update');
     Route::put('/accounts/{id}', [AccountController::class, 'updateAccount'])->name('accounts.update');
 
     Route::get('/catalog', [CatalogPageController::class, 'index'])->name('catalog.index');
-    // Authors
     Route::post('/authors', [AuthorController::class, 'store'])->name('authors.store');
     Route::put('/authors/{id}', [AuthorController::class, 'update'])->name('authors.update');
     Route::delete('/authors/{id}', [AuthorController::class, 'destroy'])->name('authors.destroy');
     Route::delete('/authors/bulk-delete', [AuthorController::class, 'bulkDelete'])->name('authors.bulk-delete');
-    // Categories
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     Route::delete('/categories/bulk-delete', [CategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
-
-    // Publishers
     Route::post('/publishers', [PublisherController::class, 'store'])->name('publishers.store');
     Route::put('/publishers/{id}', [PublisherController::class, 'update'])->name('publishers.update');
     Route::delete('/publishers/{id}', [PublisherController::class, 'destroy'])->name('publishers.destroy');
@@ -102,6 +101,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/order', [OrderPageController::class, 'index'])->name('order.index');
     Route::get('/order/detail/{id}', [OrderPageController::class, 'detail'])->name('order.detail');
     Route::patch('/order/{id}/change-status', [OrderPageController::class, 'changeStatus'])->name('order.changeStatus');
+
+    Route::get('/discounts', [DiscountPageController::class, 'index'])->name('discount.index');
+    Route::get('/discounts/create', [DiscountPageController::class, 'create'])->name('discount.create');
+    Route::get('/discounts/{id}', [DiscountPageController::class, 'show'])->name('discount.show');
+    Route::get('/discounts/{id}/edit', [DiscountPageController::class, 'edit'])->name('discount.edit');
+    Route::post('/discounts', [DiscountController::class, 'store'])->name('discount.store');
+    Route::put('/discounts/{id}', [DiscountController::class, 'update'])->name('discount.update');
+    Route::delete('/discounts/{id}', [DiscountController::class, 'destroy'])->name('discount.destroy');
   });
 
   Route::middleware(['auth', 'role:Admin,Warehouse Manager'])->prefix('warehouse')->name('warehouse.')->group(function () {

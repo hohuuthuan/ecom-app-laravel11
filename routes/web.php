@@ -7,6 +7,7 @@ use App\Http\Controllers\User\Page\HomePageController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\CheckoutController;
 use App\Http\Controllers\User\UserAddressController;
+use App\Http\Controllers\User\UserOrderController;
 
 use App\Http\Controllers\Admin\Page\CatalogPageController;
 use App\Http\Controllers\Admin\Page\ProductPageController;
@@ -68,6 +69,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/address/{id}', [UserAddressController::class, 'updateAddress'])->name('updateAddress');
     Route::delete('/address/{id}', [UserAddressController::class, 'destroyAddress'])->name('destroyAddress');
     Route::put('/address/{id}/default', [UserAddressController::class, 'setAddressDefault'])->name('setAddressDefault');
+
+    Route::get('/orders/{id}', [UserOrderController::class, 'show'])->name('orders.show');
   });
 
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {

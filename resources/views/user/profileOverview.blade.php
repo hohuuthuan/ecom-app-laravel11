@@ -212,7 +212,7 @@ $pp = (int) request('per_page_order', 10);
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ route('admin.order.detail', $order->id) }}">
+                                            <a href="{{ route('user.profile.orders.show', $order->id) }}">
                                                 <i class="fa fa-eye icon-eye-view-order-detail"></i>
                                             </a>
                                         </td>

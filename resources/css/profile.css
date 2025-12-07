@@ -586,6 +586,11 @@
   font-weight: 500;
 }
 
+.icon-eye-view-order-detail {
+    font-size: 30px;
+    color: #0065a8;
+}
+
 /* @media (max-width: 992px) {
   .profile-layout {
     grid-template-columns: 1fr;

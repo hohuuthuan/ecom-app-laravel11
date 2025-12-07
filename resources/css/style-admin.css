@@ -1462,3 +1462,50 @@ i.icon-telephone {
         content: ""
     }
 }
+
+/* ================================================================== ADMIN REVIEW ================================================================== */
+
+.review-table .review-col-index {
+  width: 40px;
+}
+
+.review-table .review-col-customer {
+  width: 145px;
+}
+
+.review-table .review-col-comment {
+  width: 220px;
+}
+
+.review-table .review-col-rating {
+  width: 123px;
+}
+
+.review-table .review-col-image {
+  width: 74px;
+}
+
+.review-table .review-col-reply {
+  width: 220px;
+}
+
+.review-table .review-col-action {
+  width: 100px;
+}
+
+.review-table .review-col-action-update {
+  width: 50px;
+}
+
+.review-table .review-comment-text {
+  max-height: 80px;
+  overflow: auto;
+}
+
+.review-table .review-thumb-img {
+  max-width: 70px;
+  max-height: 70px;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  display: block;
+}

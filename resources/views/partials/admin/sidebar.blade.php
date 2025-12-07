@@ -69,6 +69,12 @@
         active="admin.discount.*"
         icon="fa-ticket-alt"
         label="Mã giảm giá" />
+
+      <x-sidebar.item
+        route="admin.review.index"
+        active="admin.review.*"
+        icon="fa-star"
+        label="Đánh giá" />
     </ul>
   </nav>
 

@@ -8,8 +8,6 @@ $validTabs = ['info', 'orders', 'addresses', 'password'];
 if (!in_array($activeTab, $validTabs, true)) {
 $activeTab = 'info';
 }
-
-$pp = (int) request('per_page_order', 10);
 @endphp
 
 <div class="container profile-overview-page">
@@ -24,7 +22,7 @@ $pp = (int) request('per_page_order', 10);
     </div>
     <div id="profilePage">
         <div class="profile-layout">
-            {{-- BÊN TRÁI: ĐIỀU HƯỚNG --}}
+            <!-- BÊN TRÁI: ĐIỀU HƯỚNG -->
             <aside class="profile-nav">
                 <div class="profile-nav-title">
                     <i class="bi bi-person-circle"></i>
@@ -35,7 +33,8 @@ $pp = (int) request('per_page_order', 10);
                         <a
                             href="{{ route('user.profile.index', ['tab' => 'info']) }}"
                             class="profile-nav-link {{ $activeTab === 'info' ? 'active' : '' }}"
-                            data-target="info">
+                            data-target="info"
+                            data-no-loading="1">
                             <i class="bi bi-person-lines-fill"></i>
                             <span>Thông tin cá nhân</span>
                         </a>
@@ -44,7 +43,8 @@ $pp = (int) request('per_page_order', 10);
                         <a
                             href="{{ route('user.profile.index', ['tab' => 'orders']) }}"
                             class="profile-nav-link {{ $activeTab === 'orders' ? 'active' : '' }}"
-                            data-target="orders">
+                            data-target="orders"
+                            data-no-loading="1">
                             <i class="bi bi-receipt"></i>
                             <span>Lịch sử đơn hàng</span>
                         </a>
@@ -53,7 +53,8 @@ $pp = (int) request('per_page_order', 10);
                         <a
                             href="{{ route('user.profile.index', ['tab' => 'addresses']) }}"
                             class="profile-nav-link {{ $activeTab === 'addresses' ? 'active' : '' }}"
-                            data-target="addresses">
+                            data-target="addresses"
+                            data-no-loading="1">
                             <i class="bi bi-geo-alt-fill"></i>
                             <span>Sổ địa chỉ</span>
                         </a>
@@ -62,7 +63,8 @@ $pp = (int) request('per_page_order', 10);
                         <a
                             href="{{ route('user.profile.index', ['tab' => 'password']) }}"
                             class="profile-nav-link {{ $activeTab === 'password' ? 'active' : '' }}"
-                            data-target="password">
+                            data-target="password"
+                            data-no-loading="1">
                             <i class="bi bi-shield-lock-fill"></i>
                             <span>Đổi mật khẩu</span>
                         </a>
@@ -70,9 +72,9 @@ $pp = (int) request('per_page_order', 10);
                 </ul>
             </aside>
 
-            {{-- BÊN PHẢI: NỘI DUNG --}}
+            <!-- BÊN PHẢI: NỘI DUNG -->
             <main class="profile-main">
-                {{-- Thông tin cá nhân --}}
+                <!-- Thông tin cá nhân -->
                 <section class="profile-section {{ $activeTab === 'info' ? 'active' : '' }}" data-section="info">
                     <div class="profile-info-card">
                         <div class="profile-info-card-header">
@@ -145,102 +147,69 @@ $pp = (int) request('per_page_order', 10);
                     </div>
                 </section>
 
-                {{-- Lịch sử đơn hàng --}}
+                <!-- Lịch sử đơn hàng -->
                 <section class="profile-section {{ $activeTab === 'orders' ? 'active' : '' }}" data-section="orders">
-                    <div class="orders-section-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div>
-                                <h2 class="profile-section-title mb-1">Lịch sử đơn hàng</h2>
-                                <p class="profile-section-subtitle mb-0">
-                                    Danh sách các đơn hàng của bạn.
-                                </p>
-                            </div>
+                    <h2 class="profile-section-title">Lịch sử đơn hàng</h2>
+                    <p class="profile-section-subtitle">Danh sách một số đơn hàng gần đây.</p>
 
-                            <form method="GET" class="d-flex align-items-center">
-                                <label class="me-2 mb-0">Hiển thị</label>
-                                <select
-                                    class="form-select form-select-sm w-auto"
-                                    name="per_page_order"
-                                    onchange="this.form.submit()">
-                                    <option value="10" {{ $pp === 10 ? 'selected' : '' }}>10</option>
-                                    <option value="20" {{ $pp === 20 ? 'selected' : '' }}>20</option>
-                                    <option value="50" {{ $pp === 50 ? 'selected' : '' }}>50</option>
-                                </select>
-                                <input type="hidden" name="tab" value="orders">
-                            </form>
-                        </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle order-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã đơn</th>
+                                    <th>Ngày đặt</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th class="text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($recentOrders as $order)
+                                @php
+                                $status = $order->status;
+                                $statusLabel = 'Không xác định';
+                                $badgeClass = 'badge-status-pending';
 
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle order-table">
-                                <thead>
-                                    <tr>
-                                        <th>Mã đơn</th>
-                                        <th>Ngày đặt</th>
-                                        <th>Tổng tiền</th>
-                                        <th>Trạng thái</th>
-                                        <th class="text-center">Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if ($orders->count() > 0)
-                                    @foreach ($orders as $order)
-                                    @php
-                                    $statusRaw = strtoupper($order->status ?? '');
-                                    $statusLabel = 'Không xác định';
-                                    $badgeClass = 'badge-status-pending';
+                                if (in_array($status, ['pending', 'confirmed', 'picking', 'shipped'], true)) {
+                                $statusLabel = 'Đang xử lý';
+                                $badgeClass = 'badge-status-pending';
+                                } elseif ($status === 'delivered') {
+                                $statusLabel = 'Hoàn thành';
+                                $badgeClass = 'badge-status-success';
+                                } elseif (in_array($status, ['cancelled', 'returned'], true)) {
+                                $statusLabel = 'Đã hủy';
+                                $badgeClass = 'badge-status-cancel';
+                                }
+                                @endphp
+                                <tr>
+                                    <td>{{ $order->code }}</td>
+                                    <td>{{ optional($order->placed_at)->format('d/m/Y, A') }}</td>
+                                    <td>{{ number_format($order->grand_total_vnd, 0, ',', '.') }}đ</td>
+                                    <td>
+                                        <span class="badge-status {{ $badgeClass }}">
+                                            {{ $statusLabel }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ route('admin.order.detail', $order->id) }}">
+                                            <i class="fa fa-eye icon-eye-view-order-detail"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        Bạn chưa có đơn hàng nào.
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
 
-                                    if (in_array($statusRaw, ['PENDING', 'CONFIRMED', 'PICKING', 'SHIPPED', 'PROCESSING', 'SHIPPING'], true)) {
-                                    $statusLabel = 'Đang xử lý';
-                                    $badgeClass = 'badge-status-pending';
-                                    } elseif (in_array($statusRaw, ['DELIVERED', 'COMPLETED'], true)) {
-                                    $statusLabel = 'Hoàn thành';
-                                    $badgeClass = 'badge-status-success';
-                                    } elseif (in_array($statusRaw, ['CANCELLED', 'RETURNED'], true)) {
-                                    $statusLabel = 'Đã hủy';
-                                    $badgeClass = 'badge-status-cancel';
-                                    }
-                                    @endphp
-                                    <tr>
-                                        <td>{{ $order->code }}</td>
-                                        <td>
-                                            {{ optional($order->placed_at)->timezone(config('app.timezone', 'Asia/Ho_Chi_Minh'))->format('d/m/Y H:i') }}
-                                        </td>
-                                        <td>{{ number_format($order->grand_total_vnd, 0, ',', '.') }}đ</td>
-                                        <td>
-                                            <span class="badge-status {{ $badgeClass }}">
-                                                {{ $statusLabel }}
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <a href="{{ route('admin.order.detail', $order->id) }}">
-                                                <i class="fa fa-eye icon-eye-view-order-detail"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                    @else
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted">
-                                            Bạn chưa có đơn hàng nào.
-                                        </td>
-                                    </tr>
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
+                        </table>
                     </div>
-
-                    @if ($orders->hasPages())
-                    <div
-                        class="mt-3 d-flex justify-content-center orders-pagination"
-                        data-profile-orders-pagination>
-                        {{ $orders->appends(array_merge(request()->except('page'), ['tab' => 'orders']))->links('pagination::bootstrap-5') }}
-                    </div>
-                    @endif
                 </section>
 
-
-                {{-- Sổ địa chỉ --}}
+                <!-- Sổ địa chỉ -->
                 <section class="profile-section {{ $activeTab === 'addresses' ? 'active' : '' }}" data-section="addresses">
                     <div class="address-header">
                         <div class="address-header-text">
@@ -256,9 +225,7 @@ $pp = (int) request('per_page_order', 10);
                             <span>Thêm địa chỉ</span>
                         </button>
                     </div>
-
-                    @if ($addresses->count() > 0)
-                    @foreach ($addresses as $address)
+                    @forelse ($addresses as $address)
                     <div class="address-card">
                         <div class="address-card-header">
                             <div class="address-card-title">
@@ -314,15 +281,14 @@ $pp = (int) request('per_page_order', 10);
                             @endif
                         </div>
                     </div>
-                    @endforeach
-                    @else
+                    @empty
                     <p class="text-muted mb-0">
                         Bạn chưa có địa chỉ nào. Hãy thêm địa chỉ mới để đặt hàng nhanh hơn.
                     </p>
-                    @endif
+                    @endforelse
                 </section>
 
-                {{-- Đổi mật khẩu --}}
+                <!-- Đổi mật khẩu -->
                 <section class="profile-section {{ $activeTab === 'password' ? 'active' : '' }}" data-section="password">
                     <h2 class="profile-section-title">Đổi mật khẩu</h2>
                     <p class="profile-section-subtitle">Cập nhật mật khẩu để tăng tính bảo mật cho tài khoản.</p>
@@ -360,9 +326,7 @@ $pp = (int) request('per_page_order', 10);
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var modalEl = document.getElementById('editProfileModal');
-        if (!modalEl || !window.bootstrap) {
-            return;
-        }
+        if (!modalEl || !window.bootstrap) return;
         var modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.show();
     });
@@ -373,9 +337,7 @@ $pp = (int) request('per_page_order', 10);
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var el = document.getElementById('addAddressModal');
-        if (!el || !window.bootstrap) {
-            return;
-        }
+        if (!el || !window.bootstrap) return;
         var modal = window.bootstrap.Modal.getOrCreateInstance(el);
         modal.show();
     });
@@ -386,9 +348,7 @@ $pp = (int) request('per_page_order', 10);
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var el = document.getElementById('updateAddressModal');
-        if (!el || !window.bootstrap) {
-            return;
-        }
+        if (!el || !window.bootstrap) return;
         var modal = window.bootstrap.Modal.getOrCreateInstance(el);
         modal.show();
     });

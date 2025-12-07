@@ -153,10 +153,24 @@
 
 .profile-section {
   display: none;
+  min-height: 400px;
 }
 
 .profile-section.active {
   display: block;
+}
+
+.profile-section[data-section="orders"].active {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-section[data-section="orders"] .orders-section-body {
+  flex: 1 0 auto;
+}
+
+.profile-section[data-section="orders"] .orders-pagination {
+  margin-top: auto;
 }
 
 .profile-section-title {
@@ -570,6 +584,11 @@
 .address-modal-footer .btn {
   font-size: 0.9rem;
   font-weight: 500;
+}
+
+.icon-eye-view-order-detail {
+    font-size: 30px;
+    color: #0065a8;
 }
 
 /* @media (max-width: 992px) {

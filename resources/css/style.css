@@ -13,6 +13,10 @@ a {
   display: none;
 }
 
+.profile-overview-page [data-profile-orders-pagination] p.small.text-muted {
+  display: none;
+}
+
 .breadcrumb {
   font-size: 20px;
   font-weight: 500;

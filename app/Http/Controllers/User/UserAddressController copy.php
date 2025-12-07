@@ -6,6 +6,7 @@ use App\Models\Address;
 use App\Models\Province;
 use App\Models\Ward;
 use App\Models\Order;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\User\AddressService;
@@ -38,40 +39,19 @@ class UserAddressController extends Controller
       if ($user === null) {
         return redirect()->route('login');
       }
-
-      $perPage = (int) $request->query('per_page_order', 6);
-      if ($perPage <= 0) {
-        $perPage = 10;
-      }
-      if ($perPage > 50) {
-        $perPage = 50;
-      }
-
-      $orders = Order::query()
-        ->select([
-          'id',
-          'code',
-          'user_id',
-          'status',
-          'payment_method',
-          'payment_status',
-          'items_count',
-          'grand_total_vnd',
-          'placed_at',
-          'created_at',
-        ])
-        ->where('user_id', $user->id)
-        ->orderByDesc('placed_at')
-        ->paginate($perPage);
+      $recentOrders = Order::where('user_id', $user->id)
+        ->latest('placed_at')
+        ->limit(5)
+        ->get();
 
       $addresses = $this->addressService->getList();
       $provinces = Province::orderBy('name')->get();
 
       return view('user.profileOverview', [
-        'user'      => $user,
-        'addresses' => $addresses,
-        'orders'    => $orders,
-        'provinces' => $provinces,
+        'user'         => $user,
+        'addresses'    => $addresses,
+        'recentOrders' => $recentOrders,
+        'provinces'    => $provinces,
       ]);
     } catch (Throwable $e) {
       return back()->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
@@ -115,6 +95,7 @@ class UserAddressController extends Controller
     }
   }
 
+
   public function getWards(Request $request): JsonResponse
   {
     $provinceId = (int) $request->query('province_id');
@@ -144,7 +125,7 @@ class UserAddressController extends Controller
   public function storeNewAddress(StoreRequest $request): RedirectResponse
   {
     try {
-      $userId = Auth::id();
+      $userId  = Auth::id();
       $address = $request->input('address');
 
       $isExists = Address::where('user_id', $userId)
@@ -158,14 +139,13 @@ class UserAddressController extends Controller
       }
 
       $provinceId = (int) $request->input('address_province_id');
-      $wardId = (int) $request->input('address_ward_id');
+      $wardId     = (int) $request->input('address_ward_id');
 
       if (!Province::where('id', $provinceId)->exists()) {
         return back()
           ->withInput()
           ->with('toast_error', 'Tỉnh/Thành phố không hợp lệ');
       }
-
       if (!Ward::where('id', $wardId)->where('province_id', $provinceId)->exists()) {
         return back()
           ->withInput()
@@ -185,10 +165,11 @@ class UserAddressController extends Controller
     }
   }
 
+
   public function updateAddress(string $id, UpdateRequest $request): RedirectResponse
   {
     try {
-      $userId = Auth::id();
+      $userId  = Auth::id();
       $address = $request->input('address');
 
       $isExists = Address::where('user_id', $userId)
@@ -203,7 +184,7 @@ class UserAddressController extends Controller
       }
 
       $provinceId = (int) $request->input('address_province_id');
-      $wardId = (int) $request->input('address_ward_id');
+      $wardId     = (int) $request->input('address_ward_id');
 
       if (!Province::where('id', $provinceId)->exists()) {
         return back()

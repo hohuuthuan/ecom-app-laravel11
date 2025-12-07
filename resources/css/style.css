@@ -546,6 +546,14 @@ a {
   padding: .75rem 0;
 }
 
+.product-reviews .review-right .fa-star {
+  color: #ddd;
+}
+
+.product-reviews .review-right .fa-star.filled {
+  color: #ffc107;
+}
+
 
 
 /*  ============================================================= BACK TO HOME ============================================================= */

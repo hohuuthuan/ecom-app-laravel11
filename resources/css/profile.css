@@ -43,7 +43,7 @@
   gap: 15px;
 }
 
-.profile-overview-page  .page-header h1 i {
+.profile-overview-page .page-header h1 i {
   color: #667eea;
 }
 
@@ -58,7 +58,7 @@
   font-weight: 600;
   cursor: pointer;
   margin-top: 15px;
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 
 .continue-shopping:hover {
@@ -71,12 +71,12 @@
   grid-template-columns: 260px 1fr;
   gap: 30px;
   align-items: flex-start;
-  padding: 30px 0 300px; 
+  padding: 30px 0 300px;
 }
 
 .profile-nav,
 .profile-main {
-  background: rgb(255, 255, 255);
+  background: #fff;
   border-radius: 5px;
   padding: 30px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -139,11 +139,11 @@
 
 .profile-nav-link.active {
   background: #667eea;
-  color: white;
+  color: #fff;
 }
 
 .profile-nav-link.active i {
-  color: white;
+  color: #fff;
 }
 
 /* Nội dung bên phải */
@@ -217,7 +217,7 @@
   border-radius: 5px;
   border: none;
   background: #ff9f1c;
-  color: white;
+  color: #fff;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -243,7 +243,6 @@
   text-transform: uppercase;
   color: #2b4ff0;
   margin-bottom: 4px;
-  font-weight: 600;
 }
 
 .profile-info-item-value {
@@ -277,8 +276,47 @@
   color: #742a2a;
 }
 
-/* Sổ địa chỉ */
+.icon-eye-view-order-detail {
+  font-size: 30px;
+  color: #0065a8;
+}
 
+/* Filter trạng thái đơn hàng (client-side) */
+.orders-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.orders-filter-btn {
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: #4a5568;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.orders-filter-btn:hover {
+  background: #edf2ff;
+  border-color: #cbd5f5;
+}
+
+.orders-filter-btn.active {
+  background: #667eea;
+  border-color: #667eea;
+  color: #fff;
+}
+
+/* Ẩn "Showing 1 to 10 of X results" trong pagination */
+[data-profile-orders-pagination] p.small.text-muted {
+  display: none;
+}
+
+/* Sổ địa chỉ */
 .address-header {
   display: flex;
   justify-content: space-between;
@@ -311,7 +349,7 @@
   border-radius: 5px;
   border: none;
   background: #ff9f1c;
-  color: white;
+  color: #fff;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -329,7 +367,7 @@
     0 12px 30px rgba(15, 23, 42, 0.12),
     0 0 0 1px rgba(148, 163, 184, 0.12);
   margin-bottom: 20px;
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 
 .address-card:hover {
@@ -499,7 +537,6 @@
   right: 8px;
 }
 
-/* Focus state giống input */
 .profile-modal .select2-container--default.select2-container--open .select2-selection--single,
 .profile-modal .select2-container--default .select2-selection--single:focus {
   border-color: #6366f1;
@@ -565,7 +602,7 @@
 .address-modal .select2-container--default .select2-selection--single {
   height: 40px;
   border-radius: 10px;
-  border-color: #e5e7eb;
+  border-color: #e2e8f0;
   display: flex;
   align-items: center;
 }
@@ -584,11 +621,6 @@
 .address-modal-footer .btn {
   font-size: 0.9rem;
   font-weight: 500;
-}
-
-.icon-eye-view-order-detail {
-    font-size: 30px;
-    color: #0065a8;
 }
 
 /* @media (max-width: 992px) {
@@ -611,3 +643,68 @@
     padding: 16px;
   }
 } */
+
+
+/* === DATE FILTER TRONG LỊCH SỬ ĐƠN HÀNG === */
+.orders-date-filter {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.orders-date-filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.orders-date-filter-label {
+  font-size: 12px;
+  color: #718096;
+}
+
+/* input date nhỏ gọn, cùng “tone” với filter pill */
+.orders-date-filter .form-control.form-control-sm {
+  min-width: 140px;
+  height: 34px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border-color: #e2e8f0;
+  font-size: 13px;
+  box-shadow: none;
+}
+
+.orders-date-filter .form-control.form-control-sm:focus {
+  border-color: #2b4ff0;
+  box-shadow: 0 0 0 1px rgba(43, 79, 240, 0.15);
+}
+
+/* cụm nút Lọc / Xoá lọc */
+.orders-date-filter-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.orders-date-filter-actions .btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+/* responsive nhẹ cho màn nhỏ */
+@media (max-width: 576px) {
+  .orders-filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .orders-date-filter {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .orders-date-filter-item {
+    flex: 1 1 140px;
+  }
+}

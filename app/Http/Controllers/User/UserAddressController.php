@@ -18,6 +18,7 @@ use App\Http\Requests\User\Address\StoreRequest;
 use App\Http\Requests\User\Address\UpdateRequest;
 use App\Http\Requests\User\Address\DestroyRequest;
 use App\Http\Requests\User\UpdateProfileRequest;
+use Carbon\Carbon;
 use Throwable;
 
 class UserAddressController extends Controller
@@ -39,7 +40,20 @@ class UserAddressController extends Controller
         return redirect()->route('login');
       }
 
-      $perPage = (int) $request->query('per_page_order', 6);
+      $recentOrders = Order::where('user_id', $user->id)
+        ->latest('placed_at')
+        ->limit(5)
+        ->get();
+
+      $addresses = $this->addressService->getList();
+      $provinces = Province::orderBy('name')->get();
+
+      // ========= LỌC + PHÂN TRANG ĐƠN HÀNG =========
+      $statusGroup = $request->query('status_group');
+      $createdFrom = $request->query('created_from');
+      $createdTo   = $request->query('created_to');
+
+      $perPage = (int) $request->query('per_page_order', 10);
       if ($perPage <= 0) {
         $perPage = 10;
       }
@@ -47,31 +61,63 @@ class UserAddressController extends Controller
         $perPage = 50;
       }
 
-      $orders = Order::query()
-        ->select([
-          'id',
-          'code',
-          'user_id',
-          'status',
-          'payment_method',
-          'payment_status',
-          'items_count',
-          'grand_total_vnd',
-          'placed_at',
-          'created_at',
-        ])
-        ->where('user_id', $user->id)
+      $tz = config('app.timezone', 'Asia/Ho_Chi_Minh');
+
+      $ordersQuery = Order::where('user_id', $user->id);
+
+      // Lọc theo nhóm trạng thái
+      if ($statusGroup === 'processing') {
+        $ordersQuery->whereIn('status', [
+          'PENDING',
+          'CONFIRMED',
+          'PICKING',
+          'SHIPPED',
+          'PROCESSING',
+          'SHIPPING',
+        ]);
+      } elseif ($statusGroup === 'completed') {
+        $ordersQuery->whereIn('status', ['DELIVERED', 'COMPLETED']);
+      } elseif ($statusGroup === 'cancelled') {
+        $ordersQuery->whereIn('status', ['CANCELLED', 'RETURNED']);
+      }
+
+      // Lọc theo khoảng thời gian (placed_at)
+      if (!empty($createdFrom)) {
+        $fromUtc = Carbon::createFromFormat('Y-m-d', (string) $createdFrom, $tz)
+          ->startOfDay()
+          ->utc();
+        $ordersQuery->where('placed_at', '>=', $fromUtc);
+      }
+
+      if (!empty($createdTo)) {
+        $toUtc = Carbon::createFromFormat('Y-m-d', (string) $createdTo, $tz)
+          ->endOfDay()
+          ->utc();
+        $ordersQuery->where('placed_at', '<=', $toUtc);
+      }
+
+      $orders = $ordersQuery
         ->orderByDesc('placed_at')
-        ->paginate($perPage);
+        ->paginate($perPage)
+        ->appends($request->query());
 
-      $addresses = $this->addressService->getList();
-      $provinces = Province::orderBy('name')->get();
+      // Nếu là AJAX tab orders => trả về partial danh sách đơn
+      if ($request->ajax() && $request->query('tab') === 'orders') {
+        return view('user.profile.partials.ordersTable', [
+          'orders'      => $orders,
+        ]);
+      }
 
+      // Render full page
       return view('user.profileOverview', [
-        'user'      => $user,
-        'addresses' => $addresses,
-        'orders'    => $orders,
-        'provinces' => $provinces,
+        'user'         => $user,
+        'addresses'    => $addresses,
+        'recentOrders' => $recentOrders,
+        'provinces'    => $provinces,
+        'orders'       => $orders,
+        'statusGroup'  => $statusGroup,
+        'createdFrom'  => $createdFrom,
+        'createdTo'    => $createdTo,
       ]);
     } catch (Throwable $e) {
       return back()->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');

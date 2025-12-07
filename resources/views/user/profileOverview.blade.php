@@ -146,98 +146,101 @@ $pp = (int) request('per_page_order', 10);
                 </section>
 
                 {{-- Lịch sử đơn hàng --}}
-                <section class="profile-section {{ $activeTab === 'orders' ? 'active' : '' }}" data-section="orders">
-                    <div class="orders-section-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div>
-                                <h2 class="profile-section-title mb-1">Lịch sử đơn hàng</h2>
-                                <p class="profile-section-subtitle mb-0">
-                                    Danh sách các đơn hàng của bạn.
-                                </p>
-                            </div>
+<section class="profile-section {{ $activeTab === 'orders' ? 'active' : '' }}" data-section="orders">
+  <div class="orders-section-body">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div>
+        <h2 class="profile-section-title mb-1">Lịch sử đơn hàng</h2>
+        <p class="profile-section-subtitle mb-0">
+          Danh sách các đơn hàng của bạn.
+        </p>
+      </div>
 
-                            <form method="GET" class="d-flex align-items-center">
-                                <label class="me-2 mb-0">Hiển thị</label>
-                                <select
-                                    class="form-select form-select-sm w-auto"
-                                    name="per_page_order"
-                                    onchange="this.form.submit()">
-                                    <option value="10" {{ $pp === 10 ? 'selected' : '' }}>10</option>
-                                    <option value="20" {{ $pp === 20 ? 'selected' : '' }}>20</option>
-                                    <option value="50" {{ $pp === 50 ? 'selected' : '' }}>50</option>
-                                </select>
-                                <input type="hidden" name="tab" value="orders">
-                            </form>
-                        </div>
+      <form method="GET" class="d-flex align-items-center js-orders-per-page-form">
+        <label class="me-2 mb-0">Hiển thị</label>
+        <select
+          class="form-select form-select-sm w-auto"
+          name="per_page_order">
+          <option value="10" {{ $pp === 10 ? 'selected' : '' }}>10</option>
+          <option value="20" {{ $pp === 20 ? 'selected' : '' }}>20</option>
+          <option value="50" {{ $pp === 50 ? 'selected' : '' }}>50</option>
+        </select>
+        <input type="hidden" name="tab" value="orders">
+      </form>
+    </div>
 
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle order-table">
-                                <thead>
-                                    <tr>
-                                        <th>Mã đơn</th>
-                                        <th>Ngày đặt</th>
-                                        <th>Tổng tiền</th>
-                                        <th>Trạng thái</th>
-                                        <th class="text-center">Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if ($orders->count() > 0)
-                                    @foreach ($orders as $order)
-                                    @php
-                                    $statusRaw = strtoupper($order->status ?? '');
-                                    $statusLabel = 'Không xác định';
-                                    $badgeClass = 'badge-status-pending';
+    {{-- Nút lọc trạng thái + khoảng thời gian --}}
+    <div class="orders-filter-bar">
+      <div class="orders-filter">
+        <button
+          type="button"
+          class="orders-filter-btn {{ empty($statusGroup) ? 'active' : '' }}"
+          data-status-group="">
+          Tất cả
+        </button>
+        <button
+          type="button"
+          class="orders-filter-btn {{ ($statusGroup ?? '') === 'processing' ? 'active' : '' }}"
+          data-status-group="processing">
+          Đang xử lý
+        </button>
+        <button
+          type="button"
+          class="orders-filter-btn {{ ($statusGroup ?? '') === 'completed' ? 'active' : '' }}"
+          data-status-group="completed">
+          Hoàn thành
+        </button>
+        <button
+          type="button"
+          class="orders-filter-btn {{ ($statusGroup ?? '') === 'cancelled' ? 'active' : '' }}"
+          data-status-group="cancelled">
+          Đã hủy / Hoàn
+        </button>
+      </div>
 
-                                    if (in_array($statusRaw, ['PENDING', 'CONFIRMED', 'PICKING', 'SHIPPED', 'PROCESSING', 'SHIPPING'], true)) {
-                                    $statusLabel = 'Đang xử lý';
-                                    $badgeClass = 'badge-status-pending';
-                                    } elseif (in_array($statusRaw, ['DELIVERED', 'COMPLETED'], true)) {
-                                    $statusLabel = 'Hoàn thành';
-                                    $badgeClass = 'badge-status-success';
-                                    } elseif (in_array($statusRaw, ['CANCELLED', 'RETURNED'], true)) {
-                                    $statusLabel = 'Đã hủy';
-                                    $badgeClass = 'badge-status-cancel';
-                                    }
-                                    @endphp
-                                    <tr>
-                                        <td>{{ $order->code }}</td>
-                                        <td>
-                                            {{ optional($order->placed_at)->timezone(config('app.timezone', 'Asia/Ho_Chi_Minh'))->format('d/m/Y H:i') }}
-                                        </td>
-                                        <td>{{ number_format($order->grand_total_vnd, 0, ',', '.') }}đ</td>
-                                        <td>
-                                            <span class="badge-status {{ $badgeClass }}">
-                                                {{ $statusLabel }}
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <a href="{{ route('user.profile.orders.show', $order->id) }}">
-                                                <i class="fa fa-eye icon-eye-view-order-detail"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                    @else
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted">
-                                            Bạn chưa có đơn hàng nào.
-                                        </td>
-                                    </tr>
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+      <div class="orders-date-filter">
+        <div class="orders-date-filter-item">
+          <label class="orders-date-filter-label">Từ ngày</label>
+          <input
+            type="date"
+            class="form-control form-control-sm js-orders-date-from"
+            value="{{ $createdFrom ?? request('created_from') }}">
+        </div>
+        <div class="orders-date-filter-item">
+          <label class="orders-date-filter-label">Đến ngày</label>
+          <input
+            type="date"
+            class="form-control form-control-sm js-orders-date-to"
+            value="{{ $createdTo ?? request('created_to') }}">
+        </div>
+        <div class="orders-date-filter-actions">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-primary js-orders-apply-date">
+            Lọc
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-link text-muted js-orders-clear-date">
+            Xoá lọc
+          </button>
+        </div>
+      </div>
+    </div>
 
-                    @if ($orders->hasPages())
-                    <div
-                        class="mt-3 d-flex justify-content-center orders-pagination"
-                        data-profile-orders-pagination>
-                        {{ $orders->appends(array_merge(request()->except('page'), ['tab' => 'orders']))->links('pagination::bootstrap-5') }}
-                    </div>
-                    @endif
-                </section>
+    {{-- Wrapper để JS replace bằng HTML partial --}}
+    <div
+      id="ordersAjaxWrapper"
+      data-orders-container
+      data-orders-url="{{ route('user.profile.index') }}"
+      data-orders-tab="orders">
+      @include('user.profile.partials.ordersTable', [
+        'orders' => $orders,
+      ])
+    </div>
+  </div>
+</section>
+
 
 
                 {{-- Sổ địa chỉ --}}

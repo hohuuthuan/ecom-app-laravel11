@@ -55,13 +55,25 @@ class HomePageController extends Controller
 
   public function productDetail(Request $request)
   {
-    $id = (string) $request->route('id');
+    $id = (string)$request->route('id');
+
     $product = $this->productService->getProductDetail($id);
     if (!$product) {
       return back()->with('toast_error', 'Không tìm thấy sản phẩm');
     }
 
-    return view('user.productDetail', compact('product'));
+    $perPage = (int)$request->query('per_page_review', 5);
+    $reviews = $this->productService->getProductReviews($id, $perPage);
+
+    return view('user.productDetail', compact('product', 'reviews'));
+  }
+
+  public function productReviews(Request $request, string $id)
+  {
+    $perPage = (int)$request->query('per_page_review', 5);
+    $reviews = $this->productService->getProductReviews($id, $perPage);
+
+    return view('partials.ui.productDetail.reviews-list', compact('reviews'));
   }
 
   public function cartPage(Request $request, CartService $svc)

@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Author;
 use App\Models\Publisher;
+use App\Models\Review;
 use App\Helpers\PaginationHelper;
 use Illuminate\Support\Collection;
 use Illuminate\Http\UploadedFile;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Throwable;
 
 class ProductService
@@ -324,7 +326,7 @@ class ProductService
   {
     $userId = Auth::id();
 
-    $product = Product::query()
+    return Product::query()
       ->select('products.*')
       ->selectSub(function ($q) {
         $q->from('reviews')
@@ -359,7 +361,23 @@ class ProductService
         'publisher:id,name,slug',
       ])
       ->find($id);
+  }
 
-    return $product;
+  public function getProductReviews(string $productId, int $perPage = 5): LengthAwarePaginator
+  {
+    if ($perPage <= 0 || $perPage > 50) {
+      $perPage = 5;
+    }
+
+    $query = Review::query()
+      ->where('product_id', $productId)
+      ->where('is_active', true)
+      ->with(['user:id,name'])
+      ->orderByDesc('created_at');
+
+    $reviews = $query->paginate($perPage)->withQueryString();
+    $reviews->withPath(route('product.reviews', $productId));
+
+    return $reviews;
   }
 }

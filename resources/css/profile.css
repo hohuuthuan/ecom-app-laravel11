@@ -708,3 +708,369 @@
     flex: 1 1 140px;
   }
 }
+
+.order-review-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #16a34a;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  box-shadow: 0 6px 14px rgba(22, 163, 74, 0.35);
+  transition: all 0.2s ease;
+}
+
+.order-review-btn:hover {
+  text-decoration: none;
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  box-shadow: 0 8px 18px rgba(21, 128, 61, 0.45);
+  color: #ffffff;
+}
+
+.order-review-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(21, 128, 61, 0.4);
+}
+
+.order-review-btn i {
+  font-size: 0.8rem;
+}
+
+
+
+
+
+
+/* ====================== TRANG ĐÁNH GIÁ ĐƠN HÀNG ====================== */
+
+.review-order-page {
+  padding-bottom: 40px;
+}
+
+.book-card-review {
+  max-height: 420px;
+}
+/* ====================== THÔNG TIN ĐƠN HÀNG ====================== */
+
+.review-order-summary {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 18px 20px;
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(209, 213, 219, 0.6);
+}
+
+.review-order-summary-header {
+  margin-bottom: 10px;
+}
+
+.review-order-summary-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 4px;
+}
+
+.review-order-summary-body .review-summary-item {
+  padding: 6px 0;
+}
+
+.review-order-summary-body .review-summary-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  margin-bottom: 2px;
+}
+
+.review-order-summary-body .review-summary-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* badge trạng thái dùng lại style chung nhưng đảm bảo nhìn ổn ở trang này */
+.review-order-page .badge-status {
+  font-size: 12px;
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+/* ====================== DANH SÁCH SẢN PHẨM ====================== */
+
+.review-products-wrapper {
+  margin-top: 16px;
+}
+
+.review-products-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Card từng sản phẩm */
+.review-product-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  box-shadow:
+    0 14px 40px rgba(15, 23, 42, 0.09),
+    0 0 0 1px rgba(203, 213, 225, 0.7);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.review-product-card:hover {
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(148, 163, 184, 0.8);
+}
+
+/* Cột trái: ảnh + tên sản phẩm */
+.review-product-left {
+  text-align: center;
+}
+
+.review-product-image-wrapper {
+  width: 120px;
+  height: 160px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f9fafb;
+  box-shadow: 0 6px 15px rgba(15, 23, 42, 0.08);
+}
+
+.review-product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.review-product-title {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.review-product-title a {
+  color: inherit;
+}
+
+.review-product-title a:hover {
+  color: #2563eb;
+}
+
+/* Cột phải: phần rating + nội dung + upload */
+
+.review-product-right {
+  gap: 6px;
+}
+
+/* rating label */
+.review-rating-label {
+  font-size: 20px;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* Stars */
+.review-rating-stars {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  gap: 4px;
+}
+.review-rating-stars input[type="radio"] {
+  display: none;
+}
+
+.review-rating-stars label {
+  font-size: 40px;
+  cursor: pointer;
+  color: #d1d5db;
+  transition: color 0.15s ease, transform 0.1s ease;
+}
+
+/* hover + checked */
+.review-rating-stars label:hover,
+.review-rating-stars label:hover ~ label {
+  color: #f59e0b;
+}
+
+.review-rating-stars input[type="radio"]:checked ~ label {
+  color: #f59e0b;
+}
+
+/* textarea nội dung */
+.review-textarea-label {
+  font-size: 20px;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.review-textarea {
+  height: 230px;
+  font-size: 14px;
+  border-radius: 8px;
+  border-color: #e5e7eb;
+}
+
+.review-textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+}
+
+/* upload hình + preview + nút gửi */
+.review-upload-label {
+  font-size: 20px;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.review-upload-row {
+  margin-top: 2px;
+}
+
+.review-upload-input-wrapper .form-control {
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+.review-upload-preview-box {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  border: 1px dashed #cbd5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  overflow: hidden;
+}
+
+.review-upload-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Nút gửi đánh giá */
+.review-submit-btn {
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 6px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 8px 18px rgba(34, 197, 94, 0.4);
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.review-submit-btn:hover {
+  background: #16a34a;
+  border-color: #16a34a;
+  box-shadow: 0 10px 22px rgba(34, 197, 94, 0.55);
+}
+
+.review-submit-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 5px 12px rgba(34, 197, 94, 0.45);
+}
+
+
+
+/* ============ CỘT PHẢI – TRẠNG THÁI ĐÃ ĐÁNH GIÁ ============ */
+
+/* Khung tổng của phần đã đánh giá */
+.review-product-right--readonly {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+/* Hàng thông tin trên cùng: “Bạn đã đánh giá…” + thời gian */
+.review-product-right--readonly > .mb-2:first-child {
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #e5e7eb;
+  margin-bottom: 10px;
+}
+
+.review-product-right--readonly .text-success {
+  font-size: 14px;
+}
+
+.review-product-right--readonly .text-success i {
+  font-size: 16px;
+}
+
+/* Nhãn “Đánh giá của bạn”, “Nhận xét”, “Hình minh hoạ” */
+.review-product-right--readonly .review-rating-label,
+.review-product-right--readonly .review-textarea-label,
+.review-product-right--readonly .review-upload-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Dòng sao readonly */
+.review-rating-stars-readonly {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.review-rating-stars-readonly .star {
+  font-size: 18px;
+  color: #e5e7eb;
+}
+
+.review-rating-stars-readonly .star.is-active {
+  color: #f59e0b;
+}
+
+/* Ô hiển thị comment */
+.review-comment-readonly {
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #111827;
+}
+
+/* Hình minh hoạ đã upload */
+.review-product-right--readonly .review-upload-preview {
+  margin-top: 2px;
+}
+
+.review-product-right--readonly .review-upload-preview-box {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background-color: #f3f4f6;
+}
+
+.review-product-right--readonly .review-upload-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Mobile: co padding lại chút cho gọn */
+@media (max-width: 768px) {
+  .review-product-right--readonly {
+    padding: 10px 10px;
+  }
+}

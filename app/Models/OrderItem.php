@@ -13,13 +13,22 @@ class OrderItem extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    public function order()     { return $this->belongsTo(Order::class); }
-    public function product()   { return $this->belongsTo(Product::class); }
-    public function warehouse() { return $this->belongsTo(Warehouse::class); }
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
     public function batches()
     {
         return $this->belongsToMany(Batch::class, 'order_batches')
             ->using(OrderBatch::class)
-            ->withPivot(['quantity','unit_cost_vnd']);
+            ->withPivot(['quantity', 'unit_cost_vnd']);
     }
 }

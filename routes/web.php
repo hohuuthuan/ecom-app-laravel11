@@ -8,6 +8,7 @@ use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\CheckoutController;
 use App\Http\Controllers\User\UserAddressController;
 use App\Http\Controllers\User\UserOrderController;
+use App\Http\Controllers\User\UserReviewController;
 
 use App\Http\Controllers\Admin\Page\CatalogPageController;
 use App\Http\Controllers\Admin\Page\ProductPageController;
@@ -59,6 +60,9 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/checkout/apply-discount', [CheckoutController::class, 'applyDiscount'])->name('checkout.applyDiscount');
   Route::delete('/checkout/discount', [CheckoutController::class, 'removeDiscount'])->name('checkout.removeDiscount');
 
+  Route::get('/orders/{id}/review', [UserReviewController::class, 'showOrderReview'])->whereUuid('id')->name('user.reviews.order');
+  Route::post('/profile/orders/reviews/store-item', [UserReviewController::class, 'storeFromOrder'])->name('user.reviews.storeFromOrder');
+
   Route::prefix('profile')->name('user.profile.')->group(function () {
     Route::get('/', [UserAddressController::class, 'index'])->name('index');
     Route::get('/wards', [UserAddressController::class, 'getWards'])->name('wards');
@@ -71,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/address/{id}/default', [UserAddressController::class, 'setAddressDefault'])->name('setAddressDefault');
 
     Route::get('/orders/{id}', [UserOrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{id}/review', [UserReviewController::class, 'showOrderReviewPage'])->name('orders.review');
   });
 
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {

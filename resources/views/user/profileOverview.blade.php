@@ -3,14 +3,24 @@
 
 @section('content')
 @php
-$activeTab = request('tab', 'info');
-$validTabs = ['info', 'orders', 'addresses', 'password'];
-if (!in_array($activeTab, $validTabs, true)) {
-$activeTab = 'info';
-}
+  $activeTab = request('tab', 'info');
+  $validTabs = ['info', 'orders', 'addresses', 'password'];
+  if (!in_array($activeTab, $validTabs, true)) {
+      $activeTab = 'info';
+  }
 
-$pp = (int) request('per_page_order', 10);
+  $pp = (int) request('per_page_order', 10);
+
+  // Tiêu đề header theo tab
+  $headerTitles = [
+      'info'      => 'HỒ SƠ CỦA BẠN',
+      'orders'    => 'LỊCH SỬ ĐƠN HÀNG',
+      'addresses' => 'SỔ ĐỊA CHỈ CỦA BẠN',
+      'password'  => 'ĐỔI MẬT KHẨU',
+  ];
+  $headerTitle = $headerTitles[$activeTab] ?? 'HỒ SƠ CỦA BẠN';
 @endphp
+
 
 <div class="container profile-overview-page">
     <div class="page-header">
@@ -20,7 +30,7 @@ $pp = (int) request('per_page_order', 10);
                 Quay lại trang chủ
             </a>
         </div>
-        <h1 class="pageTitle">HỒ SƠ CỦA BẠN </h1>
+        <h1 class="pageTitle">{{ $headerTitle }}</h1>
     </div>
     <div id="profilePage">
         <div class="profile-layout">
@@ -146,102 +156,101 @@ $pp = (int) request('per_page_order', 10);
                 </section>
 
                 {{-- Lịch sử đơn hàng --}}
-<section class="profile-section {{ $activeTab === 'orders' ? 'active' : '' }}" data-section="orders">
-  <div class="orders-section-body">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <div>
-        <h2 class="profile-section-title mb-1">Lịch sử đơn hàng</h2>
-        <p class="profile-section-subtitle mb-0">
-          Danh sách các đơn hàng của bạn.
-        </p>
-      </div>
+                <section class="profile-section {{ $activeTab === 'orders' ? 'active' : '' }}" data-section="orders">
+                    <div class="orders-section-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h2 class="profile-section-title mb-1">Lịch sử đơn hàng</h2>
+                                <p class="profile-section-subtitle mb-0">
+                                    Danh sách các đơn hàng của bạn.
+                                </p>
+                            </div>
 
-      <form method="GET" class="d-flex align-items-center js-orders-per-page-form">
-        <label class="me-2 mb-0">Hiển thị</label>
-        <select
-          class="form-select form-select-sm w-auto"
-          name="per_page_order">
-          <option value="10" {{ $pp === 10 ? 'selected' : '' }}>10</option>
-          <option value="20" {{ $pp === 20 ? 'selected' : '' }}>20</option>
-          <option value="50" {{ $pp === 50 ? 'selected' : '' }}>50</option>
-        </select>
-        <input type="hidden" name="tab" value="orders">
-      </form>
-    </div>
+                            <form method="GET" class="d-flex align-items-center js-orders-per-page-form">
+                                <label class="me-2 mb-0">Hiển thị</label>
+                                <select
+                                    class="form-select form-select-sm w-auto"
+                                    name="per_page_order">
+                                    <option value="10" {{ $pp === 10 ? 'selected' : '' }}>10</option>
+                                    <option value="20" {{ $pp === 20 ? 'selected' : '' }}>20</option>
+                                    <option value="50" {{ $pp === 50 ? 'selected' : '' }}>50</option>
+                                </select>
+                                <input type="hidden" name="tab" value="orders">
+                            </form>
+                        </div>
 
-    {{-- Nút lọc trạng thái + khoảng thời gian --}}
-    <div class="orders-filter-bar">
-      <div class="orders-filter">
-        <button
-          type="button"
-          class="orders-filter-btn {{ empty($statusGroup) ? 'active' : '' }}"
-          data-status-group="">
-          Tất cả
-        </button>
-        <button
-          type="button"
-          class="orders-filter-btn {{ ($statusGroup ?? '') === 'processing' ? 'active' : '' }}"
-          data-status-group="processing">
-          Đang xử lý
-        </button>
-        <button
-          type="button"
-          class="orders-filter-btn {{ ($statusGroup ?? '') === 'completed' ? 'active' : '' }}"
-          data-status-group="completed">
-          Hoàn thành
-        </button>
-        <button
-          type="button"
-          class="orders-filter-btn {{ ($statusGroup ?? '') === 'cancelled' ? 'active' : '' }}"
-          data-status-group="cancelled">
-          Đã hủy / Hoàn
-        </button>
-      </div>
+                        {{-- Nút lọc trạng thái + khoảng thời gian --}}
+                        <div class="orders-filter-bar">
+                            <div class="orders-filter">
+                                <button
+                                    type="button"
+                                    class="orders-filter-btn {{ empty($statusGroup) ? 'active' : '' }}"
+                                    data-status-group="">
+                                    Tất cả
+                                </button>
+                                <button
+                                    type="button"
+                                    class="orders-filter-btn {{ ($statusGroup ?? '') === 'processing' ? 'active' : '' }}"
+                                    data-status-group="processing">
+                                    Đang xử lý
+                                </button>
+                                <button
+                                    type="button"
+                                    class="orders-filter-btn {{ ($statusGroup ?? '') === 'completed' ? 'active' : '' }}"
+                                    data-status-group="completed">
+                                    Hoàn thành
+                                </button>
+                                <button
+                                    type="button"
+                                    class="orders-filter-btn {{ ($statusGroup ?? '') === 'cancelled' ? 'active' : '' }}"
+                                    data-status-group="cancelled">
+                                    Đã hủy / Hoàn
+                                </button>
+                            </div>
 
-      <div class="orders-date-filter">
-        <div class="orders-date-filter-item">
-          <label class="orders-date-filter-label">Từ ngày</label>
-          <input
-            type="date"
-            class="form-control form-control-sm js-orders-date-from"
-            value="{{ $createdFrom ?? request('created_from') }}">
-        </div>
-        <div class="orders-date-filter-item">
-          <label class="orders-date-filter-label">Đến ngày</label>
-          <input
-            type="date"
-            class="form-control form-control-sm js-orders-date-to"
-            value="{{ $createdTo ?? request('created_to') }}">
-        </div>
-        <div class="orders-date-filter-actions">
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-primary js-orders-apply-date">
-            Lọc
-          </button>
-          <button
-            type="button"
-            class="btn btn-sm btn-link text-muted js-orders-clear-date">
-            Xoá lọc
-          </button>
-        </div>
-      </div>
-    </div>
+                            <div class="orders-date-filter">
+                                <div class="orders-date-filter-item">
+                                    <label class="orders-date-filter-label">Từ ngày</label>
+                                    <input
+                                        type="date"
+                                        class="form-control form-control-sm js-orders-date-from"
+                                        value="{{ $createdFrom ?? request('created_from') }}">
+                                </div>
+                                <div class="orders-date-filter-item">
+                                    <label class="orders-date-filter-label">Đến ngày</label>
+                                    <input
+                                        type="date"
+                                        class="form-control form-control-sm js-orders-date-to"
+                                        value="{{ $createdTo ?? request('created_to') }}">
+                                </div>
+                                <div class="orders-date-filter-actions">
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm btn-outline-primary js-orders-apply-date">
+                                        Lọc
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm btn-link text-muted js-orders-clear-date">
+                                        Xoá lọc
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
-    {{-- Wrapper để JS replace bằng HTML partial --}}
-    <div
-      id="ordersAjaxWrapper"
-      data-orders-container
-      data-orders-url="{{ route('user.profile.index') }}"
-      data-orders-tab="orders">
-      @include('user.profile.partials.ordersTable', [
-        'orders' => $orders,
-      ])
-    </div>
-  </div>
-</section>
-
-
+                        {{-- Wrapper để JS replace bằng HTML partial --}}
+                        <div
+                            id="ordersAjaxWrapper"
+                            data-orders-container
+                            data-orders-url="{{ route('user.profile.index') }}"
+                            data-orders-tab="orders">
+                            @include('user.profile.partials.ordersTable', [
+                            'orders' => $orders,
+                            'orderReviewStats' => $orderReviewStats ?? [],
+                            ])
+                        </div>
+                    </div>
+                </section>
 
                 {{-- Sổ địa chỉ --}}
                 <section class="profile-section {{ $activeTab === 'addresses' ? 'active' : '' }}" data-section="addresses">

@@ -6,6 +6,7 @@ use App\Models\Address;
 use App\Models\Province;
 use App\Models\Ward;
 use App\Models\Order;
+use App\Models\Review;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\User\AddressService;
@@ -63,9 +64,10 @@ class UserAddressController extends Controller
 
       $tz = config('app.timezone', 'Asia/Ho_Chi_Minh');
 
-      $ordersQuery = Order::where('user_id', $user->id);
+      // cần items để tính review theo từng order
+      $ordersQuery = Order::where('user_id', $user->id)
+        ->with('items');
 
-      // Lọc theo nhóm trạng thái
       if ($statusGroup === 'processing') {
         $ordersQuery->whereIn('status', [
           'PENDING',
@@ -81,7 +83,6 @@ class UserAddressController extends Controller
         $ordersQuery->whereIn('status', ['CANCELLED', 'RETURNED']);
       }
 
-      // Lọc theo khoảng thời gian (placed_at)
       if (!empty($createdFrom)) {
         $fromUtc = Carbon::createFromFormat('Y-m-d', (string) $createdFrom, $tz)
           ->startOfDay()
@@ -101,23 +102,78 @@ class UserAddressController extends Controller
         ->paginate($perPage)
         ->appends($request->query());
 
-      // Nếu là AJAX tab orders => trả về partial danh sách đơn
+      // ========= TÍNH THỐNG KÊ REVIEW THEO ĐƠN (order_id + product_id) =========
+      $orderReviewStats = [];
+
+      if ($orders->count() > 0) {
+        $orderIds   = [];
+        $productIds = [];
+
+        foreach ($orders as $order) {
+          $orderIds[] = $order->id;
+          foreach ($order->items as $item) {
+            if ($item->product_id !== null) {
+              $productIds[] = $item->product_id;
+            }
+          }
+        }
+
+        $orderIds   = array_values(array_unique($orderIds));
+        $productIds = array_values(array_unique($productIds));
+
+        if (!empty($orderIds) && !empty($productIds)) {
+          $reviews = Review::where('user_id', $user->id)
+            ->whereIn('order_id', $orderIds)
+            ->whereIn('product_id', $productIds)
+            ->get(['order_id', 'product_id']);
+
+          $reviewMap = [];
+          foreach ($reviews as $review) {
+            $reviewMap[$review->order_id . ':' . $review->product_id] = true;
+          }
+
+          foreach ($orders as $order) {
+            $totalItems    = 0;
+            $reviewedItems = 0;
+
+            foreach ($order->items as $item) {
+              if ($item->product_id === null) {
+                continue;
+              }
+
+              $totalItems++;
+
+              $key = $order->id . ':' . $item->product_id;
+              if (isset($reviewMap[$key])) {
+                $reviewedItems++;
+              }
+            }
+
+            $orderReviewStats[$order->id] = [
+              'total_items'    => $totalItems,
+              'reviewed_items' => $reviewedItems,
+            ];
+          }
+        }
+      }
+
       if ($request->ajax() && $request->query('tab') === 'orders') {
         return view('user.profile.partials.ordersTable', [
-          'orders'      => $orders,
+          'orders'           => $orders,
+          'orderReviewStats' => $orderReviewStats,
         ]);
       }
 
-      // Render full page
       return view('user.profileOverview', [
-        'user'         => $user,
-        'addresses'    => $addresses,
-        'recentOrders' => $recentOrders,
-        'provinces'    => $provinces,
-        'orders'       => $orders,
-        'statusGroup'  => $statusGroup,
-        'createdFrom'  => $createdFrom,
-        'createdTo'    => $createdTo,
+        'user'             => $user,
+        'addresses'        => $addresses,
+        'recentOrders'     => $recentOrders,
+        'provinces'        => $provinces,
+        'orders'           => $orders,
+        'statusGroup'      => $statusGroup,
+        'createdFrom'      => $createdFrom,
+        'createdTo'        => $createdTo,
+        'orderReviewStats' => $orderReviewStats,
       ]);
     } catch (Throwable $e) {
       return back()->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');

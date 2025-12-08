@@ -35,6 +35,7 @@ Route::delete('/cart/item/{key}', [HomePageController::class, 'removeItemInCart'
 Route::get('/cart/count', [HomePageController::class, 'countProductInCart'])->name('cart.count');
 Route::delete('/cart/clear', [HomePageController::class, 'clearCart'])->name('cart.clear');
 Route::get('/thank-you', [HomePageController::class, 'thanks'])->name('user.thanks');
+Route::get('/recently-viewed-products', [HomePageController::class, 'recentlyViewedPage'])->name('recentlyViewed');
 
 // === GUEST ===
 Route::middleware('guest')->group(function () {

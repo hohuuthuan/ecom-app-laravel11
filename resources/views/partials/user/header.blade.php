@@ -17,7 +17,9 @@
           <a class="nav-link active" href="{{ route('product.list') }}">Sản phẩm</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Giới thiệu</a>
+          <a class="nav-link" href="{{ route('recentlyViewed') }}">
+            Sản phẩm đã xem
+          </a>
         </li>
       </ul>
 

@@ -44,6 +44,9 @@ Route::middleware('guest')->group(function () {
 
   Route::view('/register', 'auth.register')->name('register.form');
   Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+  Route::get('/auth/google/redirect', [AuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+  Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 });
 
 // === LOGGED IN ===

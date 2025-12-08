@@ -45,7 +45,7 @@ class AuthService
     if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
       $seconds = RateLimiter::availableIn($key);
       session()->flash('toast_error', "Bạn thử quá nhiều lần. Vui lòng thử lại sau {$seconds}s.");
-      return back()->withInput()->withErrors(['email' => 'Tạm khóa do đăng nhập sai nhiều lần.']);
+      return back()->withInput()->withErrors(['email' => 'Tạm khóa do đăng nhập sai nhiều lần']);
     }
 
     $user = User::where('email', $email)->first();
@@ -55,7 +55,7 @@ class AuthService
       return back()->withInput()->withErrors(['email' => 'Email hoặc mật khẩu không đúng']);
     }
     if ($user->status !== 'ACTIVE') {
-      session()->flash('toast_error', 'Tài khoản đã bị khóa.');
+      session()->flash('toast_error', 'Tài khoản đã bị khóa');
       return back()->withInput()->withErrors(['email' => 'Tài khoản đã bị khóa']);
     }
 

@@ -3,23 +3,24 @@
 
 @section('content')
 @php
-  $activeTab = request('tab', 'info');
-  $validTabs = ['info', 'orders', 'addresses', 'password'];
-  if (!in_array($activeTab, $validTabs, true)) {
-      $activeTab = 'info';
-  }
+$activeTab = request('tab', 'stats');
+$validTabs = ['stats', 'info', 'orders', 'addresses', 'password'];
+if (!in_array($activeTab, $validTabs, true)) {
+$activeTab = 'stats';
+}
 
-  $pp = (int) request('per_page_order', 10);
+$pp = (int) request('per_page_order', 10);
 
-  // Tiêu đề header theo tab
-  $headerTitles = [
-      'info'      => 'HỒ SƠ CỦA BẠN',
-      'orders'    => 'LỊCH SỬ ĐƠN HÀNG',
-      'addresses' => 'SỔ ĐỊA CHỈ CỦA BẠN',
-      'password'  => 'ĐỔI MẬT KHẨU',
-  ];
-  $headerTitle = $headerTitles[$activeTab] ?? 'HỒ SƠ CỦA BẠN';
+$headerTitles = [
+'stats' => 'THỐNG KÊ ĐƠN HÀNG',
+'info' => 'HỒ SƠ CỦA BẠN',
+'orders' => 'LỊCH SỬ ĐƠN HÀNG',
+'addresses' => 'SỔ ĐỊA CHỈ CỦA BẠN',
+'password' => 'ĐỔI MẬT KHẨU',
+];
+$headerTitle = $headerTitles[$activeTab] ?? 'HỒ SƠ CỦA BẠN';
 @endphp
+
 
 
 <div class="container profile-overview-page">
@@ -41,6 +42,15 @@
                     <span>Hồ sơ của tôi</span>
                 </div>
                 <ul class="profile-nav-list">
+                    <li class="profile-nav-item">
+                        <a
+                            href="{{ route('user.profile.index', ['tab' => 'stats']) }}"
+                            class="profile-nav-link {{ $activeTab === 'stats' ? 'active' : '' }}"
+                            data-target="stats">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <span>Thống kê</span>
+                        </a>
+                    </li>
                     <li class="profile-nav-item">
                         <a
                             href="{{ route('user.profile.index', ['tab' => 'info']) }}"
@@ -78,10 +88,17 @@
                         </a>
                     </li>
                 </ul>
+
             </aside>
 
             {{-- BÊN PHẢI: NỘI DUNG --}}
             <main class="profile-main">
+                <section class="profile-section {{ $activeTab === 'stats' ? 'active' : '' }}" data-section="stats">
+                    @include('user.profile.partials.tab-stats', [
+                    'stats' => $stats ?? [],
+                    ])
+                </section>
+
                 {{-- Thông tin cá nhân --}}
                 <section class="profile-section {{ $activeTab === 'info' ? 'active' : '' }}" data-section="info">
                     <div class="profile-info-card">

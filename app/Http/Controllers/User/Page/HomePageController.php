@@ -97,7 +97,6 @@ class HomePageController extends Controller
     ]);
   }
 
-
   public function productDetail(Request $request)
   {
     $id = (string) $request->route('id');

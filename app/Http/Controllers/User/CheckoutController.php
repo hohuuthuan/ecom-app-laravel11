@@ -459,6 +459,8 @@ class CheckoutController extends Controller
             $orderData['payment_method'] = 'momo';
             $orderData['payment_status'] = 'pending';
 
+            $amount = (int) $orderData['grand_total_vnd'];
+
             $request->session()->put('checkout.momo_pending', [
                 'orderData'      => $orderData,
                 'orderItemsData' => $orderItemsData,
@@ -467,14 +469,47 @@ class CheckoutController extends Controller
             ]);
 
             $gateway = new MomoGateway(config('payment.momo'));
-            $payUrl  = $gateway->createPaymentUrl(
-                $orderData['code'],
-                (int) $orderData['grand_total_vnd'],
-                'Thanh toán đơn hàng #' . $orderData['code']
-            );
 
-            return redirect()->away($payUrl);
+            try {
+                $payUrl = $gateway->createPaymentUrl(
+                    $orderData['code'],
+                    $amount,
+                    'Thanh toán đơn hàng #' . $orderData['code']
+                );
+
+                return redirect()->away($payUrl);
+            } catch (\Throwable $e) {
+                Log::error('MoMo createPaymentUrl failed', [
+                    'error' => $e->getMessage(),
+                ]);
+
+                $toastMessage = 'Thanh toán MoMo không hợp lệ, vui lòng thử lại hoặc chọn phương thức khác.';
+
+                $raw = $e->getMessage();
+                $prefix = 'MoMo API error: ';
+
+                if (str_starts_with($raw, $prefix)) {
+                    $json = substr($raw, strlen($prefix));
+                    $data = json_decode($json, true);
+
+                    if (is_array($data)) {
+                        if (!empty($data['message']) && is_string($data['message'])) {
+                            $toastMessage = 'Thanh toán MoMo không hợp lệ: ' . $data['message'];
+                        }
+                        if (isset($data['resultCode']) && (int) $data['resultCode'] === 22) {
+                            $toastMessage = 'Số tiền thanh toán qua MoMo phải từ 10.000đ đến 50.000.000đ. '
+                                . 'Vui lòng điều chỉnh giá trị đơn hàng hoặc chọn phương thức thanh toán khác';
+                        }
+                    }
+                }
+
+                return redirect()
+                    ->route('checkout.page')
+                    ->with('toast_error', $toastMessage)
+                    ->withInput();
+            }
         }
+
 
         // VNPAY
         if ($data['payment_method'] === 'vnpay') {
@@ -488,16 +523,52 @@ class CheckoutController extends Controller
                 'items'          => $items,
             ]);
 
+            $amount  = (int) $orderData['grand_total_vnd'];
             $gateway = new VnpayGateway(config('payment.vnpay'));
-            $payUrl  = $gateway->createPaymentUrl(
-                $orderData['code'],
-                (int) $orderData['grand_total_vnd'],
-                'Thanh toán đơn hàng #' . $orderData['code'],
-                $request->ip()
-            );
 
-            return redirect()->away($payUrl);
+            try {
+                $payUrl = $gateway->createPaymentUrl(
+                    $orderData['code'],
+                    $amount,
+                    'Thanh toán đơn hàng #' . $orderData['code'],
+                    $request->ip()
+                );
+
+                return redirect()->away($payUrl);
+            } catch (\Throwable $e) {
+                Log::error('VNPay createPaymentUrl failed', [
+                    'error'  => $e->getMessage(),
+                    'code'   => $orderData['code'] ?? null,
+                    'amount' => $amount,
+                ]);
+
+                $toastMessage = 'Thanh toán VNPAY không hợp lệ, vui lòng thử lại hoặc chọn phương thức khác.';
+
+                $raw    = $e->getMessage();
+                $prefix = 'VNPay API error: ';
+
+                if (str_starts_with($raw, $prefix)) {
+                    $json = substr($raw, strlen($prefix));
+                    $dataErr = json_decode($json, true);
+
+                    if (is_array($dataErr)) {
+                        if (!empty($dataErr['message']) && is_string($dataErr['message'])) {
+                            $toastMessage = 'Thanh toán VNPAY không hợp lệ: ' . $dataErr['message'];
+                        }
+
+                        if (!empty($dataErr['code']) && (string) $dataErr['code'] === '24') {
+                            $toastMessage = 'Giao dịch VNPAY đã bị hủy. Vui lòng thử lại nếu bạn vẫn muốn thanh toán.';
+                        }
+                    }
+                }
+
+                return redirect()
+                    ->route('checkout.page')
+                    ->with('toast_error', $toastMessage)
+                    ->withInput();
+            }
         }
+
 
         // COD
         if ($data['payment_method'] === 'cod') {
@@ -546,7 +617,6 @@ class CheckoutController extends Controller
                 ->with('toast_error', 'Không tìm thấy thông tin đơn hàng chờ thanh toán.');
         }
 
-        // Kết quả trả về từ MoMo (theo code gốc của bạn)
         $resultCode = (int) $request->input('resultCode', -1);
         if ($resultCode !== 0) {
             $request->session()->forget('checkout.momo_pending');

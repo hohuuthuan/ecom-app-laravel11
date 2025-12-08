@@ -7,6 +7,8 @@ use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\View\View;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class UserOrderController extends Controller
 {
@@ -18,14 +20,14 @@ class UserOrderController extends Controller
     }
 
     $order = Order::with([
-        'user',
-        'items.product',
-        'shipment',
-        'discount',
-        'statusHistories' => function ($query) {
-          $query->orderBy('created_at', 'desc');
-        },
-      ])
+      'user',
+      'items.product',
+      'shipment',
+      'discount',
+      'statusHistories' => function ($query) {
+        $query->orderBy('created_at', 'desc');
+      },
+    ])
       ->where('id', $id)
       ->where('user_id', $userId) // CHỈ LẤY ĐƠN CỦA USER HIỆN TẠI
       ->firstOrFail();
@@ -62,5 +64,57 @@ class UserOrderController extends Controller
       'discountAmount' => $discountAmount,
       'grandTotal'     => $grandTotal,
     ]);
+  }
+
+  public function reorder(string $id, Request $request): RedirectResponse
+  {
+    $userId = Auth::id();
+    if ($userId === null) {
+      abort(Response::HTTP_FORBIDDEN);
+    }
+    $order = Order::with(['items.product'])
+      ->where('id', $id)
+      ->where('user_id', $userId)
+      ->firstOrFail();
+
+    $pairs = [];
+
+    foreach ($order->items as $item) {
+      $product = $item->product;
+      if (!$product) {
+        continue;
+      }
+
+      $status = strtoupper((string) $product->status);
+      if ($status !== 'ACTIVE') {
+        continue;
+      }
+
+      $qty = (int) ($item->quantity ?? 0);
+      if ($qty <= 0) {
+        continue;
+      }
+
+      $pairs[] = [
+        'id'  => (string) $product->id, // UUID
+        'qty' => $qty,
+      ];
+    }
+
+    if (count($pairs) === 0) {
+      return redirect()
+        ->back()
+        ->with('toast_error', 'Không có sản phẩm hợp lệ để mua lại trong đơn này');
+    }
+
+    // Ghi vào session checkout giống flow hiện tại
+    $request->session()->put('checkout.items', $pairs);
+    $request->session()->put('checkout.expires_at', now()->addMinutes(15)->timestamp);
+    // Xoá mã giảm giá cũ (nếu có) để tránh áp dụng nhầm
+    $request->session()->forget('checkout_discount');
+
+    return redirect()
+      ->route('checkout.page')
+      ->with('toast_success', 'Đã chuẩn bị lại đơn hàng, hãy kiểm tra và thanh toán');
   }
 }

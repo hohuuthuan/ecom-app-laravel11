@@ -33,7 +33,7 @@ class WarehousePageController extends Controller
       ->count();
 
     $pendingOrders = Order::query()
-      ->whereIn('status', ['PROCESSING'])
+      ->whereIn('status', ['PROCESSING', 'PICKING'])
       ->count();
 
     $lowStockItems = Stock::query()
@@ -121,8 +121,8 @@ class WarehousePageController extends Controller
 
     $mapToOrderStatus = [
       'RECEIVING_PROCESS'   => 'PROCESSING',
-      'PREPARING_ITEMS'     => 'SHIPPING',
-      'HANDED_OVER_CARRIER' => 'DELIVERED',
+      'PREPARING_ITEMS'     => 'PICKING',
+      'HANDED_OVER_CARRIER' => 'SHIPPING',
     ];
 
     $warehouseStatusLabels = [
@@ -136,8 +136,8 @@ class WarehousePageController extends Controller
 
     $levelMap = [
       'PROCESSING' => 1,
-      'SHIPPING'   => 2,
-      'DELIVERED'  => 3,
+      'PICKING'    => 2,
+      'SHIPPING'   => 3,
     ];
 
     $currentStatus = strtoupper((string) $order->status);

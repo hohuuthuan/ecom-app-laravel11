@@ -18,14 +18,22 @@
             $statusLabel = 'Không xác định';
             $badgeClass  = 'badge-status-pending';
 
-            if (in_array($statusRaw, ['PENDING','CONFIRMED','PICKING','SHIPPED','PROCESSING','SHIPPING'], true)) {
+            if (in_array($statusRaw, [
+              'PENDING',
+              'PROCESSING',
+              'PICKING',
+              'SHIPPING',
+              // legacy
+              'CONFIRMED',
+              'SHIPPED',
+            ], true)) {
               $statusLabel = 'Đang xử lý';
               $badgeClass  = 'badge-status-pending';
-            } elseif (in_array($statusRaw, ['DELIVERED','COMPLETED'], true)) {
+            } elseif (in_array($statusRaw, ['DELIVERED', 'COMPLETED'], true)) {
               $statusLabel = 'Hoàn thành';
               $badgeClass  = 'badge-status-success';
-            } elseif (in_array($statusRaw, ['CANCELLED','RETURNED'], true)) {
-              $statusLabel = 'Đã hủy';
+            } elseif (in_array($statusRaw, ['CANCELLED', 'RETURNED', 'DELIVERY_FAILED'], true)) {
+              $statusLabel = 'Đã hủy / giao thất bại';
               $badgeClass  = 'badge-status-cancel';
             }
 

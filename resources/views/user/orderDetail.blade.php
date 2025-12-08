@@ -79,20 +79,20 @@
 
               <div class="col-md-6">
                 @php
-                  $status = $order->status;
-                  $statusLabel = 'Không xác định';
-                  $badgeClass = 'badge-status-pending';
+                $status = $order->status;
+                $statusLabel = 'Không xác định';
+                $badgeClass = 'badge-status-pending';
 
-                  if (in_array($status, ['pending','confirmed','picking','shipped'], true)) {
-                    $statusLabel = 'Đang xử lý';
-                    $badgeClass = 'badge-status-pending';
-                  } elseif ($status === 'delivered') {
-                    $statusLabel = 'Hoàn thành';
-                    $badgeClass = 'badge-status-success';
-                  } elseif (in_array($status, ['cancelled','returned'], true)) {
-                    $statusLabel = 'Đã hủy';
-                    $badgeClass = 'badge-status-cancel';
-                  }
+                if (in_array($status, ['pending','confirmed','picking','shipped'], true)) {
+                $statusLabel = 'Đang xử lý';
+                $badgeClass = 'badge-status-pending';
+                } elseif ($status === 'delivered') {
+                $statusLabel = 'Hoàn thành';
+                $badgeClass = 'badge-status-success';
+                } elseif (in_array($status, ['cancelled','returned'], true)) {
+                $statusLabel = 'Đã hủy';
+                $badgeClass = 'badge-status-cancel';
+                }
                 @endphp
                 <div class="checkout-inline-item">
                   <span class="checkout-inline-label">Trạng thái:</span>
@@ -105,37 +105,37 @@
 
             {{-- ĐỊA CHỈ GIAO HÀNG --}}
             @if($order->shipment)
-              <div class="row checkout-inline-row mt-2">
-                <div class="col-12">
-                  <div class="checkout-inline-item">
-                    <span class="checkout-inline-label">Địa chỉ giao hàng:</span>
-                    <span class="checkout-inline-value">
-                      {{ $order->shipment->address }}
-                      @if($order->shipment->ward || $order->shipment->province)
-                        , {{ optional($order->shipment->ward)->name }},
-                        {{ optional($order->shipment->province)->name }}
-                      @endif
-                      @if(!empty($order->shipment->note))
-                        <br>
-                        <small class="text-muted">Ghi chú: {{ $order->shipment->note }}</small>
-                      @endif
-                    </span>
-                  </div>
+            <div class="row checkout-inline-row mt-2">
+              <div class="col-12">
+                <div class="checkout-inline-item">
+                  <span class="checkout-inline-label">Địa chỉ giao hàng:</span>
+                  <span class="checkout-inline-value">
+                    {{ $order->shipment->address }}
+                    @if($order->shipment->ward || $order->shipment->province)
+                    , {{ optional($order->shipment->ward)->name }},
+                    {{ optional($order->shipment->province)->name }}
+                    @endif
+                    @if(!empty($order->shipment->note))
+                    <br>
+                    <small class="text-muted">Ghi chú: {{ $order->shipment->note }}</small>
+                    @endif
+                  </span>
                 </div>
               </div>
+            </div>
             @endif
 
             @if($order->discount)
-              <div class="row checkout-inline-row mt-2">
-                <div class="col-md-6">
-                  <div class="checkout-inline-item">
-                    <span class="checkout-inline-label">Mã giảm giá:</span>
-                    <span class="checkout-inline-value">
-                      {{ $order->discount->code }} - {{ $order->discount->name }}
-                    </span>
-                  </div>
+            <div class="row checkout-inline-row mt-2">
+              <div class="col-md-6">
+                <div class="checkout-inline-item">
+                  <span class="checkout-inline-label">Mã giảm giá:</span>
+                  <span class="checkout-inline-value">
+                    {{ $order->discount->code }}
+                  </span>
                 </div>
               </div>
+            </div>
             @endif
           </div>
         </div>
@@ -149,45 +149,45 @@
 
           <div id="orderItemsList">
             @forelse($order->items as $item)
-              @php
-                $product = $item->product;
-                $imgPath = $product && $product->image
-                  ? asset('storage/products/' . $product->image)
-                  : asset('images/placeholder-120x160.svg');
+            @php
+            $product = $item->product;
+            $imgPath = $product && $product->image
+            ? asset('storage/products/' . $product->image)
+            : asset('images/placeholder-120x160.svg');
 
-                $qty = (int) ($item->quantity ?? 0);
-                $unitPrice = (int) ($item->unit_price_vnd ?? $item->unit_price ?? 0);
-                $lineTotal = (int) ($item->line_total_vnd ?? $item->total_price_vnd ?? ($qty * $unitPrice));
-              @endphp
+            $qty = (int) ($item->quantity ?? 0);
+            $unitPrice = (int) ($item->unit_price_vnd ?? $item->unit_price ?? 0);
+            $lineTotal = (int) ($item->line_total_vnd ?? $item->total_price_vnd ?? ($qty * $unitPrice));
+            @endphp
 
-              <div class="checkout-item">
-                <img
-                  src="{{ $imgPath }}"
-                  alt="{{ $product->title ?? 'Sản phẩm' }}"
-                  class="checkout-item-image">
-                <div class="checkout-item-details">
-                  <div class="checkout-item-title">
-                    @if($product)
-                      <a
-                        href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
-                        class="text-decoration-none text-body">
-                        {{ $product->title }}
-                      </a>
-                    @else
-                      {{ $item->product_name ?? 'Sản phẩm đã bị xóa' }}
-                    @endif
-                  </div>
-                  <div class="checkout-item-quantity">
-                    Số lượng: {{ $qty }}
-                    × {{ number_format($unitPrice, 0, ',', '.') }}VNĐ
-                  </div>
+            <div class="checkout-item">
+              <img
+                src="{{ $imgPath }}"
+                alt="{{ $product->title ?? 'Sản phẩm' }}"
+                class="checkout-item-image">
+              <div class="checkout-item-details">
+                <div class="checkout-item-title">
+                  @if($product)
+                  <a
+                    href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
+                    class="text-decoration-none text-body">
+                    {{ $product->title }}
+                  </a>
+                  @else
+                  {{ $item->product_name ?? 'Sản phẩm đã bị xóa' }}
+                  @endif
                 </div>
-                <div class="checkout-item-price">
-                  {{ number_format($lineTotal, 0, ',', '.') }}VNĐ
+                <div class="checkout-item-quantity">
+                  Số lượng: {{ $qty }}
+                  × {{ number_format($unitPrice, 0, ',', '.') }}VNĐ
                 </div>
               </div>
+              <div class="checkout-item-price">
+                {{ number_format($lineTotal, 0, ',', '.') }}VNĐ
+              </div>
+            </div>
             @empty
-              <p class="text-muted mb-0">Đơn hàng này không có sản phẩm nào.</p>
+            <p class="text-muted mb-0">Đơn hàng này không có sản phẩm nào.</p>
             @endforelse
           </div>
         </div>
@@ -236,34 +236,43 @@
               <div class="flex-grow-1">
                 <div class="payment-option-name">
                   @php
-                    $method = $order->payment_method ?? 'cod';
-                    $methodLabel = 'COD - Thanh toán khi nhận hàng';
+                  $method = $order->payment_method ?? 'cod';
+                  $methodLabel = 'COD - Thanh toán khi nhận hàng';
 
-                    if ($method === 'momo') {
-                      $methodLabel = 'Ví MoMo';
-                    } elseif ($method === 'vnpay') {
-                      $methodLabel = 'VNPAY';
-                    }
+                  if ($method === 'momo') {
+                  $methodLabel = 'Ví MoMo';
+                  } elseif ($method === 'vnpay') {
+                  $methodLabel = 'VNPAY';
+                  }
+                  $canReorder = ($status === 'delivered');
                   @endphp
                   {{ $methodLabel }}
                 </div>
                 <div class="payment-option-desc">
                   @if($order->payment_status === 'paid')
-                    Trạng thái thanh toán: Đã thanh toán
+                  Trạng thái thanh toán: Đã thanh toán
                   @else
-                    Trạng thái thanh toán: Chưa thanh toán
+                  Trạng thái thanh toán: Chưa thanh toán
                   @endif
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <a
-          href="{{ route('home') }}"
-          class="checkout-btn mt-2 d-inline-flex align-items-center justify-content-center">
-          <i class="bi bi-book"></i>
-          <span class="ms-1">Tiếp tục mua sách</span>
-        </a>
+        @if($canReorder)
+          <form
+            method="POST"
+            action="{{ route('user.profile.orders.reorder', $order->id) }}"
+            class="d-inline">
+            @csrf
+            <button
+              type="submit"
+              class="checkout-btn mt-2 d-inline-flex align-items-center justify-content-center">
+              <i class="bi bi-book"></i>
+              <span class="ms-1">Mua lại đơn này</span>
+            </button>
+          </form>
+        @endif
       </div>
     </div>
   </div>

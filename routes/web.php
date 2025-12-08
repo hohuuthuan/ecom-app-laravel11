@@ -78,6 +78,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/orders/{id}', [UserOrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{id}/review', [UserReviewController::class, 'showOrderReviewPage'])->name('orders.review');
+    Route::post('/orders/{order}/reorder', [UserOrderController::class, 'reorder'])->name('orders.reorder');
   });
 
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {

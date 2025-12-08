@@ -366,13 +366,12 @@ class ProductService
   public function getRelatedProducts(Product $product, int $perPage = 8): LengthAwarePaginator
   {
     if ($perPage <= 0) {
-      $perPage = 8;
+      $perPage = 4;
     }
     if ($perPage > 200) {
-      $perPage = 200;
+      $perPage = 50;
     }
 
-    // Giống 100% phần select + with ở getList()
     $query = Product::query()
       ->select([
         'id',
@@ -401,12 +400,8 @@ class ProductService
       ]);
     }
 
-    // ======= CÁC ĐIỀU KIỆN "LIÊN QUAN" THÊM VÀO =======
-
-    // 1) Loại trừ chính sản phẩm hiện tại
     $query->where('id', '!=', $product->id);
 
-    // 2) Ưu tiên cùng category với sản phẩm hiện tại
     $product->loadMissing('categories:id,name');
 
     $categoryIds = $product->categories?->pluck('id')->all() ?? [];
@@ -416,10 +411,7 @@ class ProductService
       });
     }
 
-    // 3) Chỉ lấy status giống trang home (nếu cần)
     $query->where('status', 'ACTIVE');
-
-    // ======= PHẦN SORT GIỐNG GETLIST (best_seller) =======
     $validStatuses = ['confirmed', 'processing', 'shipping', 'delivered', 'completed'];
 
     $query->withSum([
@@ -438,12 +430,10 @@ class ProductService
     return PaginationHelper::appendQuery($products);
   }
 
-
-
   public function getProductReviews(string $productId, int $perPage = 5): LengthAwarePaginator
   {
     if ($perPage <= 0 || $perPage > 50) {
-      $perPage = 5;
+      $perPage = 4;
     }
 
     $query = Review::query()
@@ -451,9 +441,7 @@ class ProductService
       ->where('is_active', true)
       ->with(['user:id,name'])
       ->orderByDesc('created_at');
-
     $reviews = $query->paginate($perPage)->withQueryString();
-    $reviews->withPath(route('product.reviews', $productId));
 
     return $reviews;
   }

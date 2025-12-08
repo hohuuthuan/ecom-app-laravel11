@@ -62,17 +62,22 @@ class HomePageController extends Controller
       return back()->with('toast_error', 'Không tìm thấy sản phẩm');
     }
 
-    $perPageReview = (int) $request->query('per_page_review', 5);
-    if ($perPageReview <= 0 || $perPageReview > 50) {
-      $perPageReview = 5;
+    $perPageReview = (int) $request->query('per_page_review', 4);
+    if ($perPageReview <= 0 || $perPageReview > 200) {
+      $perPageReview = 4;
     }
-    $reviews = $this->productService->getProductReviews($id, $perPageReview);
 
-    $perPageRelated = (int) $request->query('per_page_related', 8);
+    $perPageRelated = (int) $request->query('per_page_related', 4);
     if ($perPageRelated <= 0 || $perPageRelated > 200) {
-      $perPageRelated = 8;
+      $perPageRelated = 4;
     }
+    if ($request->ajax() && $request->boolean('reviews_only')) {
+      $reviews = $this->productService->getProductReviews($id, $perPageReview);
 
+      return view('partials.ui.productDetail.reviews-list', [
+        'reviews' => $reviews,
+      ]);
+    }
     if ($request->ajax() && $request->boolean('related_only')) {
       $relatedProducts = $this->productService->getRelatedProducts($product, $perPageRelated);
 
@@ -82,22 +87,16 @@ class HomePageController extends Controller
       ]);
     }
 
+    $reviews         = $this->productService->getProductReviews($id, $perPageReview);
     $relatedProducts = $this->productService->getRelatedProducts($product, $perPageRelated);
 
     return view('user.productDetail', [
       'product'         => $product,
       'reviews'         => $reviews,
+      'perPageReview'   => $perPageReview,
       'perPageRelated'  => $perPageRelated,
       'relatedProducts' => $relatedProducts,
     ]);
-  }
-
-  public function productReviews(Request $request, string $id)
-  {
-    $perPage = (int)$request->query('per_page_review', 5);
-    $reviews = $this->productService->getProductReviews($id, $perPage);
-
-    return view('partials.ui.productDetail.reviews-list', compact('reviews'));
   }
 
   public function cartPage(Request $request, CartService $svc)

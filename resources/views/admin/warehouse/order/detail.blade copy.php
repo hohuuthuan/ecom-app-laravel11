@@ -45,45 +45,36 @@ $user = $order->user;
 
 $status = strtolower((string) $order->status);
 
-// Label trạng thái theo góc nhìn kho (đã chuẩn hoá 8 trạng thái + legacy)
+// Label trạng thái theo góc nhìn kho
 $statusLabel = match ($status) {
 'pending' => 'Chờ xử lý',
-'processing' => 'Đang chờ tiếp nhận',
-'picking' => 'Đang chuẩn bị hàng',
-'shipping' => 'Đã giao cho đơn vị vận chuyển',
+'processing'=> 'Đang chờ tiếp nhận',
+'shipping' => 'Đang chuẩn bị hàng',
+'delivered' => 'Đã giao cho đơn vị vận chuyển',
 'completed' => 'Hoàn tất',
 'cancelled' => 'Đã hủy đơn hàng',
-'delivery_failed' => 'Giao hàng thất bại',
-'returned' => 'Hoàn / trả hàng',
-// legacy
-'confirmed' => 'Đã xác nhận (cũ)',
-'shipped' => 'Đã giao cho ĐVVC (cũ)',
-'delivered' => 'Đã giao hàng (cũ)',
 default => 'Không xác định',
 };
 
 // Màu badge trạng thái kho
 $statusClass = match ($status) {
 'pending' => 'badge-status--warning',
-'processing', 'picking', 'shipping',
-'confirmed', 'shipped', 'delivered' => 'badge-status--primary',
+'processing',
+'shipping',
+'delivered' => 'badge-status--primary',
 'completed' => 'badge-status--success',
-'cancelled', 'delivery_failed', 'returned' => 'badge-status--danger',
+'cancelled' => 'badge-status--danger',
 default => 'badge-status--secondary',
 };
 
 // Map từ status đơn -> warehouse_status cho select
 $warehouseStatusMap = [
 'processing' => 'RECEIVING_PROCESS',
-'picking' => 'PREPARING_ITEMS',
-'shipping' => 'HANDED_OVER_CARRIER',
+'shipping' => 'PREPARING_ITEMS',
+'delivered' => 'HANDED_OVER_CARRIER',
 ];
 
 $currentWarehouseStatus = $warehouseStatusMap[$status] ?? null;
-
-// Thông tin giao hàng
-$shippingType = strtoupper((string) (old('shipping_type', $order->shipping_type ?? 'INTERNAL'))); // INTERNAL | EXTERNAL
-$currentShipperId = (string) (old('shipper_id', $order->shipper_id ?? ''));
 @endphp
 
 <div class="card mb-3">
@@ -124,20 +115,21 @@ $currentShipperId = (string) (old('shipper_id', $order->shipper_id ?? ''));
           <select name="warehouse_status" class="form-select form-select-sm setupSelect2">
             <option
               value="RECEIVING_PROCESS"
-              @selected($currentWarehouseStatus==='RECEIVING_PROCESS' )>
+              @selected($currentWarehouseStatus==='RECEIVING_PROCESS' )}>
               Đang chờ tiếp nhận
             </option>
             <option
               value="PREPARING_ITEMS"
-              @selected($currentWarehouseStatus==='PREPARING_ITEMS' )>
+              @selected($currentWarehouseStatus==='PREPARING_ITEMS' )}>
               Đang chuẩn bị hàng
             </option>
             <option
               value="HANDED_OVER_CARRIER"
-              @selected($currentWarehouseStatus==='HANDED_OVER_CARRIER' )>
+              @selected($currentWarehouseStatus==='HANDED_OVER_CARRIER' )}>
               Đã giao cho đơn vị vận chuyển
             </option>
           </select>
+
         </div>
 
         <button type="submit" class="btn btn-primary btn-admin">
@@ -367,7 +359,7 @@ $currentShipperId = (string) (old('shipper_id', $order->shipper_id ?? ''));
   </div>
 </div>
 
-{{-- TIMELINE + ĐƠN VỊ VẬN CHUYỂN --}}
+{{-- TIMELINE + GHI CHÚ --}}
 <div class="row g-3 mt-1">
   <div class="col-lg-7">
     <div class="card h-100">
@@ -386,21 +378,15 @@ $currentShipperId = (string) (old('shipper_id', $order->shipper_id ?? ''));
         }
 
         foreach ($order->statusHistories as $log) {
-        $s = strtolower((string) $log->status);
-
-        $label = match ($s) {
+        $label = match ($log->status) {
         'pending' => 'Chờ xử lý',
         'confirmed' => 'Đã xác nhận đơn',
         'processing' => 'Đang chờ tiếp nhận',
-        'picking' => 'Đang chuẩn bị hàng',
-        'shipping' => 'Đã giao cho đơn vị vận chuyển',
-        'shipped' => 'Đã giao cho đơn vị vận chuyển (cũ)',
-        'delivered' => 'Đã giao hàng (cũ)',
+        'shipping' => 'Đang chuẩn bị hàng',
+        'delivered' => 'Đã giao cho đơn vị vận chuyển',
         'completed' => 'Hoàn tất đơn hàng',
         'cancelled' => 'Đã hủy đơn',
-        'delivery_failed' => 'Giao hàng thất bại',
-        'returned' => 'Hoàn / trả hàng',
-        default => ucfirst($s),
+        default => ucfirst($log->status),
         };
 
         $itemsTimeline->push([
@@ -416,16 +402,11 @@ $currentShipperId = (string) (old('shipper_id', $order->shipper_id ?? ''));
         <div class="timeline">
           @foreach($itemsTimeline as $row)
           @php
-          $labelText = $row['label'];
-          $dotClass = match ($labelText) {
+          $dotClass = match ($row['label']) {
           'Đã tạo đơn hàng' => 'timeline-item--primary',
           'Đã giao cho đơn vị vận chuyển',
-          'Đã giao cho đơn vị vận chuyển (cũ)',
-          'Đã giao hàng (cũ)',
           'Hoàn tất đơn hàng' => 'timeline-item--success',
-          'Đã hủy đơn',
-          'Giao hàng thất bại',
-          'Hoàn / trả hàng' => 'timeline-item--danger',
+          'Đã hủy đơn' => 'timeline-item--danger',
           default => 'timeline-item--warning',
           };
           @endphp
@@ -450,92 +431,43 @@ $currentShipperId = (string) (old('shipper_id', $order->shipper_id ?? ''));
   <div class="col-lg-5">
     <div class="card h-100">
       <div class="card-body">
-        <div class="section-title mb-3">Đơn vị vận chuyển</div>
+        <div class="section-title mb-3">Ghi chú nội bộ (Feature coming soon...)</div>
+        <div class="mb-2 mini text-muted">Chỉ hiển thị cho quản lý kho</div>
 
-        <form
-          method="POST"
-          action="{{ route('warehouse.order.assignShipper', $order->id) }}"
-          class="no-print">
-          @csrf
-          @method('PATCH')
-
-          <div class="mb-3">
-            <div class="form-check form-check-inline">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="shipping_type"
-                id="shippingTypeInternal"
-                value="INTERNAL"
-                {{ $shippingType === 'INTERNAL' ? 'checked' : '' }}>
-              <label class="form-check-label" for="shippingTypeInternal">
-                Shipper nội bộ
-              </label>
+        <ul class="list-group mb-3" id="noteList">
+          @if($order->buyer_note)
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="me-2">
+              {{ $order->buyer_note }}
+              <div class="mini text-muted">
+                {{ optional($order->placed_at ?? $order->created_at)->format('d/m/Y H:i') }}
+                • Khách hàng
+              </div>
             </div>
-
-            <div class="form-check form-check-inline">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="shipping_type"
-                id="shippingTypeExternal"
-                value="EXTERNAL"
-                {{ $shippingType === 'EXTERNAL' ? 'checked' : '' }}>
-              <label class="form-check-label" for="shippingTypeExternal">
-                Đơn vị vận chuyển khác
-              </label>
-            </div>
-          </div>
-
-          <div class="mb-3 js-internal-shipper {{ $shippingType !== 'INTERNAL' ? 'd-none' : '' }}">
-            <label class="form-label">
-              Người giao hàng (nội bộ)
-            </label>
-
-            <select
-              name="shipper_id"
-              class="form-select form-select-sm setupSelect2">
-              <option value="">
-                Chọn người giao hàng
-              </option>
-
-              @foreach($shippers as $shipper)
-              <option
-                value="{{ $shipper->id }}"
-                {{ $currentShipperId === (string) $shipper->id ? 'selected' : '' }}>
-                {{ $shipper->name }}
-              </option>
-              @endforeach
-            </select>
-            @error('shipper_id')
-            <div class="text-danger mini mt-1">{{ $message }}</div>
-            @enderror
-          </div>
-
-          <div class="text-end">
-            <button
-              type="submit"
-              class="btn btn-primary btn-sm {{ $shippingType !== 'INTERNAL' ? 'd-none' : '' }}">
-              Cập nhật
+            <button class="btn btn-sm btn-outline-danger no-print" disabled>
+              <i class="bi bi-trash"></i>
             </button>
-          </div>
-        </form>
+          </li>
+          @endif
+        </ul>
 
-        @if($shippingType === 'INTERNAL' && $currentShipperId !== '')
-        <hr>
-        @php
-        $current = $shippers->firstWhere('id', $currentShipperId);
-        @endphp
-        <div class="mini">
-          Đơn hàng đã được phân công cho:
-          <b>{{ $current?->name ?? 'Không xác định' }}</b>
-        </div>
-        @elseif($shippingType === 'EXTERNAL')
-        <hr>
-        <div class="mini">
-          Đơn đang được giao bởi đơn vị vận chuyển bên ngoài.
+        @if(!$order->buyer_note)
+        <div class="mini text-muted mb-3">
+          Chưa có ghi chú từ khách hàng.
         </div>
         @endif
+
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Thêm ghi chú (TODO API)..."
+            id="noteInput"
+            disabled>
+          <button class="btn btn-primary" id="noteAdd" disabled>
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -543,68 +475,3 @@ $currentShipperId = (string) (old('shipper_id', $order->shipper_id ?? ''));
 
 @include('partials.ui.confirm-modal')
 @endsection
-@push('scripts')
-<script>
-  (function () {
-    const internalRadio = document.getElementById('shippingTypeInternal');
-    const externalRadio = document.getElementById('shippingTypeExternal');
-    const internalBlock = document.querySelector('.js-internal-shipper');
-    const form = internalBlock ? internalBlock.closest('form') : null;
-
-    if (!internalRadio || !externalRadio || !internalBlock || !form) {
-      return;
-    }
-
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const tokenInput = form.querySelector('input[name="_token"]');
-    const csrf = tokenInput ? tokenInput.value : '';
-
-    function syncUI() {
-      const isInternal = internalRadio.checked;
-      internalBlock.classList.toggle('d-none', !isInternal);
-
-      if (submitBtn) {
-        submitBtn.classList.toggle('d-none', !isInternal);
-      }
-    }
-
-    internalRadio.addEventListener('change', syncUI);
-
-    externalRadio.addEventListener('change', function () {
-      syncUI();
-
-      if (!externalRadio.checked || !csrf) {
-        return;
-      }
-
-      fetch(form.getAttribute('action'), {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': csrf,
-          'X-Requested-With': 'XMLHttpRequest',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          shipping_type: 'EXTERNAL',
-          shipper_id: null
-        })
-      })
-        .then(function (res) {
-          if (!res.ok) {
-            throw new Error('Request failed');
-          }
-          return res.json();
-        })
-        .then(function () {
-          window.location.reload();
-        })
-        .catch(function () {
-          alert('Cập nhật đơn vị vận chuyển thất bại. Vui lòng thử lại.');
-        });
-    });
-
-    syncUI();
-  })();
-</script>
-@endpush

@@ -98,9 +98,9 @@ class WarehousePageController extends Controller
 
   public function orderDetail(string $id): View
   {
-    [$order, $stockMap, $itemBatches] = $this->orderService->getWarehouseOrderDetail($id);
+    [$order, $stockMap, $itemBatches, $shippers] = $this->orderService->getWarehouseOrderDetail($id);
 
-    return view('admin.warehouse.order.detail', compact('order', 'stockMap', 'itemBatches'));
+    return view('admin.warehouse.order.detail', compact('order', 'stockMap', 'itemBatches', 'shippers'));
   }
 
   public function changeOrderStatus(Request $r, string $id): RedirectResponse
@@ -134,6 +134,15 @@ class WarehousePageController extends Controller
     $targetStatus = $mapToOrderStatus[$validated['warehouse_status']];
     $statusLabel  = $warehouseStatusLabels[$validated['warehouse_status']] ?? $targetStatus;
 
+    $shippingType = strtoupper((string) $order->shipping_type);
+
+    if ($targetStatus === 'SHIPPING' && !in_array($shippingType, ['INTERNAL', 'EXTERNAL'], true)) {
+      return back()->with(
+        'toast_error',
+        'Vui lòng chọn đơn vị vận chuyển'
+      );
+    }
+
     $levelMap = [
       'PROCESSING' => 1,
       'PICKING'    => 2,
@@ -158,6 +167,55 @@ class WarehousePageController extends Controller
 
     return back()->with('toast_success', 'Cập nhật trạng thái đơn hàng: ' . $statusLabel);
   }
+
+  public function assignShipper(Request $request, string $orderId): RedirectResponse|JsonResponse
+  {
+    $order = Order::findOrFail($orderId);
+
+    $shippingTypeInput = strtoupper((string) $request->input('shipping_type'));
+
+    $rules = [
+      'shipping_type' => [
+        'required',
+        'string',
+        Rule::in(['INTERNAL', 'EXTERNAL']),
+      ],
+      'shipper_id' => [
+        $shippingTypeInput === 'INTERNAL' ? 'required' : 'nullable',
+        'uuid',
+        'exists:users,id',
+      ],
+    ];
+
+    $messages = [
+      'shipper_id.required' => 'Vui lòng chọn người giao hàng.',
+    ];
+
+    $data = $request->validate($rules, $messages);
+
+    $shippingType = strtoupper($data['shipping_type']);
+
+    if ($shippingType === 'INTERNAL') {
+      $shipperId = $data['shipper_id'];
+    } else {
+      $shipperId = null;
+    }
+
+    $order->shipping_type = $shippingType;
+    $order->shipper_id = $shipperId;
+    $order->save();
+
+    if ($request->expectsJson()) {
+      return response()->json([
+        'success'       => true,
+        'shipping_type' => $order->shipping_type,
+        'shipper_id'    => $order->shipper_id,
+      ]);
+    }
+
+    return back()->with('toast_success', 'Cập nhật đơn vị vận chuyển thành công.');
+  }
+
 
   public function inventory(Request $r): View
   {

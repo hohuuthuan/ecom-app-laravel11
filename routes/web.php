@@ -135,6 +135,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders', [WarehousePageController::class, 'orders'])->name('orders');
     Route::get('/orders/detail/{id}', [WarehousePageController::class, 'orderDetail'])->name('order.detail');
     Route::patch('/orders/{id}/status', [WarehousePageController::class, 'changeOrderStatus'])->name('order.changeStatus');
+    Route::patch('orders/{order}/shipping', [WarehousePageController::class, 'assignShipper'])->name('order.assignShipper');
 
     Route::get('/inventory', [WarehousePageController::class, 'inventory'])->name('inventory');
 

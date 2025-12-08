@@ -25,6 +25,10 @@ a {
   display: none;
 }
 
+.recently-viewed-pagination p.small.text-muted {
+  display: none;
+}
+
 .breadcrumb {
   font-size: 20px;
   font-weight: 500;
@@ -910,4 +914,32 @@ a {
   background-color: #0b99c4;
   border: 2px solid #0b99c4;
   box-shadow: 0 0 0 2px rgba(11, 153, 196, .2);
+}
+
+/*  ============================================================= RECENTLY VIEWED ============================================================= */
+.recently-viewed-empty {
+  min-height: 320px;            
+  padding: 14rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  border-radius: 0.75rem;
+  border: 1px dashed #dee2e6;
+}
+
+.recently-viewed-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.recently-viewed-empty-icon i {
+  font-size: 1.75rem;
 }

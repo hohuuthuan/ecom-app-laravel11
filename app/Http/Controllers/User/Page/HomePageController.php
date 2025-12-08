@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Services\User\ProductService;
 use App\Services\User\HomeService;
 use App\Services\User\CartService;
+use Illuminate\Contracts\View\View;
 
 class HomePageController extends Controller
 {
@@ -53,6 +54,50 @@ class HomePageController extends Controller
     return view('user.favoriteProduct', compact('categories', 'authors', 'publishers', 'products'));
   }
 
+  public function recentlyViewedPage(Request $request): View
+  {
+    $raw = (string) $request->cookie('recently_viewed_products', '[]');
+
+    try {
+      $data = json_decode($raw, true);
+    } catch (\Throwable $e) {
+      $data = [];
+    }
+
+    if (!is_array($data)) {
+      $data = [];
+    }
+
+    $items = array_values(array_filter($data, function ($item) {
+      return is_array($item)
+        && array_key_exists('id', $item)
+        && is_string($item['id'])
+        && $item['id'] !== ''
+        && array_key_exists('viewed_at', $item)
+        && is_string($item['viewed_at'])
+        && $item['viewed_at'] !== '';
+    }));
+
+    $ids = array_map(function (array $item) {
+      return (string) $item['id'];
+    }, $items);
+
+    $perPage = (int) $request->query('per_page_product', 9);
+    if ($perPage <= 0) {
+      $perPage = 9;
+    }
+    if ($perPage > 200) {
+      $perPage = 200;
+    }
+
+    $products = $this->productService->getRecentlyViewedProducts($ids, $perPage);
+
+    return view('user.recentlyViewed', [
+      'products' => $products,
+    ]);
+  }
+
+
   public function productDetail(Request $request)
   {
     $id = (string) $request->route('id');
@@ -71,6 +116,7 @@ class HomePageController extends Controller
     if ($perPageRelated <= 0 || $perPageRelated > 200) {
       $perPageRelated = 4;
     }
+
     if ($request->ajax() && $request->boolean('reviews_only')) {
       $reviews = $this->productService->getProductReviews($id, $perPageReview);
 
@@ -78,6 +124,7 @@ class HomePageController extends Controller
         'reviews' => $reviews,
       ]);
     }
+
     if ($request->ajax() && $request->boolean('related_only')) {
       $relatedProducts = $this->productService->getRelatedProducts($product, $perPageRelated);
 
@@ -89,6 +136,70 @@ class HomePageController extends Controller
 
     $reviews         = $this->productService->getProductReviews($id, $perPageReview);
     $relatedProducts = $this->productService->getRelatedProducts($product, $perPageRelated);
+
+    // ================== Recently viewed cookie ==================
+    $raw = (string) $request->cookie('recently_viewed_products', '[]');
+
+    try {
+      $items = json_decode($raw, true);
+    } catch (\Throwable $e) {
+      $items = [];
+    }
+
+    if (!is_array($items)) {
+      $items = [];
+    }
+
+    // Chỉ giữ item có id dạng string không rỗng
+    $items = array_values(array_filter($items, function ($item) {
+      return is_array($item)
+        && array_key_exists('id', $item)
+        && is_string($item['id'])
+        && $item['id'] !== '';
+    }));
+
+    $now         = now()->toIso8601String();
+    $exists      = false;
+    $updatedItems = [];
+
+    foreach ($items as $item) {
+      $itemId = (string) $item['id'];
+
+      if ($itemId === (string) $product->id) {
+        // Đã xem trước đó -> chỉ update thời gian xem
+        $item['viewed_at'] = $now;
+        $exists = true;
+      }
+
+      $updatedItems[] = [
+        'id'        => $itemId,
+        'viewed_at' => isset($item['viewed_at']) && is_string($item['viewed_at'])
+          ? $item['viewed_at']
+          : $now,
+      ];
+    }
+
+    if (!$exists) {
+      // Chưa từng xem -> thêm mới (mặc định mới nhất, sẽ sort lại phía dưới)
+      $updatedItems[] = [
+        'id'        => (string) $product->id,
+        'viewed_at' => $now,
+      ];
+    }
+
+    // Sắp xếp theo thời gian xem MỚI NHẤT trước (để vào trang lịch sử thấy ngay sản phẩm vừa xem)
+    usort($updatedItems, function (array $a, array $b): int {
+      return strcmp($b['viewed_at'], $a['viewed_at']);
+    });
+
+    $maxItems = 50;
+    if (count($updatedItems) > $maxItems) {
+      $updatedItems = array_slice($updatedItems, 0, $maxItems);
+    }
+
+    $minutes = 60 * 24 * 30;
+    cookie()->queue('recently_viewed_products', json_encode($updatedItems), $minutes);
+    // ================== END Recently viewed cookie ==================
 
     return view('user.productDetail', [
       'product'         => $product,

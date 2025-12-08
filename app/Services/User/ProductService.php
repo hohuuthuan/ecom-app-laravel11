@@ -445,4 +445,57 @@ class ProductService
 
     return $reviews;
   }
+  public function getRecentlyViewedProducts(array $ids, int $perPage = 9): LengthAwarePaginator
+  {
+    $ids = array_values(array_filter($ids, function ($id) {
+      return is_string($id) && $id !== '';
+    }));
+
+    if ($perPage <= 0) {
+      $perPage = 9;
+    }
+    if ($perPage > 200) {
+      $perPage = 200;
+    }
+
+    $query = Product::query()
+      ->select([
+        'id',
+        'title',
+        'image',
+        'slug',
+        'isbn',
+        'selling_price_vnd',
+        'status',
+        'publisher_id',
+        'created_at',
+      ])
+      ->with([
+        'categories:id,name',
+        'authors:id,name',
+        'publisher:id,name',
+        'stocks:product_id,on_hand,reserved',
+      ])
+      ->where('status', 'ACTIVE');
+    if (empty($ids)) {
+      $query->whereRaw('1 = 0');
+    } else {
+      $query->whereIn('id', $ids);
+      $orderExpr = 'CASE';
+      $bindings  = [];
+
+      foreach ($ids as $index => $id) {
+        $orderExpr .= ' WHEN id = ? THEN ' . (int) $index;
+        $bindings[] = $id;
+      }
+
+      $orderExpr .= ' END';
+
+      $query->orderByRaw($orderExpr, $bindings);
+    }
+
+    $products = $query->paginate($perPage);
+
+    return PaginationHelper::appendQuery($products);
+  }
 }

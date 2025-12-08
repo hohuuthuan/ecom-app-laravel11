@@ -17,6 +17,14 @@ a {
   display: none;
 }
 
+.product-reviews .reviews-pagination p.small.text-muted {
+  display: none;
+}
+
+.product-related .related-pagination p.small.text-muted {
+  display: none;
+}
+
 .breadcrumb {
   font-size: 20px;
   font-weight: 500;

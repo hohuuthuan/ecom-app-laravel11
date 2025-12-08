@@ -363,10 +363,77 @@ class ProductService
       ->find($id);
   }
 
+  public function getRelatedProducts(Product $product, int $perPage = 8): LengthAwarePaginator
+  {
+    if ($perPage <= 0) {
+      $perPage = 4;
+    }
+    if ($perPage > 200) {
+      $perPage = 50;
+    }
+
+    $query = Product::query()
+      ->select([
+        'id',
+        'title',
+        'image',
+        'slug',
+        'isbn',
+        'selling_price_vnd',
+        'status',
+        'publisher_id',
+        'created_at',
+      ])
+      ->with([
+        'categories:id,name',
+        'authors:id,name',
+        'publisher:id,name',
+        'stocks:product_id,on_hand,reserved',
+      ]);
+
+    if (Auth::check()) {
+      $userId = Auth::id();
+      $query->withExists([
+        'favoredBy as is_favorited' => function ($q) use ($userId) {
+          $q->where('users.id', $userId);
+        },
+      ]);
+    }
+
+    $query->where('id', '!=', $product->id);
+
+    $product->loadMissing('categories:id,name');
+
+    $categoryIds = $product->categories?->pluck('id')->all() ?? [];
+    if (!empty($categoryIds)) {
+      $query->whereHas('categories', function ($q) use ($categoryIds) {
+        $q->whereIn('categories.id', $categoryIds);
+      });
+    }
+
+    $query->where('status', 'ACTIVE');
+    $validStatuses = ['confirmed', 'processing', 'shipping', 'delivered', 'completed'];
+
+    $query->withSum([
+      'orderItems as sold_qty' => function ($q) use ($validStatuses) {
+        $q->whereHas('order', function ($orderQuery) use ($validStatuses) {
+          $orderQuery->where('payment_status', 'paid')
+            ->whereIn('status', $validStatuses);
+        });
+      },
+    ], 'quantity')
+      ->orderByDesc('sold_qty')
+      ->orderByDesc('created_at');
+
+    $products = $query->paginate($perPage);
+
+    return PaginationHelper::appendQuery($products);
+  }
+
   public function getProductReviews(string $productId, int $perPage = 5): LengthAwarePaginator
   {
     if ($perPage <= 0 || $perPage > 50) {
-      $perPage = 5;
+      $perPage = 4;
     }
 
     $query = Review::query()
@@ -374,9 +441,7 @@ class ProductService
       ->where('is_active', true)
       ->with(['user:id,name'])
       ->orderByDesc('created_at');
-
     $reviews = $query->paginate($perPage)->withQueryString();
-    $reviews->withPath(route('product.reviews', $productId));
 
     return $reviews;
   }

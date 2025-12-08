@@ -55,25 +55,48 @@ class HomePageController extends Controller
 
   public function productDetail(Request $request)
   {
-    $id = (string)$request->route('id');
+    $id = (string) $request->route('id');
 
     $product = $this->productService->getProductDetail($id);
     if (!$product) {
       return back()->with('toast_error', 'Không tìm thấy sản phẩm');
     }
 
-    $perPage = (int)$request->query('per_page_review', 5);
-    $reviews = $this->productService->getProductReviews($id, $perPage);
+    $perPageReview = (int) $request->query('per_page_review', 4);
+    if ($perPageReview <= 0 || $perPageReview > 200) {
+      $perPageReview = 4;
+    }
 
-    return view('user.productDetail', compact('product', 'reviews'));
-  }
+    $perPageRelated = (int) $request->query('per_page_related', 4);
+    if ($perPageRelated <= 0 || $perPageRelated > 200) {
+      $perPageRelated = 4;
+    }
+    if ($request->ajax() && $request->boolean('reviews_only')) {
+      $reviews = $this->productService->getProductReviews($id, $perPageReview);
 
-  public function productReviews(Request $request, string $id)
-  {
-    $perPage = (int)$request->query('per_page_review', 5);
-    $reviews = $this->productService->getProductReviews($id, $perPage);
+      return view('partials.ui.productDetail.reviews-list', [
+        'reviews' => $reviews,
+      ]);
+    }
+    if ($request->ajax() && $request->boolean('related_only')) {
+      $relatedProducts = $this->productService->getRelatedProducts($product, $perPageRelated);
 
-    return view('partials.ui.productDetail.reviews-list', compact('reviews'));
+      return view('partials.ui.productDetail.related-products', [
+        'products'       => $relatedProducts,
+        'perPageRelated' => $perPageRelated,
+      ]);
+    }
+
+    $reviews         = $this->productService->getProductReviews($id, $perPageReview);
+    $relatedProducts = $this->productService->getRelatedProducts($product, $perPageRelated);
+
+    return view('user.productDetail', [
+      'product'         => $product,
+      'reviews'         => $reviews,
+      'perPageReview'   => $perPageReview,
+      'perPageRelated'  => $perPageRelated,
+      'relatedProducts' => $relatedProducts,
+    ]);
   }
 
   public function cartPage(Request $request, CartService $svc)

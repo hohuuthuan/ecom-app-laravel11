@@ -7,6 +7,7 @@ use App\Models\Province;
 use App\Models\Ward;
 use App\Models\Order;
 use App\Models\Review;
+use App\Models\OrderItem;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\User\AddressService;
@@ -49,7 +50,85 @@ class UserAddressController extends Controller
       $addresses = $this->addressService->getList();
       $provinces = Province::orderBy('name')->get();
 
-      // ========= LỌC + PHÂN TRANG ĐƠN HÀNG =========
+      // ================== THỐNG KÊ TỔNG QUAN ==================
+      $ordersBase = Order::where('user_id', $user->id);
+
+      $totalOrders = (clone $ordersBase)->count();
+
+      $deliveredOrders = (clone $ordersBase)
+        ->whereIn('status', ['DELIVERED', 'COMPLETED'])
+        ->count();
+
+      $cancelledOrders = (clone $ordersBase)
+        ->whereIn('status', ['CANCELLED', 'RETURNED'])
+        ->count();
+
+      $totalSpentVnd = (int) (clone $ordersBase)->sum('grand_total_vnd');
+
+      $avgOrderValueVnd = $totalOrders > 0
+        ? (int) round($totalSpentVnd / $totalOrders)
+        : 0;
+
+      $recentFrom = now()->subDays(30);
+
+      $recentOrdersQuery = (clone $ordersBase)->where('placed_at', '>=', $recentFrom);
+
+      $recentOrdersCount = (clone $recentOrdersQuery)->count();
+      $recentSpentVnd    = (int) (clone $recentOrdersQuery)->sum('grand_total_vnd');
+
+      // Đếm số đơn theo status
+      $rawStatusCounts = (clone $ordersBase)
+        ->selectRaw('UPPER(status) as status, COUNT(*) as total')
+        ->groupBy('status')
+        ->pluck('total', 'status')
+        ->toArray();
+
+      $statusCounts = [];
+      foreach ($rawStatusCounts as $status => $total) {
+        $statusCounts[strtoupper($status)] = (int) $total;
+      }
+
+      $topProductsRows = OrderItem::query()
+        ->join('orders', 'orders.id', '=', 'order_items.order_id')
+        ->join('products', 'products.id', '=', 'order_items.product_id')
+        ->where('orders.user_id', $user->id)
+        ->whereIn('orders.status', ['DELIVERED', 'COMPLETED'])
+        ->groupBy('order_items.product_id', 'products.title', 'products.slug')
+        ->selectRaw('
+              order_items.product_id,
+              products.title,
+              products.slug,
+              SUM(order_items.quantity) as total_qty,
+              MAX(orders.placed_at) as last_order_at
+          ')
+        ->orderByDesc('total_qty')
+        ->limit(5)
+        ->get();
+
+      $topProducts = [];
+      foreach ($topProductsRows as $row) {
+        $topProducts[] = [
+          'id'            => (string) $row->product_id,
+          'slug'          => (string) $row->slug,
+          'title'         => (string) $row->title,
+          'total_qty'     => (int) $row->total_qty,
+          'last_order_at' => $row->last_order_at,
+        ];
+      }
+
+      $stats = [
+        'total_orders'        => $totalOrders,
+        'delivered_orders'    => $deliveredOrders,
+        'cancelled_orders'    => $cancelledOrders,
+        'total_spent_vnd'     => $totalSpentVnd,
+        'avg_order_value_vnd' => $avgOrderValueVnd,
+        'recent_orders_count' => $recentOrdersCount,
+        'recent_spent_vnd'    => $recentSpentVnd,
+        'status_counts'       => $statusCounts,
+        'top_products'        => $topProducts,
+      ];
+
+      // ========= LỌC + PHÂN TRANG ĐƠN HÀNG (TAB LỊCH SỬ) =========
       $statusGroup = $request->query('status_group');
       $createdFrom = $request->query('created_from');
       $createdTo   = $request->query('created_to');
@@ -102,7 +181,7 @@ class UserAddressController extends Controller
         ->paginate($perPage)
         ->appends($request->query());
 
-      // ========= TÍNH THỐNG KÊ REVIEW THEO ĐƠN (order_id + product_id) =========
+      // ========= TÍNH THỐNG KÊ REVIEW THEO ĐƠN =========
       $orderReviewStats = [];
 
       if ($orders->count() > 0) {
@@ -174,6 +253,7 @@ class UserAddressController extends Controller
         'createdFrom'      => $createdFrom,
         'createdTo'        => $createdTo,
         'orderReviewStats' => $orderReviewStats,
+        'stats'            => $stats,
       ]);
     } catch (Throwable $e) {
       return back()->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');

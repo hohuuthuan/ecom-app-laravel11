@@ -754,6 +754,7 @@
 .book-card-review {
   max-height: 420px;
 }
+
 /* ====================== THÔNG TIN ĐƠN HÀNG ====================== */
 
 .review-order-summary {
@@ -885,6 +886,7 @@
   flex-direction: row-reverse;
   gap: 4px;
 }
+
 .review-rating-stars input[type="radio"] {
   display: none;
 }
@@ -898,11 +900,11 @@
 
 /* hover + checked */
 .review-rating-stars label:hover,
-.review-rating-stars label:hover ~ label {
+.review-rating-stars label:hover~label {
   color: #f59e0b;
 }
 
-.review-rating-stars input[type="radio"]:checked ~ label {
+.review-rating-stars input[type="radio"]:checked~label {
   color: #f59e0b;
 }
 
@@ -999,7 +1001,7 @@
 }
 
 /* Hàng thông tin trên cùng: “Bạn đã đánh giá…” + thời gian */
-.review-product-right--readonly > .mb-2:first-child {
+.review-product-right--readonly>.mb-2:first-child {
   padding-bottom: 6px;
   border-bottom: 1px dashed #e5e7eb;
   margin-bottom: 10px;
@@ -1072,5 +1074,184 @@
 @media (max-width: 768px) {
   .review-product-right--readonly {
     padding: 10px 10px;
+  }
+}
+
+/* ========================================================== TRANG TỔNG QUAN PROFILE ========================================================== */
+.profile-overview-page #tab-stats {
+  padding-top: 0.25rem;
+}
+
+.user-dashboard-title {
+  font-weight: 500;
+  color: #111827;
+}
+
+.profile-overview-page #tab-stats .profile-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #1f2937;
+}
+
+.profile-overview-page #tab-stats .profile-section-title i {
+  font-size: 1.2rem;
+  color: #2563eb;
+}
+
+.profile-overview-page #tab-stats .profile-section-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* ====== CARD TỔNG QUAN (4 Ô TRÊN) ====== */
+.profile-overview-page #tab-stats .stats-card {
+  border-radius: 0.9rem;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  background: radial-gradient(circle at top left, #eef2ff 0, #ffffff 42%);
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(148, 163, 184, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-overview-page #tab-stats .stats-card::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #6366f1, #ec4899);
+  opacity: 0.85;
+}
+
+.profile-overview-page #tab-stats .stats-card .card-body {
+  padding: 0.9rem 1rem 1rem 1.1rem;
+}
+
+.profile-overview-page #tab-stats .stats-card .text-muted.small.text-uppercase {
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+.profile-overview-page #tab-stats .stats-card .fs-4 {
+  font-size: 1.35rem !important;
+}
+
+.profile-overview-page #tab-stats .stats-card:hover {
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.14),
+    0 0 0 1px rgba(129, 140, 248, 0.3);
+  border-color: rgba(129, 140, 248, 0.4);
+}
+
+/* Mỗi card một màu accent khác nhau (thanh bên trái) */
+.profile-overview-page #tab-stats .row.g-3>.col-md-3:nth-child(1) .stats-card::before {
+  background: linear-gradient(180deg, #6366f1, #22c55e);
+}
+
+.profile-overview-page #tab-stats .row.g-3>.col-md-3:nth-child(2) .stats-card::before {
+  background: linear-gradient(180deg, #22c55e, #0ea5e9);
+}
+
+.profile-overview-page #tab-stats .row.g-3>.col-md-3:nth-child(3) .stats-card::before {
+  background: linear-gradient(180deg, #0ea5e9, #a855f7);
+}
+
+.profile-overview-page #tab-stats .row.g-3>.col-md-3:nth-child(4) .stats-card::before {
+  background: linear-gradient(180deg, #f97316, #ef4444);
+}
+
+/* ====== CARD BIỂU ĐỒ / TOP SẢN PHẨM ====== */
+.profile-overview-page #tab-stats .card.shadow-sm.border-0 {
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: linear-gradient(145deg, #ffffff 0, #f9fafb 100%);
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.10),
+    0 0 0 1px rgba(148, 163, 184, 0.12);
+  overflow: hidden;
+}
+
+.profile-overview-page #tab-stats .card-header {
+  padding: 0.9rem 1.2rem 0.25rem 1.2rem;
+  border-bottom: 0;
+  background: linear-gradient(120deg,
+      rgba(59, 130, 246, 0.08),
+      rgba(129, 140, 248, 0.06),
+      rgba(236, 72, 153, 0.04));
+}
+
+.profile-overview-page #tab-stats .card-header h3 {
+  font-weight: 600;
+  color: #111827;
+}
+
+.profile-overview-page #tab-stats .card-header h3 i {
+  color: #4f46e5;
+}
+
+.profile-overview-page #tab-stats .card-body {
+  padding: 0.9rem 1.2rem 1.1rem 1.2rem;
+}
+
+/* ====== TOP SẢN PHẨM LIST ====== */
+.profile-overview-page #tab-stats .list-group-item {
+  border: 0;
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+}
+
+.profile-overview-page #tab-stats .list-group-item+.list-group-item {
+  border-top: 1px dashed rgba(148, 163, 184, 0.6);
+}
+
+.profile-overview-page #tab-stats .list-group-item:hover {
+  background-color: rgba(239, 246, 255, 0.6);
+}
+
+.profile-overview-page #tab-stats .list-group-item .fw-semibold {
+  color: #111827;
+}
+
+.profile-overview-page #tab-stats .badge.bg-primary-subtle {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+  color: #1d4ed8 !important;
+}
+
+/* ====== EMPTY STATE ====== */
+.profile-overview-page #tab-stats .text-center.py-5 i {
+  color: #9ca3af;
+}
+
+.profile-overview-page #tab-stats .text-center.py-5 h5 {
+  font-weight: 600;
+  color: #111827;
+}
+
+.profile-overview-page #tab-stats .text-center.py-5 p {
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+/* ====== RESPONSIVE NHẸ ====== */
+@media (max-width: 767.98px) {
+  .profile-overview-page #tab-stats .stats-card .card-body {
+    padding: 0.8rem 0.9rem 0.9rem 1rem;
+  }
+
+  .profile-overview-page #tab-stats .stats-card .fs-4 {
+    font-size: 1.2rem !important;
+  }
+
+  .profile-overview-page #tab-stats .card-body {
+    padding-inline: 0.9rem;
   }
 }

@@ -55,17 +55,41 @@ class HomePageController extends Controller
 
   public function productDetail(Request $request)
   {
-    $id = (string)$request->route('id');
+    $id = (string) $request->route('id');
 
     $product = $this->productService->getProductDetail($id);
     if (!$product) {
       return back()->with('toast_error', 'Không tìm thấy sản phẩm');
     }
 
-    $perPage = (int)$request->query('per_page_review', 5);
-    $reviews = $this->productService->getProductReviews($id, $perPage);
+    $perPageReview = (int) $request->query('per_page_review', 5);
+    if ($perPageReview <= 0 || $perPageReview > 50) {
+      $perPageReview = 5;
+    }
+    $reviews = $this->productService->getProductReviews($id, $perPageReview);
 
-    return view('user.productDetail', compact('product', 'reviews'));
+    $perPageRelated = (int) $request->query('per_page_related', 8);
+    if ($perPageRelated <= 0 || $perPageRelated > 200) {
+      $perPageRelated = 8;
+    }
+
+    if ($request->ajax() && $request->boolean('related_only')) {
+      $relatedProducts = $this->productService->getRelatedProducts($product, $perPageRelated);
+
+      return view('partials.ui.productDetail.related-products', [
+        'products'       => $relatedProducts,
+        'perPageRelated' => $perPageRelated,
+      ]);
+    }
+
+    $relatedProducts = $this->productService->getRelatedProducts($product, $perPageRelated);
+
+    return view('user.productDetail', [
+      'product'         => $product,
+      'reviews'         => $reviews,
+      'perPageRelated'  => $perPageRelated,
+      'relatedProducts' => $relatedProducts,
+    ]);
   }
 
   public function productReviews(Request $request, string $id)

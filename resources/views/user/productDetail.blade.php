@@ -173,25 +173,56 @@
         @include('partials.ui.productDetail.reviews-list', ['reviews' => $reviews])
       </div>
     </section>
+
+    <hr class="my-5">
+
+    <section class="product-related mt-5">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="h5 mb-0">Sản phẩm liên quan</h3>
+
+        <form class="d-flex align-items-center">
+          <label class="me-2 mb-0">Hiển thị</label>
+          <select
+            class="form-select form-select-sm w-auto"
+            name="per_page_related">
+            <option value="4"  {{ ($perPageRelated ?? 8) === 4  ? 'selected' : '' }}>4</option>
+            <option value="8"  {{ ($perPageRelated ?? 8) === 8  ? 'selected' : '' }}>8</option>
+            <option value="12" {{ ($perPageRelated ?? 8) === 12 ? 'selected' : '' }}>12</option>
+          </select>
+        </form>
+      </div>
+
+      <div
+        id="relatedProductsWrapper"
+        data-related-container
+        data-related-url="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}">
+        @include('partials.ui.productDetail.related-products', [
+          'products'       => $relatedProducts,
+          'perPageRelated' => $perPageRelated ?? 8,
+        ])
+      </div>
+    </section>
+
+
   </div>
 </div>
-
 @include('partials.ui.productDetail.noti-modal')
 
 @push('scripts')
 <script>
+  // PHÂN TRANG REVIEW (GIỮ NGUYÊN)
   document.addEventListener('DOMContentLoaded', function () {
-    const reviewsSection = document.getElementById('productReviews');
+    var reviewsSection = document.getElementById('productReviews');
     if (!reviewsSection) {
       return;
     }
 
-    const container = document.getElementById('reviewsContainer');
+    var container = document.getElementById('reviewsContainer');
     if (!container) {
       return;
     }
 
-    const viewAll = reviewsSection.querySelector('.reviews-view-all');
+    var viewAll = reviewsSection.querySelector('.reviews-view-all');
     if (viewAll) {
       viewAll.addEventListener('click', function (e) {
         e.preventDefault();
@@ -200,14 +231,14 @@
     }
 
     document.addEventListener('click', function (e) {
-      const link = e.target.closest('.reviews-pagination a');
+      var link = e.target.closest('.reviews-pagination a');
       if (!link) {
         return;
       }
 
       e.preventDefault();
 
-      const url = link.getAttribute('href');
+      var url = link.getAttribute('href');
       if (!url) {
         return;
       }
@@ -230,5 +261,107 @@
     });
   });
 </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var relatedWrapper = document.querySelector('[data-related-container]');
+    if (!relatedWrapper) {
+      return;
+    }
+
+    var baseUrl = relatedWrapper.getAttribute('data-related-url') || window.location.href;
+    var perPageSelect = document.querySelector('select[name="per_page_related"]');
+    function initRelatedImages() {
+      var covers = relatedWrapper.querySelectorAll('.book-cover');
+      covers.forEach(function (cover) {
+        var img = cover.querySelector('.book-cover-img');
+        if (!img) {
+          return;
+        }
+
+        function markLoaded() {
+          cover.classList.add('is-loaded');
+        }
+
+        if (img.complete && img.naturalWidth !== 0) {
+          markLoaded();
+        } else {
+          img.addEventListener('load', markLoaded, { once: true });
+          img.addEventListener('error', markLoaded, { once: true });
+        }
+      });
+    }
+
+    function buildRelatedUrl(rawUrl) {
+      var url = rawUrl || baseUrl;
+      var urlObj = new URL(url, window.location.origin);
+
+      urlObj.searchParams.set('related_only', '1');
+
+      if (perPageSelect && perPageSelect.value) {
+        urlObj.searchParams.set('per_page_related', perPageSelect.value);
+      }
+
+      return urlObj.toString();
+    }
+
+    function loadRelated(url) {
+      if (!url) {
+        return;
+      }
+
+      relatedWrapper.classList.add('is-loading');
+
+      fetch(url, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+        .then(function (res) {
+          if (!res.ok) {
+            throw new Error('Request failed');
+          }
+          return res.text();
+        })
+        .then(function (html) {
+          relatedWrapper.innerHTML = html;
+          relatedWrapper.classList.remove('is-loading');
+          initRelatedImages();
+        })
+        .catch(function () {
+          relatedWrapper.classList.remove('is-loading');
+        });
+    }
+
+    initRelatedImages();
+
+    if (perPageSelect) {
+      perPageSelect.addEventListener('change', function (e) {
+        e.preventDefault();
+
+        var base = buildRelatedUrl(baseUrl);
+        var urlObj = new URL(base, window.location.origin);
+        urlObj.searchParams.delete('page');
+
+        loadRelated(urlObj.toString());
+      });
+    }
+
+    relatedWrapper.addEventListener('click', function (e) {
+      var link = e.target.closest('.related-pagination a');
+      if (!link) {
+        return;
+      }
+
+      e.preventDefault();
+
+      var href = link.getAttribute('href') || '';
+      var url = buildRelatedUrl(href);
+
+      loadRelated(url);
+    });
+  });
+</script>
 @endpush
 @endsection
+

@@ -363,6 +363,83 @@ class ProductService
       ->find($id);
   }
 
+  public function getRelatedProducts(Product $product, int $perPage = 8): LengthAwarePaginator
+  {
+    if ($perPage <= 0) {
+      $perPage = 8;
+    }
+    if ($perPage > 200) {
+      $perPage = 200;
+    }
+
+    // Giống 100% phần select + with ở getList()
+    $query = Product::query()
+      ->select([
+        'id',
+        'title',
+        'image',
+        'slug',
+        'isbn',
+        'selling_price_vnd',
+        'status',
+        'publisher_id',
+        'created_at',
+      ])
+      ->with([
+        'categories:id,name',
+        'authors:id,name',
+        'publisher:id,name',
+        'stocks:product_id,on_hand,reserved',
+      ]);
+
+    if (Auth::check()) {
+      $userId = Auth::id();
+      $query->withExists([
+        'favoredBy as is_favorited' => function ($q) use ($userId) {
+          $q->where('users.id', $userId);
+        },
+      ]);
+    }
+
+    // ======= CÁC ĐIỀU KIỆN "LIÊN QUAN" THÊM VÀO =======
+
+    // 1) Loại trừ chính sản phẩm hiện tại
+    $query->where('id', '!=', $product->id);
+
+    // 2) Ưu tiên cùng category với sản phẩm hiện tại
+    $product->loadMissing('categories:id,name');
+
+    $categoryIds = $product->categories?->pluck('id')->all() ?? [];
+    if (!empty($categoryIds)) {
+      $query->whereHas('categories', function ($q) use ($categoryIds) {
+        $q->whereIn('categories.id', $categoryIds);
+      });
+    }
+
+    // 3) Chỉ lấy status giống trang home (nếu cần)
+    $query->where('status', 'ACTIVE');
+
+    // ======= PHẦN SORT GIỐNG GETLIST (best_seller) =======
+    $validStatuses = ['confirmed', 'processing', 'shipping', 'delivered', 'completed'];
+
+    $query->withSum([
+      'orderItems as sold_qty' => function ($q) use ($validStatuses) {
+        $q->whereHas('order', function ($orderQuery) use ($validStatuses) {
+          $orderQuery->where('payment_status', 'paid')
+            ->whereIn('status', $validStatuses);
+        });
+      },
+    ], 'quantity')
+      ->orderByDesc('sold_qty')
+      ->orderByDesc('created_at');
+
+    $products = $query->paginate($perPage);
+
+    return PaginationHelper::appendQuery($products);
+  }
+
+
+
   public function getProductReviews(string $productId, int $perPage = 5): LengthAwarePaginator
   {
     if ($perPage <= 0 || $perPage > 50) {

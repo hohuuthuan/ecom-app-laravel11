@@ -26,61 +26,76 @@ $fmtVnd = fn($n) => number_format((int) $n, 0, ',', '.') . ' VNĐ';
 $paymentStatus = strtolower((string) $order->payment_status);
 
 $paymentStatusTextMap = [
-'unpaid' => 'Chưa thanh toán',
-'pending' => 'Chờ thanh toán',
-'paid' => 'Đã thanh toán',
-'refunded' => 'Đã hoàn tiền',
+  'unpaid'   => 'Chưa thanh toán',
+  'pending'  => 'Chờ thanh toán',
+  'paid'     => 'Đã thanh toán',
+  'refunded' => 'Đã hoàn tiền',
 ];
 
 $paymentStatusClassMap = [
-'unpaid' => 'text-bg-secondary',
-'pending' => 'text-bg-warning',
-'paid' => 'text-bg-success',
-'refunded' => 'text-bg-info',
+  'unpaid'   => 'text-bg-secondary',
+  'pending'  => 'text-bg-warning',
+  'paid'     => 'text-bg-success',
+  'refunded' => 'text-bg-info',
 ];
 
-$paymentStatusText = $paymentStatusTextMap[$paymentStatus] ?? ucfirst($paymentStatus);
+$paymentStatusText  = $paymentStatusTextMap[$paymentStatus] ?? ucfirst($paymentStatus);
 $paymentStatusClass = $paymentStatusClassMap[$paymentStatus] ?? 'text-bg-secondary';
 
 $shipment = $order->shipment;
-$user = $order->user;
+$user     = $order->user;
 
-$status = strtolower((string) $order->status);
+$statusRaw = strtoupper((string) $order->status);
+$status    = strtolower($statusRaw);
 
 // Nhãn hiển thị theo bộ status chuẩn
 $statusLabel = match ($status) {
-'pending' => 'Chờ xử lý',
-'processing'=> 'Tiếp nhận đơn, chuyển đơn sang đơn vị kho',
-'picking' => 'Đang chuẩn bị hàng',
-'shipping' => 'Đã giao cho đơn vị vận chuyển',
-'completed' => 'Hoàn tất đơn hàng',
-'cancelled' => 'Hủy đơn hàng',
-'delivery_failed' => 'Giao hàng thất bại',
-'returned' => 'Hoàn / trả hàng',
-'confirmed' => 'Đã xác nhận (legacy)',
-'shipped' => 'Đã giao cho ĐVVC (legacy)',
-'delivered' => 'Đã giao hàng (legacy)',
-default => strtoupper((string) $order->status),
+  'pending'         => 'Chờ xử lý',
+  'processing'      => 'Tiếp nhận đơn, chuyển đơn sang đơn vị kho',
+  'picking'         => 'Đang chuẩn bị hàng',
+  'shipping'        => 'Đã giao cho đơn vị vận chuyển',
+  'completed'       => 'Hoàn tất đơn hàng',
+  'cancelled'       => 'Hủy đơn hàng',
+  'delivery_failed' => 'Giao hàng thất bại',
+  'returned'        => 'Hoàn / trả hàng',
+  'confirmed'       => 'Đã xác nhận (legacy)',
+  'shipped'         => 'Đã giao cho ĐVVC (legacy)',
+  'delivered'       => 'Đã giao hàng (legacy)',
+  default           => strtoupper((string) $order->status),
 };
-
 
 // Màu badge theo trạng thái
 $statusClass = match ($status) {
-'pending' => 'badge-status--warning',
-'processing',
-'picking',
-'shipping',
-'confirmed',
-'shipped',
-'delivered' => 'badge-status--primary',
-'completed' => 'badge-status--success', 
-'cancelled',
-'delivery_failed',
-'returned' => 'badge-status--danger',
-default => 'badge-status--secondary',
+  'pending' => 'badge-status--warning',
+  'processing',
+  'picking',
+  'shipping',
+  'confirmed',
+  'shipped',
+  'delivered' => 'badge-status--primary',
+  'completed' => 'badge-status--success',
+  'cancelled',
+  'delivery_failed',
+  'returned' => 'badge-status--danger',
+  default     => 'badge-status--secondary',
 };
 
-$current = strtoupper((string) $order->status);
+// Cho phép cập nhật chỉ khi: PENDING, PROCESSING, PICKING
+$canChange = in_array($statusRaw, ['PENDING', 'PROCESSING', 'PICKING'], true);
+
+// Tính value được chọn trong select
+$selectStatus = old('status');
+if ($selectStatus === null || $selectStatus === '') {
+  if ($statusRaw === 'CANCELLED') {
+    $selectStatus = 'CANCELLED';
+  } elseif (in_array($statusRaw, ['PROCESSING', 'PICKING'], true)) {
+    // PROCESSING hoặc PICKING đều hiển thị là "Tiếp nhận đơn, chuyển đơn sang đơn vị kho"
+    $selectStatus = 'PROCESSING';
+  } else {
+    // mặc định: Chờ xử lý
+    $selectStatus = 'PENDING';
+  }
+}
 @endphp
 
 <div class="card mb-3">
@@ -108,31 +123,42 @@ $current = strtoupper((string) $order->status);
         {{ $statusLabel }}
       </span>
 
-      <form
-        method="POST"
-        action="{{ route('admin.order.changeStatus', $order->id) }}"
-        class="d-flex align-items-center gap-2 no-print">
-        @csrf
-        @method('PATCH')
+      {{-- Từ SHIPPING trở đi không cho update nữa --}}
+      @if($canChange)
+        <form
+          method="POST"
+          action="{{ route('admin.order.changeStatus', $order->id) }}"
+          class="d-flex align-items-center gap-2 no-print">
+          @csrf
+          @method('PATCH')
 
-        <div class="admin-select-status-order">
-          <select name="status" class="form-select form-select-sm setupSelect2">
-            <option value="PENDING" @selected($current==='PENDING' )>
-              Chờ xử lý
-            </option>
-            <option value="PROCESSING" @selected($current==='PROCESSING' )>
-              Tiếp nhận đơn, chuyển đơn sang đơn vị kho
-            </option>
-            <option value="CANCELLED" @selected($current==='CANCELLED' )>
-              Hủy đơn hàng
-            </option>
-          </select>
-        </div>
+          <div class="admin-select-status-order">
+            <select
+              name="status"
+              class="form-select form-select-sm setupSelect2">
+              <option
+                value="PENDING"
+                @selected($selectStatus === 'PENDING')>
+                Chờ xử lý
+              </option>
+              <option
+                value="PROCESSING"
+                @selected($selectStatus === 'PROCESSING')>
+                Tiếp nhận đơn, chuyển đơn sang đơn vị kho
+              </option>
+              <option
+                value="CANCELLED"
+                @selected($selectStatus === 'CANCELLED')>
+                Hủy đơn hàng
+              </option>
+            </select>
+          </div>
 
-        <button type="submit" class="btn btn-primary btn-admin">
-          Cập nhật
-        </button>
-      </form>
+          <button type="submit" class="btn btn-primary btn-admin">
+            Cập nhật
+          </button>
+        </form>
+      @endif
 
       <span class="vr d-none d-md-block"></span>
       <div class="text-end">
@@ -172,19 +198,19 @@ $current = strtoupper((string) $order->status);
             </div>
             <div class="mt-2">
               @if($user?->email)
-              <div class="mini">
-                <i class="bi bi-envelope"></i>
-                <a href="mailto:{{ $user->email }}">
-                  {{ $user->email }}
-                </a>
-              </div>
+                <div class="mini">
+                  <i class="bi bi-envelope"></i>
+                  <a href="mailto:{{ $user->email }}">
+                    {{ $user->email }}
+                  </a>
+                </div>
               @endif
 
               @if($user?->phone)
-              <div class="mini">
-                <i class="bi bi-telephone"></i>
-                {{ $user->phone }}
-              </div>
+                <div class="mini">
+                  <i class="bi bi-telephone"></i>
+                  {{ $user->phone }}
+                </div>
               @endif
             </div>
           </div>
@@ -211,15 +237,15 @@ $current = strtoupper((string) $order->status);
         </h5>
 
         @if($shipment)
-        <div class="order-detail-shipment-address">{{ $shipment->address }}</div>
-        @if($shipment->phone)
-        <div class="mini mt-2">
-          <i class="icon-telephone bi bi-telephone-fill"></i>
-          {{ $shipment->phone }}
-        </div>
-        @endif
+          <div class="order-detail-shipment-address">{{ $shipment->address }}</div>
+          @if($shipment->phone)
+            <div class="mini mt-2">
+              <i class="icon-telephone bi bi-telephone-fill"></i>
+              {{ $shipment->phone }}
+            </div>
+          @endif
         @else
-        <div>Chưa có thông tin giao hàng</div>
+          <div>Chưa có thông tin giao hàng</div>
         @endif
 
         <hr>
@@ -227,13 +253,9 @@ $current = strtoupper((string) $order->status);
           Phí vận chuyển:
           {{ $fmtVnd($order->shipping_fee_vnd) }}
         </div>
-        {{-- <div class="mini">
-          Đơn vị VC:
-          {{ $shipment?->courier_name ?? '—' }}
-      </div> --}}
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 {{-- SẢN PHẨM --}}
@@ -255,38 +277,38 @@ $current = strtoupper((string) $order->status);
         </thead>
         <tbody id="itemBody">
           @forelse($order->items as $item)
-          <tr>
-            <td>{{ $loop->iteration }}</td>
-            <td>
-              <div class="fw-semibold">
-                {{ $item->product_title_snapshot ?? $item->product->title ?? 'Sản phẩm' }}
-              </div>
-              <div class="text-muted mini">
-                ID: {{ $item->product_id }}
-              </div>
-            </td>
-            <td>
-              {{ $item->isbn13_snapshot ?? $item->product_id }}
-            </td>
-            <td class="text-center">
-              {{ $item->quantity }}
-            </td>
-            <td class="text-end">
-              {{ $fmtVnd($item->unit_price_vnd) }}
-            </td>
-            <td class="text-end">
-              {{ $fmtVnd($item->discount_amount_vnd ?? 0) }}
-            </td>
-            <td class="text-end">
-              {{ $fmtVnd($item->total_price_vnd) }}
-            </td>
-          </tr>
+            <tr>
+              <td>{{ $loop->iteration }}</td>
+              <td>
+                <div class="fw-semibold">
+                  {{ $item->product_title_snapshot ?? $item->product->title ?? 'Sản phẩm' }}
+                </div>
+                <div class="text-muted mini">
+                  ID: {{ $item->product_id }}
+                </div>
+              </td>
+              <td>
+                {{ $item->isbn13_snapshot ?? $item->product_id }}
+              </td>
+              <td class="text-center">
+                {{ $item->quantity }}
+              </td>
+              <td class="text-end">
+                {{ $fmtVnd($item->unit_price_vnd) }}
+              </td>
+              <td class="text-end">
+                {{ $fmtVnd($item->discount_amount_vnd ?? 0) }}
+              </td>
+              <td class="text-end">
+                {{ $fmtVnd($item->total_price_vnd) }}
+              </td>
+            </tr>
           @empty
-          <tr>
-            <td colspan="7" class="text-center text-muted mini">
-              Không có sản phẩm nào trong đơn hàng này.
-            </td>
-          </tr>
+            <tr>
+              <td colspan="7" class="text-center text-muted mini">
+                Không có sản phẩm nào trong đơn hàng này.
+              </td>
+            </tr>
           @endforelse
         </tbody>
         <tfoot>
@@ -332,58 +354,68 @@ $current = strtoupper((string) $order->status);
         $createdAt = $order->placed_at ?? $order->created_at;
 
         if ($createdAt) {
-        $timelineItems->push([
-        'label' => 'Đã tạo đơn hàng',
-        'time' => $createdAt,
-        ]);
+          $timelineItems->push([
+            'label' => 'Đã tạo đơn hàng',
+            'time'  => $createdAt,
+          ]);
         }
 
         foreach ($order->statusHistories as $log) {
-        $label = match ($log->status) {
-        'pending' => 'Chờ xử lý',
-        'confirmed' => 'Đã xác nhận đơn',
-        'processing'=> 'Tiếp nhận đơn, chuyển đơn sang đơn vị kho',
-        'shipping' => 'Đang chuẩn bị hàng',
-        'delivered' => 'Đã giao cho đơn vị vận chuyển',
-        'completed' => 'Hoàn tất đơn hàng',
-        'cancelled' => 'Đã hủy đơn',
-        default => ucfirst($log->status),
-        };
+          $s = strtolower((string) $log->status);
 
-        $timelineItems->push([
-        'label' => $label,
-        'time' => $log->created_at,
-        ]);
+          $label = match ($s) {
+            'pending'         => 'Chờ xử lý',
+            'confirmed'       => 'Đã xác nhận đơn (legacy)',
+            'processing'      => 'Tiếp nhận đơn, chuyển đơn sang đơn vị kho',
+            'picking'         => 'Đang chuẩn bị hàng',
+            'shipping'        => 'Đã giao cho đơn vị vận chuyển',
+            'shipped'         => 'Đã giao cho ĐVVC (legacy)',
+            'delivered'       => 'Đã giao hàng (legacy)',
+            'completed'       => 'Hoàn tất đơn hàng',
+            'cancelled'       => 'Đã hủy đơn',
+            'delivery_failed' => 'Giao hàng thất bại',
+            'returned'        => 'Hoàn / trả hàng',
+            default           => strtoupper((string) $log->status),
+          };
+
+          $timelineItems->push([
+            'label' => $label,
+            'time'  => $log->created_at,
+          ]);
         }
 
         $timelineItems = $timelineItems->sortByDesc('time')->values();
         @endphp
 
         @if($timelineItems->isNotEmpty())
-        <div class="timeline">
-          @foreach($timelineItems as $row)
-          @php
-          $dotClass = match ($row['label']) {
-          'Đã tạo đơn hàng' => 'timeline-item--primary',
-          'Đã giao cho đơn vị vận chuyển',
-          'Hoàn tất đơn hàng' => 'timeline-item--success',
-          'Đã hủy đơn' => 'timeline-item--danger',
-          default => 'timeline-item--warning',
-          };
-          @endphp
+          <div class="timeline">
+            @foreach($timelineItems as $row)
+              @php
+              $dotClass = match ($row['label']) {
+                'Đã tạo đơn hàng'                   => 'timeline-item--primary',
+                'Đã giao cho đơn vị vận chuyển',
+                'Đã giao cho ĐVVC (legacy)',
+                'Đã giao hàng (legacy)',
+                'Hoàn tất đơn hàng'                 => 'timeline-item--success',
+                'Đã hủy đơn',
+                'Giao hàng thất bại',
+                'Hoàn / trả hàng'                   => 'timeline-item--danger',
+                default                              => 'timeline-item--warning',
+              };
+              @endphp
 
-          <div class="timeline-item {{ $dotClass }}">
-            <div class="fw-semibold">{{ $row['label'] }}</div>
-            <div class="text-muted mini">
-              {{ $row['time']?->format('d/m/Y h:i A') }}
-            </div>
+              <div class="timeline-item {{ $dotClass }}">
+                <div class="fw-semibold">{{ $row['label'] }}</div>
+                <div class="text-muted mini">
+                  {{ $row['time']?->format('d/m/Y h:i A') }}
+                </div>
+              </div>
+            @endforeach
           </div>
-          @endforeach
-        </div>
         @else
-        <div class="text-muted mini">
-          Chưa có lịch sử trạng thái cho đơn hàng này.
-        </div>
+          <div class="text-muted mini">
+            Chưa có lịch sử trạng thái cho đơn hàng này.
+          </div>
         @endif
       </div>
     </div>
@@ -397,24 +429,24 @@ $current = strtoupper((string) $order->status);
 
         <ul class="list-group mb-3" id="noteList">
           @if($order->buyer_note)
-          <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div class="me-2">
-              {{ $order->buyer_note }}
-              <div class="mini text-muted">
-                {{ optional($order->placed_at ?? $order->created_at)->format('d/m/Y H:i') }} • Khách hàng
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+              <div class="me-2">
+                {{ $order->buyer_note }}
+                <div class="mini text-muted">
+                  {{ optional($order->placed_at ?? $order->created_at)->format('d/m/Y H:i') }} • Khách hàng
+                </div>
               </div>
-            </div>
-            <button class="btn btn-sm btn-outline-danger no-print" disabled>
-              <i class="bi bi-trash"></i>
-            </button>
-          </li>
+              <button class="btn btn-sm btn-outline-danger no-print" disabled>
+                <i class="bi bi-trash"></i>
+              </button>
+            </li>
           @endif
         </ul>
 
         @if(!$order->buyer_note)
-        <div class="mini text-muted mb-3">
-          Chưa có ghi chú từ khách hàng.
-        </div>
+          <div class="mini text-muted mb-3">
+            Chưa có ghi chú từ khách hàng.
+          </div>
         @endif
 
         <div class="input-group">

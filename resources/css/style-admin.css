@@ -222,7 +222,7 @@ textarea#ac_address {
 }
 
 .sidebar-box .nav-section {
-    padding: 0.5rem 0.5rem 1rem;
+    padding: 0.5rem 0rem 1rem;
     flex: 1 1 auto;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -267,6 +267,10 @@ textarea#ac_address {
 
 .nav-link[aria-expanded="true"] .caret {
     transform: rotate(90deg);
+}
+
+#sidebarCol {
+    min-width: 150px;
 }
 
 /* @media (min-width: 992px) {

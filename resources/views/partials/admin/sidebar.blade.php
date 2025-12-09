@@ -1,6 +1,6 @@
 <aside
   id="sidebarCol"
-  class="d-none d-lg-block {{ $mini ? 'col-lg-1 sidebar-mini' : 'col-lg-1' }}">
+  class="col-auto">
   <div class="sidebar-box">
     @php
     $user = auth()->user();

@@ -26,60 +26,72 @@
       <div class="d-flex align-items-center">
         <form action="{{ route('product.list') }}">
           <div class="input-group me-3 header-search">
-            <input name="keyword" value="{{ request('keyword') }}" type="text" class="form-control" placeholder="Tìm kiếm sách..." id="searchInput" required>
+            <input
+              name="keyword"
+              value="{{ request('keyword') }}"
+              type="text"
+              class="form-control"
+              placeholder="Tìm kiếm sách..."
+              id="searchInput"
+              required>
             <button class="btn" type="submit">
               <i class="search-icon fas fa-search"></i>
             </button>
           </div>
         </form>
         <div class="d-flex align-items-center">
-          <!-- Wishlist -->
           @php
-          $wishlistCount = auth()->check()
-          ? auth()->user()->favorites()->count()
-          : 0;
+            $wishlistCount = auth()->check()
+              ? auth()->user()->favorites()->count()
+              : 0;
+
+            $cart       = session('cart', ['items' => []]);
+            $cartItems  = is_array($cart['items'] ?? null) ? $cart['items'] : [];
+            $cartCount  = count($cartItems);
           @endphp
 
+          {{-- Wishlist --}}
           <a href="{{ route('listFavoriteProduct') }}" class="text-decoration-none me-3 position-relative">
             <i class="fas fa-heart text-danger" style="font-size: 1.2rem;"></i>
-            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle"
-              id="wishlistCount" style="font-size: 0.7rem;">
+            <span
+              class="badge bg-danger position-absolute top-0 start-100 translate-middle"
+              id="wishlistCount"
+              style="font-size: 0.7rem;">
               {{ $wishlistCount }}
             </span>
           </a>
 
-          <!-- Cart -->
-          @php
-          $cart = session('cart', ['items' => []]);
-          $cartItems = is_array($cart['items'] ?? null) ? $cart['items'] : [];
-          $cartCount = count($cartItems);
-          @endphp
-
+          {{-- Cart --}}
           <a href="{{ route('cart') }}" class="text-decoration-none me-3 position-relative">
             <i class="fas fa-shopping-cart text-primary" style="font-size: 1.2rem;"></i>
-            <span id="cartCount"
+            <span
+              id="cartCount"
               class="badge bg-primary position-absolute top-0 start-100 translate-middle"
               style="font-size: 0.7rem;"
-              data-count-url="{{ route('cart.count') }}">{{ $cartCount }}</span>
+              data-count-url="{{ route('cart.count') }}">
+              {{ $cartCount }}
+            </span>
           </a>
 
           @auth
-          <!-- User Avatar Dropdown -->
           <div class="dropdown">
-
             @php
-            $user = auth()->user();
-            $displayName = $user->full_name ?? $user->name ?? $user->username ?? 'Admin';
-            $email = $user->email ?? '';
-            $avatarFile = $user && $user->avatar ? basename($user->avatar) : 'base-avatar.jpg';
-            $avatarPath = 'avatars/' . $avatarFile;
-            $avatarUrl = Storage::disk('public')->exists($avatarPath)
-            ? Storage::disk('public')->url($avatarPath)
-            : asset('storage/avatars/base-avatar.jpg');
+              /** @var \App\Models\User $user */
+              $user        = auth()->user();
+              $displayName = $user->full_name ?? $user->name ?? $user->username ?? 'Admin';
+              $email       = $user->email ?? '';
+              $avatarFile  = $user && $user->avatar ? basename($user->avatar) : 'base-avatar.jpg';
+              $avatarPath  = 'avatars/' . $avatarFile;
+              $avatarUrl   = Storage::disk('public')->exists($avatarPath)
+                ? Storage::disk('public')->url($avatarPath)
+                : asset('storage/avatars/base-avatar.jpg');
             @endphp
 
-            <a href="#" class="dropdown-toggle text-decoration-none d-flex align-items-center"
-              data-bs-toggle="dropdown" aria-expanded="false">
+            <a
+              href="#"
+              class="dropdown-toggle text-decoration-none d-flex align-items-center"
+              data-bs-toggle="dropdown"
+              aria-expanded="false">
               <img
                 src="{{ $avatarUrl }}"
                 alt="Avatar {{ $displayName }}"
@@ -106,29 +118,37 @@
                   </div>
                 </div>
               </li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
 
-              @if(auth()->user()->hasRole('Admin'))
-              <li>
-                <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
-                  <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                </a>
-              </li>
+              <li><hr class="dropdown-divider"></li>
+
+              @if($user->hasRole('Admin'))
+                <li>
+                  <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                    <i class="fas fa-tachometer-alt me-2"></i>Trang quản trị
+                  </a>
+                </li>
               @endif
 
               <li>
                 <a class="dropdown-item" href="{{ route('user.profile.index') }}">
-                  <i class="fas fa-user me-2"></i>Hồ sơ
+                  <i class="fas fa-user me-2"></i>Hồ sơ | Đơn hàng | Sổ địa chỉ
                 </a>
               </li>
 
-              <li>
-                <hr class="dropdown-divider">
-              </li>
+              @if(
+                $user->hasRole('Admin')
+                || $user->hasRole('Warehouse Manager')
+                || $user->hasRole('Shipper')
+              )
+                <li>
+                  <a class="dropdown-item" href="{{ route('shipper.dashboard') }}">
+                    <i class="fas fa-motorcycle me-2"></i>Đơn hàng cần giao
+                  </a>
+                </li>
+              @endif
 
-              <!-- Logout (POST + CSRF) -->
+              <li><hr class="dropdown-divider"></li>
+
               <li class="px-3">
                 <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
                   @csrf

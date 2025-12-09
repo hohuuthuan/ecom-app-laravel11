@@ -24,6 +24,8 @@ use App\Http\Controllers\Admin\PublisherController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\DiscountController;
 
+use App\Http\Controllers\Shipper\Page\ShipperPageController;
+
 // === PUBLIC ===
 Route::get('/', [HomePageController::class, 'index'])->name('home');
 Route::get('/product', [HomePageController::class, 'listProduct'])->name('product.list');
@@ -145,6 +147,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/purchase-receipts', [WarehousePageController::class, 'purchaseReceiptIndex'])->name('purchase_receipts.index');
     Route::get('/purchase-receipts/{id}', [WarehousePageController::class, 'purchaseReceiptShow'])->name('purchase_receipts.show');
   });
+
+  Route::middleware(['auth', 'role:Admin,Warehouse Manager,Shipper'])->prefix('shipper')->name('shipper.')->group(function () {
+    Route::get('/', [ShipperPageController::class, 'dashboard'])->name('dashboard');
+    Route::get('/orders/{id}', [ShipperPageController::class, 'detail'])->whereUuid('id')->name('orders.detail');
+    Route::patch('/orders/{id}/status', [ShipperPageController::class, 'changeStatus'])->whereUuid('id')->name('orders.changeStatus');
+  });
+
 });
 
 Route::fallback(fn() => response()->view('errors.404', [], 404));

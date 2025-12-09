@@ -1,15 +1,16 @@
-body.warehouse-page {
+body.warehouse-page,
+body.shipper-page {
   box-sizing: border-box;
   background: linear-gradient(135deg, #e3f2fd 0%, #e8eaf6 100%);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Sidebar trái */
-.warehouse-sidebar {
+.warehouse-sidebar,
+.shipper-sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh; /* luôn bằng chiều cao màn hình */
+  height: 100vh;
   width: 235px;
   background: #ffffff;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
@@ -18,26 +19,31 @@ body.warehouse-page {
   z-index: 1020;
 }
 
-.warehouse-sidebar .warehouse_sidebar {
+.warehouse-sidebar .warehouse_sidebar,
+.shipper-sidebar .shipper_sidebar {
   flex: 1;
   overflow-y: auto;
 }
 
-.warehouse-main {
-  margin-left: 235px;  /* chừa chỗ cho sidebar */
+.warehouse-main,
+.shipper-main {
+  margin-left: 235px;
   padding: 1.5rem;
   min-height: 100vh;
 }
 
-.warehouse-sidebar .warehouse_sidebar::-webkit-scrollbar {
+.warehouse-sidebar .warehouse_sidebar::-webkit-scrollbar,
+.shipper-sidebar .shipper_sidebar::-webkit-scrollbar {
   width: 6px;
 }
 
-.warehouse-sidebar .warehouse_sidebar::-webkit-scrollbar-track {
+.warehouse-sidebar .warehouse_sidebar::-webkit-scrollbar-track,
+.shipper-sidebar .shipper_sidebar::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.warehouse-sidebar .warehouse_sidebar::-webkit-scrollbar-thumb {
+.warehouse-sidebar .warehouse_sidebar::-webkit-scrollbar-thumb,
+.shipper-sidebar .shipper_sidebar::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.15);
   border-radius: 999px;
 }
@@ -58,15 +64,19 @@ body.warehouse-page {
   min-height: 312px;
 }
 
-.warehouse_sidebar a{
+.warehouse_sidebar a,
+.shipper_sidebar a {
   text-decoration: none;
 }
 
-.warehouse-main a {
+.warehouse-main a,
+.shipper-main a {
   text-decoration: none;
 }
 
-.warehouse-nav-btn {
+
+.warehouse-nav-btn,
+.shipper-nav-btn {
   border: none;
   background: none;
   border-radius: 10px;
@@ -74,18 +84,20 @@ body.warehouse-page {
   font-weight: 500;
 }
 
-.warehouse-nav-btn:hover {
+.warehouse-nav-btn:hover,
+.shipper-nav-btn:hover {
   background-color: #e3f2fd !important;
   color: #1976d2 !important;
 }
 
-.warehouse-nav-btn.active {
+.warehouse-nav-btn.active,
+.shipper-nav-btn.active {
   background-color: #e3f2fd !important;
   color: #1976d2 !important;
 }
 
-/* Card chung */
-.warehouse-card {
+.warehouse-card,
+.shipper-card {
   border: none;
   border-radius: 5px;
   padding: 20px;
@@ -94,7 +106,6 @@ body.warehouse-page {
   background-color: #ffffff;
 }
 
-/* Card thống kê */
 .stats-card {
   border-left: 4px solid transparent;
 }
@@ -116,12 +127,12 @@ body.warehouse-page {
 }
 
 /* Animation section */
-.warehouse-section {
+body.warehouse-page .warehouse-section {
   animation-duration: 0.25s;
   animation-fill-mode: both;
 }
 
-.fade-in {
+body.warehouse-page .fade-in {
   animation-name: warehouseFadeIn;
 }
 
@@ -137,7 +148,7 @@ body.warehouse-page {
   }
 }
 
-.slide-down {
+body.warehouse-page .slide-down {
   animation-name: warehouseSlideDown;
 }
 
@@ -238,25 +249,25 @@ body.warehouse-page {
   }
 }
 
-/* Import / Export item card */
 .warehouse-import-item,
 .warehouse-export-item {
   border-radius: 12px;
 }
 
 @media (max-width: 991.98px) {
-  .warehouse-sidebar {
+  .warehouse-sidebar,
+  .shipper-sidebar {
     position: static;
     width: 100%;
     height: auto;
   }
 
-  .warehouse-main {
+  .warehouse-main,
+  .shipper-main {
     margin-left: 0;
     padding: 1rem;
   }
 }
-
 
 
 /* Phiếu nhập kho */

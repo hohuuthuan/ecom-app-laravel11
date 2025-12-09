@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Publisher;
 use App\Models\Order;
 use App\Models\Stock;
+use App\Models\OrderBatch;
 use Illuminate\Support\Facades\DB;
 use App\Services\Admin\Warehouse\WarehouseImportService;
 use App\Services\Admin\Order\OrderService;
@@ -113,22 +114,25 @@ class WarehousePageController extends Controller
           'RECEIVING_PROCESS',
           'PREPARING_ITEMS',
           'HANDED_OVER_CARRIER',
+          'ORDER_COMPLETED',
         ]),
       ],
     ]);
 
-    $order = Order::findOrFail($id);
+    $order = Order::with(['items', 'items.product'])->findOrFail($id);
 
     $mapToOrderStatus = [
       'RECEIVING_PROCESS'   => 'PROCESSING',
       'PREPARING_ITEMS'     => 'PICKING',
       'HANDED_OVER_CARRIER' => 'SHIPPING',
+      'ORDER_COMPLETED'     => 'COMPLETED',
     ];
 
     $warehouseStatusLabels = [
       'RECEIVING_PROCESS'   => 'Tiếp nhận đơn',
       'PREPARING_ITEMS'     => 'Đang chuẩn bị hàng',
       'HANDED_OVER_CARRIER' => 'Đã giao cho đơn vị vận chuyển',
+      'ORDER_COMPLETED'     => 'Đơn hàng hoàn tất',
     ];
 
     $targetStatus = $mapToOrderStatus[$validated['warehouse_status']];
@@ -142,14 +146,22 @@ class WarehousePageController extends Controller
         'Vui lòng chọn đơn vị vận chuyển'
       );
     }
+    if ($targetStatus === 'COMPLETED' && $shippingType !== 'EXTERNAL') {
+      return back()->with(
+        'toast_error',
+        'Chỉ đơn hàng giao bởi đơn vị vận chuyển khác mới được hoàn tất từ kho'
+      );
+    }
 
     $levelMap = [
       'PROCESSING' => 1,
       'PICKING'    => 2,
       'SHIPPING'   => 3,
+      'COMPLETED'  => 4,
     ];
 
     $currentStatus = strtoupper((string) $order->status);
+
     if (!isset($levelMap[$currentStatus])) {
       return back()->with('toast_error', 'Trạng thái đơn hiện tại không thể cập nhật từ giao diện kho.');
     }
@@ -160,12 +172,152 @@ class WarehousePageController extends Controller
       return back()->with('toast_info', 'Trạng thái đơn hàng không thay đổi.');
     }
 
-    $order->status = $targetStatus;
-    $order->save();
+    try {
+      DB::transaction(function () use ($order, $targetStatus, $statusLabel, $levelMap) {
+        $currentStatusInside = strtoupper((string) $order->status);
 
-    WarehouseActivityService::log('Đơn #' . $order->code . ' - ' . $statusLabel);
+        // Lần đầu vượt qua mốc SHIPPING thì phân bổ lô + trừ tồn
+        $needHandleShipping = $levelMap[$targetStatus] >= $levelMap['SHIPPING']
+          && $levelMap[$currentStatusInside] < $levelMap['SHIPPING'];
+
+        if ($needHandleShipping) {
+          $this->allocateBatchesAndDeductStock($order);
+        }
+
+        $order->status = $targetStatus;
+        $order->save();
+
+        WarehouseActivityService::log('Đơn #' . $order->code . ' - ' . $statusLabel);
+      });
+    } catch (\RuntimeException $e) {
+      return back()->with('toast_error', $e->getMessage());
+    } catch (\Throwable $e) {
+      return back()->with('toast_error', 'Có lỗi khi cập nhật trạng thái đơn hàng.');
+    }
 
     return back()->with('toast_success', 'Cập nhật trạng thái đơn hàng: ' . $statusLabel);
+  }
+
+  private function allocateBatchesAndDeductStock(Order $order): void
+  {
+    $itemIds = $order->items->pluck('id')->all();
+    if (count($itemIds) === 0) {
+      return;
+    }
+    $hasBatches = DB::table('order_batches')
+      ->whereIn('order_item_id', $itemIds)
+      ->exists();
+
+    if ($hasBatches) {
+      return;
+    }
+
+    foreach ($order->items as $item) {
+      $qty = (int) $item->quantity;
+      if ($qty <= 0) {
+        continue;
+      }
+
+      if (!$item->warehouse_id) {
+        $name = $item->product_title_snapshot
+          ?? $item->product->title
+          ?? (string) $item->product_id;
+
+        throw new \RuntimeException('Thiếu thông tin kho cho sản phẩm: ' . $name);
+      }
+
+      $pid  = (string) $item->product_id;
+      $wid  = (string) $item->warehouse_id;
+      $need = $qty;
+
+      $batchRows = DB::table('batch_stocks as bs')
+        ->join('batches as b', 'b.id', '=', 'bs.batch_id')
+        ->select([
+          'bs.batch_id',
+          'bs.product_id',
+          'bs.warehouse_id',
+          'bs.on_hand',
+          'b.import_date',
+          'b.quantity as batch_quantity',
+          'b.import_price_vnd',
+          'b.code',
+        ])
+        ->where('bs.product_id', $pid)
+        ->where('bs.warehouse_id', $wid)
+        ->orderBy('b.import_date')
+        ->lockForUpdate()
+        ->get();
+
+      if ($batchRows->isEmpty()) {
+        $name = $item->product_title_snapshot
+          ?? $item->product->title
+          ?? (string) $item->product_id;
+
+        throw new \RuntimeException(
+          'Không tìm thấy lô hàng cho sản phẩm: ' . $name
+        );
+      }
+
+      foreach ($batchRows as $row) {
+        if ($need <= 0) {
+          break;
+        }
+
+        $available = (int) $row->on_hand;
+        if ($available <= 0) {
+          continue;
+        }
+
+        $take = $need > $available ? $available : $need;
+        OrderBatch::create([
+          'order_item_id' => $item->id,
+          'batch_id'      => $row->batch_id,
+          'quantity'      => $take,
+          'unit_cost_vnd' => (int) $row->import_price_vnd,
+        ]);
+        DB::table('batch_stocks')
+          ->where('product_id', $pid)
+          ->where('warehouse_id', $wid)
+          ->where('batch_id', $row->batch_id)
+          ->update([
+            'on_hand' => $available - $take,
+          ]);
+
+        $need -= $take;
+      }
+
+      if ($need > 0) {
+        $name = $item->product_title_snapshot
+          ?? $item->product->title
+          ?? (string) $item->product_id;
+
+        throw new \RuntimeException(
+          'Không đủ lô hàng để phân bổ cho sản phẩm: ' . $name . ' (thiếu ' . $need . ').'
+        );
+      }
+      $stockRow = DB::table('stocks')
+        ->where('product_id', $item->product_id)
+        ->where('warehouse_id', $item->warehouse_id)
+        ->lockForUpdate()
+        ->first();
+
+      if (!$stockRow || (int) $stockRow->on_hand < $qty) {
+        $name = $item->product_title_snapshot
+          ?? $item->product->title
+          ?? (string) $item->product_id;
+
+        throw new \RuntimeException(
+          'Sản phẩm "' . $name . '" không đủ tồn kho tổng (cần ' . $qty . ').'
+        );
+      }
+
+      DB::table('stocks')
+        ->where('product_id', $item->product_id)
+        ->where('warehouse_id', $item->warehouse_id)
+        ->update([
+          'on_hand' => DB::raw('on_hand - ' . $qty),
+        ]);
+    }
   }
 
   public function assignShipper(Request $request, string $orderId): RedirectResponse|JsonResponse
@@ -215,7 +367,6 @@ class WarehousePageController extends Controller
 
     return back()->with('toast_success', 'Cập nhật đơn vị vận chuyển thành công.');
   }
-
 
   public function inventory(Request $r): View
   {

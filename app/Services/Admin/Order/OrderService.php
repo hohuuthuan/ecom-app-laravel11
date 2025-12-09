@@ -197,68 +197,112 @@ class OrderService
       $stockMap[$pid][$wid] = (int) $row->on_hand;
     }
 
-    // ========= PHÂN BỔ LÔ: tính theo batch_stocks + batches =========
+    // ========= PHÂN BỔ LÔ =========
     $itemBatches = [];
+    $itemIds = $items->pluck('id')->all();
 
-    foreach ($items as $item) {
-      $pid  = (string) $item->product_id;
-      $wid  = (string) $item->warehouse_id;
-      $need = (int) $item->quantity;
+    // Nếu đã có dữ liệu trong order_batches thì dùng luôn, không tính lại từ batch_stocks
+    $hasOrderBatches = DB::table('order_batches')
+      ->whereIn('order_item_id', $itemIds)
+      ->exists();
 
-      if ($need <= 0) {
-        $itemBatches[(string) $item->id] = [];
-        continue;
-      }
-
-      $batchRows = DB::table('batch_stocks as bs')
-        ->join('batches as b', 'b.id', '=', 'bs.batch_id')
+    if ($hasOrderBatches) {
+      $batchRows = DB::table('order_batches as ob')
+        ->join('batches as b', 'b.id', '=', 'ob.batch_id')
         ->select([
-          'bs.batch_id',
-          'bs.on_hand',
+          'ob.order_item_id',
+          'ob.batch_id',
+          'ob.quantity',
+          'ob.unit_cost_vnd',
           'b.import_date',
           'b.quantity as batch_quantity',
-          'b.import_price_vnd',
           'b.code',
         ])
-        ->where('bs.product_id', $pid)
-        ->where('bs.warehouse_id', $wid)
+        ->whereIn('ob.order_item_id', $itemIds)
         ->orderBy('b.import_date')
         ->get();
 
-      if ($batchRows->isEmpty()) {
-        $itemBatches[(string) $item->id] = [];
-        continue;
-      }
-
-      $allocations = [];
-
       foreach ($batchRows as $row) {
-        if ($need <= 0) {
-          break;
+        $itemId = (string) $row->order_item_id;
+
+        if (!isset($itemBatches[$itemId])) {
+          $itemBatches[$itemId] = [];
         }
 
-        $available = (int) $row->on_hand;
+        $itemBatches[$itemId][] = [
+          'batch_id'           => (string) $row->batch_id,
+          'import_date'        => $row->import_date,
+          'quantity_allocated' => (int) $row->quantity,
+          'unit_cost_vnd'      => (int) $row->unit_cost_vnd,
+          'batch_quantity'     => (int) $row->batch_quantity,
+          // Đã trừ tồn thật rồi, nếu cần "còn lại" có thể join thêm batch_stocks,
+          // tạm thời để null để view không hiển thị phần "Còn lại"
+          'batch_available'    => null,
+          'code'               => (string) ($row->code ?? ''),
+        ];
+      }
+    } else {
+      // Chưa có order_batches => tính phân bổ dự kiến theo batch_stocks + batches
+      foreach ($items as $item) {
+        $pid  = (string) $item->product_id;
+        $wid  = (string) $item->warehouse_id;
+        $need = (int) $item->quantity;
 
-        if ($available <= 0) {
+        if ($need <= 0) {
+          $itemBatches[(string) $item->id] = [];
           continue;
         }
 
-        $take = $need > $available ? $available : $need;
+        $batchRows = DB::table('batch_stocks as bs')
+          ->join('batches as b', 'b.id', '=', 'bs.batch_id')
+          ->select([
+            'bs.batch_id',
+            'bs.on_hand',
+            'b.import_date',
+            'b.quantity as batch_quantity',
+            'b.import_price_vnd',
+            'b.code',
+          ])
+          ->where('bs.product_id', $pid)
+          ->where('bs.warehouse_id', $wid)
+          ->orderBy('b.import_date')
+          ->get();
 
-        $allocations[] = [
-          'batch_id'           => (string) $row->batch_id,
-          'import_date'        => $row->import_date,
-          'quantity_allocated' => $take,
-          'unit_cost_vnd'      => (int) $row->import_price_vnd,
-          'batch_quantity'     => (int) $row->batch_quantity,
-          'batch_available'    => $available - $take,
-          'code'               => (string) ($row->code ?? ''),
-        ];
+        if ($batchRows->isEmpty()) {
+          $itemBatches[(string) $item->id] = [];
+          continue;
+        }
 
-        $need -= $take;
+        $allocations = [];
+
+        foreach ($batchRows as $row) {
+          if ($need <= 0) {
+            break;
+          }
+
+          $available = (int) $row->on_hand;
+
+          if ($available <= 0) {
+            continue;
+          }
+
+          $take = $need > $available ? $available : $need;
+
+          $allocations[] = [
+            'batch_id'           => (string) $row->batch_id,
+            'import_date'        => $row->import_date,
+            'quantity_allocated' => $take,
+            'unit_cost_vnd'      => (int) $row->import_price_vnd,
+            'batch_quantity'     => (int) $row->batch_quantity,
+            'batch_available'    => $available - $take,
+            'code'               => (string) ($row->code ?? ''),
+          ];
+
+          $need -= $take;
+        }
+
+        $itemBatches[(string) $item->id] = $allocations;
       }
-
-      $itemBatches[(string) $item->id] = $allocations;
     }
 
     // ========= Lấy danh sách user có 1 trong các role: Admin, Warehouse Manager, Shipper =========
@@ -271,118 +315,4 @@ class OrderService
 
     return [$order, $stockMap, $itemBatches, $shippers];
   }
-
-  // public function getWarehouseOrderDetail(string $orderId): array
-  // {
-  //   $order = Order::with([
-  //     'user',
-  //     'items.product',
-  //     'shipment',
-  //     'discount',
-  //     'statusHistories' => function ($query) {
-  //       $query->orderBy('created_at', 'desc');
-  //     },
-  //   ])->findOrFail($orderId);
-
-  //   $items = $order->items;
-
-  //   if ($items->isEmpty()) {
-  //     return [$order, [], []];
-  //   }
-
-  //   $productIds   = $items->pluck('product_id')->unique()->values()->all();
-  //   $warehouseIds = $items->pluck('warehouse_id')->unique()->values()->all();
-
-  //   // ========= TỒN KHO: đọc từ bảng stocks =========
-  //   // Không dùng reserved nữa, chỉ hiển thị on_hand hiện tại
-  //   $stocks = DB::table('stocks')
-  //     ->select(['product_id', 'warehouse_id', 'on_hand'])
-  //     ->whereIn('product_id', $productIds)
-  //     ->whereIn('warehouse_id', $warehouseIds)
-  //     ->get();
-
-  //   // $stockMap[product_id][warehouse_id] = on_hand
-  //   $stockMap = [];
-  //   foreach ($stocks as $row) {
-  //     $pid = (string) $row->product_id;
-  //     $wid = (string) $row->warehouse_id;
-
-  //     if (!isset($stockMap[$pid])) {
-  //       $stockMap[$pid] = [];
-  //     }
-
-  //     $stockMap[$pid][$wid] = (int) $row->on_hand;
-  //   }
-
-  //   // ========= PHÂN BỔ LÔ: tính theo batch_stocks + batches (không dùng order_batches) =========
-  //   // $itemBatches[order_item_id] = [...]
-  //   $itemBatches = [];
-
-  //   foreach ($items as $item) {
-  //     $pid  = (string) $item->product_id;
-  //     $wid  = (string) $item->warehouse_id;
-  //     $need = (int) $item->quantity;
-
-  //     if ($need <= 0) {
-  //       $itemBatches[(string) $item->id] = [];
-  //       continue;
-  //     }
-
-  //     // Lấy tất cả lô của sản phẩm này trong kho này, sắp theo ngày nhập
-  //     $batchRows = DB::table('batch_stocks as bs')
-  //       ->join('batches as b', 'b.id', '=', 'bs.batch_id')
-  //       ->select([
-  //         'bs.batch_id',
-  //         'bs.on_hand',
-  //         'b.import_date',
-  //         'b.quantity as batch_quantity',
-  //         'b.import_price_vnd',
-  //         'b.code',
-  //       ])
-  //       ->where('bs.product_id', $pid)
-  //       ->where('bs.warehouse_id', $wid)
-  //       ->orderBy('b.import_date')
-  //       ->get();
-
-  //     if ($batchRows->isEmpty()) {
-  //       $itemBatches[(string) $item->id] = [];
-  //       continue;
-  //     }
-
-  //     $allocations = [];
-
-  //     foreach ($batchRows as $row) {
-  //       if ($need <= 0) {
-  //         break;
-  //       }
-
-  //       $available = (int) $row->on_hand; // không trừ reserved nữa
-
-  //       if ($available <= 0) {
-  //         continue;
-  //       }
-
-  //       $take = $need > $available ? $available : $need;
-
-  //       $allocations[] = [
-  //         'batch_id'           => (string) $row->batch_id,
-  //         'import_date'        => $row->import_date,
-  //         'quantity_allocated' => $take,
-  //         'unit_cost_vnd'      => (int) $row->import_price_vnd,
-  //         'batch_quantity'     => (int) $row->batch_quantity,
-  //         // Còn lại giả lập sau khi xuất cho đơn này
-  //         'batch_available'    => $available - $take,
-  //         'code'               => (string) ($row->code ?? ''),
-  //       ];
-
-  //       $need -= $take;
-  //     }
-
-  //     // Nếu không đủ hàng thì vẫn hiển thị những gì đã "allocate" được,
-  //     // còn phần thiếu kho sẽ phải xử lý sau khi bạn bổ sung nghiệp vụ.
-  //     $itemBatches[(string) $item->id] = $allocations;
-  //   }
-
-  //   return [$order, $stockMap, $itemBatches];
-  // }
 }

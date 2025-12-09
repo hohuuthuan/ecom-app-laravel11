@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\Page\WarehousePageController;
 use App\Http\Controllers\Admin\Page\DiscountPageController;
 use App\Http\Controllers\Admin\Page\ReviewPageController;
 
+use App\Http\Controllers\Admin\DashboardPageController;
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -87,7 +88,7 @@ Route::middleware(['auth'])->group(function () {
   });
 
   Route::prefix('admin')->as('admin.')->middleware('role:Admin')->group(function () {
-    Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
+    Route::get('/dashboard', [DashboardPageController::class, 'index'])->name('dashboard');
 
     Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
     Route::post('/accounts/bulk-update', [AccountController::class, 'bulkUpdate'])->name('accounts.bulk-update');

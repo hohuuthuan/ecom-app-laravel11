@@ -13,3 +13,4 @@
 @vite(['resources/css/style-admin.css'])
 @vite(['resources/css/custom.css'])
 @vite(['resources/css/warehouse.css'])
+@vite(['resources/css/admin-dashboard.css'])

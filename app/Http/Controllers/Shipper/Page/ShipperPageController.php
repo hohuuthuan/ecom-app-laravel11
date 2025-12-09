@@ -119,7 +119,6 @@ class ShipperPageController extends Controller
 
     $order = Order::with(['items'])->findOrFail($id);
 
-    // Chỉ cho phép shipper nội bộ được gán vào đơn này cập nhật
     if (
       strtoupper((string) $order->shipping_type) !== 'INTERNAL'
       || (string) $order->shipper_id !== (string) $shipper->id
@@ -136,7 +135,7 @@ class ShipperPageController extends Controller
     }
 
     try {
-      DB::transaction(function () use ($order, $currentStatus, $newStatus): void {
+      DB::transaction(function () use ($order, $newStatus): void {
         $itemIds = $order->items->pluck('id')->all();
 
         if (
@@ -163,6 +162,7 @@ class ShipperPageController extends Controller
               $pid = (string) $row->product_id;
               $wid = (string) $row->warehouse_id;
               $qty = (int) $row->quantity;
+
               DB::table('batch_stocks')
                 ->where('product_id', $pid)
                 ->where('warehouse_id', $wid)
@@ -174,26 +174,28 @@ class ShipperPageController extends Controller
 
               if (!isset($totalPerStock[$key])) {
                 $totalPerStock[$key] = [
-                  'product_id'  => $pid,
+                  'product_id'   => $pid,
                   'warehouse_id' => $wid,
-                  'qty'         => 0,
+                  'qty'          => 0,
                 ];
               }
 
               $totalPerStock[$key]['qty'] += $qty;
             }
+
             foreach ($totalPerStock as $row) {
               Stock::where('product_id', $row['product_id'])
                 ->where('warehouse_id', $row['warehouse_id'])
                 ->lockForUpdate()
                 ->increment('on_hand', $row['qty']);
             }
+
             DB::table('order_batches')
               ->whereIn('order_item_id', $itemIds)
               ->delete();
           }
         }
-        $order->status = $newStatus;
+
         if (
           $newStatus === 'COMPLETED'
           && strtoupper((string) $order->payment_method) === 'COD'
@@ -202,6 +204,7 @@ class ShipperPageController extends Controller
           $order->payment_status = 'paid';
         }
 
+        $order->status = $newStatus;
         $order->save();
       });
     } catch (\Throwable $e) {

@@ -138,6 +138,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders/detail/{id}', [WarehousePageController::class, 'orderDetail'])->name('order.detail');
     Route::patch('/orders/{id}/status', [WarehousePageController::class, 'changeOrderStatus'])->name('order.changeStatus');
     Route::patch('orders/{order}/shipping', [WarehousePageController::class, 'assignShipper'])->name('order.assignShipper');
+    Route::get('/orders/{id}/print', [WarehousePageController::class, 'ordersPrint'])->name('orders.print');
+    Route::get('/orders/print-multiple', [WarehousePageController::class, 'ordersPrintMultiple'])->name('orders.printMultiple');
 
     Route::get('/inventory', [WarehousePageController::class, 'inventory'])->name('inventory');
 

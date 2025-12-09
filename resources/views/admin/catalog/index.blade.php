@@ -65,7 +65,7 @@
               </select>
             </div>
             <div class="col-md-1 d-grid">
-              <button type="submit" class="btn btn-primary btn-admin">Lọc</button>
+              <button type="submit" class="btn-admin">Lọc</button>
             </div>
             <input type="hidden" name="tab" value="category">
             <input type="hidden" name="per_page_cat" value="{{ request('per_page_cat') }}">
@@ -74,10 +74,11 @@
           {{-- Bulk actions --}}
           <div class="d-flex justify-content-between mb-2">
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-sm btn-danger btn-admin" id="catBtnBulkDelete" disabled>Xoá đã chọn</button>
+              <button type="button" class="btn-admin" id="catBtnBulkDelete" disabled>Xoá đã chọn</button>
             </div>
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiCategoryModal">Thêm danh mục</button>
+              
+              <button type="button" class="btn-admin" data-bs-toggle="modal" data-bs-target="#uiCategoryModal"><i class="fa fa-plus me-1"></i>Thêm danh mục</button>
             </div>
           </div>
 
@@ -180,7 +181,7 @@
               </select>
             </div>
             <div class="col-md-1 d-grid">
-              <button type="submit" class="btn btn-primary btn-admin">Lọc</button>
+              <button type="submit" class="btn-admin">Lọc</button>
             </div>
             <input type="hidden" name="tab" value="author">
             {{-- bảo toàn filter category --}}
@@ -192,10 +193,10 @@
           {{-- Bulk actions --}}
           <div class="d-flex justify-content-between mb-2">
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-sm btn-danger btn-admin" id="authorBtnBulkDelete" disabled>Xoá đã chọn</button>
+              <button type="button" class="btn-admin" id="authorBtnBulkDelete" disabled>Xoá đã chọn</button>
             </div>
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiAuthorModal">Thêm tác giả</button>
+              <button type="button" class="btn-admin" data-bs-toggle="modal" data-bs-target="#uiAuthorModal"><i class="fa fa-plus me-1"></i>Thêm tác giả</button>
             </div>
           </div>
 
@@ -302,7 +303,7 @@
               </select>
             </div>
             <div class="col-md-1 d-grid">
-              <button type="submit" class="btn btn-primary btn-admin">Lọc</button>
+              <button type="submit" class="btn-admin">Lọc</button>
             </div>
             <input type="hidden" name="tab" value="publisher">
             {{-- bảo toàn filter category & author --}}
@@ -318,10 +319,10 @@
           {{-- Bulk actions --}}
           <div class="d-flex justify-content-between mb-2">
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-sm btn-danger btn-admin" id="publisherBtnBulkDelete" disabled>Xoá đã chọn</button>
+              <button type="button" class="btn-admin" id="publisherBtnBulkDelete" disabled>Xoá đã chọn</button>
             </div>
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiPublisherModal">Thêm nhà xuất bản</button>
+              <button type="button" class="btn-admin" data-bs-toggle="modal" data-bs-target="#uiPublisherModal"><i class="fa fa-plus me-1"></i>Thêm nhà xuất bản</button>
             </div>
           </div>
 

@@ -41,4 +41,10 @@ return [
         'redirect'      => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'openai' => [
+        'key'          => env('OPENAI_API_KEY'),
+        'chat_model'   => env('OPENAI_MODEL_CHAT', 'gpt-4.1-mini'),
+        'intent_model' => env('OPENAI_MODEL_INTENT', 'gpt-4o-mini'),
+    ],
+
 ];

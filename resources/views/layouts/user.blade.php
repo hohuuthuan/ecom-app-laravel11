@@ -10,5 +10,6 @@
   @include('partials.user.header')
     @yield('content')
   @include('partials.user.footer')
+  @include('partials.user.chatbox')
   @include('partials.user.script')
 @endsection

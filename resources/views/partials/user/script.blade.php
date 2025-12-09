@@ -3,4 +3,5 @@
 @vite(['resources/js/pages/select2-setup.js'])
 @vite(['resources/js/pages/home.js'])
 @vite(['resources/js/pages/cart.js'])
+@vite(['resources/js/pages/chat-box.js'])
 @stack('scripts')

@@ -46,7 +46,7 @@
             </div>
             <div class="col-md-2">
               <label class="d-block mb-1">&nbsp;</label>
-              <button type="submit" class="btn btn-primary btn-admin btn-submit-filter-admin-order">
+              <button type="submit" class="btn-admin">
                 <i class="fa fa-search me-1"></i> Tìm kiếm
               </button>
             </div>

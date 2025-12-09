@@ -54,7 +54,7 @@
             </div>
             <div class="col-md-2">
               <label class="d-block mb-1">&nbsp;</label>
-              <button type="submit" class="btn btn-primary btn-admin">
+              <button type="submit" class="btn-admin">
                 <i class="fa fa-search me-1"></i> Tìm kiếm
               </button>
             </div>
@@ -109,7 +109,7 @@
         <div class="d-flex gap-2">
           <button
             type="button"
-            class="btn btn-primary"
+            class="btn-admin"
             data-bs-toggle="modal"
             data-bs-target="#discountCreateModal">
             <i class="fa fa-plus me-1"></i> Thêm mã giảm giá
@@ -248,7 +248,7 @@
                       data-value="{{ $discount->value }}"
                       data-min-order="{{ $discount->min_order_value_vnd }}"
                       data-usage-limit="{{ $discount->usage_limit }}"
-                      data-per-user-limit="{{ $discount->per_user_limit }}" {{-- THÊM DÒNG NÀY --}}
+                      data-per-user-limit="{{ $discount->per_user_limit }}"
                       data-start="{{ $discount->start_date ? $discount->start_date->format('Y-m-d\TH:i') : '' }}"
                       data-end="{{ $discount->end_date ? $discount->end_date->format('Y-m-d\TH:i') : '' }}"
                       data-status="{{ $discount->status }}"

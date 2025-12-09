@@ -163,17 +163,19 @@
             <div class="card-body">
               @php
                 $statusLabels = [
-                  'PENDING'   => 'Chờ xử lý',
-                  'CONFIRMED' => 'Đã xác nhận',
-                  'PICKING'   => 'Đang lấy hàng',
-                  'SHIPPED'   => 'Đã gửi đi',
-                  'PROCESSING'=> 'Đang xử lý',
-                  'SHIPPING'  => 'Đang giao hàng',
-                  'DELIVERED' => 'Hoàn thành',
-                  'COMPLETED' => 'Đã hoàn tất',
-                  'CANCELLED' => 'Đã huỷ',
-                  'RETURNED'  => 'Đã trả hàng',
-                ];
+                'PENDING'         => 'Chờ xử lý',
+                'PROCESSING'      => 'Đã tiếp nhận / chuyển kho',
+                'PICKING'         => 'Đang lấy hàng',
+                'SHIPPING'        => 'Đang giao',
+                'COMPLETED'       => 'Hoàn tất',
+                'CANCELLED'       => 'Đã huỷ',
+                'DELIVERY_FAILED' => 'Giao thất bại',
+                'RETURNED'        => 'Đã trả hàng',
+                'CONFIRMED'       => 'Đã xác nhận (cũ)',
+                'SHIPPED'         => 'Đã gửi đi (cũ)',
+                'DELIVERED'       => 'Đã giao (cũ)',
+              ];
+
 
                 $chartLabels = [];
                 $chartValues = [];

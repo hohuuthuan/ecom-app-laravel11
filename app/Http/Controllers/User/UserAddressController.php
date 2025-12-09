@@ -60,7 +60,7 @@ class UserAddressController extends Controller
         ->count();
 
       $cancelledOrders = (clone $ordersBase)
-        ->whereIn('status', ['CANCELLED', 'RETURNED'])
+        ->whereIn('status', ['CANCELLED', 'RETURNED', 'DELIVERY_FAILED'])
         ->count();
 
       $totalSpentVnd = (int) (clone $ordersBase)->sum('grand_total_vnd');
@@ -150,17 +150,25 @@ class UserAddressController extends Controller
       if ($statusGroup === 'processing') {
         $ordersQuery->whereIn('status', [
           'PENDING',
-          'CONFIRMED',
-          'PICKING',
-          'SHIPPED',
           'PROCESSING',
+          'PICKING',
           'SHIPPING',
+          'CONFIRMED',
+          'SHIPPED',
         ]);
       } elseif ($statusGroup === 'completed') {
-        $ordersQuery->whereIn('status', ['DELIVERED', 'COMPLETED']);
+        $ordersQuery->whereIn('status', [
+          'COMPLETED',
+          'DELIVERED',
+        ]);
       } elseif ($statusGroup === 'cancelled') {
-        $ordersQuery->whereIn('status', ['CANCELLED', 'RETURNED']);
+        $ordersQuery->whereIn('status', [
+          'CANCELLED',
+          'RETURNED',
+          'DELIVERY_FAILED',
+        ]);
       }
+
 
       if (!empty($createdFrom)) {
         $fromUtc = Carbon::createFromFormat('Y-m-d', (string) $createdFrom, $tz)

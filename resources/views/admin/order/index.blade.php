@@ -74,13 +74,31 @@
               <label for="status" class="form-label mb-1 label-filter-admin-product">Trạng thái đơn</label>
               <select id="status" name="status" class="form-select setupSelect2">
                 <option value="">-- Tất cả trạng thái --</option>
-                <option value="PENDING" {{ request('status')==='PENDING'?'selected':'' }}>Đơn mới</option>
-                <option value="CONFIRMED" {{ request('status')==='CONFIRMED'?'selected':'' }}>Đã xác nhận</option>
-                <option value="PICKING" {{ request('status')==='PICKING'?'selected':'' }}>Đang lấy hàng</option>
-                <option value="SHIPPED" {{ request('status')==='SHIPPED'?'selected':'' }}>Đã giao cho ĐVVC</option>
-                <option value="DELIVERED" {{ request('status')==='DELIVERED'?'selected':'' }}>Đã giao</option>
-                <option value="CANCELLED" {{ request('status')==='CANCELLED'?'selected':'' }}>Đã hủy</option>
-                <option value="RETURNED" {{ request('status')==='RETURNED'?'selected':'' }}>Hoàn/trả</option>
+
+                <option value="PENDING" @selected(request('status')==='PENDING' )>
+                  Đơn mới
+                </option>
+                <option value="PROCESSING" @selected(request('status')==='PROCESSING' )>
+                  Đã tiếp nhận / chuyển kho
+                </option>
+                <option value="PICKING" @selected(request('status')==='PICKING' )>
+                  Đang lấy hàng
+                </option>
+                <option value="SHIPPING" @selected(request('status')==='SHIPPING' )>
+                  Đang giao / đã giao cho ĐVVC
+                </option>
+                <option value="COMPLETED" @selected(request('status')==='COMPLETED' )>
+                  Hoàn tất
+                </option>
+                <option value="CANCELLED" @selected(request('status')==='CANCELLED' )>
+                  Đã huỷ
+                </option>
+                <option value="DELIVERY_FAILED" @selected(request('status')==='DELIVERY_FAILED' )>
+                  Giao thất bại
+                </option>
+                <option value="RETURNED" @selected(request('status')==='RETURNED' )>
+                  Hoàn / trả hàng
+                </option>
               </select>
             </div>
             <div class="col-md-2">
@@ -140,43 +158,43 @@
                   Chưa thanh toán
                 </span>
                 @else
-                <span class="badge rounded-pill badge-status badge-status--primary">
+                <span class=" badge rounded-pill badge-status badge-status--primary">
                   Không xác định
                 </span>
                 @endif
               </td>
-              
+
               {{-- TRẠNG THÁI ĐƠN HÀNG --}}
               <td>
                 @php($status = strtolower($order->status ?? ''))
 
-                @if($status === 'pending')
+                @if ($status === 'pending')
                 <span class="badge rounded-pill badge-status badge-status--warning">
                   Chờ xử lý
                 </span>
-                @elseif($status === 'confirmed')
+                @elseif (in_array($status, ['processing', 'confirmed'], true))
                 <span class="badge rounded-pill badge-status badge-status--warning">
-                  Đã xác nhận
+                  Đã tiếp nhận / chuyển kho
                 </span>
-                @elseif($status === 'processing')
+                @elseif ($status === 'picking')
                 <span class="badge rounded-pill badge-status badge-status--warning">
-                  Đang xử lý
+                  Đang chuẩn bị hàng
                 </span>
-                @elseif($status === 'shipping')
+                @elseif (in_array($status, ['shipping', 'shipped'], true))
                 <span class="badge rounded-pill badge-status badge-status--warning">
-                  Đang giao
+                  Đang giao / đã giao cho ĐVVC
                 </span>
-                @elseif($status === 'delivered')
-                <span class="badge rounded-pill badge-status badge-status--success">
-                  Đã giao hàng
-                </span>
-                @elseif($status === 'completed')
+                @elseif (in_array($status, ['completed', 'delivered'], true))
                 <span class="badge rounded-pill badge-status badge-status--success">
                   Hoàn tất
                 </span>
-                @elseif($status === 'cancelled')
+                @elseif (in_array($status, ['cancelled', 'delivery_failed'], true))
                 <span class="badge rounded-pill badge-status badge-status--danger">
-                  Đã hủy
+                  Đã huỷ / giao thất bại
+                </span>
+                @elseif ($status === 'returned')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Hoàn / trả hàng
                 </span>
                 @else
                 <span class="badge rounded-pill badge-status badge-status--primary">

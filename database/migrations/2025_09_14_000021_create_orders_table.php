@@ -12,7 +12,7 @@ return new class extends Migration {
       $table->string('code')->unique();
       $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
 
-      $table->string('status', 32)->index();           // pending|confirmed|processing|shipping|delivered|completed|cancelled
+      $table->string('status', 32)->index();           // PENDING|PROCESSING|PICKING|SHIPPING|COMPLETED|CANCELLED|DELIVERY_FAILED|RETURNED
       $table->string('payment_method', 32)->index();   // cod|vnpay|...
       $table->string('payment_status', 32)->index();   // unpaid|paid|...
 

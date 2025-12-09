@@ -77,27 +77,27 @@
               <label for="status" class="form-label mb-1 label-filter-admin-product">Trạng thái đơn</label>
               <select id="status" name="status" class="form-select setupSelect2">
                 <option value="">-- Tất cả trạng thái --</option>
-                {{-- Không có PENDING ở đây --}}
-                {{-- Tùy theo flow kho: 3 bước chính --}}
-                <option value="PROCESSING" {{ request('status') === 'PROCESSING' ? 'selected' : '' }}>
+
+                <option value="PROCESSING" @selected(request('status')==='PROCESSING' )>
                   Đang chờ tiếp nhận
                 </option>
-                <option value="SHIPPING" {{ request('status') === 'SHIPPING' ? 'selected' : '' }}>
+                <option value="PICKING" @selected(request('status')==='PICKING' )>
                   Đang chuẩn bị hàng
                 </option>
-                <option value="DELIVERED" {{ request('status') === 'DELIVERED' ? 'selected' : '' }}>
-                  Đã giao cho đơn vị vận chuyển
+                <option value="SHIPPING" @selected(request('status')==='SHIPPING' )>
+                  Đã giao cho ĐVVC
                 </option>
-
-                {{-- Các trạng thái còn lại giữ nguyên --}}
-                <option value="COMPLETED" {{ request('status') === 'COMPLETED' ? 'selected' : '' }}>
+                <option value="COMPLETED" @selected(request('status')==='COMPLETED' )>
                   Hoàn tất
                 </option>
-                <option value="CANCELLED" {{ request('status') === 'CANCELLED' ? 'selected' : '' }}>
-                  Đã hủy
+                <option value="CANCELLED" @selected(request('status')==='CANCELLED' )>
+                  Đã huỷ
                 </option>
-                <option value="RETURNED" {{ request('status') === 'RETURNED' ? 'selected' : '' }}>
-                  Hoàn/trả
+                <option value="DELIVERY_FAILED" @selected(request('status')==='DELIVERY_FAILED' )>
+                  Giao thất bại
+                </option>
+                <option value="RETURNED" @selected(request('status')==='RETURNED' )>
+                  Hoàn / trả
                 </option>
               </select>
             </div>
@@ -143,93 +143,92 @@
 
           <tbody>
             @forelse($orders as $idx => $order)
-              <tr>
-                <td>
-                  <input type="checkbox" value="{{ $order->id }}">
-                </td>
-                <td>{{ ($orders->firstItem() ?? 0) + $idx }}</td>
-                <td>
-                  <a href="{{ route('warehouse.order.detail', $order->id) }}">
-                    {{ $order->code ?? ('ORD-' . $order->id) }}
-                  </a>
-                </td>
-                <td>
-                  <div>
-                    {{ $order->shipment->name ?? '—' }}
-                    \
-                    {{ $order->shipment->phone ?? $order->shipment->email ?? '—' }}
-                  </div>
-                </td>
+            <tr>
+              <td>
+                <input type="checkbox" value="{{ $order->id }}">
+              </td>
+              <td>{{ ($orders->firstItem() ?? 0) + $idx }}</td>
+              <td>
+                <a href="{{ route('warehouse.order.detail', $order->id) }}">
+                  {{ $order->code ?? ('ORD-' . $order->id) }}
+                </a>
+              </td>
+              <td>
+                <div>
+                  {{ $order->shipment->name ?? '—' }}
+                  \
+                  {{ $order->shipment->phone ?? $order->shipment->email ?? '—' }}
+                </div>
+              </td>
 
-                <td>{{ $order->placed_at?->format('d/m/Y h:i A') }}</td>
+              <td>{{ $order->placed_at?->format('d/m/Y h:i A') }}</td>
 
-                {{-- TRẠNG THÁI THANH TOÁN --}}
-                <td>
-                  @php($payStatus = strtoupper($order->payment_status ?? ''))
+              {{-- TRẠNG THÁI THANH TOÁN --}}
+              <td>
+                @php($payStatus = strtoupper($order->payment_status ?? ''))
 
-                  @if($payStatus === 'PAID')
-                    <span class="badge rounded-pill badge-status badge-status--success">
-                      Đã thanh toán
-                    </span>
-                  @elseif($payStatus === 'UNPAID')
-                    <span class="badge bg-secondary">
-                      Chưa thanh toán
-                    </span>
-                  @else
-                    <span class="badge rounded-pill badge-status badge-status--primary">
-                      Không xác định
-                    </span>
-                  @endif
-                </td>
+                @if($payStatus === 'PAID')
+                <span class="badge rounded-pill badge-status badge-status--success">
+                  Đã thanh toán
+                </span>
+                @elseif($payStatus === 'UNPAID')
+                <span class="badge bg-secondary">
+                  Chưa thanh toán
+                </span>
+                @else
+                <span class="badge rounded-pill badge-status badge-status--primary">
+                  Không xác định
+                </span>
+                @endif
+              </td>
 
-                {{-- TRẠNG THÁI ĐƠN HÀNG --}}
-                <td>
-                  @php($status = strtolower($order->status ?? ''))
+              {{-- TRẠNG THÁI ĐƠN HÀNG --}}
+              <td>
+                @php($status = strtolower($order->status ?? ''))
 
-                  @if($status === 'processing')
-                    <span class="badge rounded-pill badge-status badge-status--warning">
-                      Đang chờ tiếp nhận
-                    </span>
-                  @elseif($status === 'shipping')
-                    <span class="badge rounded-pill badge-status badge-status--warning">
-                      Đang chuẩn bị hàng
-                    </span>
-                  @elseif($status === 'delivered')
-                    <span class="badge rounded-pill badge-status badge-status--success">
-                      Đã giao cho đơn vị vận chuyển
-                    </span>
-                  @elseif($status === 'completed')
-                    <span class="badge rounded-pill badge-status badge-status--success">
-                      Hoàn tất
-                    </span>
-                  @elseif($status === 'cancelled')
-                    <span class="badge rounded-pill badge-status badge-status--danger">
-                      Đã hủy
-                    </span>
-                  @elseif($status === 'returned')
-                    <span class="badge rounded-pill badge-status badge-status--warning">
-                      Hoàn/trả
-                    </span>
-                  @else
-                    {{-- Trường hợp lỡ có trạng thái khác vẫn fallback cho an toàn --}}
-                    <span class="badge rounded-pill badge-status badge-status--primary">
-                      {{ strtoupper($order->status ?? 'Không xác định') }}
-                    </span>
-                  @endif
-                </td>
+                @if ($status === 'processing')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Đang chờ tiếp nhận
+                </span>
+                @elseif ($status === 'picking')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Đang chuẩn bị hàng
+                </span>
+                @elseif (in_array($status, ['shipping', 'shipped'], true))
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Đã giao cho ĐVVC
+                </span>
+                @elseif (in_array($status, ['completed', 'delivered'], true))
+                <span class="badge rounded-pill badge-status badge-status--success">
+                  Hoàn tất
+                </span>
+                @elseif (in_array($status, ['cancelled', 'delivery_failed'], true))
+                <span class="badge rounded-pill badge-status badge-status--danger">
+                  Đã huỷ / giao thất bại
+                </span>
+                @elseif ($status === 'returned')
+                <span class="badge rounded-pill badge-status badge-status--warning">
+                  Hoàn / trả hàng
+                </span>
+                @else
+                <span class="badge rounded-pill badge-status badge-status--primary">
+                  {{ strtoupper($order->status ?? 'Không xác định') }}
+                </span>
+                @endif
+              </td>
 
-                <td class="text-center">
-                  <a href="{{ route('warehouse.order.detail', $order->id) }}">
-                    <i class="fa fa-eye icon-eye-view-order-detail"></i>
-                  </a>
-                </td>
-              </tr>
+              <td class="text-center">
+                <a href="{{ route('warehouse.order.detail', $order->id) }}">
+                  <i class="fa fa-eye icon-eye-view-order-detail"></i>
+                </a>
+              </td>
+            </tr>
             @empty
-              <tr>
-                <td colspan="8" class="text-center text-muted">
-                  Không có đơn hàng phù hợp.
-                </td>
-              </tr>
+            <tr>
+              <td colspan="8" class="text-center text-muted">
+                Không có đơn hàng phù hợp.
+              </td>
+            </tr>
             @endforelse
           </tbody>
         </table>

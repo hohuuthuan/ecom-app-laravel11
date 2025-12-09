@@ -96,14 +96,14 @@
       <div class="warehouse-dashboard-recentActivities warehouse-card card">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="card-title fw-semibold mb-0">Hoạt Động Nhập Kho Gần Đây</h4>
+            <h4 class="card-title fw-semibold mb-0">Hoạt động gần đây</h4>
             <!-- <a href="{{ route('warehouse.purchase_receipts.index') }}" class="small text-decoration-none">
               Xem tất cả
             </a> -->
           </div>
 
           @if($recentActivities->count() === 0)
-          <p class="text-muted mb-0">Chưa có hoạt động nào trong ngày hôm nay.</p>
+          <p class="text-muted mb-0">Chưa có hoạt động nào trong ngày hôm nay</p>
           @else
           <div class="d-flex flex-column gap-3">
             @foreach($recentActivities as $activity)
@@ -137,7 +137,7 @@
     <div class="col-lg-5">
       <div class="warehouse-dashboard-quick-action warehouse-card card">
         <div class="card-body">
-          <h4 class="card-title fw-semibold mb-3">Thao Tác Nhanh</h4>
+          <h4 class="card-title fw-semibold mb-3">Thao tác nhanh</h4>
           <div class="list-group list-group-flush">
             <a href="{{ route('warehouse.import') }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
               <div>

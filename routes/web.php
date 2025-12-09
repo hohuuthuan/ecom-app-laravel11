@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AiChatController;
 
 use App\Http\Controllers\User\Page\HomePageController;
 use App\Http\Controllers\User\HomeController;
@@ -39,6 +40,9 @@ Route::get('/cart/count', [HomePageController::class, 'countProductInCart'])->na
 Route::delete('/cart/clear', [HomePageController::class, 'clearCart'])->name('cart.clear');
 Route::get('/thank-you', [HomePageController::class, 'thanks'])->name('user.thanks');
 Route::get('/recently-viewed-products', [HomePageController::class, 'recentlyViewedPage'])->name('recentlyViewed');
+
+// === AI CHAT BOX ===
+Route::post('/chat-ai', [AiChatController::class, 'handle'])->name('chat.ai');
 
 // === GUEST ===
 Route::middleware('guest')->group(function () {

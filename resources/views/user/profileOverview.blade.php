@@ -196,32 +196,37 @@ $headerTitle = $headerTitles[$activeTab] ?? 'HỒ SƠ CỦA BẠN';
                             </form>
                         </div>
 
-                        {{-- Nút lọc trạng thái + khoảng thời gian --}}
                         <div class="orders-filter-bar">
                             <div class="orders-filter">
                                 <button
                                     type="button"
-                                    class="orders-filter-btn {{ empty($statusGroup) ? 'active' : '' }}"
+                                    class="orders-filter-btn {{ ($statusGroup ?? '') === '' ? 'active' : '' }}"
                                     data-status-group="">
                                     Tất cả
                                 </button>
+
+                                {{-- Nhóm các trạng thái: PENDING, PROCESSING, PICKING, SHIPPING --}}
                                 <button
                                     type="button"
                                     class="orders-filter-btn {{ ($statusGroup ?? '') === 'processing' ? 'active' : '' }}"
                                     data-status-group="processing">
-                                    Đang xử lý
+                                    Đang xử lý (chờ / tiếp nhận / chuẩn bị / giao vận)
                                 </button>
+
+                                {{-- COMPLETED --}}
                                 <button
                                     type="button"
                                     class="orders-filter-btn {{ ($statusGroup ?? '') === 'completed' ? 'active' : '' }}"
                                     data-status-group="completed">
-                                    Hoàn thành
+                                    Hoàn tất đơn hàng
                                 </button>
+
+                                {{-- CANCELLED, RETURNED, DELIVERY_FAILED --}}
                                 <button
                                     type="button"
                                     class="orders-filter-btn {{ ($statusGroup ?? '') === 'cancelled' ? 'active' : '' }}"
                                     data-status-group="cancelled">
-                                    Đã hủy / Hoàn
+                                    Đã hủy / Hoàn / Giao thất bại
                                 </button>
                             </div>
 
@@ -255,7 +260,7 @@ $headerTitle = $headerTitles[$activeTab] ?? 'HỒ SƠ CỦA BẠN';
                             </div>
                         </div>
 
-                        {{-- Wrapper để JS replace bằng HTML partial --}}
+
                         <div
                             id="ordersAjaxWrapper"
                             data-orders-container

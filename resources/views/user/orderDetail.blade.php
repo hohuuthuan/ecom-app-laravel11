@@ -79,19 +79,30 @@
 
               <div class="col-md-6">
                 @php
-                $status = $order->status;
+                $statusRaw = strtoupper((string) $order->status);
                 $statusLabel = 'Không xác định';
                 $badgeClass = 'badge-status-pending';
 
-                if (in_array($status, ['pending','confirmed','picking','shipped'], true)) {
-                $statusLabel = 'Đang xử lý';
-                $badgeClass = 'badge-status-pending';
-                } elseif ($status === 'delivered') {
-                $statusLabel = 'Hoàn thành';
-                $badgeClass = 'badge-status-success';
-                } elseif (in_array($status, ['cancelled','returned'], true)) {
-                $statusLabel = 'Đã hủy';
-                $badgeClass = 'badge-status-cancel';
+                if (in_array($statusRaw, ['PENDING', 'PROCESSING', 'PICKING', 'SHIPPING'], true)) {
+                  $statusLabel = match ($statusRaw) {
+                    'PENDING'    => 'Chờ xử lý',
+                    'PROCESSING' => 'Tiếp nhận đơn, chuyển đơn sang đơn vị kho',
+                    'PICKING'    => 'Đang chuẩn bị hàng',
+                    'SHIPPING'   => 'Đã giao cho đơn vị vận chuyển',
+                    default      => 'Đang xử lý',
+                  };
+                  $badgeClass = 'badge-status-pending';
+                } elseif (in_array($statusRaw, ['COMPLETED', 'DELIVERED'], true)) {
+                  $statusLabel = 'Hoàn tất đơn hàng';
+                  $badgeClass = 'badge-status-success';
+                } elseif (in_array($statusRaw, ['CANCELLED', 'DELIVERY_FAILED', 'RETURNED'], true)) {
+                  $statusLabel = match ($statusRaw) {
+                    'CANCELLED'       => 'Đã hủy đơn',
+                    'DELIVERY_FAILED' => 'Giao hàng thất bại',
+                    'RETURNED'        => 'Hoàn / trả hàng',
+                    default           => 'Đã hủy / giao thất bại',
+                  };
+                  $badgeClass = 'badge-status-cancel';
                 }
                 @endphp
                 <div class="checkout-inline-item">
@@ -112,12 +123,12 @@
                   <span class="checkout-inline-value">
                     {{ $order->shipment->address }}
                     @if($order->shipment->ward || $order->shipment->province)
-                    , {{ optional($order->shipment->ward)->name }},
-                    {{ optional($order->shipment->province)->name }}
+                      , {{ optional($order->shipment->ward)->name }},
+                      {{ optional($order->shipment->province)->name }}
                     @endif
                     @if(!empty($order->shipment->note))
-                    <br>
-                    <small class="text-muted">Ghi chú: {{ $order->shipment->note }}</small>
+                      <br>
+                      <small class="text-muted">Ghi chú: {{ $order->shipment->note }}</small>
                     @endif
                   </span>
                 </div>
@@ -149,45 +160,45 @@
 
           <div id="orderItemsList">
             @forelse($order->items as $item)
-            @php
-            $product = $item->product;
-            $imgPath = $product && $product->image
-            ? asset('storage/products/' . $product->image)
-            : asset('images/placeholder-120x160.svg');
+              @php
+              $product = $item->product;
+              $imgPath = $product && $product->image
+                ? asset('storage/products/' . $product->image)
+                : asset('images/placeholder-120x160.svg');
 
-            $qty = (int) ($item->quantity ?? 0);
-            $unitPrice = (int) ($item->unit_price_vnd ?? $item->unit_price ?? 0);
-            $lineTotal = (int) ($item->line_total_vnd ?? $item->total_price_vnd ?? ($qty * $unitPrice));
-            @endphp
+              $qty = (int) ($item->quantity ?? 0);
+              $unitPrice = (int) ($item->unit_price_vnd ?? $item->unit_price ?? 0);
+              $lineTotal = (int) ($item->line_total_vnd ?? $item->total_price_vnd ?? ($qty * $unitPrice));
+              @endphp
 
-            <div class="checkout-item">
-              <img
-                src="{{ $imgPath }}"
-                alt="{{ $product->title ?? 'Sản phẩm' }}"
-                class="checkout-item-image">
-              <div class="checkout-item-details">
-                <div class="checkout-item-title">
-                  @if($product)
-                  <a
-                    href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
-                    class="text-decoration-none text-body">
-                    {{ $product->title }}
-                  </a>
-                  @else
-                  {{ $item->product_name ?? 'Sản phẩm đã bị xóa' }}
-                  @endif
+              <div class="checkout-item">
+                <img
+                  src="{{ $imgPath }}"
+                  alt="{{ $product->title ?? 'Sản phẩm' }}"
+                  class="checkout-item-image">
+                <div class="checkout-item-details">
+                  <div class="checkout-item-title">
+                    @if($product)
+                      <a
+                        href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
+                        class="text-decoration-none text-body">
+                        {{ $product->title }}
+                      </a>
+                    @else
+                      {{ $item->product_name ?? 'Sản phẩm đã bị xóa' }}
+                    @endif
+                  </div>
+                  <div class="checkout-item-quantity">
+                    Số lượng: {{ $qty }}
+                    × {{ number_format($unitPrice, 0, ',', '.') }}VNĐ
+                  </div>
                 </div>
-                <div class="checkout-item-quantity">
-                  Số lượng: {{ $qty }}
-                  × {{ number_format($unitPrice, 0, ',', '.') }}VNĐ
+                <div class="checkout-item-price">
+                  {{ number_format($lineTotal, 0, ',', '.') }}VNĐ
                 </div>
               </div>
-              <div class="checkout-item-price">
-                {{ number_format($lineTotal, 0, ',', '.') }}VNĐ
-              </div>
-            </div>
             @empty
-            <p class="text-muted mb-0">Đơn hàng này không có sản phẩm nào.</p>
+              <p class="text-muted mb-0">Đơn hàng này không có sản phẩm nào.</p>
             @endforelse
           </div>
         </div>
@@ -240,25 +251,27 @@
                   $methodLabel = 'COD - Thanh toán khi nhận hàng';
 
                   if ($method === 'momo') {
-                  $methodLabel = 'Ví MoMo';
+                    $methodLabel = 'Ví MoMo';
                   } elseif ($method === 'vnpay') {
-                  $methodLabel = 'VNPAY';
+                    $methodLabel = 'VNPAY';
                   }
-                  $canReorder = ($status === 'delivered');
+
+                  $canReorder = in_array(strtoupper((string) $order->status), ['DELIVERED', 'COMPLETED'], true);
                   @endphp
                   {{ $methodLabel }}
                 </div>
                 <div class="payment-option-desc">
                   @if($order->payment_status === 'paid')
-                  Trạng thái thanh toán: Đã thanh toán
+                    Trạng thái thanh toán: Đã thanh toán
                   @else
-                  Trạng thái thanh toán: Chưa thanh toán
+                    Trạng thái thanh toán: Chưa thanh toán
                   @endif
                 </div>
               </div>
             </div>
           </div>
         </div>
+
         @if($canReorder)
           <form
             method="POST"

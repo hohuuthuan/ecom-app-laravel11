@@ -72,7 +72,7 @@
               </select>
             </div>
             <div class="col-md-1 d-grid">
-              <button type="submit" class="btn btn-primary btn-admin">Lọc</button>
+              <button type="submit" class="btn-admin">Lọc</button>
             </div>
           </form>
 
@@ -84,7 +84,7 @@
                 <option value="ACTIVE">Kích hoạt</option>
                 <option value="BAN">Khoá</option>
               </select>
-              <button type="button" class="btn btn-sm btn-primary btn-admin" id="btnBulkOpen">Cập nhật</button>
+              <button type="button" class="btn-admin" id="btnBulkOpen">Cập nhật</button>
             </div>
           </div>
 

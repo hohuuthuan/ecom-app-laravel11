@@ -45,7 +45,7 @@
               <input id="keyword" type="text" name="keyword" class="form-control" placeholder="Tìm tên / ISBN / slug" value="{{ request('keyword') }}">
             </div>
             <div class="col-md-2">
-              <button type="submit" class="btn btn-primary btn-admin btn-submit-filter-admin-product"><i class="fa fa-search me-1"></i> Tìm kiếm</button>
+              <button type="submit" class="btn-admin btn-submit-filter-admin-product"><i class="fa fa-search me-1"></i> Tìm kiếm</button>
             </div>
           </div>
 
@@ -124,7 +124,7 @@
 
         </div>
         <div class="d-flex gap-2">
-          <a href="{{ route('admin.product.create') }}"><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uiProductModal">Thêm sản phẩm</button></a>
+          <a href="{{ route('admin.product.create') }}"><button type="button" class="btn-admin" data-bs-toggle="modal" data-bs-target="#uiProductModal"><i class="fa fa-plus me-1"></i>Thêm sản phẩm</button></a>
         </div>
       </div>
 

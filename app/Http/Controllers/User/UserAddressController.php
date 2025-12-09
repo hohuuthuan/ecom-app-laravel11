@@ -53,30 +53,38 @@ class UserAddressController extends Controller
       // ================== THỐNG KÊ TỔNG QUAN ==================
       $ordersBase = Order::where('user_id', $user->id);
 
+      // Chỉ những đơn đã hoàn tất + đã thanh toán
+      $completedPaidBase = (clone $ordersBase)
+        ->whereIn('status', ['DELIVERED', 'COMPLETED'])
+        ->where('payment_status', 'paid');
+
+      // Tổng số đơn (mọi trạng thái)
       $totalOrders = (clone $ordersBase)->count();
 
-      $deliveredOrders = (clone $ordersBase)
-        ->whereIn('status', ['DELIVERED', 'COMPLETED'])
-        ->count();
+      // Đơn hoàn thành (và đã thanh toán)
+      $deliveredOrders = (clone $completedPaidBase)->count();
 
       $cancelledOrders = (clone $ordersBase)
         ->whereIn('status', ['CANCELLED', 'RETURNED', 'DELIVERY_FAILED'])
         ->count();
 
-      $totalSpentVnd = (int) (clone $ordersBase)->sum('grand_total_vnd');
+      // Tổng tiền chi tiêu: chỉ tính đơn hoàn tất + đã thanh toán
+      $totalSpentVnd = (int) (clone $completedPaidBase)->sum('grand_total_vnd');
 
-      $avgOrderValueVnd = $totalOrders > 0
-        ? (int) round($totalSpentVnd / $totalOrders)
+      $avgOrderValueVnd = $deliveredOrders > 0
+        ? (int) round($totalSpentVnd / $deliveredOrders)
         : 0;
 
       $recentFrom = now()->subDays(30);
 
-      $recentOrdersQuery = (clone $ordersBase)->where('placed_at', '>=', $recentFrom);
+      // Đơn hoàn tất + đã thanh toán trong 30 ngày gần đây
+      $recentOrdersQuery = (clone $completedPaidBase)
+        ->where('placed_at', '>=', $recentFrom);
 
       $recentOrdersCount = (clone $recentOrdersQuery)->count();
       $recentSpentVnd    = (int) (clone $recentOrdersQuery)->sum('grand_total_vnd');
 
-      // Đếm số đơn theo status
+      // Đếm số đơn theo status (giữ nguyên: thống kê toàn bộ trạng thái)
       $rawStatusCounts = (clone $ordersBase)
         ->selectRaw('UPPER(status) as status, COUNT(*) as total')
         ->groupBy('status')
@@ -88,19 +96,21 @@ class UserAddressController extends Controller
         $statusCounts[strtoupper($status)] = (int) $total;
       }
 
+      // TOP sản phẩm: chỉ tính đơn hoàn tất + đã thanh toán
       $topProductsRows = OrderItem::query()
         ->join('orders', 'orders.id', '=', 'order_items.order_id')
         ->join('products', 'products.id', '=', 'order_items.product_id')
         ->where('orders.user_id', $user->id)
         ->whereIn('orders.status', ['DELIVERED', 'COMPLETED'])
+        ->where('orders.payment_status', 'paid')
         ->groupBy('order_items.product_id', 'products.title', 'products.slug')
         ->selectRaw('
-              order_items.product_id,
-              products.title,
-              products.slug,
-              SUM(order_items.quantity) as total_qty,
-              MAX(orders.placed_at) as last_order_at
-          ')
+          order_items.product_id,
+          products.title,
+          products.slug,
+          SUM(order_items.quantity) as total_qty,
+          MAX(orders.placed_at) as last_order_at
+      ')
         ->orderByDesc('total_qty')
         ->limit(5)
         ->get();
@@ -168,7 +178,6 @@ class UserAddressController extends Controller
           'DELIVERY_FAILED',
         ]);
       }
-
 
       if (!empty($createdFrom)) {
         $fromUtc = Carbon::createFromFormat('Y-m-d', (string) $createdFrom, $tz)
@@ -267,6 +276,7 @@ class UserAddressController extends Controller
       return back()->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
     }
   }
+
 
   public function updateInfo(UpdateProfileRequest $request): RedirectResponse
   {

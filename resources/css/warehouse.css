@@ -255,6 +255,7 @@ body.warehouse-page .slide-down {
 }
 
 @media (max-width: 991.98px) {
+
   .warehouse-sidebar,
   .shipper-sidebar {
     position: static;
@@ -617,4 +618,75 @@ body.warehouse-page .slide-down {
   #warehouse-inventory .inventory-alert-title {
     white-space: normal;
   }
+}
+
+
+.warehouse-order-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.warehouse-action-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease,
+    opacity 0.15s ease;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.15);
+  color: #ffffff;
+}
+
+.warehouse-action-btn i {
+  pointer-events: none;
+}
+
+.warehouse-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.25);
+  opacity: 0.95;
+}
+
+.warehouse-action-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+  opacity: 0.9;
+}
+
+.warehouse-action-btn-view {
+  background-color: #0d6efd;
+}
+
+.warehouse-action-btn-view:hover {
+  background-color: #0b5ed7;
+}
+
+.warehouse-action-btn-print {
+  background-color: #16a34a;
+}
+
+.warehouse-action-btn-print:hover {
+  background-color: #15803d;
+}
+
+.warehouse-order-row-selected {
+  --bs-table-bg: #F0E9D7;
+  --bs-table-accent-bg: #F0E9D7;
+}
+
+.warehouse-order-row-selected > td,
+.warehouse-order-row-selected > th {
+  background-color: #F0E9D7 !important;
 }

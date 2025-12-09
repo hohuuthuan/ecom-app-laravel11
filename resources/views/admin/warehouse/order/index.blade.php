@@ -78,25 +78,25 @@
               <select id="status" name="status" class="form-select setupSelect2">
                 <option value="">-- Tất cả trạng thái --</option>
 
-                <option value="PROCESSING" @selected(request('status')==='PROCESSING' )>
+                <option value="PROCESSING" @selected(request('status')==='PROCESSING')>
                   Đang chờ tiếp nhận
                 </option>
-                <option value="PICKING" @selected(request('status')==='PICKING' )>
+                <option value="PICKING" @selected(request('status')==='PICKING')>
                   Đang chuẩn bị hàng
                 </option>
-                <option value="SHIPPING" @selected(request('status')==='SHIPPING' )>
+                <option value="SHIPPING" @selected(request('status')==='SHIPPING')>
                   Đã giao cho ĐVVC
                 </option>
-                <option value="COMPLETED" @selected(request('status')==='COMPLETED' )>
+                <option value="COMPLETED" @selected(request('status')==='COMPLETED')>
                   Hoàn tất
                 </option>
-                <option value="CANCELLED" @selected(request('status')==='CANCELLED' )>
+                <option value="CANCELLED" @selected(request('status')==='CANCELLED')>
                   Đã huỷ
                 </option>
-                <option value="DELIVERY_FAILED" @selected(request('status')==='DELIVERY_FAILED' )>
+                <option value="DELIVERY_FAILED" @selected(request('status')==='DELIVERY_FAILED')>
                   Giao thất bại
                 </option>
-                <option value="RETURNED" @selected(request('status')==='RETURNED' )>
+                <option value="RETURNED" @selected(request('status')==='RETURNED')>
                   Hoàn / trả
                 </option>
               </select>
@@ -124,6 +124,18 @@
         </div>
       </form>
 
+      {{-- Thanh công cụ phía trên bảng --}}
+      <div class="d-flex justify-content-end mb-2">
+        <button
+          type="button"
+          class="btn btn-sm btn-success d-flex align-items-center"
+          id="btnPrintSelectedOrders"
+          disabled>
+          <i class="bi bi-printer-fill me-1"></i>
+          <span>In đơn đã chọn</span>
+        </button>
+      </div>
+
       <div class="table-responsive">
         <table id="warehouseOrderTable" class="table table-bordered table-striped align-middle">
           <thead class="table-light">
@@ -143,92 +155,110 @@
 
           <tbody>
             @forelse($orders as $idx => $order)
-            <tr>
-              <td>
-                <input type="checkbox" value="{{ $order->id }}">
-              </td>
-              <td>{{ ($orders->firstItem() ?? 0) + $idx }}</td>
-              <td>
-                <a href="{{ route('warehouse.order.detail', $order->id) }}">
-                  {{ $order->code ?? ('ORD-' . $order->id) }}
-                </a>
-              </td>
-              <td>
-                <div>
-                  {{ $order->shipment->name ?? '—' }}
-                  \
-                  {{ $order->shipment->phone ?? $order->shipment->email ?? '—' }}
-                </div>
-              </td>
+              <tr>
+                <td>
+                  <input
+                    type="checkbox"
+                    class="warehouse-order-checkbox"
+                    value="{{ $order->id }}">
+                </td>
+                <td>{{ ($orders->firstItem() ?? 0) + $idx }}</td>
+                <td>
+                  <a href="{{ route('warehouse.order.detail', $order->id) }}">
+                    {{ $order->code ?? ('ORD-' . $order->id) }}
+                  </a>
+                </td>
+                <td>
+                  <div>
+                    {{ $order->shipment->name ?? '—' }}
+                    \
+                    {{ $order->shipment->phone ?? $order->shipment->email ?? '—' }}
+                  </div>
+                </td>
 
-              <td>{{ $order->placed_at?->format('d/m/Y h:i A') }}</td>
+                <td>{{ $order->placed_at?->format('d/m/Y h:i A') }}</td>
 
-              {{-- TRẠNG THÁI THANH TOÁN --}}
-              <td>
-                @php($payStatus = strtoupper($order->payment_status ?? ''))
+                {{-- TRẠNG THÁI THANH TOÁN --}}
+                <td>
+                  @php($payStatus = strtoupper($order->payment_status ?? ''))
 
-                @if($payStatus === 'PAID')
-                <span class="badge rounded-pill badge-status badge-status--success">
-                  Đã thanh toán
-                </span>
-                @elseif($payStatus === 'UNPAID')
-                <span class="badge bg-secondary">
-                  Chưa thanh toán
-                </span>
-                @else
-                <span class="badge rounded-pill badge-status badge-status--primary">
-                  Không xác định
-                </span>
-                @endif
-              </td>
+                  @if($payStatus === 'PAID')
+                    <span class="badge rounded-pill badge-status badge-status--success">
+                      Đã thanh toán
+                    </span>
+                  @elseif($payStatus === 'UNPAID')
+                    <span class="badge bg-secondary">
+                      Chưa thanh toán
+                    </span>
+                  @else
+                    <span class="badge rounded-pill badge-status badge-status--primary">
+                      Không xác định
+                    </span>
+                  @endif
+                </td>
 
-              {{-- TRẠNG THÁI ĐƠN HÀNG --}}
-              <td>
-                @php($status = strtolower($order->status ?? ''))
+                {{-- TRẠNG THÁI ĐƠN HÀNG --}}
+                <td>
+                  @php($status = strtolower($order->status ?? ''))
 
-                @if ($status === 'processing')
-                <span class="badge rounded-pill badge-status badge-status--warning">
-                  Đang chờ tiếp nhận
-                </span>
-                @elseif ($status === 'picking')
-                <span class="badge rounded-pill badge-status badge-status--warning">
-                  Đang chuẩn bị hàng
-                </span>
-                @elseif (in_array($status, ['shipping', 'shipped'], true))
-                <span class="badge rounded-pill badge-status badge-status--warning">
-                  Đã giao cho ĐVVC
-                </span>
-                @elseif (in_array($status, ['completed', 'delivered'], true))
-                <span class="badge rounded-pill badge-status badge-status--success">
-                  Hoàn tất
-                </span>
-                @elseif (in_array($status, ['cancelled', 'delivery_failed'], true))
-                <span class="badge rounded-pill badge-status badge-status--danger">
-                  Đã huỷ / giao thất bại
-                </span>
-                @elseif ($status === 'returned')
-                <span class="badge rounded-pill badge-status badge-status--warning">
-                  Hoàn / trả hàng
-                </span>
-                @else
-                <span class="badge rounded-pill badge-status badge-status--primary">
-                  {{ strtoupper($order->status ?? 'Không xác định') }}
-                </span>
-                @endif
-              </td>
+                  @if ($status === 'processing')
+                    <span class="badge rounded-pill badge-status badge-status--warning">
+                      Đang chờ tiếp nhận
+                    </span>
+                  @elseif ($status === 'picking')
+                    <span class="badge rounded-pill badge-status badge-status--warning">
+                      Đang chuẩn bị hàng
+                    </span>
+                  @elseif (in_array($status, ['shipping', 'shipped'], true))
+                    <span class="badge rounded-pill badge-status badge-status--warning">
+                      Đã giao cho ĐVVC
+                    </span>
+                  @elseif (in_array($status, ['completed', 'delivered'], true))
+                    <span class="badge rounded-pill badge-status badge-status--success">
+                      Hoàn tất
+                    </span>
+                  @elseif (in_array($status, ['cancelled', 'delivery_failed'], true))
+                    <span class="badge rounded-pill badge-status badge-status--danger">
+                      Đã huỷ / giao thất bại
+                    </span>
+                  @elseif ($status === 'returned')
+                    <span class="badge rounded-pill badge-status badge-status--warning">
+                      Hoàn / trả hàng
+                    </span>
+                  @else
+                    <span class="badge rounded-pill badge-status badge-status--primary">
+                      {{ strtoupper($order->status ?? 'Không xác định') }}
+                    </span>
+                  @endif
+                </td>
 
-              <td class="text-center">
-                <a href="{{ route('warehouse.order.detail', $order->id) }}">
-                  <i class="fa fa-eye icon-eye-view-order-detail"></i>
-                </a>
-              </td>
-            </tr>
+                <td class="text-center">
+                  <div class="warehouse-order-actions">
+                    <a
+                      href="{{ route('warehouse.order.detail', $order->id) }}"
+                      class="warehouse-action-btn warehouse-action-btn-view"
+                      title="Xem chi tiết"
+                      aria-label="Xem chi tiết">
+                      <i class="fa fa-eye"></i>
+                    </a>
+
+                    <a
+                      href="{{ route('warehouse.orders.print', ['id' => $order->id]) }}"
+                      target="_blank"
+                      class="warehouse-action-btn warehouse-action-btn-print"
+                      title="In đơn A4"
+                      aria-label="In đơn A4">
+                      <i class="bi bi-printer"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
             @empty
-            <tr>
-              <td colspan="8" class="text-center text-muted">
-                Không có đơn hàng phù hợp.
-              </td>
-            </tr>
+              <tr>
+                <td colspan="8" class="text-center text-muted">
+                  Không có đơn hàng phù hợp.
+                </td>
+              </tr>
             @endforelse
           </tbody>
         </table>
@@ -241,3 +271,107 @@
   </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+  (function () {
+    var checkAll = document.getElementById('order_check_all');
+    var btnPrint = document.getElementById('btnPrintSelectedOrders');
+
+    if (!btnPrint) {
+      return;
+    }
+
+    function getRowCheckboxes() {
+      return Array.prototype.slice.call(
+        document.querySelectorAll('.warehouse-order-checkbox')
+      );
+    }
+
+    function setRowHighlight(cb) {
+      var row = cb.closest('tr');
+      if (!row) {
+        return;
+      }
+      row.classList.toggle('warehouse-order-row-selected', cb.checked);
+    }
+
+    function updateButtonState() {
+      var checkboxes = getRowCheckboxes();
+      var count = 0;
+
+      checkboxes.forEach(function (cb) {
+        if (cb.checked) {
+          count++;
+        }
+      });
+
+      btnPrint.disabled = count === 0;
+
+      var label = count > 0
+        ? 'In ' + count + ' đơn đã chọn'
+        : 'In đơn đã chọn';
+
+      var span = btnPrint.querySelector('span');
+      if (span) {
+        span.textContent = label;
+      }
+    }
+
+    if (checkAll) {
+      checkAll.addEventListener('change', function () {
+        var checkboxes = getRowCheckboxes();
+
+        checkboxes.forEach(function (cb) {
+          cb.checked = checkAll.checked;
+          setRowHighlight(cb);
+        });
+
+        updateButtonState();
+      });
+    }
+
+    document.addEventListener('change', function (event) {
+      var target = event.target;
+      if (!target.classList || !target.classList.contains('warehouse-order-checkbox')) {
+        return;
+      }
+
+      if (!target.checked && checkAll && checkAll.checked) {
+        checkAll.checked = false;
+      }
+
+      setRowHighlight(target);
+      updateButtonState();
+    });
+
+    btnPrint.addEventListener('click', function () {
+      var checkboxes = getRowCheckboxes();
+      var ids = [];
+
+      checkboxes.forEach(function (cb) {
+        if (cb.checked) {
+          ids.push(cb.value);
+        }
+      });
+
+      if (ids.length === 0) {
+        return;
+      }
+
+      var url = new URL('{{ route('warehouse.orders.printMultiple') }}', window.location.origin);
+      ids.forEach(function (id) {
+        url.searchParams.append('ids[]', id);
+      });
+
+      window.open(url.toString(), '_blank');
+    });
+
+    getRowCheckboxes().forEach(function (cb) {
+      setRowHighlight(cb);
+    });
+
+    updateButtonState();
+  })();
+</script>
+@endpush

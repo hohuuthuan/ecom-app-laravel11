@@ -146,6 +146,7 @@ class WarehousePageController extends Controller
         'Vui lòng chọn đơn vị vận chuyển'
       );
     }
+
     if ($targetStatus === 'COMPLETED' && $shippingType !== 'EXTERNAL') {
       return back()->with(
         'toast_error',
@@ -165,23 +166,34 @@ class WarehousePageController extends Controller
     if (!isset($levelMap[$currentStatus])) {
       return back()->with('toast_error', 'Trạng thái đơn hiện tại không thể cập nhật từ giao diện kho.');
     }
+
     if ($levelMap[$targetStatus] < $levelMap[$currentStatus]) {
       return back()->with('toast_error', 'Không thể chuyển trạng thái lùi về bước trước đó.');
     }
+
     if ($currentStatus === $targetStatus) {
       return back()->with('toast_info', 'Trạng thái đơn hàng không thay đổi.');
     }
 
     try {
-      DB::transaction(function () use ($order, $targetStatus, $statusLabel, $levelMap) {
+      DB::transaction(function () use ($order, $targetStatus, $statusLabel, $levelMap, $shippingType) {
         $currentStatusInside = strtoupper((string) $order->status);
 
-        // Lần đầu vượt qua mốc SHIPPING thì phân bổ lô + trừ tồn
         $needHandleShipping = $levelMap[$targetStatus] >= $levelMap['SHIPPING']
           && $levelMap[$currentStatusInside] < $levelMap['SHIPPING'];
 
         if ($needHandleShipping) {
           $this->allocateBatchesAndDeductStock($order);
+        }
+
+        // ================== CHỈ XỬ LÝ COD KHI HOÀN TẤT (EXTERNAL) ==================
+        if (
+          $targetStatus === 'COMPLETED'
+          && $shippingType === 'EXTERNAL'
+          && strtoupper((string) $order->payment_method) === 'COD'
+          && strtolower((string) $order->payment_status) !== 'paid'
+        ) {
+          $order->payment_status = 'paid';
         }
 
         $order->status = $targetStatus;
@@ -197,6 +209,7 @@ class WarehousePageController extends Controller
 
     return back()->with('toast_success', 'Cập nhật trạng thái đơn hàng: ' . $statusLabel);
   }
+
 
   private function allocateBatchesAndDeductStock(Order $order): void
   {
@@ -536,5 +549,49 @@ class WarehousePageController extends Controller
     }
 
     return view('admin.warehouse.purchase-receipts.show', compact('receipt'));
+  }
+
+  public function ordersPrint(string $id): View|RedirectResponse
+  {
+    try {
+      [$order] = $this->orderService->getWarehouseOrderDetail($id);
+    } catch (\Throwable $e) {
+      return redirect()
+        ->route('warehouse.orders')
+        ->with('toast_error', 'Không tìm thấy đơn hàng');
+    }
+
+    return view('admin.warehouse.order.print', [
+      'order' => $order,
+    ]);
+  }
+
+  public function ordersPrintMultiple(Request $request): View|RedirectResponse
+  {
+    $ids = $request->query('ids', []);
+
+    if (!is_array($ids) || count($ids) === 0) {
+      return redirect()
+        ->route('warehouse.orders')
+        ->with('toast_error', 'Vui lòng chọn ít nhất một đơn hàng để in.');
+    }
+
+    $orders = Order::with([
+      'user',
+      'shipment',
+      'items.product.authors',
+      'items.product.categories',
+    ])
+      ->whereIn('id', $ids)
+      ->orderBy('placed_at')
+      ->get();
+
+    if ($orders->isEmpty()) {
+      return redirect()
+        ->route('warehouse.orders')
+        ->with('toast_error', 'Không tìm thấy đơn hàng nào phù hợp để in.');
+    }
+
+    return view('admin.warehouse.order.print-multiple', compact('orders'));
   }
 }

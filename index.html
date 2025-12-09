@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="vi">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Thống K��</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .dashboard-wrapper {
+            min-height: 100%;
+            width: 100%;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 260px;
+            min-height: 100%;
+            padding: 24px 0;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header h4 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .sidebar-nav {
+            padding: 24px 0;
+        }
+
+        .nav-item {
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            border-left-color: currentColor;
+        }
+
+        .nav-item.active {
+            border-left-color: currentColor;
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            width: calc(100% - 260px);
+            padding: 32px;
+            min-height: 100%;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, currentColor, currentColor);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            background: rgba(0,0,0,0.03);
+            transition: background 0.3s;
+        }
+
+        .user-info:hover {
+            background: rgba(0,0,0,0.06);
+        }
+
+        .user-info span {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(0,0,0,0.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, currentColor, transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-change.positive {
+            color: #10b981;
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        .chart-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.06);
+            transition: box-shadow 0.3s;
+        }
+
+        .chart-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .chart-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .table-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .table-card {
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.06);
+            transition: box-shadow 0.3s;
+        }
+
+        .table-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .table-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+        }
+
+        .table-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 12px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+        }
+
+        .product-item:hover {
+            background: rgba(0,0,0,0.02);
+            transform: translateX(4px);
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .product-rank {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .product-sales {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .product-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+
+            .sidebar-header h4,
+            .nav-item span {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 12px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+            }
+
+            .table-section {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="dashboard-wrapper"><!-- Sidebar -->
+   <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+     <h4 id="sidebar-title">📊 Admin Panel</h4>
+    </div>
+    <nav class="sidebar-nav">
+     <div class="nav-item active"><i class="fas fa-chart-line"></i> <span>Dashboard</span>
+     </div>
+     <div class="nav-item"><i class="fas fa-shopping-cart"></i> <span>Đơn Hàng</span>
+     </div>
+     <div class="nav-item"><i class="fas fa-box"></i> <span>Sản Phẩm</span>
+     </div>
+     <div class="nav-item"><i class="fas fa-users"></i> <span>Khách Hàng</span>
+     </div>
+     <div class="nav-item"><i class="fas fa-chart-bar"></i> <span>B��o Cáo</span>
+     </div>
+     <div class="nav-item"><i class="fas fa-cog"></i> <span>Cài Đặt</span>
+     </div>
+    </nav>
+   </aside><!-- Main Content -->
+   <main class="main-content"><!-- Top Bar -->
+    <div class="top-bar">
+     <h1 class="page-title" id="page-title">Dashboard Thống Kê</h1>
+     <div class="user-info"><span>Admin User</span>
+      <div class="user-avatar" id="user-avatar">
+       A
+      </div>
+     </div>
+    </div><!-- Stats Cards -->
+    <div class="stats-grid">
+     <div class="stat-card" id="revenue-card">
+      <div class="stat-icon" id="revenue-icon">
+       💰
+      </div>
+      <div class="stat-label" id="revenue-label">
+       Doanh Thu Tháng Này
+      </div>
+      <div class="stat-value" id="revenue-value">
+       ₫125,450,000
+      </div>
+      <div class="stat-change positive"><i class="fas fa-arrow-up"></i> <span>+12.5% so với tháng trước</span>
+      </div>
+     </div>
+     <div class="stat-card" id="profit-card">
+      <div class="stat-icon" id="profit-icon">
+       📈
+      </div>
+      <div class="stat-label" id="profit-label">
+       Lợi Nhuận Tháng Này
+      </div>
+      <div class="stat-value" id="profit-value">
+       ₫38,650,000
+      </div>
+      <div class="stat-change positive"><i class="fas fa-arrow-up"></i> <span>+8.3% so với tháng trước</span>
+      </div>
+     </div>
+     <div class="stat-card" id="orders-card">
+      <div class="stat-icon" id="orders-icon">
+       📦
+      </div>
+      <div class="stat-label" id="total-orders-label">
+       Tổng Đơn Tháng Này
+      </div>
+      <div class="stat-value" id="orders-value">
+       1,248
+      </div>
+      <div class="stat-change positive"><i class="fas fa-arrow-up"></i> <span>+15.2% so với tháng trước</span>
+      </div>
+     </div>
+     <div class="stat-card" id="today-card">
+      <div class="stat-icon" id="today-icon">
+       🎯
+      </div>
+      <div class="stat-label" id="today-orders-label">
+       Đơn Hàng Hôm Nay
+      </div>
+      <div class="stat-value" id="today-value">
+       42
+      </div>
+      <div class="stat-change positive"><i class="fas fa-arrow-up"></i> <span>+5 so với hôm qua</span>
+      </div>
+     </div>
+    </div><!-- Charts Section -->
+    <div class="chart-section">
+     <div class="chart-card" id="order-status-card">
+      <div class="chart-header">
+       <h3 class="chart-title">Tỷ Lệ Giao Hàng Tháng Này</h3>
+      </div>
+      <div class="chart-container">
+       <canvas id="orderStatusChart"></canvas>
+      </div>
+     </div>
+     <div class="chart-card" id="top-customer-card">
+      <div class="chart-header">
+       <h3 class="chart-title">Top 5 Khách Hàng Chi Tiêu Nhiều Nhất</h3>
+      </div>
+      <div class="chart-container">
+       <canvas id="topCustomerChart"></canvas>
+      </div>
+     </div>
+    </div><!-- Tables Section -->
+    <div class="table-section">
+     <div class="table-card" id="top-products-card">
+      <div class="table-header">
+       <h3 class="table-title">Top Sản Phẩm Bán Chạy</h3>
+      </div>
+      <div id="topProductsList"><!-- Products will be dynamically added -->
+      </div>
+     </div>
+     <div class="table-card" id="out-of-stock-card">
+      <div class="table-header">
+       <h3 class="table-title">Sản Phẩm Sắp Hết Hàng</h3>
+      </div>
+      <div id="outOfStockList"><!-- Products will be dynamically added -->
+      </div>
+     </div>
+    </div><!-- Revenue Chart - Bottom -->
+    <div class="chart-section">
+     <div class="chart-card" id="revenue-chart-card" style="grid-column: 1 / -1;">
+      <div class="chart-header">
+       <h3 class="chart-title">Biểu Đồ Doanh Thu, Vốn &amp; Lợi Nhuận 12 Tháng</h3>
+      </div>
+      <div class="chart-container" style="height: 400px;">
+       <canvas id="revenueChart"></canvas>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div>
+  <script>
+        // Default configuration
+        const defaultConfig = {
+            dashboard_title: "Dashboard Thống Kê",
+            revenue_label: "Doanh Thu Tháng Này",
+            profit_label: "Lợi Nhuận Tháng Này",
+            total_orders_label: "Tổng Đơn Tháng Này",
+            today_orders_label: "Đơn Hàng Hôm Nay",
+            background_color: "#f0f4f8",
+            card_color: "#ffffff",
+            primary_color: "#3b82f6",
+            text_color: "#1f2937",
+            accent_color: "#10b981"
+        };
+
+        let config = { ...defaultConfig };
+
+        // Sample data
+        const topProducts = [
+            { name: "iPhone 15 Pro Max", sales: 245, rank: 1 },
+            { name: "Samsung Galaxy S24", sales: 198, rank: 2 },
+            { name: "MacBook Air M3", sales: 156, rank: 3 },
+            { name: "AirPods Pro Gen 3", sales: 134, rank: 4 },
+            { name: "iPad Pro 2024", sales: 112, rank: 5 }
+        ];
+
+        const outOfStockProducts = [
+            { name: "Bàn phím cơ Logitech MX", stock: 5 },
+            { name: "Chuột gaming Razer", stock: 8 },
+            { name: "Tai nghe Sony WH-1000XM5", stock: 3 },
+            { name: "Ổ cứng SSD Samsung 1TB", stock: 12 },
+            { name: "Webcam Logitech C920", stock: 6 }
+        ];
+
+        // Initialize charts
+        let orderStatusChart, topCustomerChart, revenueChart;
+
+        function initCharts() {
+            const primaryColor = config.primary_color || defaultConfig.primary_color;
+            const accentColor = config.accent_color || defaultConfig.accent_color;
+
+            // Order Status Chart
+            const orderCtx = document.getElementById('orderStatusChart').getContext('2d');
+            orderStatusChart = new Chart(orderCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Giao thành công', 'Thất bại', 'Đang giao'],
+                    datasets: [{
+                        data: [892, 124, 232],
+                        backgroundColor: [accentColor, '#ef4444', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: { size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Top Customer Chart
+            const customerCtx = document.getElementById('topCustomerChart').getContext('2d');
+            topCustomerChart = new Chart(customerCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Nguyễn Văn A', 'Trần Thị B', 'Lê Văn C', 'Phạm Thị D', 'Hoàng Văn E'],
+                    datasets: [{
+                        label: 'Chi tiêu (triệu ₫)',
+                        data: [125, 98, 87, 76, 65],
+                        backgroundColor: [
+                            primaryColor,
+                            accentColor,
+                            '#f59e0b',
+                            '#6366f1',
+                            '#8b5cf6'
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: { display: false },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + ' tr';
+                                }
+                            }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Revenue Chart - 12 months
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            const monthLabels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 
+                                'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+
+            revenueChart = new Chart(revenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: monthLabels,
+                    datasets: [
+                        {
+                            label: 'Doanh thu (triệu ₫)',
+                            data: [95000, 102000, 98000, 115000, 125000, 118000, 130000, 122000, 135000, 128000, 140000, 125450],
+                            backgroundColor: primaryColor,
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Vốn (triệu ₫)',
+                            data: [60000, 65000, 62000, 72000, 78000, 75000, 82000, 77000, 85000, 81000, 88000, 86800],
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Lợi nhu��n (triệu ₫)',
+                            data: [35000, 37000, 36000, 43000, 47000, 43000, 48000, 45000, 50000, 47000, 52000, 38650],
+                            backgroundColor: accentColor,
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                padding: 15,
+                                font: { size: 13 },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { 
+                                color: 'rgba(0,0,0,0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000).toFixed(0) + 'tr';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderProducts() {
+            const primaryColor = config.primary_color || defaultConfig.primary_color;
+            const accentColor = config.accent_color || defaultConfig.accent_color;
+
+            // Top products
+            const topProductsList = document.getElementById('topProductsList');
+            topProductsList.innerHTML = topProducts.map(product => {
+                const rankColors = [accentColor, primaryColor, '#f59e0b', '#6366f1', '#8b5cf6'];
+                return `
+                    <div class="product-item">
+                        <div class="product-info">
+                            <div class="product-rank" style="background-color: ${rankColors[product.rank - 1]}20; color: ${rankColors[product.rank - 1]};">
+                                ${product.rank}
+                            </div>
+                            <div class="product-details">
+                                <div class="product-name">${product.name}</div>
+                                <div class="product-sales">${product.sales} đã bán</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Out of stock products
+            const outOfStockList = document.getElementById('outOfStockList');
+            outOfStockList.innerHTML = outOfStockProducts.map(product => `
+                <div class="product-item">
+                    <div class="product-info">
+                        <div class="product-details">
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-sales">Còn ${product.stock} sản phẩm</div>
+                        </div>
+                    </div>
+                    <span class="product-badge badge-warning">⚠️ Cảnh báo</span>
+                </div>
+            `).join('');
+        }
+
+        async function onConfigChange(newConfig) {
+            const backgroundColor = newConfig.background_color || defaultConfig.background_color;
+            const cardColor = newConfig.card_color || defaultConfig.card_color;
+            const primaryColor = newConfig.primary_color || defaultConfig.primary_color;
+            const textColor = newConfig.text_color || defaultConfig.text_color;
+            const accentColor = newConfig.accent_color || defaultConfig.accent_color;
+
+            // Apply background colors
+            document.body.style.backgroundColor = backgroundColor;
+            document.querySelector('.main-content').style.backgroundColor = backgroundColor;
+
+            // Apply text colors
+            document.body.style.color = textColor;
+            document.querySelectorAll('.chart-title, .table-title, .page-title').forEach(el => {
+                el.style.color = textColor;
+            });
+
+            // Apply primary color to user avatar
+            document.getElementById('user-avatar').style.backgroundColor = primaryColor;
+            document.getElementById('user-avatar').style.color = '#ffffff';
+
+            // Apply colors to stat cards
+            const statCards = [
+                { card: 'revenue-card', icon: 'revenue-icon', color: primaryColor },
+                { card: 'profit-card', icon: 'profit-icon', color: accentColor },
+                { card: 'orders-card', icon: 'orders-icon', color: '#f59e0b' },
+                { card: 'today-card', icon: 'today-icon', color: '#8b5cf6' }
+            ];
+
+            statCards.forEach(item => {
+                const card = document.getElementById(item.card);
+                const icon = document.getElementById(item.icon);
+                card.style.backgroundColor = cardColor;
+                card.style.color = textColor;
+                icon.style.backgroundColor = item.color + '20';
+            });
+
+            // Apply colors to chart cards
+            document.querySelectorAll('.chart-card, .table-card').forEach(card => {
+                card.style.backgroundColor = cardColor;
+                card.style.color = textColor;
+            });
+
+            // Update text content
+            document.getElementById('page-title').textContent = newConfig.dashboard_title || defaultConfig.dashboard_title;
+            document.getElementById('revenue-label').textContent = newConfig.revenue_label || defaultConfig.revenue_label;
+            document.getElementById('profit-label').textContent = newConfig.profit_label || defaultConfig.profit_label;
+            document.getElementById('total-orders-label').textContent = newConfig.total_orders_label || defaultConfig.total_orders_label;
+            document.getElementById('today-orders-label').textContent = newConfig.today_orders_label || defaultConfig.today_orders_label;
+
+            // Update charts with new colors
+            if (orderStatusChart) {
+                orderStatusChart.data.datasets[0].backgroundColor[0] = accentColor;
+                orderStatusChart.update();
+            }
+
+            if (topCustomerChart) {
+                topCustomerChart.data.datasets[0].backgroundColor = [
+                    primaryColor,
+                    accentColor,
+                    '#f59e0b',
+                    '#6366f1',
+                    '#8b5cf6'
+                ];
+                topCustomerChart.update();
+            }
+
+            if (revenueChart) {
+                revenueChart.data.datasets[0].backgroundColor = primaryColor;
+                revenueChart.data.datasets[1].backgroundColor = '#f59e0b';
+                revenueChart.data.datasets[2].backgroundColor = accentColor;
+                revenueChart.update();
+            }
+
+            renderProducts();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            initCharts();
+            renderProducts();
+            await onConfigChange(config);
+
+            // Initialize Element SDK
+            if (window.elementSdk) {
+                window.elementSdk.init({
+                    defaultConfig: defaultConfig,
+                    onConfigChange: async (newConfig) => {
+                        config = { ...config, ...newConfig };
+                        await onConfigChange(config);
+                    },
+                    mapToCapabilities: (config) => ({
+                        recolorables: [
+                            {
+                                get: () => config.background_color || defaultConfig.background_color,
+                                set: (value) => {
+                                    config.background_color = value;
+                                    window.elementSdk.setConfig({ background_color: value });
+                                }
+                            },
+                            {
+                                get: () => config.card_color || defaultConfig.card_color,
+                                set: (value) => {
+                                    config.card_color = value;
+                                    window.elementSdk.setConfig({ card_color: value });
+                                }
+                            },
+                            {
+                                get: () => config.text_color || defaultConfig.text_color,
+                                set: (value) => {
+                                    config.text_color = value;
+                                    window.elementSdk.setConfig({ text_color: value });
+                                }
+                            },
+                            {
+                                get: () => config.primary_color || defaultConfig.primary_color,
+                                set: (value) => {
+                                    config.primary_color = value;
+                                    window.elementSdk.setConfig({ primary_color: value });
+                                }
+                            },
+                            {
+                                get: () => config.accent_color || defaultConfig.accent_color,
+                                set: (value) => {
+                                    config.accent_color = value;
+                                    window.elementSdk.setConfig({ accent_color: value });
+                                }
+                            }
+                        ],
+                        borderables: [],
+                        fontEditable: undefined,
+                        fontSizeable: undefined
+                    }),
+                    mapToEditPanelValues: (config) => new Map([
+                        ["dashboard_title", config.dashboard_title || defaultConfig.dashboard_title],
+                        ["revenue_label", config.revenue_label || defaultConfig.revenue_label],
+                        ["profit_label", config.profit_label || defaultConfig.profit_label],
+                        ["total_orders_label", config.total_orders_label || defaultConfig.total_orders_label],
+                        ["today_orders_label", config.today_orders_label || defaultConfig.today_orders_label]
+                    ])
+                });
+            }
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ab395b62681fcf6',t:'MTc2NTI3MzY4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

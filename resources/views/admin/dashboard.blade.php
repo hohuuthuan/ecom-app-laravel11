@@ -4,65 +4,312 @@
 
 @section('body_class','dashboard-page')
 
+@php
+  $metrics = $metrics ?? [
+      'today' => [
+          'revenue_vnd'      => 0,
+          'cogs_vnd'         => 0,
+          'profit_vnd'       => 0,
+          'total_orders'     => 0,
+          'delivered_orders' => 0,
+          'orders_change_vs_yesterday' => null,
+      ],
+      'month' => [
+          'revenue_vnd'            => 0,
+          'cogs_vnd'               => 0,
+          'profit_vnd'             => 0,
+          'total_orders'           => 0,
+          'delivered_orders'       => 0,
+          'revenue_change_percent' => null,
+          'profit_change_percent'  => null,
+          'orders_change_percent'  => null,
+      ],
+      'year' => [
+          'revenue_vnd'      => 0,
+          'cogs_vnd'         => 0,
+          'profit_vnd'       => 0,
+          'total_orders'     => 0,
+          'delivered_orders' => 0,
+      ],
+  ];
+
+  $today = $metrics['today'] ?? [];
+  $month = $metrics['month'] ?? [];
+  $year  = $metrics['year']  ?? [];
+
+  if (!function_exists('vnd_format')) {
+    function vnd_format($value) {
+      return number_format((int) $value, 0, ',', '.') . 'đ';
+    }
+  }
+
+  $dashboardData = $dashboardData ?? [];
+@endphp
+
 @section('content')
-<div class="container-fluid">
-  <div class="row g-3">
-    <div class="col-md-6 col-xl-3">
-      <div class="card shadow-sm h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h6 class="mb-0">Income</h6>
-          <span class="badge rounded-pill text-bg-success">Monthly</span>
+  <div class="container-fluid admin-dashboard">
+    <div class="admin-stats-grid mb-4">
+      {{-- DOANH THU THÁNG NÀY --}}
+      @php($revChange = $month['revenue_change_percent'] ?? null)
+      <div class="admin-stat-card" id="adminRevenueCard">
+        <div class="admin-stat-icon" id="adminRevenueIcon">
+          💰
         </div>
-        <div class="card-body">
-          <h2 class="mb-1 fw-semibold">40 886,200</h2>
-          <div class="text-success fw-bold">98% <i class="fa fa-bolt"></i></div>
-          <small class="text-muted">Total income</small>
+        <div class="admin-stat-label">
+          Doanh thu tháng này
+        </div>
+        <div class="admin-stat-value" id="adminRevenueValue">
+          {{ vnd_format($month['revenue_vnd'] ?? 0) }}
+        </div>
+        <div class="admin-stat-change
+          @if($revChange === null)
+            admin-stat-change-neutral
+          @elseif($revChange > 0)
+            admin-stat-change-positive
+          @elseif($revChange < 0)
+            admin-stat-change-negative
+          @else
+            admin-stat-change-neutral
+          @endif
+        ">
+          <i class="fas
+            @if($revChange === null || $revChange == 0)
+              fa-minus
+            @elseif($revChange > 0)
+              fa-arrow-up
+            @else
+              fa-arrow-down
+            @endif
+            me-1"></i>
+          <span>
+            @if($revChange === null)
+              Không có dữ liệu so với tháng trước
+            @elseif($revChange > 0)
+              +{{ number_format($revChange, 1) }}% so với tháng trước
+            @elseif($revChange < 0)
+              {{ number_format($revChange, 1) }}% so với tháng trước
+            @else
+              Không thay đổi so với tháng trước
+            @endif
+          </span>
+        </div>
+      </div>
+
+      {{-- LỢI NHUẬN THÁNG NÀY --}}
+      @php($profitChange = $month['profit_change_percent'] ?? null)
+      <div class="admin-stat-card" id="adminProfitCard">
+        <div class="admin-stat-icon" id="adminProfitIcon">
+          📈
+        </div>
+        <div class="admin-stat-label">
+          Lợi nhuận tháng này
+        </div>
+        <div class="admin-stat-value" id="adminProfitValue">
+          {{ vnd_format($month['profit_vnd'] ?? 0) }}
+        </div>
+        <div class="admin-stat-change
+          @if($profitChange === null)
+            admin-stat-change-neutral
+          @elseif($profitChange > 0)
+            admin-stat-change-positive
+          @elseif($profitChange < 0)
+            admin-stat-change-negative
+          @else
+            admin-stat-change-neutral
+          @endif
+        ">
+          <i class="fas
+            @if($profitChange === null || $profitChange == 0)
+              fa-minus
+            @elseif($profitChange > 0)
+              fa-arrow-up
+            @else
+              fa-arrow-down
+            @endif
+            me-1"></i>
+          <span>
+            @if($profitChange === null)
+              Không có dữ liệu so với tháng trước
+            @elseif($profitChange > 0)
+              +{{ number_format($profitChange, 1) }}% so với tháng trước
+            @elseif($profitChange < 0)
+              {{ number_format($profitChange, 1) }}% so với tháng trước
+            @else
+              Không thay đổi so với tháng trước
+            @endif
+          </span>
+        </div>
+      </div>
+
+      {{-- TỔNG ĐƠN THÁNG NÀY --}}
+      @php($ordersChange = $month['orders_change_percent'] ?? null)
+      <div class="admin-stat-card" id="adminOrdersCard">
+        <div class="admin-stat-icon" id="adminOrdersIcon">
+          📦
+        </div>
+        <div class="admin-stat-label">
+          Tổng đơn tháng này
+        </div>
+        <div class="admin-stat-value" id="adminOrdersValue">
+          {{ number_format((int) ($month['total_orders'] ?? 0), 0, ',', '.') }}
+        </div>
+        <div class="admin-stat-change
+          @if($ordersChange === null)
+            admin-stat-change-neutral
+          @elseif($ordersChange > 0)
+            admin-stat-change-positive
+          @elseif($ordersChange < 0)
+            admin-stat-change-negative
+          @else
+            admin-stat-change-neutral
+          @endif
+        ">
+          <i class="fas
+            @if($ordersChange === null || $ordersChange == 0)
+              fa-minus
+            @elseif($ordersChange > 0)
+              fa-arrow-up
+            @else
+              fa-arrow-down
+            @endif
+            me-1"></i>
+          <span>
+            @if($ordersChange === null)
+              Không có dữ liệu so với tháng trước
+            @elseif($ordersChange > 0)
+              +{{ number_format($ordersChange, 1) }}% so với tháng trước
+            @elseif($ordersChange < 0)
+              {{ number_format($ordersChange, 1) }}% so với tháng trước
+            @else
+              Không thay đổi so với tháng trước
+            @endif
+          </span>
+        </div>
+      </div>
+
+      {{-- ĐƠN HÔM NAY --}}
+      @php($todayDiff = $today['orders_change_vs_yesterday'] ?? null)
+      <div class="admin-stat-card" id="adminTodayCard">
+        <div class="admin-stat-icon" id="adminTodayIcon">
+          🎯
+        </div>
+        <div class="admin-stat-label">
+          Đơn hàng hôm nay
+        </div>
+        <div class="admin-stat-value" id="adminTodayValue">
+          {{ number_format((int) ($today['total_orders'] ?? 0), 0, ',', '.') }}
+        </div>
+        <div class="admin-stat-change
+          @if($todayDiff === null)
+            admin-stat-change-neutral
+          @elseif($todayDiff > 0)
+            admin-stat-change-positive
+          @elseif($todayDiff < 0)
+            admin-stat-change-negative
+          @else
+            admin-stat-change-neutral
+          @endif
+        ">
+          <i class="fas
+            @if($todayDiff === null || $todayDiff == 0)
+              fa-minus
+            @elseif($todayDiff > 0)
+              fa-arrow-up
+            @else
+              fa-arrow-down
+            @endif
+            me-1"></i>
+          <span>
+            @if($todayDiff === null)
+              Không có dữ liệu so với hôm qua
+            @elseif($todayDiff > 0)
+              +{{ number_format($todayDiff, 0, ',', '.') }} đơn so với hôm qua
+            @elseif($todayDiff < 0)
+              {{ number_format($todayDiff, 0, ',', '.') }} đơn so với hôm qua
+            @else
+              Không thay đổi so với hôm qua
+            @endif
+          </span>
         </div>
       </div>
     </div>
 
-    <div class="col-md-6 col-xl-3">
-      <div class="card shadow-sm h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h6 class="mb-0">Orders</h6>
-          <span class="badge rounded-pill text-bg-info">Annual</span>
+    {{-- Khu vực chart: tỉ lệ giao hàng + top khách hàng --}}
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-xl-6">
+        <div class="admin-chart-card h-100">
+          <div class="admin-chart-header">
+            <h3 class="admin-chart-title mb-0">
+              Tỷ lệ giao hàng tháng này
+            </h3>
+          </div>
+          <div class="admin-chart-container">
+            <canvas id="orderStatusChart"></canvas>
+          </div>
         </div>
-        <div class="card-body">
-          <h2 class="mb-1 fw-semibold">275,800</h2>
-          <div class="text-info fw-bold">20% <i class="fa fa-level-up-alt"></i></div>
-          <small class="text-muted">New orders</small>
+      </div>
+
+      <div class="col-12 col-xl-6">
+        <div class="admin-chart-card h-100">
+          <div class="admin-chart-header">
+            <h3 class="admin-chart-title mb-0">
+              Top 5 khách hàng chi tiêu nhiều nhất
+            </h3>
+          </div>
+          <div class="admin-chart-container">
+            <canvas id="topCustomerChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="col-md-6 col-xl-3">
-      <div class="card shadow-sm h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h6 class="mb-0">Visits</h6>
-          <span class="badge rounded-pill text-bg-primary">Today</span>
+    {{-- Top sản phẩm + sắp hết hàng --}}
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-xl-6">
+        <div class="admin-table-card h-100">
+          <div class="admin-table-header">
+            <h3 class="admin-table-title mb-0">
+              Top sản phẩm bán chạy
+            </h3>
+          </div>
+
+          <div id="topProductsList">
+            {{-- JS sẽ render dữ liệu ở đây --}}
+          </div>
         </div>
-        <div class="card-body">
-          <h2 class="mb-1 fw-semibold">106,120</h2>
-          <div class="text-primary fw-bold">44% <i class="fa fa-level-up-alt"></i></div>
-          <small class="text-muted">New visits</small>
+      </div>
+
+      <div class="col-12 col-xl-6">
+        <div class="admin-table-card h-100">
+          <div class="admin-table-header">
+            <h3 class="admin-table-title mb-0">
+              Sản phẩm sắp hết hàng
+            </h3>
+          </div>
+
+          <div id="outOfStockList">
+            {{-- JS sẽ render dữ liệu ở đây --}}
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="col-md-6 col-xl-3">
-      <div class="card shadow-sm h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h6 class="mb-0">User activity</h6>
-          <span class="badge rounded-pill text-bg-danger">Low value</span>
-        </div>
-        <div class="card-body">
-          <h2 class="mb-1 fw-semibold">80,600</h2>
-          <div class="text-danger fw-bold">38% <i class="fa fa-level-down-alt"></i></div>
-          <small class="text-muted">In first month</small>
-        </div>
+    {{-- Biểu đồ doanh thu 12 tháng --}}
+    <div class="admin-chart-card">
+      <div class="admin-chart-header">
+        <h3 class="admin-chart-title mb-0">
+          Doanh thu, vốn và lợi nhuận 12 tháng
+        </h3>
+      </div>
+      <div class="admin-chart-container admin-chart-container-lg">
+        <canvas id="revenueChart"></canvas>
       </div>
     </div>
-
   </div>
-</div>
 @endsection
+
+@push('scripts')
+  <script>
+    window.ADMIN_DASHBOARD_DATA = @json($dashboardData, JSON_UNESCAPED_UNICODE);
+  </script>
+@endpush

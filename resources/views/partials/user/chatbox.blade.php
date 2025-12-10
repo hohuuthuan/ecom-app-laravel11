@@ -43,6 +43,40 @@
         </button>
       </div>
     </header>
+
+    <section class="ai-chat-faq">
+      <p class="ai-chat-faq-title">Câu hỏi thường gặp</p>
+      <div class="ai-chat-faq-items">
+        <button
+          type="button"
+          class="ai-chat-faq-btn"
+          data-faq-key="buy_flow">
+          Cách mua hàng trên website
+        </button>
+
+        <button
+          type="button"
+          class="ai-chat-faq-btn"
+          data-faq-key="track_order">
+          Cách theo dõi tình trạng đơn hàng
+        </button>
+
+        <button
+          type="button"
+          class="ai-chat-faq-btn"
+          data-faq-key="review_product">
+          Cách đánh giá sản phẩm sau khi mua
+        </button>
+
+        <button
+          type="button"
+          class="ai-chat-faq-btn"
+          data-faq-key="update_account">
+          Cách cập nhật thông tin tài khoản
+        </button>
+      </div>
+    </section>
+
     <main id="aiChatMessages" class="ai-chat-messages">
       <div class="ai-chat-message-row ai-chat-message-row-assistant message-enter">
         <div class="ai-chat-bubble ai-chat-bubble-assistant">

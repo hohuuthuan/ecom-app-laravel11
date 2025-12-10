@@ -18,7 +18,49 @@
     var sendBtn   = document.getElementById('aiChatSend');
     var typingEl  = null;
 
+    var faqButtons = widget.querySelectorAll('[data-faq-key]');
+
     var STORAGE_KEY = 'ai_chat_history_v1';
+
+    // Câu hỏi thường gặp + câu trả lời cứng phía AI (không gọi OpenAI)
+    var FAQ_CONFIG = {
+      buy_flow: {
+        question: 'Cách mua hàng trên website',
+        answer:
+          '<p><strong>Bước 1:</strong> Tìm cuốn sách bạn muốn mua bằng thanh tìm kiếm hoặc duyệt theo danh mục.</p>' +
+          '<p><strong>Bước 2:</strong> Mở trang chi tiết sách để xem mô tả, giá bán và tồn kho.</p>' +
+          '<p><strong>Bước 3:</strong> Nhấn nút "Thêm vào giỏ hàng".</p>' +
+          '<p><strong>Bước 4:</strong> Vào trang giỏ hàng để kiểm tra lại sản phẩm, số lượng và tổng tiền.</p>' +
+          '<p><strong>Bước 5:</strong> Nhấn "Tiến hành đặt hàng", chọn hoặc thêm địa chỉ nhận hàng.</p>' +
+          '<p><strong>Bước 6:</strong> Chọn phương thức thanh toán phù hợp với bạn.</p>' +
+          '<p><strong>Bước 7:</strong> Kiểm tra lại thông tin và nhấn "Đặt hàng" để hoàn tất đơn.</p>'
+      },
+      track_order: {
+        question: 'Cách theo dõi tình trạng đơn hàng',
+        answer:
+          '<p><strong>Bước 1:</strong> Đăng nhập vào tài khoản của bạn.</p>' +
+          '<p><strong>Bước 2:</strong> Bấm vào tên của bạn ở góc trên bên phải và chọn "Đơn hàng của tôi".</p>' +
+          '<p><strong>Bước 3:</strong> Xem danh sách đơn hàng và trạng thái từng đơn (đang xử lý, đang giao, đã hoàn tất,...).</p>' +
+          '<p><strong>Bước 4:</strong> Nhấn vào từng đơn để xem chi tiết sản phẩm, địa chỉ nhận hàng và lịch sử cập nhật.</p>'
+      },
+      review_product: {
+        question: 'Cách đánh giá sản phẩm sau khi mua',
+        answer:
+          '<p><strong>Bước 1:</strong> Đăng nhập tài khoản và vào mục "Đơn hàng của tôi".</p>' +
+          '<p><strong>Bước 2:</strong> Chọn đơn hàng đã ở trạng thái "Hoàn tất".</p>' +
+          '<p><strong>Bước 3:</strong> Tại từng sản phẩm trong đơn, nhấn nút "Đánh giá".</p>' +
+          '<p><strong>Bước 4:</strong> Chọn số sao, viết cảm nhận và (nếu muốn) tải lên hình ảnh sản phẩm thực tế.</p>' +
+          '<p><strong>Bước 5:</strong> Nhấn "Gửi đánh giá" để hoàn thành.</p>'
+      },
+      update_account: {
+        question: 'Cách cập nhật thông tin tài khoản',
+        answer:
+          '<p><strong>Bước 1:</strong> Đăng nhập vào tài khoản trên website.</p>' +
+          '<p><strong>Bước 2:</strong> Bấm vào tên của bạn ở góc trên bên phải và chọn "Tài khoản của tôi".</p>' +
+          '<p><strong>Bước 3:</strong> Tại đây bạn có thể cập nhật tên, email, số điện thoại, mật khẩu và danh sách địa chỉ nhận hàng.</p>' +
+          '<p><strong>Bước 4:</strong> Sau khi chỉnh sửa, nhấn nút "Lưu" để áp dụng thay đổi.</p>'
+      }
+    };
 
     if (
       !chatUrl ||
@@ -181,6 +223,20 @@
       });
     }
 
+    // Xử lý khi click vào 1 câu hỏi FAQ: gửi tin nhắn user + trả lời cứng từ AI (frontend)
+    function handleFaqClick(key) {
+      var config = FAQ_CONFIG[key];
+      if (!config) {
+        return;
+      }
+
+      // Đẩy câu hỏi vào khung chat như user gõ
+      appendMessage(config.question, 'user', false);
+
+      // Trả lời luôn bằng nội dung cứng, không gọi API, không tốn token
+      appendMessage(config.answer, 'assistant', false);
+    }
+
     toggle.addEventListener('click', function () {
       windowEl.classList.remove('ai-hidden');
       toggle.classList.add('ai-hidden');
@@ -245,6 +301,19 @@
           input.focus();
         });
     });
+
+    // Gắn event click cho các nút FAQ
+    if (faqButtons && faqButtons.length > 0) {
+      faqButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var key = btn.getAttribute('data-faq-key');
+          if (!key) {
+            return;
+          }
+          handleFaqClick(key);
+        });
+      });
+    }
 
     restoreHistory();
     scrollToBottom();

@@ -3,7 +3,6 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     var data = getDashboardData();
-
     renderTopProducts(data);
     renderLowStockProducts(data);
     renderOrderStatusChart(data);
@@ -12,28 +11,38 @@
   });
 
   function getDashboardData() {
-    var raw = window.ADMIN_DASHBOARD_DATA;
-    if (!raw || typeof raw !== 'object') {
+    try {
+      if (window.ADMIN_DASHBOARD_DATA && typeof window.ADMIN_DASHBOARD_DATA === 'object') {
+        return window.ADMIN_DASHBOARD_DATA;
+      }
+    } catch (e) {}
+
+    var el = document.getElementById('adminDashboardPayload');
+    if (!el) {
       return {};
     }
-    return raw;
+
+    try {
+      var json = el.textContent || el.innerText || '{}';
+      var data = JSON.parse(json);
+      window.ADMIN_DASHBOARD_DATA = data;
+      return data;
+    } catch (e) {
+      return {};
+    }
   }
 
   function formatVnd(value) {
     var number = Number(value) || 0;
-
     if (typeof Intl !== 'undefined' && Intl.NumberFormat) {
       return new Intl.NumberFormat('vi-VN').format(number) + ' đ';
     }
-
     return number.toLocaleString('vi-VN') + ' đ';
   }
 
   function safeArray(value) {
     return Array.isArray(value) ? value : [];
   }
-
-  /* ================= TOP PRODUCTS ================= */
 
   function renderTopProducts(data) {
     var container = document.getElementById('topProductsList');
@@ -52,7 +61,6 @@
     var html = '';
     for (var i = 0; i < items.length; i++) {
       var item = items[i] || {};
-
       var name = item.product_name || item.name || 'Sản phẩm';
       var sku = item.sku || item.code || null;
       var sold = item.total_sold || item.total_qty || item.quantity || 0;
@@ -65,7 +73,7 @@
             '<div class="admin-product-details">' +
               '<div class="admin-product-name">' + escapeHtml(name) + '</div>' +
               '<div class="admin-product-meta">' +
-                '<span class="admin-product-meta-item">Đã bán: ' + sold + ' sp</span>';
+                '<span class="admin-product-meta-item">Đã bán: ' + sold + ' sản phẩm</span>';
 
       if (sku) {
         html +=
@@ -86,8 +94,6 @@
 
     container.innerHTML = html;
   }
-
-  /* ============= LOW STOCK PRODUCTS ============= */
 
   function renderLowStockProducts(data) {
     var container = document.getElementById('outOfStockList');
@@ -110,10 +116,9 @@
     var html = '';
     for (var i = 0; i < items.length; i++) {
       var item = items[i] || {};
-
       var name = item.product_name || item.name || 'Sản phẩm';
       var sku = item.sku || item.code || null;
-      var onHand = item.on_hand || item.quantity || 0;
+      var onHand = item.on_hand || 0;
       var threshold = item.safe_stock || item.min_stock || 0;
       var warehouse = item.warehouse_name || item.warehouse || null;
 
@@ -125,13 +130,6 @@
               '<div class="admin-product-name">' + escapeHtml(name) + '</div>' +
               '<div class="admin-product-meta">' +
                 '<span class="admin-product-meta-item">Tồn kho: ' + onHand + '</span>';
-
-      if (threshold) {
-        html +=
-          '<span class="admin-product-meta-dot">•</span>' +
-          '<span class="admin-product-meta-item">Ngưỡng cảnh báo: ' + threshold + '</span>';
-      }
-
       if (warehouse) {
         html +=
           '<span class="admin-product-meta-dot">•</span>' +
@@ -149,7 +147,7 @@
             '</div>' +
           '</div>' +
           '<div class="admin-product-badge admin-product-badge--danger">' +
-            '<span>Cảnh báo</span>' +
+            '<span>Cảnh báo </span>' +
             '<strong>Sắp hết hàng</strong>' +
           '</div>' +
         '</div>';
@@ -157,8 +155,6 @@
 
     container.innerHTML = html;
   }
-
-  /* ================= ORDER STATUS CHART ================= */
 
   function renderOrderStatusChart(data) {
     var canvas = document.getElementById('orderStatusChart');
@@ -180,11 +176,6 @@
       values = [60, 25, 10, 5];
     }
 
-    // Map màu theo label:
-    // - Hoàn tất / thành công: xanh lá (#22c55e)
-    // - Đang giao: vàng đất (#f59e0b)
-    // - Thất bại: đỏ (#ef4444)
-    // - Hoàn / trả: cam (#fb923c)
     var bgColors = [];
     for (var i = 0; i < labels.length; i++) {
       var text = String(labels[i] || '').toLowerCase();
@@ -268,8 +259,6 @@
     });
   }
 
-  /* ================= TOP CUSTOMERS CHART ================= */
-
   function renderTopCustomersChart(data) {
     var canvas = document.getElementById('topCustomerChart');
     if (!canvas || typeof Chart === 'undefined') {
@@ -351,8 +340,6 @@
     });
   }
 
-  /* ================= REVENUE CHART (BAR) ================= */
-
   function renderRevenueChart(data) {
     var canvas = document.getElementById('revenueChart');
     if (!canvas || typeof Chart === 'undefined') {
@@ -375,7 +362,6 @@
       revenue = [12, 14, 11, 16, 18, 20, 22, 23, 19, 21, 24, 26];
       cogs = [8, 9, 8, 10, 11, 13, 14, 15, 13, 14, 15, 16];
       profit = [4, 5, 3, 6, 7, 7, 8, 8, 6, 7, 9, 10];
-
       var factor = 1000000;
       for (var i = 0; i < labels.length; i++) {
         revenue[i] = revenue[i] * factor;
@@ -464,12 +450,9 @@
     });
   }
 
-  /* ================= HELPERS ================= */
-
   function formatShortVnd(value) {
     var num = Number(value) || 0;
     var abs = Math.abs(num);
-
     if (abs >= 1000000000) {
       return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + ' tỷ';
     }

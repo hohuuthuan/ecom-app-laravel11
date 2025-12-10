@@ -19,8 +19,7 @@ class DashboardService
 
         $monthStart = $now->copy()->startOfMonth();
         $monthEnd   = $now->copy()->endOfMonth();
-
-        $month = $this->aggregateRange($monthStart, $monthEnd);
+        $month      = $this->aggregateRange($monthStart, $monthEnd);
 
         $prevMonthStart = $monthStart->copy()->subMonthNoOverflow()->startOfMonth();
         $prevMonthEnd   = $monthStart->copy()->subMonthNoOverflow()->endOfMonth();
@@ -72,9 +71,9 @@ class DashboardService
         ];
 
         foreach ($rows as $row) {
-            $key = strtoupper((string) $row->status);
-            if (isset($map[$key])) {
-                $map[$key] = (int) $row->total;
+            $status = strtoupper((string) $row->status);
+            if (isset($map[$status])) {
+                $map[$status] = (int) $row->total;
             }
         }
 
@@ -107,10 +106,11 @@ class DashboardService
                  u.email,
                  u.phone,
                  count(*) as orders_count,
-                 coalesce(sum(o.grand_total_vnd), 0) as total_spent_vnd,
-                 coalesce(avg(o.grand_total_vnd), 0) as avg_order_vnd'
+                 coalesce(sum(o.grand_total_vnd - o.shipping_fee_vnd), 0) as total_spent_vnd,
+                 coalesce(avg(o.grand_total_vnd - o.shipping_fee_vnd), 0) as avg_order_vnd'
             )
-            ->whereRaw('upper(o.status) = ?', ['COMPLETED'])
+            ->whereIn(DB::raw('upper(o.status)'), ['COMPLETED', 'DELIVERED'])
+            ->whereRaw('upper(o.payment_status) = ?', ['PAID'])
             ->whereBetween(DB::raw('coalesce(o.placed_at, o.created_at)'), [$from, $to])
             ->groupBy('u.id', 'u.name', 'u.email', 'u.phone')
             ->orderByDesc('total_spent_vnd')
@@ -149,7 +149,8 @@ class DashboardService
                  coalesce(sum(oi.quantity), 0) as total_qty,
                  coalesce(sum(oi.total_price_vnd), 0) as revenue_vnd'
             )
-            ->whereRaw('upper(o.status) = ?', ['COMPLETED'])
+            ->whereIn(DB::raw('upper(o.status)'), ['COMPLETED', 'DELIVERED'])
+            ->whereRaw('upper(o.payment_status) = ?', ['PAID'])
             ->whereBetween(DB::raw('coalesce(o.placed_at, o.created_at)'), [$from, $to])
             ->groupBy('oi.product_id')
             ->orderByDesc('total_qty')
@@ -170,19 +171,19 @@ class DashboardService
         return $result;
     }
 
-    public function getLowStockProducts(int $limit = 5, int $threshold = 5): array
+    public function getLowStockProducts(int $limit = 5, int $threshold = 50): array
     {
         $rows = DB::table('stocks as s')
             ->join('products as p', 'p.id', '=', 's.product_id')
             ->selectRaw(
                 'p.id as product_id,
                  p.title as product_name,
-                 s.warehouse_id,
-                 s.on_hand,
-                 s.reserved'
+                 coalesce(sum(s.on_hand), 0) as total_on_hand,
+                 coalesce(sum(s.reserved), 0) as total_reserved'
             )
-            ->where('s.on_hand', '<=', $threshold)
-            ->orderBy('s.on_hand')
+            ->groupBy('p.id', 'p.title')
+            ->havingRaw('coalesce(sum(s.on_hand), 0) < ?', [$threshold])
+            ->orderBy('total_on_hand')
             ->limit($limit)
             ->get();
 
@@ -192,9 +193,9 @@ class DashboardService
             $result[] = [
                 'product_id'   => (string) $row->product_id,
                 'product_name' => (string) $row->product_name,
-                'warehouse_id' => (string) $row->warehouse_id,
-                'on_hand'      => (int) $row->on_hand,
-                'reserved'     => (int) $row->reserved,
+                'on_hand'      => (int) $row->total_on_hand,
+                'reserved'     => (int) $row->total_reserved,
+                'safe_stock'   => $threshold,
             ];
         }
 
@@ -242,17 +243,19 @@ class DashboardService
         $yesterdayFrom = $now->copy()->subDay()->startOfDay();
         $yesterdayTo   = $now->copy()->subDay()->endOfDay();
 
-        $todayCounts     = $this->countOrdersByStatusRange($todayFrom, $todayTo);
-        $yesterdayCounts = $this->countOrdersByStatusRange($yesterdayFrom, $yesterdayTo);
+        $todayCompleted = DB::table('orders')
+            ->whereRaw('upper(status) = ?', ['COMPLETED'])
+            ->whereBetween('delivered_at', [$todayFrom, $todayTo])
+            ->count();
 
-        $totalToday     = $todayCounts['total'];
-        $totalYesterday = $yesterdayCounts['total'];
+        $yesterdayCompleted = DB::table('orders')
+            ->whereRaw('upper(status) = ?', ['COMPLETED'])
+            ->whereBetween('delivered_at', [$yesterdayFrom, $yesterdayTo])
+            ->count();
 
         return [
-            'total_today'       => $totalToday,
-            'completed_today'   => $todayCounts['completed'],
-            'shipping_today'    => $todayCounts['shipping'],
-            'diff_vs_yesterday' => $totalToday - $totalYesterday,
+            'total_today'       => $todayCompleted,
+            'diff_vs_yesterday' => $todayCompleted - $yesterdayCompleted,
         ];
     }
 
@@ -261,23 +264,20 @@ class DashboardService
         $row = DB::table('orders as o')
             ->leftJoin('order_items as oi', 'oi.order_id', '=', 'o.id')
             ->leftJoin('order_batches as ob', 'ob.order_item_id', '=', 'oi.id')
-            ->whereRaw('upper(o.status) = ?', ['COMPLETED'])
+            ->whereIn(DB::raw('upper(o.status)'), ['COMPLETED', 'DELIVERED'])
+            ->whereRaw('upper(o.payment_status) = ?', ['PAID'])
             ->whereBetween(DB::raw('coalesce(o.placed_at, o.created_at)'), [$from, $to])
             ->selectRaw(
-                'coalesce(sum(o.grand_total_vnd), 0) as revenue_vnd,
-             coalesce(sum(ob.quantity * ob.unit_cost_vnd), 0) as cogs_vnd,
-             count(distinct o.id) as completed_orders'
+                'coalesce(sum(o.grand_total_vnd - o.shipping_fee_vnd), 0) as revenue_vnd,
+                 coalesce(sum(ob.quantity * ob.unit_cost_vnd), 0) as cogs_vnd,
+                 count(distinct o.id) as completed_orders'
             )
             ->first();
 
-        $revenueBeforeShip = (int) ($row->revenue_vnd ?? 0);
-        $cogs              = (int) ($row->cogs_vnd ?? 0);
-        $orders            = (int) ($row->completed_orders ?? 0);
-
-        $shippingTotal = 30000 * $orders;
-        $revenue       = max($revenueBeforeShip - $shippingTotal, 0);
-
-        $profit = $revenue - $cogs;
+        $revenue = (int) ($row->revenue_vnd ?? 0);
+        $cogs    = (int) ($row->cogs_vnd ?? 0);
+        $orders  = (int) ($row->completed_orders ?? 0);
+        $profit  = $revenue - $cogs;
 
         return [
             'revenue_vnd'      => $revenue,
@@ -285,39 +285,6 @@ class DashboardService
             'profit_vnd'       => $profit,
             'total_orders'     => $orders,
             'delivered_orders' => $orders,
-        ];
-    }
-
-
-    private function countOrdersByStatusRange(Carbon $from, Carbon $to): array
-    {
-        $rows = DB::table('orders')
-            ->selectRaw('upper(status) as status, count(*) as total')
-            ->whereBetween(DB::raw('coalesce(placed_at, created_at)'), [$from, $to])
-            ->groupBy(DB::raw('upper(status)'))
-            ->get();
-
-        $total     = 0;
-        $completed = 0;
-        $shipping  = 0;
-
-        foreach ($rows as $row) {
-            $status = strtoupper((string) $row->status);
-            $count  = (int) $row->total;
-
-            $total += $count;
-
-            if (in_array($status, ['COMPLETED', 'DELIVERED'], true)) {
-                $completed += $count;
-            } elseif (in_array($status, ['SHIPPING', 'SHIPPED'], true)) {
-                $shipping += $count;
-            }
-        }
-
-        return [
-            'total'     => $total,
-            'completed' => $completed,
-            'shipping'  => $shipping,
         ];
     }
 

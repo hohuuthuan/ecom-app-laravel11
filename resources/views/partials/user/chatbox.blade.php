@@ -17,7 +17,9 @@
     <header class="ai-chat-header">
       <div class="ai-chat-header-left">
         <div class="ai-chat-avatar">
-          <span class="ai-chat-avatar-icon">🤖</span>
+          <span class="ai-chat-avatar-icon">
+            <img src="{{ asset('storage/AI/avatar-AI.avif') }}" alt="Chat AI" class="ai-chat-toggle-icon">
+          </span>
         </div>
         <div class="ai-chat-header-text">
           <h2 class="ai-chat-title">Trợ lý AI</h2>

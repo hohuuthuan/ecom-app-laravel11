@@ -86,7 +86,7 @@
             '</div>' +
           '</div>' +
           '<div class="admin-product-badge">' +
-            '<span>Doanh thu</span>' +
+            '<span>Doanh thu </span>' +
             '<strong>' + formatVnd(revenue) + '</strong>' +
           '</div>' +
         '</div>';
@@ -125,7 +125,7 @@
       html +=
         '<div class="admin-product-item admin-product-item--warning">' +
           '<div class="admin-product-main">' +
-            '<div class="admin-product-rank">!</div>' +
+            '<div class="admin-product-rank">' + (i + 1) + '</div>' +
             '<div class="admin-product-details">' +
               '<div class="admin-product-name">' + escapeHtml(name) + '</div>' +
               '<div class="admin-product-meta">' +

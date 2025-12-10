@@ -42,6 +42,12 @@
         label="Dashboard" />
 
       <x-sidebar.item
+        route="admin.reports.index"
+        active="admin.reports.*"
+        icon="fa-chart-line"
+        label="Báo cáo" />
+
+      <x-sidebar.item
         route="admin.accounts.index"
         icon="fa-users"
         label="Tài khoản" />

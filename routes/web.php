@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\Page\OrderPageController;
 use App\Http\Controllers\Admin\Page\WarehousePageController;
 use App\Http\Controllers\Admin\Page\DiscountPageController;
 use App\Http\Controllers\Admin\Page\ReviewPageController;
+use App\Http\Controllers\Admin\Page\ReportPageController;
 
 use App\Http\Controllers\Admin\DashboardPageController;
 use App\Http\Controllers\Admin\AccountController;
@@ -137,6 +138,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('review', [ReviewPageController::class, 'index'])->name('review.index');
     Route::get('review/product/{productId}', [ReviewPageController::class, 'show'])->name('review.product.show');
     Route::patch('review/{id}', [ReviewPageController::class, 'updateReview'])->name('review.update');
+
+    Route::get('/reports', [ReportPageController::class, 'index'])->name('reports.index');
   });
 
   Route::middleware(['auth', 'role:Admin,Warehouse Manager'])->prefix('warehouse')->name('warehouse.')->group(function () {

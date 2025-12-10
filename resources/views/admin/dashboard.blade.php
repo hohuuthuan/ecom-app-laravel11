@@ -12,7 +12,6 @@
           'profit_vnd'       => 0,
           'total_orders'     => 0,
           'delivered_orders' => 0,
-          'orders_change_vs_yesterday' => null,
       ],
       'month' => [
           'revenue_vnd'            => 0,
@@ -33,9 +32,12 @@
       ],
   ];
 
-  $today = $metrics['today'] ?? [];
   $month = $metrics['month'] ?? [];
-  $year  = $metrics['year']  ?? [];
+
+  $todayPerformance = $todayPerformance ?? [
+      'total_today'       => 0,
+      'diff_vs_yesterday' => null,
+  ];
 
   if (!function_exists('vnd_format')) {
     function vnd_format($value) {
@@ -48,16 +50,15 @@
 
 @section('content')
   <div class="container-fluid admin-dashboard">
+    <script id="adminDashboardPayload" type="application/json">
+      {!! json_encode($dashboardData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+    </script>
+
     <div class="admin-stats-grid mb-4">
-      {{-- DOANH THU THÁNG NÀY --}}
-      @php($revChange = $month['revenue_change_percent'] ?? null)
+      @php $revChange = $month['revenue_change_percent'] ?? null; @endphp
       <div class="admin-stat-card" id="adminRevenueCard">
-        <div class="admin-stat-icon" id="adminRevenueIcon">
-          💰
-        </div>
-        <div class="admin-stat-label">
-          Doanh thu tháng này
-        </div>
+        <div class="admin-stat-icon" id="adminRevenueIcon">💰</div>
+        <div class="admin-stat-label">Doanh thu tháng này</div>
         <div class="admin-stat-value" id="adminRevenueValue">
           {{ vnd_format($month['revenue_vnd'] ?? 0) }}
         </div>
@@ -95,15 +96,10 @@
         </div>
       </div>
 
-      {{-- LỢI NHUẬN THÁNG NÀY --}}
-      @php($profitChange = $month['profit_change_percent'] ?? null)
+      @php $profitChange = $month['profit_change_percent'] ?? null; @endphp
       <div class="admin-stat-card" id="adminProfitCard">
-        <div class="admin-stat-icon" id="adminProfitIcon">
-          📈
-        </div>
-        <div class="admin-stat-label">
-          Lợi nhuận tháng này
-        </div>
+        <div class="admin-stat-icon" id="adminProfitIcon">📈</div>
+        <div class="admin-stat-label">Lợi nhuận tháng này</div>
         <div class="admin-stat-value" id="adminProfitValue">
           {{ vnd_format($month['profit_vnd'] ?? 0) }}
         </div>
@@ -141,15 +137,10 @@
         </div>
       </div>
 
-      {{-- TỔNG ĐƠN THÁNG NÀY --}}
-      @php($ordersChange = $month['orders_change_percent'] ?? null)
+      @php $ordersChange = $month['orders_change_percent'] ?? null; @endphp
       <div class="admin-stat-card" id="adminOrdersCard">
-        <div class="admin-stat-icon" id="adminOrdersIcon">
-          📦
-        </div>
-        <div class="admin-stat-label">
-          Tổng đơn tháng này
-        </div>
+        <div class="admin-stat-icon" id="adminOrdersIcon">📦</div>
+        <div class="admin-stat-label">Tổng đơn tháng này</div>
         <div class="admin-stat-value" id="adminOrdersValue">
           {{ number_format((int) ($month['total_orders'] ?? 0), 0, ',', '.') }}
         </div>
@@ -187,17 +178,15 @@
         </div>
       </div>
 
-      {{-- ĐƠN HÔM NAY --}}
-      @php($todayDiff = $today['orders_change_vs_yesterday'] ?? null)
+      @php
+        $todayTotal = (int) ($todayPerformance['total_today'] ?? 0);
+        $todayDiff  = $todayPerformance['diff_vs_yesterday'] ?? null;
+      @endphp
       <div class="admin-stat-card" id="adminTodayCard">
-        <div class="admin-stat-icon" id="adminTodayIcon">
-          🎯
-        </div>
-        <div class="admin-stat-label">
-          Đơn hàng hôm nay
-        </div>
+        <div class="admin-stat-icon" id="adminTodayIcon">🎯</div>
+        <div class="admin-stat-label">Đơn hoàn tất hôm nay</div>
         <div class="admin-stat-value" id="adminTodayValue">
-          {{ number_format((int) ($today['total_orders'] ?? 0), 0, ',', '.') }}
+          {{ number_format($todayTotal, 0, ',', '.') }}
         </div>
         <div class="admin-stat-change
           @if($todayDiff === null)
@@ -234,14 +223,11 @@
       </div>
     </div>
 
-    {{-- Khu vực chart: tỉ lệ giao hàng + top khách hàng --}}
     <div class="row g-3 mb-4">
       <div class="col-12 col-xl-6">
         <div class="admin-chart-card h-100">
           <div class="admin-chart-header">
-            <h3 class="admin-chart-title mb-0">
-              Tỷ lệ giao hàng tháng này
-            </h3>
+            <h3 class="admin-chart-title mb-0">Tỷ lệ giao hàng tháng này</h3>
           </div>
           <div class="admin-chart-container">
             <canvas id="orderStatusChart"></canvas>
@@ -252,9 +238,7 @@
       <div class="col-12 col-xl-6">
         <div class="admin-chart-card h-100">
           <div class="admin-chart-header">
-            <h3 class="admin-chart-title mb-0">
-              Top 5 khách hàng chi tiêu nhiều nhất
-            </h3>
+            <h3 class="admin-chart-title mb-0">Top 5 khách hàng chi tiêu nhiều nhất</h3>
           </div>
           <div class="admin-chart-container">
             <canvas id="topCustomerChart"></canvas>
@@ -263,43 +247,29 @@
       </div>
     </div>
 
-    {{-- Top sản phẩm + sắp hết hàng --}}
     <div class="row g-3 mb-4">
       <div class="col-12 col-xl-6">
         <div class="admin-table-card h-100">
           <div class="admin-table-header">
-            <h3 class="admin-table-title mb-0">
-              Top sản phẩm bán chạy
-            </h3>
+            <h3 class="admin-table-title mb-0">Top sản phẩm bán chạy</h3>
           </div>
-
-          <div id="topProductsList">
-            {{-- JS sẽ render dữ liệu ở đây --}}
-          </div>
+          <div id="topProductsList"></div>
         </div>
       </div>
 
       <div class="col-12 col-xl-6">
         <div class="admin-table-card h-100">
           <div class="admin-table-header">
-            <h3 class="admin-table-title mb-0">
-              Sản phẩm sắp hết hàng
-            </h3>
+            <h3 class="admin-table-title mb-0">Sản phẩm sắp hết hàng</h3>
           </div>
-
-          <div id="outOfStockList">
-            {{-- JS sẽ render dữ liệu ở đây --}}
-          </div>
+          <div id="outOfStockList"></div>
         </div>
       </div>
     </div>
 
-    {{-- Biểu đồ doanh thu 12 tháng --}}
     <div class="admin-chart-card">
       <div class="admin-chart-header">
-        <h3 class="admin-chart-title mb-0">
-          Doanh thu, vốn và lợi nhuận 12 tháng
-        </h3>
+        <h3 class="admin-chart-title mb-0">Doanh thu, vốn và lợi nhuận 12 tháng</h3>
       </div>
       <div class="admin-chart-container admin-chart-container-lg">
         <canvas id="revenueChart"></canvas>
@@ -307,9 +277,3 @@
     </div>
   </div>
 @endsection
-
-@push('scripts')
-  <script>
-    window.ADMIN_DASHBOARD_DATA = @json($dashboardData, JSON_UNESCAPED_UNICODE);
-  </script>
-@endpush

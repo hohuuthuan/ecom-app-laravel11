@@ -242,4 +242,5 @@ class ShipperPageController extends Controller
 
         return back()->with('toast_success', 'Cập nhật kết quả giao hàng thành công.');
     }
+    
 }

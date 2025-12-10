@@ -8,12 +8,7 @@ use Illuminate\Contracts\View\View;
 
 class DashboardPageController extends Controller
 {
-    private DashboardService $dashboardService;
-
-    public function __construct(DashboardService $dashboardService)
-    {
-        $this->dashboardService = $dashboardService;
-    }
+    public function __construct(private DashboardService $dashboardService) {}
 
     public function index(): View
     {
@@ -26,24 +21,19 @@ class DashboardPageController extends Controller
         $todayPerformance = $this->dashboardService->getTodayOrderPerformance();
 
         $dashboardData = [
-            'metrics'           => $metrics,
-            'orderStatusChart'  => $orderStatusChart,
-            'topCustomers'      => $topCustomers,
-            'topProducts'       => $topProducts,
-            'lowStockProducts'  => $lowStockProducts,
-            'revenueSeries'     => $revenueSeries,
-            'todayPerformance'  => $todayPerformance,
+            'metrics'          => $metrics,
+            'orderStatusChart' => $orderStatusChart,
+            'topCustomers'     => $topCustomers,
+            'topProducts'      => $topProducts,
+            'lowStockProducts' => $lowStockProducts,
+            'revenueSeries'    => $revenueSeries,
+            'todayPerformance' => $todayPerformance,
         ];
 
         return view('admin.dashboard', [
-            'metrics'         => $metrics,
-            'orderStatusChart'=> $orderStatusChart,
-            'topCustomers'    => $topCustomers,
-            'topProducts'     => $topProducts,
-            'lowStockProducts'=> $lowStockProducts,
-            'revenueSeries'   => $revenueSeries,
-            'todayPerformance'=> $todayPerformance,
-            'dashboardData'   => $dashboardData,
+            'metrics'          => $metrics,
+            'todayPerformance' => $todayPerformance,
+            'dashboardData'    => $dashboardData,
         ]);
     }
 }

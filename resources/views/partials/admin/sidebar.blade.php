@@ -8,13 +8,11 @@
     $name = $user->full_name ?? 'Admin';
     $email = $user->email ?? '';
 
-    $avatarFile = $user && $user->avatar ? $user->avatar : 'base-avatar.jpg';
-    $avatarPath = 'avatars/' . $avatarFile;
-
-    $avatar = Storage::disk('public')->url($avatarPath);
-
-    if (!Storage::disk('public')->exists($avatarPath)) {
-    $avatar = asset('storage/avatars/base-avatar.jpg');
+    // Lấy avatar từ user hoặc dùng ảnh mặc định
+    if ($user && $user->avatar) {
+        $avatar = asset('storage/avatars/' . $user->avatar);
+    } else {
+        $avatar = asset('storage/avatars/base-avatar.jpg');
     }
     @endphp
 

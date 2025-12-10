@@ -21,7 +21,7 @@
           {{-- 2 cột: Avatar --}}
           <div class="col-lg-2">
             <div class="ac-avatar">
-              <img id="ac_avatar_preview" src="" alt="Avatar">
+              <img id="ac_avatar_preview" src="{{ asset('storage/avatars/base-avatar.jpg') }}" alt="Avatar">
             </div>
 
             <label class="form-label mt-2 label-select-image"><b>Chọn hình ảnh</b></label>

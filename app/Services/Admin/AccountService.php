@@ -54,7 +54,9 @@ class AccountService
       $user->status    = $data['status'];
       if (isset($data['avatar']) && $data['avatar'] instanceof UploadedFile) {
         $oldAvatar = $user->avatar;
-        $newAvatar = $data['avatar']->store('avatars', 'public');
+        $fileName = $data['avatar']->hashName();
+        $data['avatar']->storeAs('avatars', $fileName, 'public');
+        $newAvatar = $fileName;
         $user->avatar = $newAvatar;
       }
       $user->save();

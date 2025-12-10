@@ -134,7 +134,7 @@
                         data-phone="{{ $user->phone }}"
                         data-address="{{ $user->address }}"
                         data-status="{{ $user->status }}"
-                        data-avatar="{{ $user->avatar ? Storage::url($user->avatar) : Storage::url('avatars/base-avatar.jpg') }}"
+                        data-avatar="{{ $user->avatar ? asset('storage/avatars/' . $user->avatar) : asset('storage/avatars/base-avatar.jpg') }}"
                         data-role_ids="{{ $user->roles->pluck('id')->join(',') }}">
                         <i class="fa fa-edit"></i>
                       </button>
@@ -226,6 +226,6 @@
   <script id="seed"
           type="application/json"
           data-roles='@json($rolesForSelect->map(fn($r)=>["id"=>$r->id,"name"=>$r->name])->values())'
-          data-avatar='@json(Storage::url("avatars/base-avatar.jpg"))'></script>
+          data-avatar='@json(asset("storage/avatars/base-avatar.jpg"))'></script>
   @vite('resources/js/pages/ecom-app-laravel_admin_accounts_index.js')
 @endpush

@@ -1,6 +1,8 @@
 (function () {
   "use strict";
 
+  var revenueChart = null;
+
   function scrollToLayout() {
     var layout = document.querySelector(".admin-report-layout");
     if (!layout) return;
@@ -24,6 +26,11 @@
     var chartData = dataElement.getAttribute("data-chart");
     if (!chartData) return;
 
+    if (revenueChart) {
+      revenueChart.destroy();
+      revenueChart = null;
+    }
+
     try {
       var data = JSON.parse(chartData);
       var labels = Array.isArray(data.labels) ? data.labels : [];
@@ -34,7 +41,7 @@
       if (labels.length === 0) return;
 
       var ctx = chartContainer.getContext("2d");
-      new Chart(ctx, {
+      revenueChart = new Chart(ctx, {
         type: "bar",
         data: {
           labels: labels,
@@ -215,10 +222,14 @@
         link.classList.add("active");
 
         var url = new URL(window.location);
-        url.searchParams.set("tab", target);
+        url.search = "?tab=" + target;
         window.history.pushState({}, "", url);
 
         setTimeout(function () {
+          if (target === "revenue") {
+            initRevenueChart();
+          }
+          
           var layout = document.querySelector(".admin-report-layout");
           if (!layout) return;
           var top = layout.getBoundingClientRect().top + window.scrollY - 80;

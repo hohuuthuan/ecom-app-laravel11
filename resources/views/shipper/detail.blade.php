@@ -21,58 +21,58 @@ $fmtVnd = fn($n) => number_format((int) $n, 0, ',', '.') . ' VNĐ';
 $paymentStatus = strtolower((string) $order->payment_status);
 
 $paymentStatusTextMap = [
-'unpaid' => 'Chưa thanh toán',
-'pending' => 'Chờ thanh toán',
-'paid' => 'Đã thanh toán',
-'refunded' => 'Đã hoàn tiền',
+  'unpaid'   => 'Chưa thanh toán',
+  'pending'  => 'Chờ thanh toán',
+  'paid'     => 'Đã thanh toán',
+  'refunded' => 'Đã hoàn tiền',
 ];
 
 $paymentStatusClassMap = [
-'unpaid' => 'text-bg-secondary',
-'pending' => 'text-bg-warning',
-'paid' => 'text-bg-success',
-'refunded' => 'text-bg-info',
+  'unpaid'   => 'text-bg-secondary',
+  'pending'  => 'text-bg-warning',
+  'paid'     => 'text-bg-success',
+  'refunded' => 'text-bg-info',
 ];
 
-$paymentStatusText = $paymentStatusTextMap[$paymentStatus] ?? ucfirst($paymentStatus);
+$paymentStatusText  = $paymentStatusTextMap[$paymentStatus] ?? ucfirst($paymentStatus);
 $paymentStatusClass = $paymentStatusClassMap[$paymentStatus] ?? 'text-bg-secondary';
 
 $shipment = $order->shipment;
-$user = $order->user;
+$user     = $order->user;
 
 $statusRaw = strtoupper((string) $order->status);
-$status = strtolower($statusRaw);
+$status    = strtolower($statusRaw);
 
 // Label trạng thái ở góc độ giao hàng
 $statusLabel = match ($status) {
-'pending' => 'Chờ xử lý',
-'processing' => 'Đang chờ tiếp nhận',
-'picking' => 'Đang chuẩn bị hàng',
-'shipping' => 'Đang giao',
-'completed' => 'Giao thành công',
-'cancelled' => 'Đã hủy đơn hàng',
-'delivery_failed' => 'Giao hàng thất bại',
-'returned' => 'Hoàn / trả hàng',
-'confirmed' => 'Đã xác nhận (cũ)',
-'shipped' => 'Đã giao cho ĐVVC (cũ)',
-'delivered' => 'Đã giao hàng (cũ)',
-default => 'Không xác định',
+  'pending'         => 'Chờ xử lý',
+  'processing'      => 'Đang chờ tiếp nhận',
+  'picking'         => 'Đang chuẩn bị hàng',
+  'shipping'        => 'Đang giao',
+  'completed'       => 'Giao thành công',
+  'cancelled'       => 'Đã hủy đơn hàng',
+  'delivery_failed' => 'Giao hàng thất bại',
+  'returned'        => 'Hoàn / trả hàng',
+  'confirmed'       => 'Đã xác nhận (cũ)',
+  'shipped'         => 'Đã giao cho ĐVVC (cũ)',
+  'delivered'       => 'Đã giao hàng (cũ)',
+  default           => 'Không xác định',
 };
 
 $statusClass = match ($status) {
-'shipping' => 'badge-status--primary',
-'completed' => 'badge-status--success',
-'delivery_failed',
-'returned',
-'cancelled' => 'badge-status--danger',
-default => 'badge-status--secondary',
+  'shipping'        => 'badge-status--primary',
+  'completed'       => 'badge-status--success',
+  'delivery_failed',
+  'returned',
+  'cancelled'       => 'badge-status--danger',
+  default           => 'badge-status--secondary',
 };
 
-$isShipping = $statusRaw === 'SHIPPING';
-$isResultStatus = in_array($statusRaw, ['COMPLETED','DELIVERY_FAILED','RETURNED'], true);
+$isShipping     = $statusRaw === 'SHIPPING';
+$isResultStatus = in_array($statusRaw, ['COMPLETED', 'DELIVERY_FAILED', 'RETURNED'], true);
 
 $shipAddress = $order->receiver_address ?? $shipment?->address;
-$shipPhone = $order->receiver_phone ?? $shipment?->phone;
+$shipPhone   = $order->receiver_phone ?? $shipment?->phone;
 @endphp
 
 <div class="card mb-3">
@@ -100,31 +100,29 @@ $shipPhone = $order->receiver_phone ?? $shipment?->phone;
         {{ $statusLabel }}
       </span>
 
-      @if($isShipping)
-      <form
-        method="POST"
-        action="{{ route('shipper.orders.changeStatus', $order->id) }}"
-        class="d-flex align-items-center gap-2 no-print">
-        @csrf
-        @method('PATCH')
+      @if($isShipping && !$isResultStatus)
+      <div class="d-flex flex-wrap align-items-center gap-2 no-print">
+        {{-- Nút giao hàng thành công --}}
+        <form
+          method="POST"
+          action="{{ route('shipper.orders.changeStatus', $order->id) }}">
+          @csrf
+          @method('PATCH')
+          <input type="hidden" name="status" value="COMPLETED">
+          <button type="submit" class="btn btn-success btn-sm">
+            Giao hàng thành công
+          </button>
+        </form>
 
-        <div class="admin-select-status-order">
-          <select
-            name="status"
-            class="setupSelect2">
-            <option value="SHIPPING" selected>
-              Đang giao
-            </option>
-            <option value="COMPLETED">Giao thành công</option>
-            <option value="DELIVERY_FAILED">Giao thất bại</option>
-            <option value="RETURNED">Hoàn / trả hàng</option>
-          </select>
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-admin">
-          Cập nhật
+        {{-- Nút giao hàng thất bại (mở modal nhập lý do) --}}
+        <button
+          type="button"
+          class="btn btn-danger btn-sm"
+          data-bs-toggle="modal"
+          data-bs-target="#deliveryFailedModal">
+          Giao hàng thất bại
         </button>
-      </form>
+      </div>
       @endif
 
       <span class="vr d-none d-md-block"></span>
@@ -309,6 +307,63 @@ $shipPhone = $order->receiver_phone ?? $shipment?->phone;
           </tr>
         </tfoot>
       </table>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="deliveryFailedModal"
+  tabindex="-1"
+  aria-labelledby="deliveryFailedModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form
+        method="POST"
+        action="{{ route('shipper.orders.changeStatus', $order->id) }}">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="status" value="DELIVERY_FAILED">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="deliveryFailedModalLabel">
+            Xác nhận giao hàng thất bại
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="deliveryFailedReason" class="form-label">
+              Lý do giao hàng thất bại
+            </label>
+            <textarea
+              id="deliveryFailedReason"
+              name="reason"
+              class="form-control"
+              rows="3"
+              placeholder="Nhập lý do: khách không nghe máy, khách từ chối nhận, sai địa chỉ,..."
+              required></textarea>
+          </div>
+
+          <div class="alert alert-warning small mb-0">
+            Vui lòng ghi rõ lý do để bộ phận xử lý đơn và kế toán có căn cứ hoàn tiền hoặc trừ phí ship phù hợp.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal">
+            Hủy
+          </button>
+          <button type="submit" class="btn btn-danger">
+            Xác nhận thất bại
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

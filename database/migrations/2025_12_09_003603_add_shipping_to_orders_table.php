@@ -9,41 +9,63 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table): void {
-            $table->string('shipping_type', 20)
-                ->nullable()
-                ->after('payment_status'); // INTERNAL|EXTERNAL
-            $table->uuid('shipper_id')
-                ->nullable()
-                ->after('shipping_type');
+            if (!Schema::hasColumn('orders', 'shipping_type')) {
+                $table->string('shipping_type', 20)
+                    ->nullable()
+                    ->after('payment_status'); // INTERNAL|EXTERNAL
+            }
 
-            $table->timestamp('shipping_started_at')
-                ->nullable()
-                ->after('shipper_id');
+            if (!Schema::hasColumn('orders', 'shipper_id')) {
+                $table->uuid('shipper_id')
+                    ->nullable()
+                    ->after('shipping_type');
 
-            $table->timestamp('delivery_failed_at')
-                ->nullable()
-                ->after('delivered_at');
+                $table->index('shipper_id');
+            }
 
-            $table->string('delivery_failed_reason')
-                ->nullable()
-                ->after('delivery_failed_at');
+            if (!Schema::hasColumn('orders', 'shipping_started_at')) {
+                $table->timestamp('shipping_started_at')
+                    ->nullable()
+                    ->after('shipper_id');
+            }
 
-            $table->index('shipper_id');
+            if (!Schema::hasColumn('orders', 'delivery_failed_at')) {
+                $table->timestamp('delivery_failed_at')
+                    ->nullable()
+                    ->after('delivered_at');
+            }
+
+            if (!Schema::hasColumn('orders', 'delivery_failed_reason')) {
+                $table->string('delivery_failed_reason')
+                    ->nullable()
+                    ->after('delivery_failed_at');
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table): void {
-            $table->dropIndex(['shipper_id']);
+            if (Schema::hasColumn('orders', 'shipper_id')) {
+                $table->dropIndex(['shipper_id']);
+                $table->dropColumn('shipper_id');
+            }
 
-            $table->dropColumn([
-                'shipping_type',
-                'shipper_id',
-                'shipping_started_at',
-                'delivery_failed_at',
-                'delivery_failed_reason',
-            ]);
+            if (Schema::hasColumn('orders', 'shipping_type')) {
+                $table->dropColumn('shipping_type');
+            }
+
+            if (Schema::hasColumn('orders', 'shipping_started_at')) {
+                $table->dropColumn('shipping_started_at');
+            }
+
+            if (Schema::hasColumn('orders', 'delivery_failed_at')) {
+                $table->dropColumn('delivery_failed_at');
+            }
+
+            if (Schema::hasColumn('orders', 'delivery_failed_reason')) {
+                $table->dropColumn('delivery_failed_reason');
+            }
         });
     }
 };

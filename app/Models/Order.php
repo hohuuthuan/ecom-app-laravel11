@@ -43,4 +43,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderStatusHistory::class);
     }
+
+    public function deliveryIssues()
+    {
+        return $this->hasMany(OrderDeliveryIssue::class);
+    }
 }

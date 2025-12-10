@@ -43,9 +43,9 @@ class OrderDeliveryIssueService
         $refundAmount = 0;
         $lostShippingFee = 0;
 
-        if ($paymentMethod === 'COD') {
+        if ($paymentMethod === 'cod') {
             $lostShippingFee = $shippingFee;
-        } elseif (in_array($paymentMethod, ['MOMO', 'VNPAY'], true)) {
+        } elseif (in_array($paymentMethod, ['momo', 'vnpay'], true)) {
             $refundAmount = $grandTotal - $shippingFee;
             if ($refundAmount < 0) {
                 $refundAmount = 0;

@@ -38,6 +38,18 @@ a:hover {
     width: 250px;
 }
 
+.incidentWidth {
+    width: 180px;
+}
+
+.infoWidth {
+    width: 250px;
+}
+
+.reasonWidth {
+    width: 370px;
+}
+
 .createTimeWidth {
     width: 180px;
 }

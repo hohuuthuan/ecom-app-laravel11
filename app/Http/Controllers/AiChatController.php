@@ -24,6 +24,16 @@ class AiChatController extends Controller
       ], 422);
     }
 
+    // 1. CÁC CÂU LỆNH THƯỜNG GẶP – TRẢ VỀ NGAY, KHÔNG GỌI OPENAI
+    $staticReply = $this->getStaticReplyForCommonCommands($userMessage);
+    if ($staticReply !== null) {
+      return response()->json([
+        'ok'    => true,
+        'reply' => $staticReply,
+      ]);
+    }
+
+    // 2. PHÂN LOẠI Ý ĐỊNH BẰNG MODEL (CHỈ KHI KHÔNG KHỚP CÂU LỆNH THƯỜNG GẶP)
     $classification = $this->classifyIntentWithAi($userMessage);
 
     if (is_array($classification) && ($classification['intent'] ?? '') === 'search_products') {
@@ -42,6 +52,7 @@ class AiChatController extends Controller
       ]);
     }
 
+    // 3. HỘI THOẠI BÌNH THƯỜNG VỚI MODEL CHAT
     $history   = session('ai_chat_history', []);
     $history[] = [
       'role'    => 'user',
@@ -49,8 +60,8 @@ class AiChatController extends Controller
     ];
 
     $payload = [
-      'model'    => config('services.openai.chat_model', 'gpt-4.1-mini'),
-      'messages' => array_merge([
+      'model'       => config('services.openai.chat_model', 'gpt-4.1-mini'),
+      'messages'    => array_merge([
         [
           'role'    => 'system',
           'content' => $this->getChatSystemPrompt(),
@@ -95,6 +106,73 @@ class AiChatController extends Controller
       'ok'    => true,
       'reply' => $reply,
     ]);
+  }
+
+  protected function getStaticReplyForCommonCommands(string $message): ?string
+  {
+    $normalized = mb_strtolower(trim($message));
+    $normalized = preg_replace('/\s+/', ' ', $normalized);
+
+    if ($normalized === null) {
+      return null;
+    }
+
+    // Hướng dẫn mua hàng
+    if (
+      mb_strpos($normalized, 'hướng dẫn mua hàng') !== false
+      || mb_strpos($normalized, 'cách mua hàng') !== false
+      || mb_strpos($normalized, 'mua hàng như thế nào') !== false
+      || mb_strpos($normalized, 'làm sao để mua hàng') !== false
+      || mb_strpos($normalized, 'cách đặt hàng') !== false
+    ) {
+      return '<p><strong>Bước 1:</strong> Tìm cuốn sách bạn muốn mua bằng thanh tìm kiếm hoặc duyệt theo danh mục.</p>'
+        . '<p><strong>Bước 2:</strong> Mở trang chi tiết sách để xem mô tả, giá bán và tồn kho.</p>'
+        . '<p><strong>Bước 3:</strong> Nhấn nút "Thêm vào giỏ hàng".</p>'
+        . '<p><strong>Bước 4:</strong> Vào trang giỏ hàng để kiểm tra lại sản phẩm, số lượng và tổng tiền.</p>'
+        . '<p><strong>Bước 5:</strong> Nhấn "Tiến hành đặt hàng", chọn hoặc thêm địa chỉ nhận hàng.</p>'
+        . '<p><strong>Bước 6:</strong> Chọn phương thức thanh toán phù hợp với bạn.</p>'
+        . '<p><strong>Bước 7:</strong> Kiểm tra lại thông tin và nhấn "Đặt hàng" để hoàn tất đơn.</p>';
+    }
+
+    // Theo dõi đơn hàng
+    if (
+      mb_strpos($normalized, 'theo dõi đơn hàng') !== false
+      || mb_strpos($normalized, 'xem đơn hàng') !== false
+      || mb_strpos($normalized, 'tình trạng đơn hàng') !== false
+    ) {
+      return '<p><strong>Bước 1:</strong> Đăng nhập vào tài khoản của bạn.</p>'
+        . '<p><strong>Bước 2:</strong> Bấm vào tên của bạn ở góc trên bên phải và chọn "Đơn hàng của tôi".</p>'
+        . '<p><strong>Bước 3:</strong> Xem danh sách đơn hàng và trạng thái từng đơn (đang xử lý, đang giao, đã hoàn tất,...).</p>'
+        . '<p><strong>Bước 4:</strong> Nhấn vào từng đơn để xem chi tiết sản phẩm, địa chỉ nhận hàng và lịch sử cập nhật.</p>';
+    }
+
+    // Đánh giá sản phẩm
+    if (
+      mb_strpos($normalized, 'đánh giá sản phẩm') !== false
+      || mb_strpos($normalized, 'cách đánh giá') !== false
+      || mb_strpos($normalized, 'viết review') !== false
+    ) {
+      return '<p><strong>Bước 1:</strong> Đăng nhập tài khoản và vào mục "Đơn hàng của tôi".</p>'
+        . '<p><strong>Bước 2:</strong> Chọn đơn hàng đã ở trạng thái "Hoàn tất".</p>'
+        . '<p><strong>Bước 3:</strong> Tại từng sản phẩm trong đơn, nhấn nút "Đánh giá".</p>'
+        . '<p><strong>Bước 4:</strong> Chọn số sao, viết cảm nhận và (nếu muốn) tải lên hình ảnh sản phẩm thực tế.</p>'
+        . '<p><strong>Bước 5:</strong> Nhấn "Gửi đánh giá" để hoàn thành.</p>';
+    }
+
+    // Cập nhật thông tin tài khoản
+    if (
+      mb_strpos($normalized, 'cập nhật tài khoản') !== false
+      || mb_strpos($normalized, 'sửa thông tin tài khoản') !== false
+      || mb_strpos($normalized, 'đổi mật khẩu') !== false
+      || mb_strpos($normalized, 'thay đổi thông tin cá nhân') !== false
+    ) {
+      return '<p><strong>Bước 1:</strong> Đăng nhập vào tài khoản trên website.</p>'
+        . '<p><strong>Bước 2:</strong> Bấm vào tên của bạn ở góc trên bên phải và chọn "Tài khoản của tôi".</p>'
+        . '<p><strong>Bước 3:</strong> Tại đây bạn có thể cập nhật tên, email, số điện thoại, mật khẩu và danh sách địa chỉ nhận hàng.</p>'
+        . '<p><strong>Bước 4:</strong> Sau khi chỉnh sửa, nhấn nút "Lưu" để áp dụng thay đổi.</p>';
+    }
+
+    return null;
   }
 
   protected function classifyIntentWithAi(string $message): ?array
@@ -166,7 +244,6 @@ class AiChatController extends Controller
   {
     $searchType = (string) ($classification['search_type'] ?? 'unknown');
 
-    // 1. Lấy term từ JSON phân loại (KHÔNG fallback về cả câu gốc)
     $term = '';
     if ($searchType === 'author') {
       $term = (string) ($classification['author_name'] ?? '');
@@ -178,10 +255,9 @@ class AiChatController extends Controller
       $term = (string) ($classification['keyword'] ?? '');
     }
 
-    $term = trim($term);
-    $hasTerm = mb_strlen($term) >= 2; // chỉ coi là từ khóa khi đủ dài
+    $term    = trim($term);
+    $hasTerm = mb_strlen($term) >= 2;
 
-    // Nếu không có term và cũng không có filter gì thì thôi, coi như không xử lý
     $priceMin = $classification['price_min'] ?? null;
     $priceMax = $classification['price_max'] ?? null;
     $sortBy   = (string) ($classification['sort_by'] ?? 'relevance');
@@ -189,7 +265,6 @@ class AiChatController extends Controller
     $query = Product::query()
       ->with(['authors', 'categories', 'publisher']);
 
-    // 2. Chỉ áp dụng điều kiện LIKE nếu có term
     if ($hasTerm) {
       $query->where(function ($q) use ($term) {
         $like = '%' . $term . '%';
@@ -209,13 +284,12 @@ class AiChatController extends Controller
       });
     }
 
-    // 3. Xác định có đang dùng các bộ lọc “cần lọc” để quyết định có gọi external hay không
     $hasStructuredFilter = false;
 
     if (
-      ($searchType === 'author' && ! empty($classification['author_name'])) ||
-      ($searchType === 'category' && ! empty($classification['category_name'])) ||
-      ($searchType === 'publisher' && ! empty($classification['publisher_name']))
+      ($searchType === 'author' && !empty($classification['author_name']))
+      || ($searchType === 'category' && !empty($classification['category_name']))
+      || ($searchType === 'publisher' && !empty($classification['publisher_name']))
     ) {
       $hasStructuredFilter = true;
     }
@@ -230,7 +304,6 @@ class AiChatController extends Controller
       $query->where('selling_price_vnd', '<=', (int) $priceMax);
     }
 
-    // 4. Sort
     if ($sortBy === 'best_selling') {
       $hasStructuredFilter = true;
 
@@ -268,112 +341,229 @@ class AiChatController extends Controller
       $query->orderByDesc('created_at');
     }
 
-    // 5. Lấy sản phẩm
     $products = $query->limit(5)->get();
 
-    if ($products->isEmpty()) {
-      // Không tìm thấy sách phù hợp với filter hiện tại
-      $randomProducts = Product::query()
-        ->with(['authors', 'categories', 'publisher'])
-        ->inRandomOrder()
-        ->limit(3)
-        ->get();
+    // 3. Nếu query chính có kết quả => trả về luôn (không gọi bên ngoài)
+    if ($products->isNotEmpty()) {
+      $html = '<div>Tôi tìm được một số sách phù hợp với yêu cầu của bạn:</div>';
+      $html .= '<div class="ai-chat-product-list">';
 
-      // Chỉ gợi ý sách bên ngoài nếu có filter “cần lọc”
-      $externalBooks = [];
-      if ($hasStructuredFilter) {
-        $externalBooks = $this->getExternalBookSuggestions($classification, $originalMessage);
-      }
+      foreach ($products as $product) {
+        $html .= '<a href="' . e(route('product.detail', [
+          'slug' => $product->slug,
+          'id'   => $product->id,
+        ])) . '" target="_blank" class="ai-chat-product-item">';
 
-      if (empty($externalBooks) && $randomProducts->isEmpty()) {
-        return null;
-      }
+        $html .= '<div class="ai-chat-product-title">' . e($product->title) . '</div>';
 
-      $html = '<div>';
-      $html .= 'Hiện tại tôi không tìm thấy sách nào trong kho phù hợp chính xác với yêu cầu của bạn.';
-      $html .= '</div>';
+        $html .= '<div class="ai-chat-product-meta">';
 
-      if (! empty($externalBooks)) {
-        $html .= '<div style="margin-top:6px;">'
-          . 'Dưới đây là một vài gợi ý tham khảo bên ngoài (có thể không có sẵn trong kho của chúng tôi):'
-          . '</div>';
-
-        $html .= '<ul class="ai-chat-external-book-list" style="margin:4px 0 8px 18px; padding:0;">';
-
-        foreach ($externalBooks as $book) {
-          $title = (string) ($book['title'] ?? '');
-          if ($title === '') {
-            continue;
-          }
-
-          $author = (string) ($book['author'] ?? '');
-          $reason = (string) ($book['reason'] ?? '');
-
-          $html .= '<li style="margin-bottom:4px;">'
-            . '<strong>' . e($title) . '</strong>';
-
-          if ($author !== '') {
-            $html .= ' — ' . e($author);
-          }
-
-          if ($reason !== '') {
-            $html .= '<br><span style="font-size:12px;color:#64748b;">' . e($reason) . '</span>';
-          }
-
-          $html .= '</li>';
+        if ($product->relationLoaded('authors') && $product->authors->isNotEmpty()) {
+          $html .= '<div><strong>Tác giả:</strong> '
+            . e($product->authors->pluck('name')->implode(', '))
+            . '</div>';
         }
 
-        $html .= '</ul>';
+        if ($product->relationLoaded('categories') && $product->categories->isNotEmpty()) {
+          $html .= '<div><strong>Thể loại:</strong> '
+            . e($product->categories->pluck('name')->implode(', '))
+            . '</div>';
+        }
+
+        if (isset($product->selling_price_vnd)) {
+          $html .= '<div><strong>Giá:</strong> '
+            . number_format((int) $product->selling_price_vnd, 0, ',', '.')
+            . 'đ</div>';
+        }
+
+        $html .= '</div>';
+        $html .= '</a>';
       }
 
-      if ($randomProducts->isEmpty()) {
-        return $html;
+      $html .= '</div>';
+      $html .= '<span class="ai-chat-product-note">'
+        . 'Bạn có thể bấm vào tên sách để mở trang chi tiết sản phẩm trong tab mới.'
+        . '</span>';
+
+      return $html;
+    }
+
+    $fallbackQuery = Product::query()
+      ->with(['authors', 'categories', 'publisher']);
+
+    $normalizedSentence = mb_strtolower(trim($originalMessage));
+    $normalizedSentence = preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $normalizedSentence);
+    $normalizedSentence = preg_replace('/\s+/', ' ', $normalizedSentence);
+
+    $keywords = [];
+    if ($normalizedSentence !== null && $normalizedSentence !== '') {
+      $parts = explode(' ', $normalizedSentence);
+
+      $stopwords = [
+        'xin',
+        'chào',
+        'toi',
+        'tôi',
+        'minh',
+        'mình',
+        'em',
+        'anh',
+        'chi',
+        'chị',
+        'ban',
+        'bạn',
+        'muon',
+        'muốn',
+        'doc',
+        'đọc',
+        'sach',
+        'sách',
+        'cuon',
+        'cuốn',
+        'huong',
+        'hướng',
+        'dan',
+        'dẫn',
+        'cho',
+        'voi',
+        'với',
+        've',
+        'về'
+      ];
+
+      foreach ($parts as $word) {
+        $word = trim($word);
+        if ($word === '' || mb_strlen($word) < 3) {
+          continue;
+        }
+        if (in_array($word, $stopwords, true)) {
+          continue;
+        }
+        $keywords[] = $word;
       }
+    }
 
-      $html .= '<div style="margin-top:4px;">Ngoài ra, đây là một vài cuốn đang có sẵn trên hệ thống của chúng tôi:</div>';
+    if (!empty($keywords)) {
+      $fallbackQuery->where(function ($q) use ($keywords) {
+        foreach ($keywords as $kw) {
+          $like = '%' . $kw . '%';
 
-      $products = $randomProducts;
+          $q->orWhere('title', 'LIKE', $like)
+            ->orWhere('slug', 'LIKE', $like)
+            ->orWhere('isbn', 'LIKE', $like)
+            ->orWhereHas('authors', function ($qa) use ($like) {
+              $qa->where('name', 'LIKE', $like);
+            })
+            ->orWhereHas('categories', function ($qc) use ($like) {
+              $qc->where('name', 'LIKE', $like);
+            })
+            ->orWhereHas('publisher', function ($qp) use ($like) {
+              $qp->where('name', 'LIKE', $like);
+            });
+        }
+      });
     } else {
-      $html = '<div>Tôi tìm được một số sách phù hợp với yêu cầu của bạn:</div>';
+      $fallbackQuery->whereRaw('1 = 0');
     }
 
-    // 6. Render danh sách sản phẩm trong hệ thống
-    $html .= '<div class="ai-chat-product-list">';
+    $fallbackQuery->orderByDesc('created_at');
 
-    foreach ($products as $product) {
-      $html .= '<a href="' . e(route('product.detail', [
-        'slug' => $product->slug,
-        'id'   => $product->id,
-      ])) . '" target="_blank" class="ai-chat-product-item">';
+    $fallbackProducts = $fallbackQuery->limit(5)->get();
 
-      $html .= '<div class="ai-chat-product-title">' . e($product->title) . '</div>';
+    if ($fallbackProducts->isNotEmpty()) {
+      $html = '<div>'
+        . 'Tôi chưa tìm được cuốn nào khớp hoàn toàn với yêu cầu, '
+        . 'nhưng dưới đây là một số sách gần với nhu cầu của bạn trong kho:'
+        . '</div>';
 
-      $metaParts = [];
+      $html .= '<div class="ai-chat-product-list">';
 
-      if ($product->relationLoaded('authors') && $product->authors->isNotEmpty()) {
-        $metaParts[] = 'Tác giả: ' . e($product->authors->pluck('name')->implode(', '));
+      foreach ($fallbackProducts as $product) {
+        $html .= '<a href="' . e(route('product.detail', [
+          'slug' => $product->slug,
+          'id'   => $product->id,
+        ])) . '" target="_blank" class="ai-chat-product-item">';
+
+        $html .= '<div class="ai-chat-product-title">' . e($product->title) . '</div>';
+
+        $html .= '<div class="ai-chat-product-meta">';
+
+        if ($product->relationLoaded('authors') && $product->authors->isNotEmpty()) {
+          $html .= '<div><strong>Tác giả:</strong> '
+            . e($product->authors->pluck('name')->implode(', '))
+            . '</div>';
+        }
+
+        if ($product->relationLoaded('categories') && $product->categories->isNotEmpty()) {
+          $html .= '<div><strong>Thể loại:</strong> '
+            . e($product->categories->pluck('name')->implode(', '))
+            . '</div>';
+        }
+
+        if (isset($product->selling_price_vnd)) {
+          $html .= '<div><strong>Giá:</strong> '
+            . number_format((int) $product->selling_price_vnd, 0, ',', '.')
+            . 'đ</div>';
+        }
+
+        $html .= '</div>';
+        $html .= '</a>';
       }
 
-      if (isset($product->selling_price_vnd)) {
-        $metaParts[] = 'Giá: ' . number_format((int) $product->selling_price_vnd, 0, ',', '.') . 'đ';
-      }
+      $html .= '</div>';
+      $html .= '<span class="ai-chat-product-note">'
+        . 'Bạn có thể bấm vào tên sách để mở trang chi tiết sản phẩm trong tab mới.'
+        . '</span>';
 
-      if (! empty($metaParts)) {
-        $html .= '<div class="ai-chat-product-meta">' . implode(' | ', $metaParts) . '</div>';
-      }
-
-      $html .= '</a>';
+      return $html;
     }
 
+    $externalBooks = [];
+    if ($hasStructuredFilter || !empty($keywords)) {
+      $externalBooks = $this->getExternalBookSuggestions($classification, $originalMessage);
+    }
+
+    if (empty($externalBooks)) {
+      return null;
+    }
+
+    $html = '<div>';
+    $html .= 'Hiện tại tôi chưa tìm được sách nào trong kho phù hợp với yêu cầu của bạn.';
     $html .= '</div>';
 
-    $html .= '<span class="ai-chat-product-note">'
-      . 'Bạn có thể bấm vào tên sách để mở trang chi tiết sản phẩm trong tab mới.'
-      . '</span>';
+    $html .= '<div style="margin-top:6px;">'
+      . 'Dưới đây là một vài gợi ý tham khảo bên ngoài (có thể không có sẵn trong kho của chúng tôi):'
+      . '</div>';
+
+    $html .= '<ul class="ai-chat-external-book-list" style="margin:4px 0 8px 18px; padding:0;">';
+
+    foreach ($externalBooks as $book) {
+      $title = (string) ($book['title'] ?? '');
+      if ($title === '') {
+        continue;
+      }
+
+      $author = (string) ($book['author'] ?? '');
+      $reason = (string) ($book['reason'] ?? '');
+
+      $html .= '<li style="margin-bottom:4px;">'
+        . '<strong>' . e($title) . '</strong>';
+
+      if ($author !== '') {
+        $html .= ' — ' . e($author);
+      }
+
+      if ($reason !== '') {
+        $html .= '<br><span style="font-size:12px;color:#64748b;">' . e($reason) . '</span>';
+      }
+
+      $html .= '</li>';
+    }
+
+    $html .= '</ul>';
 
     return $html;
   }
-
 
   protected function getExternalBookSuggestions(array $classification, string $originalMessage): array
   {
@@ -445,6 +635,12 @@ class AiChatController extends Controller
           - Nếu bạn không rõ về tác phẩm, hãy nói thẳng là bạn không chắc, đừng bịa nội dung.
 
         3) Hướng dẫn sử dụng hệ thống (flow thao tác):
+          - Mỗi thao tác là một bước rõ ràng, phải xuống hàng và in đậm phần "Bước X" để người dùng dễ theo dõi.
+          - KHI HƯỚNG DẪN THEO TỪNG BƯỚC, LUÔN ĐỊNH DẠNG THEO ĐÚNG MẪU HTML SAU (KHÔNG ĐƯỢC DÙNG MARKDOWN):
+            <p><strong>Bước 1:</strong> Nội dung thao tác ngắn gọn, rõ ràng.</p>
+            <p><strong>Bước 2:</strong> Nội dung thao tác tiếp theo.</p>
+            <p><strong>Bước 3:</strong> ...</p>
+          - Tuyệt đối không dùng các ký hiệu Markdown như **, __, ##, ### trong câu trả lời. Chỉ dùng HTML đơn giản (p, strong, br, ul, li) khi cần.
           - Giải thích cách tìm kiếm sách, lọc theo thể loại, tác giả, nhà xuất bản, khoảng giá.
           - Hướng dẫn cách xem chi tiết sách, xem mô tả, đánh giá, tồn kho.
           - Hướng dẫn các bước đặt hàng: vào giỏ hàng, kiểm tra sản phẩm, chọn hoặc thêm địa chỉ nhận hàng, chọn phương thức thanh toán, xác nhận đặt hàng.
@@ -454,7 +650,7 @@ class AiChatController extends Controller
 
         Quy tắc trả lời:
         Đặc biệt quan trọng: trả lời ngắn gọn, súc tích, rõ ràng, lịch sự.
-        1) Luôn trả lời bằng tiếng Việt, ngắn gọn, đi vào trọng tâm, văn phong rõ ràng, lịch sự, tích cực, và kèm lời khen nhẹ nhàng khi phù hợp, không khen khách hàng là 'thông minh' (ví dụ: khen việc đọc sách, quan tâm đến kiến thức...).
+        1) Luôn trả lời bằng tiếng Việt, ngắn gọn, đi vào trọng tâm, văn phong rõ ràng, lịch sự, tích cực, và kèm lời khen nhẹ nhàng khi phù hợp, không khen khách hàng là "thông minh" (ví dụ: khen việc đọc sách, quan tâm đến kiến thức...).
         2) Ưu tiên giải pháp liên quan trực tiếp đến sách và chức năng của hệ thống (giỏ hàng, đơn hàng, tài khoản, đánh giá).
         3) Nếu câu hỏi không liên quan đến sách, đọc, học tập, kỹ năng, hoặc việc mua sách trên hệ thống, hãy từ chối lịch sự và nhắc lại rằng bạn là trợ lý cho website bán sách.
         4) Không bịa tên sách, tác giả, nhà xuất bản, hoặc thông tin đơn hàng cụ thể. Nếu cần dữ liệu chính xác (đơn hàng, tồn kho, giá thực tế...), hãy gợi ý người dùng kiểm tra trực tiếp trên website.

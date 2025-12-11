@@ -22,6 +22,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderPlacedMail;
 
 class CheckoutController extends Controller
 {
@@ -569,8 +571,6 @@ class CheckoutController extends Controller
             }
         }
 
-
-        // COD
         if ($data['payment_method'] === 'cod') {
             $order = $checkoutService->placeCodOrder(
                 $orderData,
@@ -582,6 +582,8 @@ class CheckoutController extends Controller
                 if (!empty($discountId)) {
                     $this->recordDiscountUsage((string) $discountId, (string) $user->id, (string) $order->id);
                 }
+
+                $this->sendOrderPlacedMail($order);
 
                 $request->session()->forget([
                     'checkout.items',
@@ -601,7 +603,6 @@ class CheckoutController extends Controller
             return back()
                 ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
         }
-
 
         return back()
             ->with('toast_error', 'Phương thức thanh toán không hợp lệ');
@@ -654,6 +655,8 @@ class CheckoutController extends Controller
                 $this->recordDiscountUsage((string) $discountId, (string) $order->user_id, (string) $order->id);
             }
 
+            $this->sendOrderPlacedMail($order);
+
             foreach (array_keys($items) as $productId) {
                 $cartService->removeItemInCart((string) $productId);
             }
@@ -662,6 +665,7 @@ class CheckoutController extends Controller
                 ->route('user.thanks', ['code' => $order->code])
                 ->with('toast_success', 'Thanh toán MoMo thành công, đơn hàng đã được tạo.');
         }
+
 
 
         return redirect()
@@ -753,6 +757,8 @@ class CheckoutController extends Controller
                 $this->recordDiscountUsage((string) $discountId, (string) $order->user_id, (string) $order->id);
             }
 
+            $this->sendOrderPlacedMail($order);
+
             foreach (array_keys($items) as $productId) {
                 $cartService->removeItemInCart((string) $productId);
             }
@@ -761,7 +767,6 @@ class CheckoutController extends Controller
                 ->route('user.thanks', ['code' => $order->code])
                 ->with('toast_success', 'Thanh toán VNPAY thành công, đơn hàng đã được tạo.');
         }
-
 
         return redirect()
             ->route('checkout.page')
@@ -921,7 +926,6 @@ class CheckoutController extends Controller
         ]);
     }
 
-
     protected function recordDiscountUsage(string $discountId, string $userId, string $orderId): void
     {
         if ($discountId === '') {
@@ -945,7 +949,6 @@ class CheckoutController extends Controller
         }
     }
 
-
     public function removeDiscount(Request $request): JsonResponse
     {
         $request->session()->forget('checkout_discount');
@@ -954,5 +957,36 @@ class CheckoutController extends Controller
             'ok' => true,
             'message' => 'Đã xoá mã giảm giá.',
         ]);
+    }
+
+    protected function sendOrderPlacedMail(Order $order): void
+    {
+        $order->loadMissing([
+            'items',
+            'shipment',
+            'user',
+        ]);
+
+        $shipment = $order->shipment;
+        $user = $order->user;
+
+        $toEmail = null;
+        if ($shipment !== null && !empty($shipment->email)) {
+            $toEmail = $shipment->email;
+        } elseif ($user !== null && !empty($user->email)) {
+            $toEmail = $user->email;
+        }
+        if ($toEmail === null) {
+            return;
+        }
+
+        try {
+            Mail::to($toEmail)->send(new OrderPlacedMail($order));
+        } catch (\Throwable $e) {
+            Log::error('Send order placed mail failed', [
+                'order_id' => $order->id,
+                'error'    => $e->getMessage(),
+            ]);
+        }
     }
 }

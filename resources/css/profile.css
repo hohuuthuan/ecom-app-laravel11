@@ -233,8 +233,25 @@
 
 .profile-info-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 250px;
   gap: 16px 32px;
+}
+
+.profile-info-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.profile-avatar-column {
+  width: 160px;
+  max-width: 160px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.profile-avatar-container {
+  width: 100%;
+  text-align: center;
 }
 
 .profile-info-item-label {

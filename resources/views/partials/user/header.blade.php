@@ -131,7 +131,7 @@
 
               <li>
                 <a class="dropdown-item" href="{{ route('user.profile.index') }}">
-                  <i class="fas fa-user me-2"></i>Hồ sơ | Đơn hàng | Sổ địa chỉ
+                  <i class="fas fa-user me-2"></i>Hồ sơ cá nhân
                 </a>
               </li>
 

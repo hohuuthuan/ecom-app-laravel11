@@ -121,51 +121,72 @@ $headerTitle = $headerTitles[$activeTab] ?? 'HỒ SƠ CỦA BẠN';
                         </div>
 
                         <div class="profile-info-grid">
-                            <div>
-                                <div class="profile-info-item-label">Họ và tên</div>
-                                <div class="profile-info-item-value">
-                                    {{ $user->name }}
+                            {{-- Cột 1: Họ và tên, Email, Giới tính --}}
+                            <div class="profile-info-column">
+                                <div>
+                                    <div class="profile-info-item-label">Họ và tên</div>
+                                    <div class="profile-info-item-value">
+                                        {{ $user->name }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="profile-info-item-label">Email</div>
+                                    <div class="profile-info-item-value">
+                                        {{ $user->email }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="profile-info-item-label">Giới tính</div>
+                                    <div class="profile-info-item-value">
+                                        @php
+                                        $gender = $user->gender ?? null;
+                                        @endphp
+                                        @if ($gender === 'male')
+                                        Nam
+                                        @elseif ($gender === 'female')
+                                        Nữ
+                                        @elseif ($gender === 'other')
+                                        Khác
+                                        @else
+                                        Chưa cập nhật
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <div class="profile-info-item-label">Số điện thoại</div>
-                                <div class="profile-info-item-value">
-                                    {{ $user->phone ?? 'Chưa cập nhật' }}
+
+                            {{-- Cột 2: Số điện thoại, Ngày sinh, Tham gia từ --}}
+                            <div class="profile-info-column">
+                                <div>
+                                    <div class="profile-info-item-label">Số điện thoại</div>
+                                    <div class="profile-info-item-value">
+                                        {{ $user->phone ?? 'Chưa cập nhật' }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="profile-info-item-label">Ngày sinh</div>
+                                    <div class="profile-info-item-value">
+                                        {{ $user->birthday ?? 'Chưa cập nhật' }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="profile-info-item-label">Tham gia từ</div>
+                                    <div class="profile-info-item-value">
+                                        {{ optional($user->created_at)->format('m/Y') }}
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <div class="profile-info-item-label">Email</div>
-                                <div class="profile-info-item-value">
-                                    {{ $user->email }}
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-info-item-label">Ngày sinh</div>
-                                <div class="profile-info-item-value">
-                                    {{ $user->birthday ?? 'Chưa cập nhật' }}
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-info-item-label">Giới tính</div>
-                                <div class="profile-info-item-value">
-                                    @php
-                                    $gender = $user->gender ?? null;
-                                    @endphp
-                                    @if ($gender === 'male')
-                                    Nam
-                                    @elseif ($gender === 'female')
-                                    Nữ
-                                    @elseif ($gender === 'other')
-                                    Khác
-                                    @else
-                                    Chưa cập nhật
-                                    @endif
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-info-item-label">Tham gia từ</div>
-                                <div class="profile-info-item-value">
-                                    {{ optional($user->created_at)->format('m/Y') }}
+
+                            {{-- Cột 3: Ảnh đại diện --}}
+                            <div class="profile-info-column profile-avatar-column">
+                                <div class="profile-avatar-container">
+                                    <div class="profile-info-item-label">Ảnh đại diện</div>
+                                    <img 
+                                        src="{{ $user->avatar ? asset('storage/avatars/' . $user->avatar) : asset('storage/avatars/base-avatar.jpg') }}" 
+                                        alt="Avatar" 
+                                        class="rounded-circle" 
+                                        width="160" 
+                                        height="160" 
+                                        style="object-fit: cover; border: 2px solid #e0e0e0;">
                                 </div>
                             </div>
                         </div>

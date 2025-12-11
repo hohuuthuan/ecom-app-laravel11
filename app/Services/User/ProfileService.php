@@ -3,7 +3,10 @@
 namespace App\Services\User;
 
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class ProfileService
@@ -29,6 +32,21 @@ class ProfileService
 
       if (array_key_exists('gender', $data)) {
         $user->gender = $data['gender'] !== null && $data['gender'] !== '' ? $data['gender'] : null;
+      }
+
+      if (array_key_exists('avatar', $data) && $data['avatar'] instanceof UploadedFile) {
+        try {
+          $oldAvatar = $user->avatar;
+          $fileName = $data['avatar']->hashName();
+          $data['avatar']->storeAs('avatars', $fileName, 'public');
+          $user->avatar = $fileName;
+          if ($oldAvatar && Storage::disk('public')->exists('avatars/' . $oldAvatar)) {
+            Storage::disk('public')->delete('avatars/' . $oldAvatar);
+          }
+        } catch (Throwable $e) {
+          Log::error('Avatar upload failed', ['msg' => $e->getMessage()]);
+          throw $e;
+        }
       }
 
       return $user->save();

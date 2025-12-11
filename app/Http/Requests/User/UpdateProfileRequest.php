@@ -48,6 +48,12 @@ class UpdateProfileRequest extends FormRequest
                 'nullable',
                 'in:male,female,other',
             ],
+            'avatar' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
+            ],
         ];
     }
 
@@ -59,6 +65,7 @@ class UpdateProfileRequest extends FormRequest
             'email' => 'Email',
             'birthday' => 'Ngày sinh',
             'gender' => 'Giới tính',
+            'avatar' => 'Ảnh đại diện',
         ];
     }
 
@@ -72,6 +79,9 @@ class UpdateProfileRequest extends FormRequest
             'birthday.date' => 'Ngày sinh không hợp lệ.',
             'birthday.before' => 'Ngày sinh phải nhỏ hơn ngày hiện tại.',
             'gender.in' => 'Giới tính không hợp lệ.',
+            'avatar.image' => 'Ảnh đại diện phải là ảnh.',
+            'avatar.mimes' => 'Ảnh chỉ chấp nhận: jpg, jpeg, png, webp.',
+            'avatar.max' => 'Ảnh tối đa 2MB.',
         ];
     }
 }

@@ -1,5 +1,4 @@
 (function () {
-  // ==== RESET MODAL EDIT PROFILE ====
   var profileModalEl = document.getElementById("editProfileModal");
   if (profileModalEl) {
     profileModalEl.addEventListener("hidden.bs.modal", function () {
@@ -23,10 +22,21 @@
             field.value = originalValue;
           }
         });
+
+      var avatarFile = profileModalEl.querySelector("#avatarFile");
+      var avatarPreview = profileModalEl.querySelector("#avatarPreview");
+      if (avatarFile && avatarPreview) {
+        avatarFile.value = "";
+        var originalSrc =
+          avatarPreview.getAttribute("data-original-src") ||
+          avatarPreview.getAttribute("data-default-src");
+        if (originalSrc) {
+          avatarPreview.src = originalSrc;
+        }
+      }
     });
   }
 
-  // ==== RESET MODAL UPDATE ĐỊA CHỈ ====
   var updateAddressModalEl = document.getElementById("updateAddressModal");
   if (updateAddressModalEl) {
     updateAddressModalEl.addEventListener("hidden.bs.modal", function () {
@@ -83,7 +93,6 @@
       }
     });
 
-    // ==== HANDLE ĐỔI TỈNH TRONG MODAL UPDATE (SELECT2) ====
     if (window.jQuery) {
       jQuery(document).on("change", "#updateShippingProvince", function () {
         if (!updateAddressModalEl) {
@@ -182,7 +191,6 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    // ==== CONFIRM XOÁ ĐỊA CHỈ ====
     document.addEventListener("click", function (e) {
       var btn = e.target.closest(".js-address-delete-btn");
       if (!btn) {
@@ -220,7 +228,6 @@
         });
     });
 
-    // ==== MỞ MODAL CHỈNH SỬA ĐỊA CHỈ ====
     document.addEventListener("click", function (e) {
       var btn = e.target.closest(".address-edit-btn");
       if (!btn) {
@@ -261,7 +268,9 @@
         noteTextarea.value = btn.getAttribute("data-note") || "";
       }
 
-      var provinceSelect = modalEl.querySelector('select[name="address_province_id"]');
+      var provinceSelect = modalEl.querySelector(
+        'select[name="address_province_id"]'
+      );
       var wardId = btn.getAttribute("data-ward-id") || "";
       var provinceId = btn.getAttribute("data-province-id") || "";
 
@@ -282,7 +291,6 @@
       modal.show();
     });
 
-    // ==== FILTER ĐƠN HÀNG BẰNG AJAX (TRẠNG THÁI + KHOẢNG NGÀY) ====
     var ordersWrapper = document.querySelector("[data-orders-container]");
     if (!ordersWrapper) {
       return;
@@ -351,7 +359,6 @@
         });
     }
 
-    // Click filter trạng thái
     if (filterButtons.length) {
       filterButtons.forEach(function (btn) {
         btn.addEventListener("click", function () {
@@ -378,7 +385,6 @@
       });
     }
 
-    // Thay đổi số bản ghi / trang
     if (perPageSelect) {
       perPageSelect.addEventListener("change", function (e) {
         e.preventDefault();
@@ -402,7 +408,6 @@
       });
     }
 
-    // Nhấn nút "Lọc" theo ngày
     if (applyDateBtn) {
       applyDateBtn.addEventListener("click", function () {
         var urlObj = new URL(baseUrl, window.location.origin);
@@ -427,7 +432,6 @@
       });
     }
 
-    // Nhấn "Xoá lọc" ngày
     if (clearDateBtn) {
       clearDateBtn.addEventListener("click", function () {
         if (dateFromInput) {
@@ -453,7 +457,6 @@
           }
         }
 
-        // Xoá param ngày
         urlObj.searchParams.delete("created_from");
         urlObj.searchParams.delete("created_to");
 
@@ -461,7 +464,6 @@
       });
     }
 
-    // Phân trang trong bảng đơn hàng => AJAX
     ordersWrapper.addEventListener("click", function (e) {
       var link = e.target.closest(".pagination a");
       if (!link) {
@@ -471,4 +473,64 @@
       loadOrders(link.href);
     });
   });
+
+  var avatarFile = document.getElementById("avatarFile");
+  var avatarPreview = document.getElementById("avatarPreview");
+
+  if (avatarFile && avatarPreview) {
+    avatarFile.addEventListener("change", function () {
+      var file = this.files[0];
+      if (!file) {
+        return;
+      }
+
+      var maxSize = 2 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert("Ảnh tối đa 2MB.");
+        this.value = "";
+        avatarPreview.src =
+          avatarPreview.getAttribute("data-default-src") || avatarPreview.src;
+        return;
+      }
+
+      var validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+      if (!validTypes.includes(file.type)) {
+        alert("Định dạng chỉ chấp nhận: jpg, jpeg, png, webp.");
+        this.value = "";
+        avatarPreview.src =
+          avatarPreview.getAttribute("data-default-src") || avatarPreview.src;
+        return;
+      }
+
+      var reader = new FileReader();
+      reader.onload = function (event) {
+        avatarPreview.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  var editProfileForm = document.querySelector("#editProfileModal form");
+  if (editProfileForm) {
+    editProfileForm.addEventListener("submit", function (e) {
+      var fileInput = this.querySelector('input[name="avatar"]');
+      if (fileInput && fileInput.files[0]) {
+        var file = fileInput.files[0];
+        var maxSize = 2 * 1024 * 1024;
+
+        if (file.size > maxSize) {
+          e.preventDefault();
+          alert("Ảnh tối đa 2MB.");
+          return false;
+        }
+
+        var validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+        if (!validTypes.includes(file.type)) {
+          e.preventDefault();
+          alert("Định dạng chỉ chấp nhận: jpg, jpeg, png, webp.");
+          return false;
+        }
+      }
+    });
+  }
 })();

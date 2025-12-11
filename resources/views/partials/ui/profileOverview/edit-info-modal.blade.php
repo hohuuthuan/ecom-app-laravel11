@@ -7,7 +7,7 @@
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content profile-modal">
-      <form method="POST" action="{{ route('user.profile.info.update') }}">
+      <form method="POST" action="{{ route('user.profile.info.update') }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -24,6 +24,27 @@
 
         <div class="modal-body profile-modal-body">
           <div class="row g-3">
+            <div class="col-12 text-center mb-3">
+              <div class="d-flex flex-column align-items-center">
+                <img id="avatarPreview" 
+                     src="{{ $user->avatar ? asset('storage/avatars/' . $user->avatar) : asset('storage/avatars/base-avatar.jpg') }}" 
+                     alt="Avatar"
+                     data-original-src="{{ $user->avatar ? asset('storage/avatars/' . $user->avatar) : asset('storage/avatars/base-avatar.jpg') }}"
+                     data-default-src="{{ asset('storage/avatars/base-avatar.jpg') }}"
+                     class="rounded-circle mb-3" 
+                     width="100" 
+                     height="100" 
+                     style="object-fit: cover;">
+                <div>
+                  <label for="avatarFile" class="btn btn-sm btn-primary">
+                    <i class="bi bi-upload me-1"></i>Chọn ảnh đại diện
+                  </label>
+                  <input type="file" id="avatarFile" name="avatar" accept="image/*" class="d-none">
+                  <small class="d-block mt-2 text-muted">Tối đa 2MB, định dạng: jpg, jpeg, png, webp</small>
+                </div>
+              </div>
+            </div>
+
             {{-- Họ và tên --}}
             <div class="col-md-6">
               <label for="profileName" class="form-label profile-modal-label">

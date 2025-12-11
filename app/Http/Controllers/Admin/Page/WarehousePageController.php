@@ -122,10 +122,10 @@ class WarehousePageController extends Controller
     $order = Order::with(['items', 'items.product'])->findOrFail($id);
 
     $mapToOrderStatus = [
-      'RECEIVING_PROCESS'   => 'PROCESSING',
-      'PREPARING_ITEMS'     => 'PICKING',
-      'HANDED_OVER_CARRIER' => 'SHIPPING',
-      'ORDER_COMPLETED'     => 'COMPLETED',
+      'RECEIVING_PROCESS'   => 'processing',
+      'PREPARING_ITEMS'     => 'picking',
+      'HANDED_OVER_CARRIER' => 'shipping',
+      'ORDER_COMPLETED'     => 'completed',
     ];
 
     $warehouseStatusLabels = [
@@ -135,19 +135,27 @@ class WarehousePageController extends Controller
       'ORDER_COMPLETED'     => 'Đơn hàng hoàn tất',
     ];
 
-    $targetStatus = $mapToOrderStatus[$validated['warehouse_status']];
-    $statusLabel  = $warehouseStatusLabels[$validated['warehouse_status']] ?? $targetStatus;
+    $warehouseStatus = strtoupper((string) $validated['warehouse_status']);
+    $targetStatus    = $mapToOrderStatus[$warehouseStatus] ?? null;
+    $statusLabel     = $warehouseStatusLabels[$warehouseStatus] ?? $targetStatus;
 
-    $shippingType = strtoupper((string) $order->shipping_type);
+    if ($targetStatus === null) {
+      return back()->with('toast_error', 'Trạng thái kho không hợp lệ.');
+    }
 
-    if ($targetStatus === 'SHIPPING' && !in_array($shippingType, ['INTERNAL', 'EXTERNAL'], true)) {
+    $shippingType = strtolower((string) $order->shipping_type);
+
+    if (
+      $targetStatus === 'shipping'
+      && !in_array($shippingType, ['internal', 'external'], true)
+    ) {
       return back()->with(
         'toast_error',
         'Vui lòng chọn đơn vị vận chuyển'
       );
     }
 
-    if ($targetStatus === 'COMPLETED' && $shippingType !== 'EXTERNAL') {
+    if ($targetStatus === 'completed' && $shippingType !== 'external') {
       return back()->with(
         'toast_error',
         'Chỉ đơn hàng giao bởi đơn vị vận chuyển khác mới được hoàn tất từ kho'
@@ -155,13 +163,13 @@ class WarehousePageController extends Controller
     }
 
     $levelMap = [
-      'PROCESSING' => 1,
-      'PICKING'    => 2,
-      'SHIPPING'   => 3,
-      'COMPLETED'  => 4,
+      'processing' => 1,
+      'picking'    => 2,
+      'shipping'   => 3,
+      'completed'  => 4,
     ];
 
-    $currentStatus = strtoupper((string) $order->status);
+    $currentStatus = strtolower((string) $order->status);
 
     if (!isset($levelMap[$currentStatus])) {
       return back()->with('toast_error', 'Trạng thái đơn hiện tại không thể cập nhật từ giao diện kho.');
@@ -177,10 +185,10 @@ class WarehousePageController extends Controller
 
     try {
       DB::transaction(function () use ($order, $targetStatus, $statusLabel, $levelMap, $shippingType) {
-        $currentStatusInside = strtoupper((string) $order->status);
+        $currentStatusInside = strtolower((string) $order->status);
 
-        $needHandleShipping = $levelMap[$targetStatus] >= $levelMap['SHIPPING']
-          && $levelMap[$currentStatusInside] < $levelMap['SHIPPING'];
+        $needHandleShipping = $levelMap[$targetStatus] >= $levelMap['shipping']
+          && $levelMap[$currentStatusInside] < $levelMap['shipping'];
 
         if ($needHandleShipping) {
           $this->allocateBatchesAndDeductStock($order);
@@ -188,9 +196,9 @@ class WarehousePageController extends Controller
 
         // ================== CHỈ XỬ LÝ COD KHI HOÀN TẤT (EXTERNAL) ==================
         if (
-          $targetStatus === 'COMPLETED'
-          && $shippingType === 'EXTERNAL'
-          && strtoupper((string) $order->payment_method) === 'COD'
+          $targetStatus === 'completed'
+          && $shippingType === 'external'
+          && strtolower((string) $order->payment_method) === 'cod'
           && strtolower((string) $order->payment_status) !== 'paid'
         ) {
           $order->payment_status = 'paid';
@@ -209,7 +217,6 @@ class WarehousePageController extends Controller
 
     return back()->with('toast_success', 'Cập nhật trạng thái đơn hàng: ' . $statusLabel);
   }
-
 
   private function allocateBatchesAndDeductStock(Order $order): void
   {

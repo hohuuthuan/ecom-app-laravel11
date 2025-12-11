@@ -55,6 +55,11 @@ Route::middleware('guest')->group(function () {
 
   Route::get('/auth/google/redirect', [AuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
   Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
+  Route::get('/forgot-password', [AuthController::class, 'showLinkRequestForm'])->name('password.request');
+  Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+  Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+  Route::post('/reset-password', [AuthController::class, 'reset'])->name('password.update');
 });
 
 // === LOGGED IN ===
@@ -166,7 +171,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders/{id}', [ShipperPageController::class, 'detail'])->whereUuid('id')->name('orders.detail');
     Route::patch('/orders/{id}/status', [ShipperPageController::class, 'changeStatus'])->whereUuid('id')->name('orders.changeStatus');
   });
-
 });
 
 Route::fallback(fn() => response()->view('errors.404', [], 404));

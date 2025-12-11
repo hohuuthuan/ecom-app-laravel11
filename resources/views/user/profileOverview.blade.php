@@ -180,12 +180,12 @@ $headerTitle = $headerTitles[$activeTab] ?? 'HỒ SƠ CỦA BẠN';
                             <div class="profile-info-column profile-avatar-column">
                                 <div class="profile-avatar-container">
                                     <div class="profile-info-item-label">Ảnh đại diện</div>
-                                    <img 
-                                        src="{{ $user->avatar ? asset('storage/avatars/' . $user->avatar) : asset('storage/avatars/base-avatar.jpg') }}" 
-                                        alt="Avatar" 
-                                        class="rounded-circle" 
-                                        width="160" 
-                                        height="160" 
+                                    <img
+                                        src="{{ $user->avatar ? asset('storage/avatars/' . $user->avatar) : asset('storage/avatars/base-avatar.jpg') }}"
+                                        alt="Avatar"
+                                        class="rounded-circle"
+                                        width="160"
+                                        height="160"
                                         style="object-fit: cover; border: 2px solid #e0e0e0;">
                                 </div>
                             </div>
@@ -376,28 +376,75 @@ $headerTitle = $headerTitles[$activeTab] ?? 'HỒ SƠ CỦA BẠN';
                     </p>
                     @endif
                 </section>
-
                 {{-- Đổi mật khẩu --}}
                 <section class="profile-section {{ $activeTab === 'password' ? 'active' : '' }}" data-section="password">
-                    <h2 class="profile-section-title">Đổi mật khẩu</h2>
-                    <p class="profile-section-subtitle">Cập nhật mật khẩu để tăng tính bảo mật cho tài khoản.</p>
+                    <div class="text-center mb-3">
+                        <h2 class="profile-section-title mb-1">Đổi mật khẩu</h2>
+                        <p class="profile-section-subtitle mb-0">
+                            Cập nhật mật khẩu để tăng tính bảo mật cho tài khoản.
+                        </p>
+                    </div>
 
-                    <form class="password-form">
-                        <div class="mb-3">
-                            <label class="form-label" for="currentPassword">Mật khẩu hiện tại</label>
-                            <input type="password" id="currentPassword" class="form-control" placeholder="Nhập mật khẩu hiện tại">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 col-lg-5">
+                            <form
+                                class="password-form"
+                                method="POST"
+                                action="{{ route('user.profile.password.update') }}">
+                                @csrf
+                                @method('PUT')
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="current_password">Mật khẩu hiện tại</label>
+                                    <input
+                                        type="password"
+                                        id="current_password"
+                                        name="current_password"
+                                        class="form-control @error('current_password') is-invalid @enderror"
+                                        placeholder="Nhập mật khẩu hiện tại"
+                                        value="{{ old('current_password') }}">
+                                    @error('current_password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="password">Mật khẩu mới</label>
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        class="form-control @error('password') is-invalid @enderror"
+                                        placeholder="Nhập mật khẩu mới"
+                                        value="{{ old('password') }}">
+                                    @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="password_confirmation">Xác nhận mật khẩu mới</label>
+                                    <input
+                                        type="password"
+                                        id="password_confirmation"
+                                        name="password_confirmation"
+                                        class="form-control @error('password_confirmation') is-invalid @enderror"
+                                        placeholder="Nhập lại mật khẩu mới"
+                                        value="{{ old('password_confirmation') }}">
+                                    @error('password_confirmation')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <button type="submit" class="btn btn-primary mt-2 w-100">
+                                    Lưu thay đổi
+                                </button>
+                            </form>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="newPassword">Mật khẩu mới</label>
-                            <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="confirmPassword">Xác nhận mật khẩu mới</label>
-                            <input type="password" id="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu mới">
-                        </div>
-                        <button type="button" class="btn btn-primary mt-2">Lưu thay đổi</button>
-                    </form>
+                    </div>
                 </section>
+
+
             </main>
         </div>
     </div>

@@ -12,6 +12,8 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
 use App\Models\User;
 use App\Models\Role;
 use Throwable;
@@ -126,5 +128,67 @@ class AuthController extends Controller
         ->route('login.form')
         ->with('toast_error', 'Không thể đăng nhập bằng Google, vui lòng thử lại sau.');
     }
+  }
+
+  public function showLinkRequestForm(): \Illuminate\View\View
+  {
+    return view('auth.passwords.email');
+  }
+
+  public function sendResetLinkEmail(Request $request): \Illuminate\Http\RedirectResponse
+  {
+    $data = $request->validate([
+      'email' => ['required', 'email'],
+    ]);
+
+    $status = Password::sendResetLink([
+      'email' => $data['email'],
+    ]);
+
+    if ($status === Password::RESET_LINK_SENT) {
+      return back()->with('status', __($status));
+    }
+
+    return back()
+      ->withInput($request->only('email'))
+      ->withErrors(['email' => __($status)]);
+  }
+
+  public function showResetForm(Request $request, string $token): \Illuminate\View\View
+  {
+    return view('auth.passwords.reset', [
+      'token' => $token,
+      'email' => $request->query('email'),
+    ]);
+  }
+
+  public function reset(Request $request): \Illuminate\Http\RedirectResponse
+  {
+    $data = $request->validate([
+      'token'    => ['required'],
+      'email'    => ['required', 'email'],
+      'password' => ['required', 'confirmed', 'min:6'],
+    ]);
+
+    $status = Password::reset(
+      $data,
+      function (User $user, string $password): void {
+        $user->forceFill([
+          'password'       => Hash::make($password),
+          'remember_token' => Str::random(60),
+        ])->save();
+
+        event(new PasswordReset($user));
+      }
+    );
+    if ($status === Password::PASSWORD_RESET) {
+      return redirect()
+        ->route('login')
+        ->with('toast_success', __('Mật khẩu của bạn đã được đặt lại, vui lòng đăng nhập lại.'));
+    }
+
+    return back()
+      ->withInput($request->only('email'))
+      ->withErrors(['email' => __($status)]);
   }
 }

@@ -78,7 +78,7 @@
                   <label class="form-check-label" for="remember">Ghi nhớ tôi</label>
                 </div>
 
-                <a href="#" class="small">Quên mật khẩu?</a>
+                <a href="{{ route('password.request') }}" class="small">Quên mật khẩu?</a>
               </div>
 
               <button type="submit" class="btn btn-primary btn-login w-100 mb-3">Đăng nhập</button>

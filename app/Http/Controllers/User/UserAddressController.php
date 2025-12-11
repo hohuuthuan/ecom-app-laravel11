@@ -20,6 +20,9 @@ use App\Http\Requests\User\Address\StoreRequest;
 use App\Http\Requests\User\Address\UpdateRequest;
 use App\Http\Requests\User\Address\DestroyRequest;
 use App\Http\Requests\User\UpdateProfileRequest;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Throwable;
 
@@ -277,7 +280,6 @@ class UserAddressController extends Controller
     }
   }
 
-
   public function updateInfo(UpdateProfileRequest $request): RedirectResponse
   {
     $authUser = Auth::user();
@@ -466,6 +468,74 @@ class UserAddressController extends Controller
     } catch (Throwable $e) {
       return back()
         ->with('toast_error', 'Có lỗi xảy ra, vui lòng thử lại sau');
+    }
+  }
+
+  public function changePassword(Request $request): RedirectResponse
+  {
+    $user = Auth::user();
+    if ($user === null) {
+      return redirect()->route('login');
+    }
+
+    $validator = Validator::make(
+      $request->all(),
+      [
+        'current_password'      => ['required', 'min:6'],
+        'password'              => ['required', 'confirmed', 'min:6'],
+        'password_confirmation' => ['required'],
+      ],
+      [
+        'current_password.required'       => 'Vui lòng nhập mật khẩu hiện tại.',
+        'current_password.min'            => 'Mật khẩu hiện tại phải có ít nhất :min ký tự.',
+
+        'password.required'              => 'Vui lòng nhập mật khẩu mới.',
+        'password.min'                   => 'Mật khẩu mới phải có ít nhất :min ký tự.',
+        'password.confirmed'             => 'Mật khẩu mới và xác nhận mật khẩu mới phải giống nhau.',
+
+        'password_confirmation.required' => 'Vui lòng nhập xác nhận mật khẩu mới.',
+      ],
+      [
+        'current_password'      => 'mật khẩu hiện tại',
+        'password'              => 'mật khẩu mới',
+        'password_confirmation' => 'xác nhận mật khẩu mới',
+      ]
+    );
+
+    // Lỗi validate: quay lại tab password + giữ input
+    if ($validator->fails()) {
+      return redirect()
+        ->route('user.profile.index', ['tab' => 'password'])
+        ->withErrors($validator)
+        ->withInput();
+    }
+
+    $data = $validator->validated();
+
+    // Sai mật khẩu hiện tại: toast + lỗi field + giữ input
+    if (!Hash::check($data['current_password'], $user->password)) {
+      return redirect()
+        ->route('user.profile.index', ['tab' => 'password'])
+        ->with('toast_error', 'Mật khẩu hiện tại không đúng.')
+        ->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.'])
+        ->withInput();
+    }
+
+    try {
+      $user->password = Hash::make($data['password']);
+      $user->remember_token = Str::random(60);
+      $user->save();
+
+      return redirect()
+        ->route('user.profile.index', ['tab' => 'password'])
+        ->with('toast_success', 'Đổi mật khẩu thành công.');
+    } catch (Throwable $e) {
+      report($e);
+
+      return redirect()
+        ->route('user.profile.index', ['tab' => 'password'])
+        ->with('toast_error', 'Đổi mật khẩu thất bại, vui lòng thử lại sau.')
+        ->withInput();
     }
   }
 }

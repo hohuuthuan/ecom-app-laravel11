@@ -1578,3 +1578,24 @@ i.icon-telephone {
   border-radius: 0.25rem;
   display: block;
 }
+
+/* =================== ADMIN LAYOUT (CONTENT) =================== */
+.admin-layout {
+    min-height: 100vh;
+}
+
+.admin-layout-row {
+    min-height: 100vh;
+    align-items: stretch;
+}
+
+.admin-content-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.admin-content-col .wrapper-content {
+    flex: 1 1 auto;
+    overflow-x: hidden;
+}

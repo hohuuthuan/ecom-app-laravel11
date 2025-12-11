@@ -8,10 +8,10 @@
 
 @section('layout')
 <div class="container-fluid g-0 admin-layout">
-  <div class="row g-0 admin-layout-row flex-nowrap">
+  <div class="row g-0 admin-layout-row flex-lg-nowrap">
     @include('partials.admin.sidebar')
 
-    <div id="contentCol" class="col d-flex flex-column min-vh-100 admin-content-col">
+    <div id="contentCol" class="col d-flex flex-column admin-content-col">
       @include('partials.admin.header')
 
       <main class="wrapper-content flex-grow-1">

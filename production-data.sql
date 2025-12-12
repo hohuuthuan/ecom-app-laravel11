@@ -1,10 +1,10 @@
-CREATE DATABASE  IF NOT EXISTS `book-shop-version-2` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `book-shop-version-2`;
--- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
+CREATE DATABASE  IF NOT EXISTS `book_shop_production` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `book_shop_production`;
+-- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: book-shop-version-2
+-- Host: 127.0.0.1    Database: book_shop_production
 -- ------------------------------------------------------
--- Server version	8.0.42
+-- Server version	8.0.43
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -25,14 +25,14 @@ DROP TABLE IF EXISTS `addresses`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `addresses` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `line1` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `line2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `city` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `state` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `postal_code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `country_code` char(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'VN',
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `line1` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `line2` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `state` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `postal_code` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country_code` char(2) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'VN',
   `is_default` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -60,12 +60,12 @@ DROP TABLE IF EXISTS `authors`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `authors` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -79,7 +79,7 @@ CREATE TABLE `authors` (
 
 LOCK TABLES `authors` WRITE;
 /*!40000 ALTER TABLE `authors` DISABLE KEYS */;
-INSERT INTO `authors` VALUES ('9ffacafe-82b8-485d-9fd0-31caf61bee7a','Ho Huu Thuan','ho-huu-thuan','GC5x6DfYr8cgGBOBqNnj8hcYf305W3AUzQKWDxCB.png','xx','ACTIVE','2025-09-27 17:42:43','2025-09-27 17:42:43'),('9ffc7aa4-68a2-4c4d-88ca-ff11ab2547ca','Tác giả 2','tac-gia-2','C2t6fYVjMjuXWMEcHsRwnrEN9BgHoqkoyJ75ZiW5.png','Mô tả','ACTIVE','2025-09-28 13:49:41','2025-10-05 18:55:35');
+INSERT INTO `authors` VALUES ('a0915ff8-4262-4bc9-9a46-62e15ee91f4e','Phi Tân','phi-tan','ZgN6CtswtIMW9Ij0i8nHVT8KQ8smoU3NGTgS67EE.webp','no','ACTIVE','2025-12-11 14:13:28','2025-12-11 14:13:28'),('a09160af-9c20-4da6-9113-afef9b99a1f4','Bùi Tiểu Quyên','bui-tieu-quyen','bJKldRU8R4Uu9M8eaS5lcxudjEd6LZjAyO91s4aQ.jpg','no','ACTIVE','2025-12-11 14:15:28','2025-12-11 14:15:28'),('a09160f4-eb7f-469d-a08d-6f38c90e790c','Vương Nhất Cửu','vuong-nhat-cuu','mn7aAdQxsBZ2HkrTnbg0Dn6LDOpRWJPu6TGSH48I.jpg','no','ACTIVE','2025-12-11 14:16:13','2025-12-11 14:16:13'),('a091611d-594e-4ebe-a9e8-74c0992bcd80','Hà Nham','ha-nham','xtMGD8urunsfSTl7EPkyk16SxTaw5v2M2vGaQ1ak.jpg','no','ACTIVE','2025-12-11 14:16:40','2025-12-11 14:16:40'),('a091614d-cef7-4f31-893c-fde1098e4382','Marcus Sheridan, Tyler Lessard','marcus-sheridan-tyler-lessard','WRbUAxiBpjjmgU0VjDhew36mEnop5Zno1myKBqWQ.jpg','no','ACTIVE','2025-12-11 14:17:11','2025-12-11 14:17:11'),('a0916176-6a8b-437b-a4e2-718e68a5d5be','Philip Zimbardo','philip-zimbardo','uslmijge1DGa03V0NvQTOoo43lyBHCmCjE4b5oqF.jpg','no','ACTIVE','2025-12-11 14:17:38','2025-12-11 14:17:38'),('a09161a6-29eb-490f-bd1a-4112f6e4c22e','Lee Pyeong','lee-pyeong','vHt6XRCQCPxykCFaqHV6wZlukiRjCul1RScvdJ1L.jpg','no','ACTIVE','2025-12-11 14:18:09','2025-12-11 14:18:09'),('a09161db-e295-4150-b497-aaf32abd716e','Yun Subin','yun-subin','TkWIIDKpO0d475CjRWNNVIhmZIhDvTXYplY9LjOh.jpg','no','ACTIVE','2025-12-11 14:18:45','2025-12-11 14:18:45'),('a0916253-8630-4f4d-ab7f-71aea2f120ec','Line Papin','line-papin','UH88lHiMIxcuApuAltGGxlQl7yBYwiiCGhXJa4jv.jpg','no','ACTIVE','2025-12-11 14:20:03','2025-12-11 14:20:03'),('a091628b-d77c-4a9f-8c41-9eb3d9cab6ee','Trương Thị Thương Huyền','truong-thi-thuong-huyen','kLd7xmjFZbxlgPTRDRZM3kwsBonzbyh0TRbosatu.jpg','no','ACTIVE','2025-12-11 14:20:40','2025-12-11 14:20:40'),('a09165b5-f30f-42dc-a69b-f8b7e9c03fd0','Park Hyun Wook','park-hyun-wook','dgqL3D5cxSC9qvH7moeY3Nq2eGKmlW38gdMfKso1.jpg','no','ACTIVE','2025-12-11 14:29:31','2025-12-11 14:29:31'),('a09165ea-6908-44db-9b2d-c3e4b089da74','Edith Nesbit','edith-nesbit','QfiSXDqbaCt6ytijYdaLX64QQuU1SejTJoQv43GR.jpg','no','ACTIVE','2025-12-11 14:30:05','2025-12-11 14:30:05'),('a0916613-df0e-4de8-a99d-98c79061f37d','Jonah Berger','jonah-berger','oJlUanxqqLAPKwDOTVRJHcbTcmQhKInHJN1jlDZB.jpg','no','ACTIVE','2025-12-11 14:30:32','2025-12-11 14:30:32'),('a091663e-dcdc-4b37-91f0-4ac916198a88','Mun Yohan','mun-yohan','A9GhtNIa2eqmH9zR4LwxS880iM5b3tPQteWdCMmJ.jpg','no','ACTIVE','2025-12-11 14:31:00','2025-12-11 14:31:00'),('a091666c-2ce6-4ab3-9958-990b2414f07a','Cris Doloc','cris-doloc','JQ8MEBSJ8Ifq81WDnFNeZAAMBpd9Qiv587KSnbXB.jpg','no','ACTIVE','2025-12-11 14:31:30','2025-12-11 14:31:30'),('a091668f-39e3-4005-88e2-1f9377cb532e','Joe Vitale','joe-vitale','LiQjZtGvWCuE8rCKUVvppJ5Y5gIeVVIxmAcotftk.jpg','no','ACTIVE','2025-12-11 14:31:53','2025-12-11 14:31:53'),('a09166b8-71fb-4ea3-816f-862b86c5da97','Uông Việt Hà','uong-viet-ha','IcOPhE0y48s6DQsiJg6LcLQJxpU3WdGPUdQAtJ3W.jpg','no','ACTIVE','2025-12-11 14:32:20','2025-12-11 14:32:20'),('a0916727-6a33-4aed-a18f-d3fcdb4c4e1c','Morgan Housel','morgan-housel','nei9OMxPoqEBa5N4VbR2bpAF6gRnKKByAmjGkpRq.jpg','no','ACTIVE','2025-12-11 14:33:33','2025-12-11 14:33:33'),('a091674c-a9af-47f5-98af-41518b6f44c3','Nguyên Anh','nguyen-anh','fJ8TOhDhJiMWdyd7ZbqKgLu0GYKLhZKW8Lw6oBew.jpg','no','ACTIVE','2025-12-11 14:33:57','2025-12-11 14:33:57'),('a0916774-d5fb-4d34-a841-006273a9e6c4','Anita Moorjani','anita-moorjani','6hzvDQWbmMQEeh5zqNc0bBjYNcMPNZpSF0A4vzI2.jpg','no','ACTIVE','2025-12-11 14:34:24','2025-12-11 14:34:24'),('a0916797-5f41-4712-9550-1b10b3377c83','Tuế Kiến','tue-kien','gskfmjTeJE5pBRjpT80n75YuMvsPYmZORfLxBaX7.jpg','no','ACTIVE','2025-12-11 14:34:46','2025-12-11 14:34:46'),('a09167b8-f530-4dca-a3d2-2d8a2f2148c6','Hà Minh','ha-minh','bnsG3new9gZaNicJfhqOR2NMWyZMAGFwYIdHSLqL.jpg','no','ACTIVE','2025-12-11 14:35:08','2025-12-11 14:35:08'),('a09167d9-f690-497e-aca1-589f9a849b04','Nguyễn Đình Tú','nguyen-dinh-tu','tTedb1Rm9liQeM9rqYr4x4Wnb6v3mr8cnK7AhXQN.jpg','no','ACTIVE','2025-12-11 14:35:30','2025-12-11 14:35:30'),('a0916804-cd78-41a2-a3d5-b30f34ca7c3e','Chu Lai','chu-lai','1O6bhhS461GKImW1IkCaOxrL2I8z5myvarewcIbS.jpg','no','ACTIVE','2025-12-11 14:35:58','2025-12-11 14:35:58'),('a0916856-a280-41c3-96f2-88ff5c64a1b0','Huy Hải','huy-hai','gOXZ0boMRjOYZQqfoV7QaQzdaHFZIB1ZDbOnnB9j.jpg','no','ACTIVE','2025-12-11 14:36:52','2025-12-11 14:36:52'),('a091687b-0cce-45f0-be90-39e1bcf0d979','Noboru Koyama','noboru-koyama','9FKaHUg7y06dIGxENJbCQFSsz87jWsvqzD0c7e3j.jpg','no','ACTIVE','2025-12-11 14:37:15','2025-12-11 14:37:15'),('a09168aa-7f42-4035-95c3-3b18fd8ce436','Brian Finch','brian-finch','XfvhRU5FnqfHtru9VYu8JQCNMUcSnoezkOwD67Qq.jpg','no','ACTIVE','2025-12-11 14:37:47','2025-12-11 14:37:47'),('a09168c9-b37d-489c-984a-58a4bdb73c34','Alice Muir','alice-muir','qQapq9qMuhDB4JWMnBGoOSfAQ0A1ahGESZOvu0cK.jpg','no','ACTIVE','2025-12-11 14:38:07','2025-12-11 14:38:07'),('a09168f2-31eb-4555-b78d-720418c485e3','Howard Yu','howard-yu','b0D5oqlvtEej5GYqIUJKE23jkKQiiIRzMyMaUcJR.jpg','no','ACTIVE','2025-12-11 14:38:34','2025-12-11 14:38:34'),('a0916915-439f-40a3-a241-d7262c21fb29','Nguyễn Nhật Ánh','nguyen-nhat-anh','Lc3GLsuNobjibpvoA9sWtHHX1PNsJ8KEJ63OVlZd.jpg','no','ACTIVE','2025-12-11 14:38:57','2025-12-11 14:38:57'),('a091693f-4998-4fbb-8863-aa146f2bf1f5','Hâu Nâu','hau-nau','C0gboWZbTpTQ8oVK4RtjduK9WCTe6jws1Yj6l0wB.jpg','no','ACTIVE','2025-12-11 14:39:24','2025-12-11 14:39:24'),('a091695b-6969-430c-9ba1-22877c4f5423','Tô Hoài','to-hoai','WHvD4DSWLQABX4i73j8m8LRiOGksqFHhB9lIg6ik.jpg','no','ACTIVE','2025-12-11 14:39:43','2025-12-11 14:39:43'),('a0916981-9c1b-4ae7-80e6-54488ef9dd63','Đỗ Đình Tấn','do-dinh-tan','fijAG8UX3nGzF4k2jsCBoXNAlaqz4Qh2IJ0BwNlM.jpg','no','ACTIVE','2025-12-11 14:40:08','2025-12-11 14:40:08'),('a0916999-15c8-4782-a7d3-5231c0801887','Thùy Dương','thuy-duong','pgxpBMXHukAThKJSJ2QJB8CYUdx8oHIZC6IT03eH.jpg','no','ACTIVE','2025-12-11 14:40:23','2025-12-11 14:40:23');
 /*!40000 ALTER TABLE `authors` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -91,9 +91,9 @@ DROP TABLE IF EXISTS `batch_stocks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `batch_stocks` (
-  `batch_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `product_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `warehouse_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `warehouse_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `on_hand` bigint NOT NULL DEFAULT '0',
   `reserved` bigint NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE `batch_stocks` (
 
 LOCK TABLES `batch_stocks` WRITE;
 /*!40000 ALTER TABLE `batch_stocks` DISABLE KEYS */;
-INSERT INTO `batch_stocks` VALUES ('90f75be1-bd1f-11f0-a62c-6c24081d8924','a00abb28-6a82-4ed8-80b0-870a99ffeab5','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,'2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f75d8d-bd1f-11f0-a62c-6c24081d8924','a00ac32b-cb44-4f59-b37c-6cb764bf0acb','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,'2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f75dcb-bd1f-11f0-a62c-6c24081d8924','a00ad142-fa6c-4cdc-85b0-16452f5153a6','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,'2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f75df3-bd1f-11f0-a62c-6c24081d8924','a00ad1d5-758b-47c8-9f5b-bc33898c5af9','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,'2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f75e17-bd1f-11f0-a62c-6c24081d8924','a00ad242-ccc5-43b3-90b0-b8f5d6fd9a72','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,'2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f75e3a-bd1f-11f0-a62c-6c24081d8924','a00adfb5-df2d-4fe4-9bca-558173aa4c73','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,'2025-11-09 03:52:52','2025-11-09 03:52:52');
+INSERT INTO `batch_stocks` VALUES ('02e96d33-fe44-4ebb-af1a-93341227fa71','a09269d3-e6a7-4618-a001-93f8a44d2476','90f465e7-bd1f-11f0-a62c-6c24081d8924',500,0,'2025-12-12 09:57:53','2025-12-12 09:57:53'),('04720cb6-aefd-46de-968b-9ae45e610776','a092550a-9b2d-46ae-8f56-70d25558e8ed','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:39:41','2025-12-12 10:39:41'),('0fee91a8-f336-41fb-8d37-043e3f8b85cd','a0916ef7-3d22-4ab0-b3c9-a0219d479d88','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,'2025-12-12 10:48:25','2025-12-12 10:48:25'),('120d0183-24d2-414d-89f6-c16583a44c01','a09175d6-7e86-40ba-8106-22489e6a1328','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('1259f4d1-ca2d-4e2f-87b2-3466f505d1aa','a0916fa0-4ea3-44d9-a7b8-a93199cb8f4c','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,'2025-12-12 10:44:35','2025-12-12 10:44:35'),('16f0e91d-824e-4ed9-a4b4-12757c1464e4','a0917753-d035-4f5a-9b39-69b474f86989','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('1ac267d7-3e44-4fd9-9c8f-17bcfe316f2b','a0917550-3cbe-4e4d-9a04-19490c83f89e','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:34:02','2025-12-12 10:34:02'),('1c3603cf-b0c8-4522-af34-40c8bad5677c','a09170be-5855-4a23-874e-68f588a17450','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('1f8a5a4f-f22f-4eef-b85e-c0fafbf2cb2e','a092558f-5526-44aa-a29e-f771de5ff21e','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:34:02','2025-12-12 10:34:02'),('273a917d-90b8-43dc-bd2b-3b19ce6d6aa4','a09176e8-e6d3-4f32-b1c3-ef892c4705eb','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('33cfd4af-8bd0-42bc-9ada-46116ee57598','a0917151-c03f-44ea-823d-73594ac322cc','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('51532d6a-6000-467a-b6fd-c1758346bed9','a0916dab-037c-4738-ae3a-cb92ae47850f','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('51a58cf8-f4ff-4ebb-a28b-5f2e0dfbab0e','a0916e60-ca1e-4796-b71b-4ee49047952b','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('5a16e382-d786-49d1-976f-1eefe8bf3ef9','a09253a1-2461-43a2-8038-c808ce1e7a93','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,'2025-12-12 10:46:19','2025-12-12 10:46:19'),('5b4b87fa-5b5a-4bf6-b49d-954a385b6a10','a092693d-83a4-41ed-94cc-4fc063faa23d','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:12:03','2025-12-12 10:12:03'),('5bb04990-9a5c-42ad-86b7-88469c5c7e76','a09171ee-0eac-4f42-bbf3-116fb9cb5d8a','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('5bc42926-2053-4230-8dd6-354492d0394b','a0917036-443e-49c1-b73e-cb8db35925a2','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('6bb16640-9c47-4ba3-9719-01298eb6d4b7','a0926bfe-ce19-49a8-be5a-14763ef2f917','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:00:24','2025-12-12 10:00:24'),('742a81b1-ac0b-4af7-9c77-50ce5756a86a','a0925464-ef0a-4b58-9511-408945f4b071','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:39:41','2025-12-12 10:39:41'),('78493c25-748e-46a1-abf5-19535d70aee4','a09172c3-cc01-46dc-a1d1-037a3ae0d880','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:50:43','2025-12-12 10:50:43'),('7e197253-351b-422d-b0d7-8a25ec85fc02','a0916e0b-cf5a-46c1-9489-e6345b0c0bd5','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('8ce8c96f-6491-41cd-8b79-de0863021fc2','a0926d18-3dea-4906-9c3e-c45fd20357ae','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:34:02','2025-12-12 10:34:02'),('9a92035a-8cb4-4fcd-9478-bb8e711b5059','a091786f-68b7-4c63-b714-99540e16234d','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:39:41','2025-12-12 10:39:41'),('9c8397d9-bbb1-46c2-81a4-362ddc7853f2','a0926ca4-9e6c-484c-9561-7de006d62e3e','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:12:03','2025-12-12 10:12:03'),('a3bad70a-0446-4d22-bfd4-070b7fa8d16d','a0926dd0-549c-4a0e-a0fd-fa037408e3dc','90f465e7-bd1f-11f0-a62c-6c24081d8924',10,0,'2025-12-12 09:47:54','2025-12-12 09:47:54'),('aa8d1d9b-bfbb-4127-9fb8-ad5ea25c01b8','a091749d-2d7f-400a-a56b-507299300406','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('b1a4b59f-8934-470f-bd0e-42e3741f1de8','a091734e-efca-4d23-9574-55deb6efd189','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('bf08bf25-60e3-491c-a8b9-2e8252ecdf5a','a0926a51-101b-4eee-8ea4-a9743cb98e88','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:16:27','2025-12-12 10:16:27'),('c84bea34-c920-4c78-a616-a971af905755','a09256b7-db74-4250-8214-e329fe723aa0','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,'2025-12-12 10:46:19','2025-12-12 10:46:19'),('cda7e81b-35f7-4f4d-a6fd-8f864cec71c0','a0925632-7c60-4845-8e58-702ea9fcdba5','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,'2025-12-12 10:46:19','2025-12-12 10:46:19'),('ce24413c-b632-45ce-8700-98e9c4b9901e','a0916ae3-c057-45f7-affe-3b6de4ff778a','90f465e7-bd1f-11f0-a62c-6c24081d8924',10,0,'2025-12-12 10:31:42','2025-12-12 10:31:42'),('d3ab4426-2779-4bf8-8bd2-0218f8bba288','a0925785-cfd7-4160-9a30-b44b5d3b8f10','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('d5efa8fb-f9e5-4873-bb8b-2d11fa624573','a0916cf2-0e0a-40b6-a442-27c68b5fc2aa','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:31:42','2025-12-12 10:31:42'),('dcc04d95-2a76-448a-bed6-175baddaf9de','a092531d-446b-4d4b-8f42-1ced07307806','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:41:02','2025-12-12 10:41:02'),('dfc6fe0b-18a0-4276-b6dc-1764301e2bfc','a0926d18-3dea-4906-9c3e-c45fd20357ae','90f465e7-bd1f-11f0-a62c-6c24081d8924',500,0,'2025-12-12 09:57:53','2025-12-12 09:57:53'),('e3fc5235-d52f-49cb-8d0a-4e128314918a','a091764b-d3cf-4ecf-9c9b-bb6778fd0a37','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,'2025-12-12 10:50:00','2025-12-12 10:50:00'),('e881c2be-eac8-4353-a5ab-74d3540c32b1','a0926ad7-76db-4148-8623-673cfa055189','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:07:37','2025-12-12 10:07:37'),('ebf0d1db-ac31-4260-ae12-72e393abbcab','a0917429-d57c-400c-b642-1a8fa6ba0d57','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,'2025-12-12 10:47:22','2025-12-12 10:47:22'),('f0f6f6a0-2893-418b-8601-09e52705fca1','a0926ad7-76db-4148-8623-673cfa055189','90f465e7-bd1f-11f0-a62c-6c24081d8924',10,0,'2025-12-12 10:15:46','2025-12-12 10:15:46'),('f4ae4cf7-c5eb-45bc-972a-e043560e20a9','a0926b7f-119f-4c24-a079-bca7c71fc4a5','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:04:25','2025-12-12 10:04:25'),('f9ffe729-a9cf-4f90-bd52-38ba3dff197e','a0916c61-4c53-477b-9b38-d619e79cfe36','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,'2025-12-12 10:31:42','2025-12-12 10:31:42'),('fb62ff04-0ffe-47b9-b636-507f4ded1625','a09269d3-e6a7-4618-a001-93f8a44d2476','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,'2025-12-12 10:34:02','2025-12-12 10:34:02');
 /*!40000 ALTER TABLE `batch_stocks` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -125,10 +125,11 @@ DROP TABLE IF EXISTS `batches`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `batches` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `purchase_receipt_item_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `product_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `warehouse_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `purchase_receipt_item_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `warehouse_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantity` int unsigned NOT NULL,
   `import_price_vnd` bigint unsigned NOT NULL,
   `import_date` date NOT NULL,
@@ -150,7 +151,7 @@ CREATE TABLE `batches` (
 
 LOCK TABLES `batches` WRITE;
 /*!40000 ALTER TABLE `batches` DISABLE KEYS */;
-INSERT INTO `batches` VALUES ('90f75be1-bd1f-11f0-a62c-6c24081d8924','90f69c3a-bd1f-11f0-a62c-6c24081d8924','a00abb28-6a82-4ed8-80b0-870a99ffeab5','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,90000000,'2025-11-09','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f75d8d-bd1f-11f0-a62c-6c24081d8924','90f69d9a-bd1f-11f0-a62c-6c24081d8924','a00ac32b-cb44-4f59-b37c-6cb764bf0acb','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,900000,'2025-11-09','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f75dcb-bd1f-11f0-a62c-6c24081d8924','90f69dcf-bd1f-11f0-a62c-6c24081d8924','a00ad142-fa6c-4cdc-85b0-16452f5153a6','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,900000,'2025-11-09','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f75df3-bd1f-11f0-a62c-6c24081d8924','90f69df2-bd1f-11f0-a62c-6c24081d8924','a00ad1d5-758b-47c8-9f5b-bc33898c5af9','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,900000,'2025-11-09','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f75e17-bd1f-11f0-a62c-6c24081d8924','90f69e12-bd1f-11f0-a62c-6c24081d8924','a00ad242-ccc5-43b3-90b0-b8f5d6fd9a72','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,9000000,'2025-11-09','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f75e3a-bd1f-11f0-a62c-6c24081d8924','90f69e31-bd1f-11f0-a62c-6c24081d8924','a00adfb5-df2d-4fe4-9bca-558173aa4c73','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,15000000000,'2025-11-09','2025-11-09 03:52:52','2025-11-09 03:52:52');
+INSERT INTO `batches` VALUES ('02e96d33-fe44-4ebb-af1a-93341227fa71',NULL,'b001de98-eb85-410b-8025-5f22ce80ae3d','a09269d3-e6a7-4618-a001-93f8a44d2476','90f465e7-bd1f-11f0-a62c-6c24081d8924',500,40000,'2025-12-01','2025-12-12 09:57:53','2025-12-12 09:57:53'),('04720cb6-aefd-46de-968b-9ae45e610776',NULL,'6fe30329-3088-4003-8809-cdd725527edc','a092550a-9b2d-46ae-8f56-70d25558e8ed','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,79000,'2025-12-11','2025-12-12 10:39:41','2025-12-12 10:39:41'),('0fee91a8-f336-41fb-8d37-043e3f8b85cd',NULL,'fd517e8b-aaac-45df-b8f3-34243f67ba48','a0916ef7-3d22-4ab0-b3c9-a0219d479d88','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,55000,'2025-12-11','2025-12-12 10:48:25','2025-12-12 10:48:25'),('120d0183-24d2-414d-89f6-c16583a44c01',NULL,'76c3c1e7-d587-4ad4-b9f6-c5756e55522b','a09175d6-7e86-40ba-8106-22489e6a1328','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,50000,'2025-12-11','2025-12-12 10:43:08','2025-12-12 10:43:08'),('1259f4d1-ca2d-4e2f-87b2-3466f505d1aa',NULL,'58cccc05-df3b-42b4-9500-ca297bab235c','a0916fa0-4ea3-44d9-a7b8-a93199cb8f4c','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,60000,'2025-12-11','2025-12-12 10:44:35','2025-12-12 10:44:35'),('16f0e91d-824e-4ed9-a4b4-12757c1464e4',NULL,'44f02847-1d40-4896-ba2f-51c152692b6e','a0917753-d035-4f5a-9b39-69b474f86989','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,125000,'2025-12-11','2025-12-12 10:43:08','2025-12-12 10:43:08'),('1ac267d7-3e44-4fd9-9c8f-17bcfe316f2b',NULL,'5b7163d7-e34f-4356-968d-6502b63c839d','a0917550-3cbe-4e4d-9a04-19490c83f89e','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,60000,'2025-12-11','2025-12-12 10:34:02','2025-12-12 10:34:02'),('1c3603cf-b0c8-4522-af34-40c8bad5677c',NULL,'0dc92164-36bd-4d55-a960-acebf4eee34e','a09170be-5855-4a23-874e-68f588a17450','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,20000,'2025-12-11','2025-12-12 10:37:14','2025-12-12 10:37:14'),('1f8a5a4f-f22f-4eef-b85e-c0fafbf2cb2e',NULL,'146c324f-8975-41c7-87f3-b3cc3770ecf8','a092558f-5526-44aa-a29e-f771de5ff21e','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,45000,'2025-12-11','2025-12-12 10:34:02','2025-12-12 10:34:02'),('273a917d-90b8-43dc-bd2b-3b19ce6d6aa4',NULL,'916d91fd-9d43-446b-b55c-4127046fe5e1','a09176e8-e6d3-4f32-b1c3-ef892c4705eb','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,150000,'2025-12-11','2025-12-12 10:43:08','2025-12-12 10:43:08'),('33cfd4af-8bd0-42bc-9ada-46116ee57598',NULL,'00aa71f7-fc23-4a07-8a0a-b415b502231c','a0917151-c03f-44ea-823d-73594ac322cc','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,20000,'2025-12-11','2025-12-12 10:37:14','2025-12-12 10:37:14'),('51532d6a-6000-467a-b6fd-c1758346bed9',NULL,'3ee6ad56-2e21-4ed8-b3a3-90b2a7a8b8d6','a0916dab-037c-4738-ae3a-cb92ae47850f','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,65000,'2025-12-11','2025-12-12 10:37:14','2025-12-12 10:37:14'),('51a58cf8-f4ff-4ebb-a28b-5f2e0dfbab0e',NULL,'f88a7cb2-8c03-4520-8cb4-02858fed55e7','a0916e60-ca1e-4796-b71b-4ee49047952b','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,65000,'2025-12-11','2025-12-12 10:37:14','2025-12-12 10:37:14'),('5a16e382-d786-49d1-976f-1eefe8bf3ef9',NULL,'56e1bfca-158e-4a08-b95c-016d1a1ef7fc','a09253a1-2461-43a2-8038-c808ce1e7a93','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,95000,'2025-12-11','2025-12-12 10:46:19','2025-12-12 10:46:19'),('5b4b87fa-5b5a-4bf6-b49d-954a385b6a10',NULL,'3a087ad6-6252-4d8e-8178-84aec6fdd4b1','a092693d-83a4-41ed-94cc-4fc063faa23d','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,140000,'2025-12-11','2025-12-12 10:12:03','2025-12-12 10:12:03'),('5bb04990-9a5c-42ad-86b7-88469c5c7e76',NULL,'b4b91fca-16b5-43ee-8371-2a1af97b9dc9','a09171ee-0eac-4f42-bbf3-116fb9cb5d8a','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,75000,'2025-12-11','2025-12-12 10:37:14','2025-12-12 10:37:14'),('5bc42926-2053-4230-8dd6-354492d0394b',NULL,'1485e9a1-8f73-4046-98bf-fe23b2bc8b73','a0917036-443e-49c1-b73e-cb8db35925a2','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,75000,'2025-12-11','2025-12-12 10:37:14','2025-12-12 10:37:14'),('6bb16640-9c47-4ba3-9719-01298eb6d4b7',NULL,'2c5f6cba-b22f-4fe0-8093-e11b18be018b','a0926bfe-ce19-49a8-be5a-14763ef2f917','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,120000,'2025-12-10','2025-12-12 10:00:24','2025-12-12 10:00:24'),('742a81b1-ac0b-4af7-9c77-50ce5756a86a',NULL,'ae164e3f-29bf-4ff2-b006-f55ea948535d','a0925464-ef0a-4b58-9511-408945f4b071','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,114000,'2025-12-11','2025-12-12 10:39:41','2025-12-12 10:39:41'),('78493c25-748e-46a1-abf5-19535d70aee4',NULL,'11663d61-527a-4eee-8a06-54d0ecfea017','a09172c3-cc01-46dc-a1d1-037a3ae0d880','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,55000,'2025-12-11','2025-12-12 10:50:43','2025-12-12 10:50:43'),('7e197253-351b-422d-b0d7-8a25ec85fc02',NULL,'1a455863-6f96-4655-93f3-384351d5fc89','a0916e0b-cf5a-46c1-9489-e6345b0c0bd5','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,65000,'2025-12-11','2025-12-12 10:37:14','2025-12-12 10:37:14'),('8ce8c96f-6491-41cd-8b79-de0863021fc2',NULL,'8221b4fe-c218-41e2-b80a-4678d9f3f2b1','a0926d18-3dea-4906-9c3e-c45fd20357ae','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,55000,'2025-12-11','2025-12-12 10:34:02','2025-12-12 10:34:02'),('9a92035a-8cb4-4fcd-9478-bb8e711b5059',NULL,'27c0ab34-a67f-41ae-9429-7c4e44b4d262','a091786f-68b7-4c63-b714-99540e16234d','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,95000,'2025-12-11','2025-12-12 10:39:41','2025-12-12 10:39:41'),('9c8397d9-bbb1-46c2-81a4-362ddc7853f2',NULL,'733afec6-5e4e-4b1b-a3f6-3fd2f93f5995','a0926ca4-9e6c-484c-9561-7de006d62e3e','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,85000,'2025-12-11','2025-12-12 10:12:03','2025-12-12 10:12:03'),('a3bad70a-0446-4d22-bfd4-070b7fa8d16d',NULL,'5d006378-997f-4d1c-b372-9ad5459d4c8c','a0926dd0-549c-4a0e-a0fd-fa037408e3dc','90f465e7-bd1f-11f0-a62c-6c24081d8924',10,75000,'2025-12-12','2025-12-12 09:47:54','2025-12-12 09:47:54'),('aa8d1d9b-bfbb-4127-9fb8-ad5ea25c01b8',NULL,'9115c4fe-e42a-4c7b-af5b-6995f8382e3c','a091749d-2d7f-400a-a56b-507299300406','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,20000,'2025-12-11','2025-12-12 10:43:08','2025-12-12 10:43:08'),('b1a4b59f-8934-470f-bd0e-42e3741f1de8',NULL,'29914b26-6e9a-47ab-8bea-d978a6a74619','a091734e-efca-4d23-9574-55deb6efd189','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,40000,'2025-12-11','2025-12-12 10:37:14','2025-12-12 10:37:14'),('bf08bf25-60e3-491c-a8b9-2e8252ecdf5a',NULL,'aad3906b-e854-4e58-843c-72192a50369a','a0926a51-101b-4eee-8ea4-a9743cb98e88','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,90000,'2025-12-11','2025-12-12 10:16:27','2025-12-12 10:16:27'),('c84bea34-c920-4c78-a616-a971af905755',NULL,'be174189-01f8-411a-8fdc-6b832bddd8bb','a09256b7-db74-4250-8214-e329fe723aa0','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,75000,'2025-12-11','2025-12-12 10:46:19','2025-12-12 10:46:19'),('cda7e81b-35f7-4f4d-a6fd-8f864cec71c0',NULL,'f4469af8-5d18-45c4-b046-04e409962b73','a0925632-7c60-4845-8e58-702ea9fcdba5','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,50000,'2025-12-11','2025-12-12 10:46:19','2025-12-12 10:46:19'),('ce24413c-b632-45ce-8700-98e9c4b9901e',NULL,'3479e06e-92c7-41de-9f29-05e3b85f3e5e','a0916ae3-c057-45f7-affe-3b6de4ff778a','90f465e7-bd1f-11f0-a62c-6c24081d8924',10,290000,'2025-12-11','2025-12-12 10:31:42','2025-12-12 10:31:42'),('d3ab4426-2779-4bf8-8bd2-0218f8bba288',NULL,'3029eb70-ea06-4ad2-a0db-f09065836205','a0925785-cfd7-4160-9a30-b44b5d3b8f10','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,75000,'2025-12-11','2025-12-12 10:43:08','2025-12-12 10:43:08'),('d5efa8fb-f9e5-4873-bb8b-2d11fa624573',NULL,'c2c65b31-f058-435e-a34d-5741b9a3c0c7','a0916cf2-0e0a-40b6-a442-27c68b5fc2aa','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,75000,'2025-12-11','2025-12-12 10:31:42','2025-12-12 10:31:42'),('dcc04d95-2a76-448a-bed6-175baddaf9de',NULL,'e8993264-25ec-43c9-9ec2-62145f24b9ba','a092531d-446b-4d4b-8f42-1ced07307806','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,105000,'2025-12-11','2025-12-12 10:41:02','2025-12-12 10:41:02'),('dfc6fe0b-18a0-4276-b6dc-1764301e2bfc',NULL,'d929647e-47be-4bf5-b080-17e7824696c1','a0926d18-3dea-4906-9c3e-c45fd20357ae','90f465e7-bd1f-11f0-a62c-6c24081d8924',500,55000,'2025-12-01','2025-12-12 09:57:53','2025-12-12 09:57:53'),('e3fc5235-d52f-49cb-8d0a-4e128314918a',NULL,'0c14b8bc-63cf-4fa4-ad6a-84f8f651b7b5','a091764b-d3cf-4ecf-9c9b-bb6778fd0a37','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,75000,'2025-12-11','2025-12-12 10:50:00','2025-12-12 10:50:00'),('e881c2be-eac8-4353-a5ab-74d3540c32b1',NULL,'4e103c98-f2c3-4940-a2ca-d63f5290fe2c','a0926ad7-76db-4148-8623-673cfa055189','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,90000,'2025-12-11','2025-12-12 10:07:37','2025-12-12 10:07:37'),('ebf0d1db-ac31-4260-ae12-72e393abbcab',NULL,'aeadb1ed-2b02-4290-aec4-10430b3a8452','a0917429-d57c-400c-b642-1a8fa6ba0d57','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,50000,'2025-12-11','2025-12-12 10:47:22','2025-12-12 10:47:22'),('f0f6f6a0-2893-418b-8601-09e52705fca1',NULL,'aeac7158-d2d1-41d2-976b-e981b43fcae5','a0926ad7-76db-4148-8623-673cfa055189','90f465e7-bd1f-11f0-a62c-6c24081d8924',10,90000,'2025-12-11','2025-12-12 10:15:46','2025-12-12 10:15:46'),('f4ae4cf7-c5eb-45bc-972a-e043560e20a9',NULL,'8a934b29-2e22-4690-8912-b2bfac5f6468','a0926b7f-119f-4c24-a079-bca7c71fc4a5','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,85000,'2025-12-01','2025-12-12 10:04:25','2025-12-12 10:04:25'),('f9ffe729-a9cf-4f90-bd52-38ba3dff197e',NULL,'e9fd891c-43e1-46c2-a4bd-c9e3c7b0a674','a0916c61-4c53-477b-9b38-d619e79cfe36','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,30000,'2025-12-11','2025-12-12 10:31:42','2025-12-12 10:31:42'),('fb62ff04-0ffe-47b9-b636-507f4ded1625',NULL,'024ed6b5-2bae-49c5-8de7-60b9cdf49a88','a09269d3-e6a7-4618-a001-93f8a44d2476','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,50000,'2025-12-11','2025-12-12 10:34:02','2025-12-12 10:34:02');
 /*!40000 ALTER TABLE `batches` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -162,11 +163,11 @@ DROP TABLE IF EXISTS `categories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `categories` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -180,7 +181,7 @@ CREATE TABLE `categories` (
 
 LOCK TABLES `categories` WRITE;
 /*!40000 ALTER TABLE `categories` DISABLE KEYS */;
-INSERT INTO `categories` VALUES ('9ffad2ba-2124-4abf-a555-66921630aae5','Tiểu thuyết','tieu-thuyet','no','ACTIVE','2025-09-27 18:04:20','2025-10-20 14:20:55'),('9ffad2d9-d3ae-4332-9169-0b18ceaf4dbc','Kinh doanh','kinh-doanh','no','ACTIVE','2025-09-27 18:04:41','2025-10-20 14:21:08'),('a028c7b7-5a7f-45f1-874f-0cb1c2adcb89','Tâm lý','tam-ly','no','ACTIVE','2025-10-20 14:21:38','2025-10-20 14:21:38'),('a028c7c9-1fc2-4bed-83ed-9a06a69ba715','Thiếu nhi','thieu-nhi','no','ACTIVE','2025-10-20 14:21:49','2025-10-20 14:21:49'),('a02aec3e-a112-40ff-a8b6-8aa6fe1337bb','Danh mục 1','danh-muc-1','NO','ACTIVE','2025-10-21 15:55:25','2025-10-21 15:55:25'),('a02aec4b-04dd-41d4-bf28-9db8d7c44d30','Danh mục 2','danh-muc-2','NO','ACTIVE','2025-10-21 15:55:34','2025-10-21 15:55:34');
+INSERT INTO `categories` VALUES ('a09162b4-48c8-4da2-b584-d80206b30b5f','Kinh Doanh','kinh-doanh','no','ACTIVE','2025-12-11 14:21:06','2025-12-11 14:21:06'),('a09162cd-7c77-449f-bdd5-f84409a803bb','Thiếu Nhi','thieu-nhi','no','ACTIVE','2025-12-11 14:21:23','2025-12-11 14:21:23'),('a09162e0-bd99-4cfd-91c1-a0812112c368','Tiểu Thuyết','tieu-thuyet','no','ACTIVE','2025-12-11 14:21:35','2025-12-11 14:21:35'),('a09162f1-a667-4c95-b22c-4441e72932c3','Tâm Lý','tam-ly','no','ACTIVE','2025-12-11 14:21:47','2025-12-11 14:21:47');
 /*!40000 ALTER TABLE `categories` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -192,10 +193,10 @@ DROP TABLE IF EXISTS `discount_usages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `discount_usages` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `discount_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `order_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `discount_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `order_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `used_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -225,14 +226,16 @@ DROP TABLE IF EXISTS `discounts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `discounts` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `value` int unsigned NOT NULL,
   `min_order_value_vnd` bigint unsigned DEFAULT NULL,
+  `usage_limit` int unsigned DEFAULT NULL,
+  `per_user_limit` int unsigned DEFAULT NULL,
   `start_date` timestamp NULL DEFAULT NULL,
   `end_date` timestamp NULL DEFAULT NULL,
-  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
+  `status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -257,8 +260,8 @@ DROP TABLE IF EXISTS `favorites`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `favorites` (
-  `user_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `product_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`user_id`,`product_id`),
@@ -274,7 +277,6 @@ CREATE TABLE `favorites` (
 
 LOCK TABLES `favorites` WRITE;
 /*!40000 ALTER TABLE `favorites` DISABLE KEYS */;
-INSERT INTO `favorites` VALUES ('9ffa3b13-7f5c-4535-a2e6-f42566c649c7','a00ad242-ccc5-43b3-90b0-b8f5d6fd9a72','2025-11-12 16:06:33','2025-11-12 16:06:33'),('9ffa3b13-7f5c-4535-a2e6-f42566c649c7','a00adfb5-df2d-4fe4-9bca-558173aa4c73','2025-11-13 04:36:02','2025-11-13 04:36:02');
 /*!40000 ALTER TABLE `favorites` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -287,10 +289,10 @@ DROP TABLE IF EXISTS `migrations`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `migrations` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -299,7 +301,7 @@ CREATE TABLE `migrations` (
 
 LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
-INSERT INTO `migrations` VALUES (1,'2025_09_14_000001_create_users_table',1),(2,'2025_09_14_000002_create_roles_table',1),(3,'2025_09_14_000003_create_role_user_table',1),(4,'2025_09_14_000004_create_addresses_table',1),(5,'2025_09_14_000005_create_authors_table',1),(6,'2025_09_14_000006_create_categories_table',1),(7,'2025_09_14_000007_create_publishers_table',1),(8,'2025_09_14_000008_create_products_table',1),(9,'2025_09_14_000009_create_product_authors_table',1),(10,'2025_09_14_000010_create_product_categories_table',1),(11,'2025_09_14_000011_create_reviews_table',1),(12,'2025_09_14_000012_create_discounts_table',1),(13,'2025_09_14_000013_create_discount_usages_table',1),(14,'2025_09_14_000014_create_warehouses_table',1),(15,'2025_09_14_000015_create_purchase_receipts_table',1),(16,'2025_09_14_000016_create_purchase_receipt_items_table',1),(17,'2025_09_14_000017_create_batches_table',1),(18,'2025_09_14_000018_create_stock_movements_table',1),(19,'2025_09_14_000019_create_stocks_table',1),(20,'2025_09_14_000020_create_batch_stocks_table',1),(21,'2025_09_14_000021_create_orders_table',1),(22,'2025_09_14_000022_create_order_items_table',1),(23,'2025_09_14_000023_create_order_batches_table',1),(24,'2025_09_14_000024_create_shipments_table',1),(25,'2025_09_14_000025_create_payments_table',1),(26,'2025_09_14_000019_create_favorites_table',2),(27,'2025_11_13_000001_create_provinces_table',3),(28,'2025_11_13_000002_create_wards_table',3),(29,'2025_11_13_000100_create_user_addresses_table',4),(30,'2025_11_13_111654_add_profile_fields_to_users_table',5);
+INSERT INTO `migrations` VALUES (1,'2025_09_14_000001_create_users_table',1),(2,'2025_09_14_000002_create_roles_table',1),(3,'2025_09_14_000003_create_role_user_table',1),(4,'2025_09_14_000004_create_addresses_table',1),(5,'2025_09_14_000005_create_authors_table',1),(6,'2025_09_14_000006_create_categories_table',1),(7,'2025_09_14_000007_create_publishers_table',1),(8,'2025_09_14_000008_create_products_table',1),(9,'2025_09_14_000009_create_product_authors_table',1),(10,'2025_09_14_000010_create_product_categories_table',1),(11,'2025_09_14_000011_create_reviews_table',1),(12,'2025_09_14_000012_create_discounts_table',1),(13,'2025_09_14_000013_create_discount_usages_table',1),(14,'2025_09_14_000014_create_warehouses_table',1),(15,'2025_09_14_000015_create_purchase_receipts_table',1),(16,'2025_09_14_000016_create_purchase_receipt_items_table',1),(17,'2025_09_14_000017_create_batches_table',1),(18,'2025_09_14_000018_create_stock_movements_table',1),(19,'2025_09_14_000019_create_favorites_table',1),(20,'2025_09_14_000019_create_stocks_table',1),(21,'2025_09_14_000020_create_batch_stocks_table',1),(22,'2025_09_14_000021_create_orders_table',1),(23,'2025_09_14_000022_create_order_items_table',1),(24,'2025_09_14_000023_create_order_batches_table',1),(25,'2025_09_14_000024_create_shipments_table',1),(26,'2025_09_14_000025_create_payments_table',1),(27,'2025_11_13_000001_create_provinces_table',1),(28,'2025_11_13_000002_create_wards_table',1),(29,'2025_11_13_000100_create_user_addresses_table',1),(30,'2025_11_13_111654_add_profile_fields_to_users_table',1),(31,'2025_11_16_010321_create_order_status_histories_table',1),(32,'2025_11_30_142045_add_receipt_code_to_purchase_receipts_table',1),(33,'2025_12_01_000045_add_code_to_batches_table',1),(34,'2025_12_01_173356_create_warehouse_activities_table',1),(35,'2025_12_06_005441_add_usage_limit_to_discounts_table',1),(36,'2025_12_06_152512_add_per_user_limit_to_discounts_table',1),(37,'2025_12_07_153634_add_image_to_reviews_table',1),(38,'2025_12_07_170747_add_order_id_to_reviews_table',1),(39,'2025_12_09_003602_add_google_id_to_users_table',1),(40,'2025_12_09_003603_add_shipping_to_orders_table',1),(41,'2025_12_10_173354_create_order_delivery_issues_table',1),(42,'2025_12_10_173355_create_password_reset_tokens_table',2);
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -311,8 +313,8 @@ DROP TABLE IF EXISTS `order_batches`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `order_batches` (
-  `order_item_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `order_item_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantity` int unsigned NOT NULL,
   `unit_cost_vnd` bigint unsigned NOT NULL,
   PRIMARY KEY (`order_item_id`,`batch_id`),
@@ -332,6 +334,46 @@ LOCK TABLES `order_batches` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `order_delivery_issues`
+--
+
+DROP TABLE IF EXISTS `order_delivery_issues`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `order_delivery_issues` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `order_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `issue_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reason` text COLLATE utf8mb4_unicode_ci,
+  `order_payment_method` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `order_grand_total_vnd` bigint unsigned NOT NULL DEFAULT '0',
+  `order_shipping_fee_vnd` bigint unsigned NOT NULL DEFAULT '0',
+  `refund_amount_vnd` bigint unsigned NOT NULL DEFAULT '0',
+  `lost_shipping_fee_vnd` bigint unsigned NOT NULL DEFAULT '0',
+  `is_refunded` tinyint(1) NOT NULL DEFAULT '0',
+  `refunded_at` timestamp NULL DEFAULT NULL,
+  `issued_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `order_delivery_issues_order_id_index` (`order_id`),
+  KEY `order_delivery_issues_issue_type_index` (`issue_type`),
+  KEY `order_delivery_issues_order_payment_method_index` (`order_payment_method`),
+  KEY `order_delivery_issues_issued_at_index` (`issued_at`),
+  CONSTRAINT `order_delivery_issues_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `order_delivery_issues`
+--
+
+LOCK TABLES `order_delivery_issues` WRITE;
+/*!40000 ALTER TABLE `order_delivery_issues` DISABLE KEYS */;
+/*!40000 ALTER TABLE `order_delivery_issues` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `order_items`
 --
 
@@ -339,12 +381,12 @@ DROP TABLE IF EXISTS `order_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `order_items` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `order_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `product_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `product_title_snapshot` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `isbn13_snapshot` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `warehouse_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `order_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_title_snapshot` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `isbn13_snapshot` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `warehouse_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantity` int unsigned NOT NULL,
   `unit_price_vnd` bigint unsigned NOT NULL,
   `discount_amount_vnd` bigint unsigned NOT NULL DEFAULT '0',
@@ -374,6 +416,59 @@ LOCK TABLES `order_items` WRITE;
 UNLOCK TABLES;
 
 --
+-- Temporary view structure for view `order_profit_view`
+--
+
+DROP TABLE IF EXISTS `order_profit_view`;
+/*!50001 DROP VIEW IF EXISTS `order_profit_view`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `order_profit_view` AS SELECT 
+ 1 AS `id`,
+ 1 AS `code`,
+ 1 AS `user_id`,
+ 1 AS `status`,
+ 1 AS `payment_status`,
+ 1 AS `placed_at`,
+ 1 AS `subtotal_vnd`,
+ 1 AS `discount_vnd`,
+ 1 AS `tax_vnd`,
+ 1 AS `shipping_fee_vnd`,
+ 1 AS `revenue_vnd`,
+ 1 AS `cogs_vnd`,
+ 1 AS `completed_orders`,
+ 1 AS `profit_vnd`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Table structure for table `order_status_histories`
+--
+
+DROP TABLE IF EXISTS `order_status_histories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `order_status_histories` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `order_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `order_status_histories_order_id_foreign` (`order_id`),
+  CONSTRAINT `order_status_histories_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `order_status_histories`
+--
+
+LOCK TABLES `order_status_histories` WRITE;
+/*!40000 ALTER TABLE `order_status_histories` DISABLE KEYS */;
+/*!40000 ALTER TABLE `order_status_histories` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `orders`
 --
 
@@ -381,22 +476,27 @@ DROP TABLE IF EXISTS `orders`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `orders` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payment_method` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payment_status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payment_method` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payment_status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `shipping_type` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `shipper_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `shipping_started_at` timestamp NULL DEFAULT NULL,
   `items_count` int unsigned NOT NULL DEFAULT '0',
   `subtotal_vnd` bigint unsigned NOT NULL DEFAULT '0',
   `discount_vnd` bigint unsigned NOT NULL DEFAULT '0',
   `tax_vnd` bigint unsigned NOT NULL DEFAULT '0',
   `shipping_fee_vnd` bigint unsigned NOT NULL DEFAULT '0',
   `grand_total_vnd` bigint unsigned NOT NULL DEFAULT '0',
-  `discount_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `buyer_note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `discount_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `buyer_note` text COLLATE utf8mb4_unicode_ci,
   `placed_at` timestamp NOT NULL,
   `delivered_at` timestamp NULL DEFAULT NULL,
+  `delivery_failed_at` timestamp NULL DEFAULT NULL,
+  `delivery_failed_reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `cancelled_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -408,6 +508,7 @@ CREATE TABLE `orders` (
   KEY `orders_payment_method_index` (`payment_method`),
   KEY `orders_payment_status_index` (`payment_status`),
   KEY `orders_placed_at_index` (`placed_at`),
+  KEY `orders_shipper_id_index` (`shipper_id`),
   CONSTRAINT `orders_discount_id_foreign` FOREIGN KEY (`discount_id`) REFERENCES `discounts` (`id`) ON DELETE SET NULL,
   CONSTRAINT `orders_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -419,8 +520,31 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES ('9ffa3ac9-e4df-4a59-aa82-fd4de160b2a7','CODE','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','PENDING','CODE','UNPAID',3,200000000,0,0,0,0,NULL,NULL,'2024-12-31 17:00:00',NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `password_reset_tokens`
+--
+
+DROP TABLE IF EXISTS `password_reset_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `password_reset_tokens` (
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  KEY `password_reset_tokens_email_index` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `password_reset_tokens`
+--
+
+LOCK TABLES `password_reset_tokens` WRITE;
+/*!40000 ALTER TABLE `password_reset_tokens` DISABLE KEYS */;
+/*!40000 ALTER TABLE `password_reset_tokens` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -431,14 +555,14 @@ DROP TABLE IF EXISTS `payments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `payments` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `order_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `method` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `provider` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `txn_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `order_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `method` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `provider` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `txn_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `amount_vnd` bigint unsigned NOT NULL,
   `fee_amount_vnd` bigint unsigned DEFAULT NULL,
-  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `paid_at` timestamp NULL DEFAULT NULL,
   `raw_gateway_payload` json DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -467,9 +591,9 @@ DROP TABLE IF EXISTS `product_authors`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `product_authors` (
-  `product_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `author_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `product_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `author_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`product_id`,`author_id`),
   KEY `product_authors_author_id_foreign` (`author_id`),
   CONSTRAINT `product_authors_author_id_foreign` FOREIGN KEY (`author_id`) REFERENCES `authors` (`id`) ON DELETE CASCADE,
@@ -483,7 +607,7 @@ CREATE TABLE `product_authors` (
 
 LOCK TABLES `product_authors` WRITE;
 /*!40000 ALTER TABLE `product_authors` DISABLE KEYS */;
-INSERT INTO `product_authors` VALUES ('a00abb28-6a82-4ed8-80b0-870a99ffeab5','9ffacafe-82b8-485d-9fd0-31caf61bee7a',NULL),('a00abb28-6a82-4ed8-80b0-870a99ffeab5','9ffc7aa4-68a2-4c4d-88ca-ff11ab2547ca',NULL),('a00ac32b-cb44-4f59-b37c-6cb764bf0acb','9ffacafe-82b8-485d-9fd0-31caf61bee7a',NULL),('a00ac32b-cb44-4f59-b37c-6cb764bf0acb','9ffc7aa4-68a2-4c4d-88ca-ff11ab2547ca',NULL),('a00ad142-fa6c-4cdc-85b0-16452f5153a6','9ffacafe-82b8-485d-9fd0-31caf61bee7a',NULL),('a00ad142-fa6c-4cdc-85b0-16452f5153a6','9ffc7aa4-68a2-4c4d-88ca-ff11ab2547ca',NULL),('a00ad1d5-758b-47c8-9f5b-bc33898c5af9','9ffacafe-82b8-485d-9fd0-31caf61bee7a',NULL),('a00ad242-ccc5-43b3-90b0-b8f5d6fd9a72','9ffc7aa4-68a2-4c4d-88ca-ff11ab2547ca',NULL),('a00adfb5-df2d-4fe4-9bca-558173aa4c73','9ffacafe-82b8-485d-9fd0-31caf61bee7a',NULL),('a00adfb5-df2d-4fe4-9bca-558173aa4c73','9ffc7aa4-68a2-4c4d-88ca-ff11ab2547ca',NULL);
+INSERT INTO `product_authors` VALUES ('a0916ae3-c057-45f7-affe-3b6de4ff778a','a091693f-4998-4fbb-8863-aa146f2bf1f5',NULL),('a0916c61-4c53-477b-9b38-d619e79cfe36','a0915ff8-4262-4bc9-9a46-62e15ee91f4e',NULL),('a0916cf2-0e0a-40b6-a442-27c68b5fc2aa','a0916915-439f-40a3-a241-d7262c21fb29',NULL),('a0916dab-037c-4738-ae3a-cb92ae47850f','a0916915-439f-40a3-a241-d7262c21fb29',NULL),('a0916e0b-cf5a-46c1-9489-e6345b0c0bd5','a0916915-439f-40a3-a241-d7262c21fb29',NULL),('a0916e60-ca1e-4796-b71b-4ee49047952b','a0916915-439f-40a3-a241-d7262c21fb29',NULL),('a0916ef7-3d22-4ab0-b3c9-a0219d479d88','a09160af-9c20-4da6-9113-afef9b99a1f4',NULL),('a0916fa0-4ea3-44d9-a7b8-a93199cb8f4c','a09167b8-f530-4dca-a3d2-2d8a2f2148c6',NULL),('a0917036-443e-49c1-b73e-cb8db35925a2','a09167d9-f690-497e-aca1-589f9a849b04',NULL),('a09170be-5855-4a23-874e-68f588a17450','a0916856-a280-41c3-96f2-88ff5c64a1b0',NULL),('a0917151-c03f-44ea-823d-73594ac322cc','a091695b-6969-430c-9ba1-22877c4f5423',NULL),('a09171ee-0eac-4f42-bbf3-116fb9cb5d8a','a091695b-6969-430c-9ba1-22877c4f5423',NULL),('a09172c3-cc01-46dc-a1d1-037a3ae0d880','a0916253-8630-4f4d-ab7f-71aea2f120ec',NULL),('a091734e-efca-4d23-9574-55deb6efd189','a091628b-d77c-4a9f-8c41-9eb3d9cab6ee',NULL),('a0917429-d57c-400c-b642-1a8fa6ba0d57','a09165b5-f30f-42dc-a69b-f8b7e9c03fd0',NULL),('a091749d-2d7f-400a-a56b-507299300406','a0916915-439f-40a3-a241-d7262c21fb29',NULL),('a0917550-3cbe-4e4d-9a04-19490c83f89e','a09165ea-6908-44db-9b2d-c3e4b089da74',NULL),('a09175d6-7e86-40ba-8106-22489e6a1328','a0916915-439f-40a3-a241-d7262c21fb29',NULL),('a091764b-d3cf-4ecf-9c9b-bb6778fd0a37','a0916797-5f41-4712-9550-1b10b3377c83',NULL),('a09176e8-e6d3-4f32-b1c3-ef892c4705eb','a0916804-cd78-41a2-a3d5-b30f34ca7c3e',NULL),('a0917753-d035-4f5a-9b39-69b474f86989','a0916999-15c8-4782-a7d3-5231c0801887',NULL),('a091786f-68b7-4c63-b714-99540e16234d','a09160f4-eb7f-469d-a08d-6f38c90e790c',NULL),('a092531d-446b-4d4b-8f42-1ced07307806','a091611d-594e-4ebe-a9e8-74c0992bcd80',NULL),('a09253a1-2461-43a2-8038-c808ce1e7a93','a091614d-cef7-4f31-893c-fde1098e4382',NULL),('a0925464-ef0a-4b58-9511-408945f4b071','a091666c-2ce6-4ab3-9958-990b2414f07a',NULL),('a092550a-9b2d-46ae-8f56-70d25558e8ed','a091668f-39e3-4005-88e2-1f9377cb532e',NULL),('a092558f-5526-44aa-a29e-f771de5ff21e','a09168aa-7f42-4035-95c3-3b18fd8ce436',NULL),('a0925632-7c60-4845-8e58-702ea9fcdba5','a09168c9-b37d-489c-984a-58a4bdb73c34',NULL),('a09256b7-db74-4250-8214-e329fe723aa0','a09168f2-31eb-4555-b78d-720418c485e3',NULL),('a0925785-cfd7-4160-9a30-b44b5d3b8f10','a0916981-9c1b-4ae7-80e6-54488ef9dd63',NULL),('a092693d-83a4-41ed-94cc-4fc063faa23d','a0916176-6a8b-437b-a4e2-718e68a5d5be',NULL),('a09269d3-e6a7-4618-a001-93f8a44d2476','a09161a6-29eb-490f-bd1a-4112f6e4c22e',NULL),('a0926a51-101b-4eee-8ea4-a9743cb98e88','a09161db-e295-4150-b497-aaf32abd716e',NULL),('a0926ad7-76db-4148-8623-673cfa055189','a0916774-d5fb-4d34-a841-006273a9e6c4',NULL),('a0926b7f-119f-4c24-a079-bca7c71fc4a5','a0916613-df0e-4de8-a99d-98c79061f37d',NULL),('a0926bfe-ce19-49a8-be5a-14763ef2f917','a09166b8-71fb-4ea3-816f-862b86c5da97',NULL),('a0926ca4-9e6c-484c-9561-7de006d62e3e','a0916727-6a33-4aed-a18f-d3fcdb4c4e1c',NULL),('a0926d18-3dea-4906-9c3e-c45fd20357ae','a091663e-dcdc-4b37-91f0-4ac916198a88',NULL),('a0926dd0-549c-4a0e-a0fd-fa037408e3dc','a091687b-0cce-45f0-be90-39e1bcf0d979',NULL);
 /*!40000 ALTER TABLE `product_authors` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -495,8 +619,8 @@ DROP TABLE IF EXISTS `product_categories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `product_categories` (
-  `product_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `category_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`product_id`,`category_id`),
   KEY `product_categories_category_id_foreign` (`category_id`),
   CONSTRAINT `product_categories_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
@@ -510,7 +634,7 @@ CREATE TABLE `product_categories` (
 
 LOCK TABLES `product_categories` WRITE;
 /*!40000 ALTER TABLE `product_categories` DISABLE KEYS */;
-INSERT INTO `product_categories` VALUES ('a00ac32b-cb44-4f59-b37c-6cb764bf0acb','9ffad2ba-2124-4abf-a555-66921630aae5'),('a00ad142-fa6c-4cdc-85b0-16452f5153a6','9ffad2ba-2124-4abf-a555-66921630aae5'),('a00ad1d5-758b-47c8-9f5b-bc33898c5af9','9ffad2ba-2124-4abf-a555-66921630aae5'),('a00ad242-ccc5-43b3-90b0-b8f5d6fd9a72','9ffad2ba-2124-4abf-a555-66921630aae5'),('a00adfb5-df2d-4fe4-9bca-558173aa4c73','9ffad2ba-2124-4abf-a555-66921630aae5'),('a00abb28-6a82-4ed8-80b0-870a99ffeab5','9ffad2d9-d3ae-4332-9169-0b18ceaf4dbc'),('a00ac32b-cb44-4f59-b37c-6cb764bf0acb','9ffad2d9-d3ae-4332-9169-0b18ceaf4dbc'),('a00ad142-fa6c-4cdc-85b0-16452f5153a6','9ffad2d9-d3ae-4332-9169-0b18ceaf4dbc'),('a00ad1d5-758b-47c8-9f5b-bc33898c5af9','9ffad2d9-d3ae-4332-9169-0b18ceaf4dbc'),('a00adfb5-df2d-4fe4-9bca-558173aa4c73','9ffad2d9-d3ae-4332-9169-0b18ceaf4dbc');
+INSERT INTO `product_categories` VALUES ('a091786f-68b7-4c63-b714-99540e16234d','a09162b4-48c8-4da2-b584-d80206b30b5f'),('a092531d-446b-4d4b-8f42-1ced07307806','a09162b4-48c8-4da2-b584-d80206b30b5f'),('a09253a1-2461-43a2-8038-c808ce1e7a93','a09162b4-48c8-4da2-b584-d80206b30b5f'),('a0925464-ef0a-4b58-9511-408945f4b071','a09162b4-48c8-4da2-b584-d80206b30b5f'),('a092550a-9b2d-46ae-8f56-70d25558e8ed','a09162b4-48c8-4da2-b584-d80206b30b5f'),('a092558f-5526-44aa-a29e-f771de5ff21e','a09162b4-48c8-4da2-b584-d80206b30b5f'),('a0925632-7c60-4845-8e58-702ea9fcdba5','a09162b4-48c8-4da2-b584-d80206b30b5f'),('a09256b7-db74-4250-8214-e329fe723aa0','a09162b4-48c8-4da2-b584-d80206b30b5f'),('a0925785-cfd7-4160-9a30-b44b5d3b8f10','a09162b4-48c8-4da2-b584-d80206b30b5f'),('a0916ae3-c057-45f7-affe-3b6de4ff778a','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a0916c61-4c53-477b-9b38-d619e79cfe36','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a0916cf2-0e0a-40b6-a442-27c68b5fc2aa','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a0916dab-037c-4738-ae3a-cb92ae47850f','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a0916e0b-cf5a-46c1-9489-e6345b0c0bd5','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a0916e60-ca1e-4796-b71b-4ee49047952b','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a0916ef7-3d22-4ab0-b3c9-a0219d479d88','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a0916fa0-4ea3-44d9-a7b8-a93199cb8f4c','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a0917036-443e-49c1-b73e-cb8db35925a2','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a09170be-5855-4a23-874e-68f588a17450','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a0917151-c03f-44ea-823d-73594ac322cc','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a09171ee-0eac-4f42-bbf3-116fb9cb5d8a','a09162cd-7c77-449f-bdd5-f84409a803bb'),('a09172c3-cc01-46dc-a1d1-037a3ae0d880','a09162e0-bd99-4cfd-91c1-a0812112c368'),('a091734e-efca-4d23-9574-55deb6efd189','a09162e0-bd99-4cfd-91c1-a0812112c368'),('a0917429-d57c-400c-b642-1a8fa6ba0d57','a09162e0-bd99-4cfd-91c1-a0812112c368'),('a091749d-2d7f-400a-a56b-507299300406','a09162e0-bd99-4cfd-91c1-a0812112c368'),('a0917550-3cbe-4e4d-9a04-19490c83f89e','a09162e0-bd99-4cfd-91c1-a0812112c368'),('a09175d6-7e86-40ba-8106-22489e6a1328','a09162e0-bd99-4cfd-91c1-a0812112c368'),('a091764b-d3cf-4ecf-9c9b-bb6778fd0a37','a09162e0-bd99-4cfd-91c1-a0812112c368'),('a09176e8-e6d3-4f32-b1c3-ef892c4705eb','a09162e0-bd99-4cfd-91c1-a0812112c368'),('a0917753-d035-4f5a-9b39-69b474f86989','a09162e0-bd99-4cfd-91c1-a0812112c368'),('a092693d-83a4-41ed-94cc-4fc063faa23d','a09162f1-a667-4c95-b22c-4441e72932c3'),('a09269d3-e6a7-4618-a001-93f8a44d2476','a09162f1-a667-4c95-b22c-4441e72932c3'),('a0926a51-101b-4eee-8ea4-a9743cb98e88','a09162f1-a667-4c95-b22c-4441e72932c3'),('a0926ad7-76db-4148-8623-673cfa055189','a09162f1-a667-4c95-b22c-4441e72932c3'),('a0926b7f-119f-4c24-a079-bca7c71fc4a5','a09162f1-a667-4c95-b22c-4441e72932c3'),('a0926bfe-ce19-49a8-be5a-14763ef2f917','a09162f1-a667-4c95-b22c-4441e72932c3'),('a0926ca4-9e6c-484c-9561-7de006d62e3e','a09162f1-a667-4c95-b22c-4441e72932c3'),('a0926d18-3dea-4906-9c3e-c45fd20357ae','a09162f1-a667-4c95-b22c-4441e72932c3'),('a0926dd0-549c-4a0e-a0fd-fa037408e3dc','a09162f1-a667-4c95-b22c-4441e72932c3');
 /*!40000 ALTER TABLE `product_categories` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -522,17 +646,17 @@ DROP TABLE IF EXISTS `products`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `products` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `isbn` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `publisher_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `unit` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'book',
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `isbn` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `publisher_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `unit` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'book',
   `selling_price_vnd` bigint unsigned NOT NULL,
-  `image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -550,7 +674,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES ('a00abb28-6a82-4ed8-80b0-870a99ffeab5','CODE','Các để đi đến thành công','cac-de-di-den-thanh-cong','1111','Mô tả sản phẩm nè','9ffc7a76-0a3f-40bd-bf9f-bb488d5ea19d','Bộ',150000000,'64Md85UpCU4EiSmQQJ3xDxmX9AwTCyGNrtcQLoD0.png','ACTIVE','2025-10-05 15:51:41','2025-10-20 17:03:49'),('a00ac32b-cb44-4f59-b37c-6cb764bf0acb','CODE1','Không hiểu gì hết','khong-hieu-gi-het','11111','Mô tả','9ffc7a76-0a3f-40bd-bf9f-bb488d5ea19d','Bộ',1500000,'wDVedQxYUQZi7xzfVEkentOiBWvNUairVImKgUB2.jpg','ACTIVE','2025-10-05 16:14:05','2025-10-20 17:03:30'),('a00ad142-fa6c-4cdc-85b0-16452f5153a6','CODE2','Chúa tể của những chiếc nhẫn','chua-te-cua-nhung-chiec-nhan','2222','Mô tả sản phẩm','9ffc7a76-0a3f-40bd-bf9f-bb488d5ea19d','Bộ',1500000,'O18f4EW66LolBMh9z9WOySd8ElyX206ZOlhXEVFB.png','ACTIVE','2025-10-05 16:53:29','2025-10-20 17:03:14'),('a00ad1d5-758b-47c8-9f5b-bc33898c5af9','CODE3','Sauron nè','sauron-ne','3333','Mô tả','9ffc7a76-0a3f-40bd-bf9f-bb488d5ea19d','Bộ',1500000,'mno2u40k9LnLA7HZ4u0GAkm5CRjnWaqV1NoMCbbM.png','ACTIVE','2025-10-05 16:55:05','2025-10-20 17:02:38'),('a00ad242-ccc5-43b3-90b0-b8f5d6fd9a72','CODE4','Chả lá lốt nè','cha-la-lot-ne','4444','Mô tả','9ffc7a76-0a3f-40bd-bf9f-bb488d5ea19d','Bộ',15000000,'zXlrYfkajI2bEuROJwqHJjvI7lpzL95xNEjDDHSe.jpg','ACTIVE','2025-10-05 16:56:17','2025-10-20 17:02:22'),('a00adfb5-df2d-4fe4-9bca-558173aa4c73','CODENOIBO','Tiểu thuyết 1','tieu-thuyet-1','11112003','Mô tả','9ffc7a76-0a3f-40bd-bf9f-bb488d5ea19d','Bộ',25000000000,'o9jVHYZOiHCl8xVp6H3FC1oMRYPoFZK0z4jnikr6.png','ACTIVE','2025-10-05 17:33:53','2025-10-20 17:02:04');
+INSERT INTO `products` VALUES ('a0916ae3-c057-45f7-affe-3b6de4ff778a','TRENNHUNGDAMMAY','Trên Những Đám Mây','tren-nhung-dam-may','1111','Một con mèo và một con chim sẻ cùng một cuộc phiêu lưu từ thị trấn Thứ Ba đến bờ biển San Hô để đi tìm ý nghĩa cuộc sống.','a09163b9-f356-486d-ae87-7e6a33a65d43','quyển',150000,'sLFxUpEs37Il0prcwGLRGxedTDEn1WXAeI04Lbe9.webp','ACTIVE','2025-12-11 14:44:00','2025-12-12 10:26:10'),('a0916c61-4c53-477b-9b38-d619e79cfe36','COTICHCUABA','Cổ Tích Của Ba','co-tich-cua-ba','1112','Phi Tân đã vẽ lên những dòng sông, bờ nước, đồng ruộng, ao làng, sân đình, chợ quê... đầy xao xuyến và đáng nhớ... bằng câu chữ mềm mại. Tác giả dùng nhiều phương ngữ Huế, nhưng đó cũng là cách để bất cứ trẻ con hay ai đó đọc tập sách, cũng có thể biết thêm về một miền ngôn ngữ và văn hóa độc đáo.','a09163b9-f356-486d-ae87-7e6a33a65d43','quyển',60000,'RlBTiUK5aCBWMOyAJ5qaOOn8XDU1ltG1Z7N2L25U.jpg','ACTIVE','2025-12-11 14:48:10','2025-12-12 10:29:02'),('a0916cf2-0e0a-40b6-a442-27c68b5fc2aa','NGOITRUONGMOIKHI','Ngôi Trường Mọi Khi','ngoi-truong-moi-khi','1113','Những câu chuyện về nhóm bạn học sinh năm đầu cấp 3 với bao kỷ niệm vui buồn hờn giận, bao nhiêu trò tinh nghịch của tuổi mới lớn. Với những Hạt tiêu, Tóc ngắn, Hột mít, Bảnh trai, Răng chuột, Mặt mụn… đã tạo nên không khí của một lớp học thật dễ thương với bao nhiêu tình cảm yêu thương, cảm động và gần gũi.','a09163b9-f356-486d-ae87-7e6a33a65d43','quyển',580000,'4pDTNAeGYF5vATrpIBnSwfzszTtnU7AQ9LmbqHQX.webp','ACTIVE','2025-12-11 14:49:45','2025-12-12 10:28:43'),('a0916dab-037c-4738-ae3a-cb92ae47850f','KINHVANHOATAP1','Kính Vạn Hoa - Tập 1','kinh-van-hoa-tap-1','1114','Đọc Kính Vạn Hoa, tôi cảm ơn Nguyễn Nhật Ánh đã dày công phản ánh những sinh hoạt muôn mặt của lứa tuổi học trò. Từ cách học với các thủ thuật “phổ thơ” để ghi nhớ thuộc lòng các công thức Toán, Lý, Hóa, Anh văn... đến lối làm thơ, kể vè, dựng hoạt cảnh để học tập các môn Văn, Sử.','a091646f-bfaf-4954-8eaa-1ddeba18fec9','quyển',135000,'NPjKZ3mqS7gfes7JDXQYIN3bdP2ndgzV68DwpKOA.webp','ACTIVE','2025-12-11 14:51:46','2025-12-12 10:28:08'),('a0916e0b-cf5a-46c1-9489-e6345b0c0bd5','KINHVANHOATAP3','Kính Vạn Hoa - Tập 3','kinh-van-hoa-tap-3','1115','Đọc Kính Vạn Hoa, tôi cảm ơn Nguyễn Nhật Ánh đã dày công phản ánh những sinh hoạt muôn mặt của lứa tuổi học trò. Từ cách học với các thủ thuật “phổ thơ” để ghi nhớ thuộc lòng các công thức Toán, Lý, Hóa, Anh văn... đến lối làm thơ, kể vè, dựng hoạt cảnh để học tập các môn Văn, Sử.','a091646f-bfaf-4954-8eaa-1ddeba18fec9','quyển',135000,'8aB1MhVpCxKxb1MLuxqW2s0qaETVjHLdFk4Fe4re.webp','ACTIVE','2025-12-11 14:52:49','2025-12-12 10:28:23'),('a0916e60-ca1e-4796-b71b-4ee49047952b','KINHVANHOATAP2','Kính Vạn Hoa - Tập 2','kinh-van-hoa-tap-2','1116','Đọc Kính Vạn Hoa, tôi cảm ơn Nguyễn Nhật Ánh đã dày công phản ánh những sinh hoạt muôn mặt của lứa tuổi học trò. Từ cách học với các thủ thuật “phổ thơ” để ghi nhớ thuộc lòng các công thức Toán, Lý, Hóa, Anh văn... đến lối làm thơ, kể vè, dựng hoạt cảnh để học tập các môn Văn, Sử.','a091646f-bfaf-4954-8eaa-1ddeba18fec9','quyển',135000,'ADOwyVLnxEa3FcRyDVsbyL5U5Zq9dugJ9BQ2FsbE.jpg','ACTIVE','2025-12-11 14:53:45','2025-12-12 10:27:46'),('a0916ef7-3d22-4ab0-b3c9-a0219d479d88','HUMXAMQUASONG','Hùm Xám Qua Sông','hum-xam-qua-song','1117','Trên hòn đảo của rừng đước rừng dừa, của những bến sông và các đoàn tàu cá uy nghi, có chú khuyển mang cái tên lạ lùng là Hùm Xám. Sống vô tư giữa bạn bè đồng loại và các loài khác, được chủ yêu thương, thế nhưng thẳm sâu trong tâm hồn, một điều gì đó luôn thôi thúc Hùm Xám kiếm tìm.','a091646f-bfaf-4954-8eaa-1ddeba18fec9','quyển',115000,'WgfPuVvWIEniLEhYuKjEURhQ81irKufW1taxS9dR.jpg','ACTIVE','2025-12-11 14:55:23','2025-12-12 10:27:23'),('a0916fa0-4ea3-44d9-a7b8-a93199cb8f4c','TUYENTAPTRUYENCOTICHVIETNAMDANHCHOTHIEUNHI','Tuyển Tập Truyện Cổ Tích Việt Nam Dành Cho Thiếu Nhi','tuyen-tap-truyen-co-tich-viet-nam-danh-cho-thieu-nhi','1118','Bước vào thế giới của những câu chuyện cổ tích, các bạn nhỏ không chỉ thỏa mãn được nhu cầu khám phá, tìm hiểu về đời sống cha ông từ thuở xưa mà còn rút ra nhiều bài học ý nghĩa về cuộc sống, tình yêu thương và lòng nhân ái.','a09164e4-ee6a-4bdd-9629-34db4ef6852d','quyển',120000,'UmefAyP8mQ9OCGGb5BXgqqQxFTl4tSZfMJVab0vQ.webp','ACTIVE','2025-12-11 14:57:14','2025-12-12 10:26:59'),('a0917036-443e-49c1-b73e-cb8db35925a2','CAUBEDENTUDUONGCHANTROI','Cậu Bé Đến Từ Đường Chân Trời','cau-be-den-tu-duong-chan-troi','1119','Người cá trong những câu chuyện cổ xưa hiện hữu ngay trên vùng biển khơi vào chuyến nghỉ hè của cậu bé Hoàng và cùng cậu khám phá những bí mật trên hòn đảo bé nhỏ, thân thương ở miền Đông Bắc…','a091646f-bfaf-4954-8eaa-1ddeba18fec9','quyển',150000,'NmgOOWnMC2dIM6gOzM66v57ue1xsnkU1OfgKOeWs.webp','ACTIVE','2025-12-11 14:58:53','2025-12-12 10:26:32'),('a09170be-5855-4a23-874e-68f588a17450','CHUMEOTAMNANGBENHIEN','Chú Mèo Tắm Nắng Bên Hiên','chu-meo-tam-nang-ben-hien','1110','Hành trình lớn lên của chú mèo Xám Tro là những ngày rong chơi bên bạn mèo Nắng rực rỡ, bạn cún Lu tinh nghịch, bác Cóc trầm lắng… Xám Tro học cách nói lời xin lỗi, mở lòng thứ tha, từng chút một hiểu được giá trị của tự do và yêu thương.','a091646f-bfaf-4954-8eaa-1ddeba18fec9','quyển',40000,'b5SoYLTga4IcO7KQOYAPdeP2v3Y9GVXORwqznULl.webp','ACTIVE','2025-12-11 15:00:22','2025-12-12 10:25:38'),('a0917151-c03f-44ea-823d-73594ac322cc','KIMDONG','Kim Đồng (Tái Bản 2021)','kim-dong-tai-ban-2021','2111','Cậu bé Nông Văn Dền quê ở Nà Mạ, châu Hà Quảng (Cao Bằng) được giác ngộ cách mạng và đặt bí danh Kim Đồng. Kim Đồng được giao nhiệm vụ canh gác, chuyển thư từ, liên lạc… đưa đường cho cán bộ vượt qua vùng bị địch bao vây, canh gác.','a091646f-bfaf-4954-8eaa-1ddeba18fec9','quyển',40000,'a6nrQLjnH220vyJ7YZTNpzXBKaC8flkrIZQHLjGs.webp','ACTIVE','2025-12-11 15:01:58','2025-12-12 10:25:15'),('a09171ee-0eac-4f42-bbf3-116fb9cb5d8a','DEMENPHIEULUUKY','Dế Mèn Phiêu Lưu Ký','de-men-phieu-luu-ky','2112','“Một con dế đã từ tay ông thả ra chu du thế giới tìm những điều tốt đẹp cho loài người. Và con dế ấy đã mang tên tuổi ông đi cùng trên những chặng đường phiêu lưu đến với cộng đồng những con vật trong văn học thế giới, đến với những xứ sở thiên nhiên và văn hóa của các quốc gia khác. Dế Mèn Tô Hoài đã lại sinh ra Tô Hoài Dế Mèn, một nhà văn trẻ mãi không già trong văn chương...” - Nhà phê bình Phạm Xuân Nguyên','a091646f-bfaf-4954-8eaa-1ddeba18fec9','quyển',150000,'bdATXRCc7ri8oY8M0IFgPnqK7245U6r2DTCFNSJ6.webp','ACTIVE','2025-12-11 15:03:41','2025-12-12 10:24:56'),('a09172c3-cc01-46dc-a1d1-037a3ae0d880','THUCTINH','Thức Tỉnh','thuc-tinh','2113','Đây là tác phẩm đầu tay của Line Papin, nữ nhà văn trẻ nhất của làng văn học Pháp trong mùa sách 2016-2017. L’éveil là những câu chuyện tình với nhiều cung bậc khác nhau, vừa đam mê khát khao, vừa ngây thơ trong trắng song vẫn bị lý trí chi phối. Câu chuyện tình xoay quanh bốn nhân vật, tất cả đều là người nước ngoài, sống ở Hà Nội.Mỗi người có một hoàn cảnh khác nhau. Họ đến Hà Nội vì những lý do cá nhân khác nhau. Sự tiếp xúc, gặp gỡ với người kia, tiếp theo là mối quan hệ của họ, đã giúp người kia thức tỉnh.','a09163b9-f356-486d-ae87-7e6a33a65d43','quyển',115000,'rd4o0XINm1DFljxNFGJHTCT1JnzQ86lgq0n7WuC1.webp','ACTIVE','2025-12-11 15:06:01','2025-12-12 10:24:26'),('a091734e-efca-4d23-9574-55deb6efd189','CONCUADAO','Con Của Đảo','con-cua-dao','2114','Những đứa trẻ đó là cư dân nhỏ tuổi từ đất liền ra đảo, là thành viên của các hộ ngư dân đã cùng cha mẹ và cán bộ chiến sĩ góp phần dựng bia chủ quyền, sống trên các đảo nổi Trường Sa.','a091646f-bfaf-4954-8eaa-1ddeba18fec9','quyển',85000,'U1VHh4VmzzYTFybUBTkoh2isCG77vLvAUdaoyar6.webp','ACTIVE','2025-12-11 15:07:32','2025-12-12 10:24:11'),('a0917429-d57c-400c-b642-1a8fa6ba0d57','GIATUTHONGAY','Giã Từ Thơ Ngây','gia-tu-tho-ngay','2115','Giã từ thơ ngây viết về chuyện giới tính ở tuổi vị thành niên, trực diện nhưng không thô thiển, trái lại lành mạnh và tươi sáng, thoáng qua thì tưởng khiêu khích và thiếu trong sáng nhưng kỳ thực lại ngây thơ và thuần khiết hơn bao giờ hết.','a0916339-6a35-4803-b0c5-8e3f59235ee9','quyển',105000,'xdQ4rVvaPjic8BH6iUfD5vZDEZ6a6WybH7Thnm3Z.webp','ACTIVE','2025-12-11 15:09:56','2025-12-12 10:23:52'),('a091749d-2d7f-400a-a56b-507299300406','HADO','Hạ Đỏ','ha-do','2116','Kể về mối tình đầu trong sáng của một cậu học trò dành cho một cô gái quê 16 tuổi trong dịp về quê nghỉ hè, và những việc làm cao đẹp của cậu cho em bé quê chân chất chịu nhiều thiệt thòi ở nông thôn.','a09163b9-f356-486d-ae87-7e6a33a65d43','quyển',40000,'XrcvjFzCYBgTGC0rQ83JepsirEnzzspl9b8sQk0H.webp','ACTIVE','2025-12-11 15:11:11','2025-12-12 10:23:29'),('a0917550-3cbe-4e4d-9a04-19490c83f89e','LUTREDUONGTAU','Lũ Trẻ Đường Tàu','lu-tre-duong-tau','2117','Kỳ thực chúng nào phải là trẻ đường tàu. Tôi đoán chừng là chúng chưa từng lăn tăn gì về đường tàu ngoại trừ ấy là phương tiện đưa chúng tới Maskelyne và Cooke để xem ảo thuật, coi kịch câm pantomime, đi chơi vườn bách thảo, và tham quan bảo tàng tượng sáp Madame Tussaud. Chúng chỉ là những đứa trẻ ngoại ô bình thường, sống cùng cha mẹ trong một căn biệt thự bình thường có mặt tiền ốp gạch đỏ, cửa ra vào lắp kính màu, một lối đi lát gạch gọi là hành lang, một phòng tắm có nước nóng lạnh, chuông điện, cửa sổ kiểu Pháp, tường quét vôi trắng, và “mọi tiện nghi hiện đại”, theo ngôn ngữ của cánh môi giới nhà đất.','a0916428-f872-4a30-99ae-14b725e2e67f','quyển',120000,'yPiL0AD41OHFPr9TllZoUS2pnl0r8HJhaFL5os8K.webp','ACTIVE','2025-12-11 15:13:08','2025-12-12 10:23:13'),('a09175d6-7e86-40ba-8106-22489e6a1328','TOILABETO','Tôi Là Bêtô','toi-la-beto','2118','Truyện Tôi là Bêtô là sáng tác mới nhất của nhà văn Nguyễn Nhật Ánh được viết theo phong cách hoàn toàn khác so với những tác phẩm trước đây của ông. Những mẩu chuyện, hay những phát hiện của chú chó Bêtô đầy thú vị, vừa hài hước, vừa chiêm nghiệm một cách nhẹ nhàng “vô vàn những điều thú vị mà cuộc sống cố tình giấu kín ở ngóc ngách nào đó trong tâm hồn của mỗi chúng ta”.','a09163b9-f356-486d-ae87-7e6a33a65d43','quyển',100000,'z2rHbF7D1vCAzn7R5NNPJO5wmeAwWx2xeS94SLp3.webp','ACTIVE','2025-12-11 15:14:36','2025-12-12 10:22:52'),('a091764b-d3cf-4ecf-9c9b-bb6778fd0a37','HODIEPVAKINHNGU','Hồ Điệp Và Kình Ngư','ho-diep-va-kinh-ngu','2119','Một câu chuyện cuốn hút ngay từ những trang đầu tiên - Khi tình yêu trở thành sợi dây mong manh giữa sinh tử, phản bội và hy vọng. Khi một nàng hồ điệp nhỏ bé chạm trán với kình ngư mạnh mẽ, liệu đó là định mệnh hay chỉ là một giấc mộng chóng tàn?','a09164e4-ee6a-4bdd-9629-34db4ef6852d','quyển',155000,'CCgRPqAt950zUFIXLQaQuLFmy26DFR1X8podnOu5.webp','ACTIVE','2025-12-11 15:15:53','2025-12-12 10:22:36'),('a09176e8-e6d3-4f32-b1c3-ef892c4705eb','MUADO','Mưa Đỏ','mua-do','2110','Những miền cảm xúc đan xen giữa nụ cười - nước mắt, nỗi đau - niềm vui, sự sống - cái chết, những thăng hoa - mất mát, sự hy sinh của những người cha, người chồng, người con, những người lính, những đồng chí, đồng đội đã không tiếc máu xương trong cuộc chiến đấu 81 ngày đêm bảo vệ thành Cổ Quảng Trị, bảo vệ Tổ quốc với những gian khổ, thiểu thốn lẫn những mất mát đau thương. Đó là một tiểu đội có 7 người lính với 7 tính cách, số phận, suy nghĩ và xuất thân khác nhau. Có người lãng tử, có người bộc trực, có anh lính nhút nhát, có anh lính gan dạ nhưng hơn tất cả họ là một gia đình, luôn có nhau dù đang giữa ranh giới mong manh sự sống và cái chết cận kề.','a09163b9-f356-486d-ae87-7e6a33a65d43','quyển',300000,'NhImmFoAO7vkqSgPfSib4cgCkNxfOTwRfzGcW3Wn.webp','ACTIVE','2025-12-11 15:17:36','2025-12-12 10:22:13'),('a0917753-d035-4f5a-9b39-69b474f86989','LACLOI','Lạc Lối','lac-loi','3111','“Lạc lối” xoay quanh ba nhân vật chính là ba cô bạn học cũ trong vòng xoáy tranh đoạt tình, tiền, quyền lực. Thùy Dương kể khéo, lạnh và tỉnh về những mưu toan của đấu đá chức quyền, những tinh quái của thương trường và những lắt léo của tình người. Để rồi khi nhìn lại, đâm đầu, va đập, giẫm đạp lên nhau để chạy đua trong cuộc đời, tưởng chừng chạy được đến nơi nào đó rồi lại ngỡ hóa ra không?','a09163b9-f356-486d-ae87-7e6a33a65d43','quyển',250000,'UaIebhrKfdwYB1xqXKSaVDlUKYhYkijNLgh3PLtz.webp','ACTIVE','2025-12-11 15:18:46','2025-12-12 10:21:55'),('a091786f-68b7-4c63-b714-99540e16234d','XAYDUNGCONTENTTHUONGHIEUCANHAN','Xây Dựng Content Thương Hiệu Cá Nhân','xay-dung-content-thuong-hieu-ca-nhan','3112','Cuốn sách được chia làm 8 chương sẽ giúp bạn đọc hiểu rõ về xây dựng thương hiệu cá nhân là cả một quá trình, và trong quá trình phát triển thương hiệu cá nhân sẽ giúp xác định đúng những thế mạnh, điểm yếu, kỹ năng,… của bản thân, để vận dụng những điều đó một cách hiệu quả hơn.','a091654f-f0ca-4f35-b215-7ecbd3816f09','quyển',195000,'VKj5AX4vJby0pFMaa2eYF1Ek1J8okwEe3YQRjmL3.webp','ACTIVE','2025-12-11 15:21:52','2025-12-12 10:21:36'),('a092531d-446b-4d4b-8f42-1ced07307806','CONTENTTIKTOK','Content Tiktok','content-tiktok','3113','Là mạng xã hội phát triển nhanh nhất trong thập kỷ vừa qua, TikTok đang vượt mặt các nền tảng khác trong việc thu hút cả người dùng lẫn các thương hiệu, người bán hàng. Lượng người sử dụng ngày một tăng, TikTok đang là kênh bán hàng phát triển mạnh mẽ và đem lại lợi nhuận lớn cho đến thời điểm hiện tại.','a0916375-cf91-4717-a7ee-3cf7d0753413','quyển',219000,'Yw9dfPvyQTjlz2URbM7TAviqxxTdfTfd2yrkJPxZ.webp','ACTIVE','2025-12-12 01:33:21','2025-12-12 10:21:07'),('a09253a1-2461-43a2-8038-c808ce1e7a93','VISUALMARKETING','Visual Marketing','visual-marketing','3114','Hơn 1 tỉ giờ đồng hồ video được xem mỗi ngày trên YouTube, và bạn bắt đầu đánh giá cao việc video đã ăn sâu vào cuộc sống hằng ngày của chúng ta như thế nào. Và mặc dù việc dựng và đăng video từ lâu đã trở thành một đề xuất tốn kém cho hầu hết các doanh nghiệp, giờ đây, chúng ta mang theo máy quay có độ phân giải cao ngay trong túi mình cùng với nhiều dịch vụ lưu trữ video miễn phí dành cho doanh nghiệp.','a091639d-ffa5-40b2-b4dd-952c97113d2e','quyển',195000,'Bm9Hr15L2rC9RFhjeVK255M4mdtbFTDNMyQuu7KB.webp','ACTIVE','2025-12-12 01:34:47','2025-12-12 10:20:37'),('a0925464-ef0a-4b58-9511-408945f4b071','UNGDUNGAITRONGDAUTUTAICHINH','Ứng Dụng AI Trong Đầu Tư Tài Chính','ung-dung-ai-trong-dau-tu-tai-chinh','3115','Cuốn sách \" Ứng Dụng AI Trong Đầu Tư Tài Chính\" là một tài liệu chuyên sâu và thực tiễn, dành cho những người đang hoạt động trong lĩnh vực tài chính, đặc biệt là những ai quan tâm đến việc ứng dụng trí tuệ nhân tạo (AI) và dữ liệu lớn (Big Data) trong phân tích và ra quyết định đầu tư.','a091654f-f0ca-4f35-b215-7ecbd3816f09','quyển',229000,'9diyBEOvtmgUWHSJYxbxW1PUljP7pTe1LVy3QrUY.webp','ACTIVE','2025-12-12 01:36:55','2025-12-12 10:20:08'),('a092550a-9b2d-46ae-8f56-70d25558e8ed','MANIFESTMARKETING','Manifest Marketing','manifest-marketing','3116','Trong một thế giới kỹ thuật số ngày càng minh bạch, nơi thông tin về sản phẩm có thể được truy cập tức thì chỉ bằng một cú nhấp chuột, niềm tin đã trở thành yếu tố sống còn của mọi chiến lược marketing. Những phương pháp tiếp thị truyền thống, nặng về thao túng và thiếu chân thực, đang dần mất hiệu lực trong một thị trường mà người tiêu dùng biết nhiều như người bán. Trước bối cảnh đó, \"Manifest Marketing\" của Joe Vitale đưa ra một cách tiếp cận hoàn toàn khác: tiếp thị nhân quả - một mô hình lấy \"cho đi vô điều kiện\" làm nền tảng để xây dựng lòng tin và tạo ảnh hưởng sâu sắc.','a091654f-f0ca-4f35-b215-7ecbd3816f09','quyển',159000,'n7UtNiWhyayMbc6OENO5IL4H4uKk690Cm5BbBkTP.webp','ACTIVE','2025-12-12 01:38:44','2025-12-12 10:19:40'),('a092558f-5526-44aa-a29e-f771de5ff21e','LAPKEHOACHKINHDOANHHIEUQUA','Lập Kế Hoạch Kinh Doanh Hiệu Quả','lap-ke-hoach-kinh-doanh-hieu-qua','3117','Cuốn sách Lập Kế Hoạch Kinh Doanh Hiệu Quả sẽ hướng dẫn bạn cách để tạo ra bản kế hoạch kinh doanh thu hút mọi tổ chức tài chính, khiến họ phải đáp ứng mong muốn của bạn và hỗ trợ bạn tới cùng trong công việc kinh doanh.','a0916428-f872-4a30-99ae-14b725e2e67f','quyển',90000,'VgF72ZVZWsMrBgKnavTJFdMdtLJkR8jW29M6I8Kc.webp','ACTIVE','2025-12-12 01:40:11','2025-12-12 10:19:07'),('a0925632-7c60-4845-8e58-702ea9fcdba5','TUTINTRONGKINHDOANH','Tự Tin Trong Kinh Doanh','tu-tin-trong-kinh-doanh','3118','“Cuốn sách chứa đầy những điều thiết thực giúp bạn có thể luyện tập để nâng cao năng lực tự tin. Trong công việc hay cuộc sống cá nhân, tự tin là điều quan trọng nhất. Đây là cuốn sách bạn không thể bỏ qua.”','a091639d-ffa5-40b2-b4dd-952c97113d2e','quyển',100000,'wqU0p2wThrt3Wk9OUQpVQrSvOFROBmUW4DyKlTsd.webp','ACTIVE','2025-12-12 01:41:58','2025-12-12 10:18:38'),('a09256b7-db74-4250-8214-e329fe723aa0','DOTPHATUDUYKINHDOANH','Đột Phá Tư Duy Kinh Doanh','dot-pha-tu-duy-kinh-doanh','3119','Đây là tác phẩm thuộc Top 10 cuốn sách kinh doanh hay nhất năm 2018 (theo tạp chí Inc.), một cẩm nang xuất sắc hướng dẫn bạn cách trở nên khác biệt trong một thế giới mà mọi thứ đều có thể bị sao chép.','a091639d-ffa5-40b2-b4dd-952c97113d2e','quyển',150000,'ENfFSy8JAP1VKZxnojXhE1aizaAflX8C8AYPL9Dn.webp','ACTIVE','2025-12-12 01:43:25','2025-12-12 10:18:14'),('a0925785-cfd7-4160-9a30-b44b5d3b8f10','TRUYENTHONGKINHDOANH','Truyền Thông & Kinh Doanh','truyen-thong-kinh-doanh','4110','Khởi đi từ câu hỏi lớn: Tiền là thứ đầu tiên được nhắc đến, còn công chúng liệu là thứ sau cùng?, tác giả cung cấp một cái nhìn toàn cảnh về thực trạng của ngành truyền thông thế giới, với những phương tiện truyền thông mới, những cách tiếp cận, thích nghi và những chiến lược mới.','a09163b9-f356-486d-ae87-7e6a33a65d43','quyển',150000,'nrO514KWQ1nc4ChlSQthStjd3pBsAQfQVSL5xmvw.webp','ACTIVE','2025-12-12 01:45:40','2025-12-12 10:17:49'),('a092693d-83a4-41ed-94cc-4fc063faa23d','THIENVAAC','Thiện Và Ác','thien-va-ac','4114','Cuốn sách là bản tường thuật chân thực và chi tiết nhất về thí nghiệm nhà tù Stanford kinh điển do Philip Zimbardo chủ trì thực hiện, bên cạnh việc phân tích nhiều nghiên cứu tâm lý xã hội gây sốc khác và nhìn lại những câu chuyện thực tế kinh hoàng mãi mãi in dấu trong lịch sử. Và khiến chúng ta phải có cái nhìn khác về bản chất của con người, rằng ranh giới thiện - ác không hề bất khả xâm phạm và mỗi cá nhân đều có thể dễ dàng sa ngã và bị cuốn theo sự tàn độc.','a0916375-cf91-4717-a7ee-3cf7d0753413','quyển',289000,'SfgEmkscW0qnptMWSR4ekgPA1nHYEBt0r3U1m4j3.jpg','ACTIVE','2025-12-12 02:35:13','2025-12-12 09:55:39'),('a09269d3-e6a7-4618-a001-93f8a44d2476','KHONGCANDUOCLONGTATCAMOINGUOI','Không Cần Được Lòng Tất Cả Mọi Người','khong-can-duoc-long-tat-ca-moi-nguoi','4112','Khi quá để ý đến thái độ của người khác thì mối quan hệ của bạn rất dễ đi lệch hướng và bạn cũng rất dễ bị thiệt thòi. Vậy thì làm thế nào để có thể vừa bảo vệ được bản thân, lại vừa phát triển được mối quan hệ theo đúng hướng? Bạn sẽ cần ghi nhớ năm từ khóa sau đây: tôn trọng, quan tâm, từ chối, cẩn thận lời nói và thừa nhận. Đây là năm từ khóa gắn liền với những phương pháp hữu ích và cụ thể mà tác giả Lee Pyeong đã tâm huyết gửi gắm vào trong cuốn sách.','a0916428-f872-4a30-99ae-14b725e2e67f','quyển',99000,'leDhLd5AIG8aHiqwluLt50jxY6rbOlqIqIH08TBr.webp','ACTIVE','2025-12-12 02:36:51','2025-12-12 09:55:23'),('a0926a51-101b-4eee-8ea4-a9743cb98e88','DUNGTHOIDIEMHOASENO','Đúng Thời Điểm, Hoa Sẽ Nở','dung-thoi-diem-hoa-se-no','4113','Đây là thông điệp mà tác giả Yun Subin muốn gửi gắm tới độc giả xuyên suốt cuốn sách Đúng thời điểm, hoa sẽ nở. Có thể các hạt giống trong khu vườn của bạn còn đang bận vươn rễ cắm sâu xuống đất nên chưa nảy mầm, đơm hoa, nhưng tất cả những gì bạn cần làm chỉ nên là kiên nhẫn tưới nước, bón phân cho chúng mà thôi. Bởi vì, mỗi sự nỗ lực bạn gieo xuống cũng có thời điểm của riêng chúng, đến đúng thời điểm, chúng sẽ kết thành quả ngọt, và bạn sẽ đạt được những thành tựu xứng đáng với mỗi giọt mồ hôi đã tuôn rơi.','a0916375-cf91-4717-a7ee-3cf7d0753413','quyển',180000,'SYP4wlXM4nEWgHSwyOyTBXirsJnMVYypJK5rjebi.jpg','ACTIVE','2025-12-12 02:38:13','2025-12-12 09:54:58'),('a0926ad7-76db-4148-8623-673cfa055189','NEUTHIENDUONGLADAY','Nếu Thiên Đường Là Đây?','neu-thien-duong-la-day','4104','Mỗi chương trình trong sách what if this is heaven? sẽ tập trung vào một ảo tưởng mà hầu hết chúng ta đều xem là sự thật cũng như chỉ ra mức độ phổ biến và tinh vi của nó trong cuộc đời hằng ngày. Tác giả Anita Moorjani sẽ chia sẻ những ví dụ và câu chuyện có thật từ cuộc sống của bà khi chứng kiến sự kiện tác động của những niềm tin sai lầm đến bản thân mình, để rồi nhận ra điều gì mới là sự thật.','a0916490-3d74-4041-9968-a7c44b7ea619','quyển',180000,'8Rbg3rZTPf9IIaqS2K2v4JcdGoJfHuyojcid1iOM.webp','ACTIVE','2025-12-12 02:39:41','2025-12-12 09:54:20'),('a0926b7f-119f-4c24-a079-bca7c71fc4a5','THAYDOITAMTRIBATKYAI','Thay Đổi Tâm Trí Bất Kỳ Ai','thay-doi-tam-tri-bat-ky-ai','4115','Mỗi người đều có thứ họ muốn thay đổi. Người bán hàng muốn thay đổi suy nghĩ của người mua. Nhân viên muốn thay đổi góc nhìn của sếp, lãnh đạo thì muốn thay đổi cả tổ chức. Phụ huynh muốn thay đổi cách hành xử của con cái…','a091654f-f0ca-4f35-b215-7ecbd3816f09','quyển',170000,'L4TAA8Q01J8szGPEHrhOBbTzQQjtP8wVfqrWtxbD.webp','ACTIVE','2025-12-12 02:41:31','2025-12-12 09:52:26'),('a0926bfe-ce19-49a8-be5a-14763ef2f917','MOINGAYLAMOTCOHOISONGKHAC','Mỗi Ngày Là Một Cơ Hội Sống Khác','moi-ngay-la-mot-co-hoi-song-khac','4116','Có những giai đoạn trong cuộc đời, ta cảm thấy bế tắc. Mọi thứ xung quanh dường như mất đi ý nghĩa, tâm trí quay cuồng với những lo lắng, sợ hãi và nỗi buồn không thể gọi tên. “Mỗi ngày là một cơ hội sống khác” của tác giả Uông Việt Hà dành cho những ai đang loay hoay trong vùng tối của trầm cảm, rối loạn lo âu hay ám ảnh cưỡng chế. Cuốn sách không vội vã kéo bạn ra khỏi bóng tối, nhưng sẽ giúp bạn hiểu rằng, phía trước vẫn có con đường để bước tiếp.','a091639d-ffa5-40b2-b4dd-952c97113d2e','quyển',250000,'OJUxlFIijuNksr7BwKUrNGWgxjXJ2rBkgSPM721f.webp','ACTIVE','2025-12-12 02:42:55','2025-12-12 09:51:59'),('a0926ca4-9e6c-484c-9561-7de006d62e3e','TAMLYHOCVETIEN','Tâm Lý Học Về Tiền','tam-ly-hoc-ve-tien','4117','Tiền bạc có ở khắp mọi nơi, nó ảnh hưởng đến tất cả chúng ta, và khiến phần lớn chúng ta bối rối. Mọi người nghĩ về nó theo những cách hơi khác nhau một chút. Nó mang lại những bài học có thể được áp dụng tới rất nhiều lĩnh vực trong cuộc sống, như rủi ro, sự tự tin, và hạnh phúc. Rất ít chủ đề cung cấp một lăng kính phóng to đầy quyền lực giúp giải thích vì sao mọi người lại hành xử theo cách họ làm hơn là về tiền bạc. Đó mới là một trong những chương trình hoành tráng nhất trên thế giới.','a0916375-cf91-4717-a7ee-3cf7d0753413','quyển',190000,'BvZ9jGk3QNwdP08WLpL9NJhIqKbP0IlQI3q5ftH1.webp','ACTIVE','2025-12-12 02:44:43','2025-12-12 09:51:33'),('a0926d18-3dea-4906-9c3e-c45fd20357ae','DOICUAMINHPHAIVECHOXINH','Đời Của Mình, Phải Tự Vẽ Cho Xinh','doi-cua-minh-phai-tu-ve-cho-xinh','4118','Con người là sinh vật duy nhất tự làm khổ chính mình. Chúng ta luôn suy nghĩ cho người khác, đặt bản thân vào vị trí của họ nhưng người tổn thương lúc nào cũng là mình. Tại sao ta luôn thấy bản thân chưa đủ tốt, chưa đủ giỏi? Tại sao ta luôn soi mói, dằn vặt bản thân chỉ vì một câu nói vu vơ của người khác?','a0916428-f872-4a30-99ae-14b725e2e67f','quyển',115000,'jQ7Q72VvZGhfVo3Jp5uFOYDtxIUno2pU2sQs04EF.webp','ACTIVE','2025-12-12 02:45:59','2025-12-12 09:51:01'),('a0926dd0-549c-4a0e-a0fd-fa037408e3dc','HIEUUNGTAMLY','Hiệu Ứng Tâm Lý','hieu-ung-tam-ly','4119','Yếu tố “tâm lý” là điều đặc biệt quan trọng để lay động lòng người. Việc thấu hiểu tâm lý con người sẽ giúp ta nắm bắt được ý nghĩa hành vi, làm chủ cảm xúc, từ đó giúp ta giao tiếp lôi cuốn hơn, có thể thu phục lòng người và tạo nên sự khác biệt.','a091652e-4144-4790-a298-3673d3a1e801','quyển',150000,'F5B09NBOdw0eMkKSv1UEsDxg9VZdsXuHjUMSe2qQ.webp','ACTIVE','2025-12-12 02:48:00','2025-12-12 09:47:26');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -589,12 +713,12 @@ DROP TABLE IF EXISTS `publishers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `publishers` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `logo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `logo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -608,7 +732,7 @@ CREATE TABLE `publishers` (
 
 LOCK TABLES `publishers` WRITE;
 /*!40000 ALTER TABLE `publishers` DISABLE KEYS */;
-INSERT INTO `publishers` VALUES ('9ffc7a76-0a3f-40bd-bf9f-bb488d5ea19d','Ho Huu Thuan','ho-huu-thuan','GTd82amYX5ozh3pRpjT3zYAz4iTtiRL9VdLwe3Q2.png','Mô tả','ACTIVE','2025-09-28 13:49:11','2025-09-28 13:49:11');
+INSERT INTO `publishers` VALUES ('a0916339-6a35-4803-b0c5-8e3f59235ee9','NHÀ XUẤT BẢN HÀ NỘI','nha-xuat-ban-ha-noi','Xyx7TLmYZy4jslD1cAylOo9GB7X3jpYxZ39dDusM.jpg','no','ACTIVE','2025-12-11 14:22:34','2025-12-11 14:22:34'),('a0916375-cf91-4717-a7ee-3cf7d0753413','NHÀ XUẤT BẢN DÂN TRÍ','nha-xuat-ban-dan-tri','xzaS1WMdqUegJxxuJA6bwXYNdIVweF3tp6UmLgxf.jpg','NO','ACTIVE','2025-12-11 14:23:13','2025-12-11 14:23:13'),('a091639d-ffa5-40b2-b4dd-952c97113d2e','NHÀ XUẤT BẢN LAO ĐỘNG','nha-xuat-ban-lao-dong','HdjYbjIWHALuwNF3W0aFAtAvApE22vbhEGay8p6D.jpg','NO','ACTIVE','2025-12-11 14:23:40','2025-12-11 14:23:40'),('a09163b9-f356-486d-ae87-7e6a33a65d43','NHÀ XUẤT BẢN TRẺ','nha-xuat-ban-tre','gX7TZKRRvqzTlg4ZAMl4UMNkTHLxBvj39FXq98rM.jpg','NO','ACTIVE','2025-12-11 14:23:58','2025-12-11 14:23:58'),('a0916428-f872-4a30-99ae-14b725e2e67f','NHÀ XUẤT BẢN THANH NIÊN','nha-xuat-ban-thanh-nien','r6bTMGN10v9kMKslFnjBwnsnY6J8C8HbbYCA39Y1.jpg','NO','ACTIVE','2025-12-11 14:25:11','2025-12-11 14:25:11'),('a091646f-bfaf-4954-8eaa-1ddeba18fec9','NHÀ XUẤT BẢN KIM ĐỒNG','nha-xuat-ban-kim-dong','qVXxwScgVvGULz7rDVzARRvaOLNayjKmVDjdmQkk.jpg','NO','ACTIVE','2025-12-11 14:25:57','2025-12-11 14:25:57'),('a0916490-3d74-4041-9968-a7c44b7ea619','NHÀ XUẤT BẢN THẾ GIỚI','nha-xuat-ban-the-gioi','xOeGIHyZijn1sVGqv6X0xsdk5sKUefdzR0PSGmTC.jpg','NO','ACTIVE','2025-12-11 14:26:18','2025-12-11 14:26:18'),('a09164b0-5d34-4234-b2a9-49c20e01b11b','NHÀ XUẤT BẢN QUÂN ĐỘI NHÂN DÂN','nha-xuat-ban-quan-doi-nhan-dan','RpLahLZ2VE37rPsvrF0pIiZ3OJdpL9ggKKO4eGfO.jpg','NO','ACTIVE','2025-12-11 14:26:39','2025-12-11 14:26:39'),('a09164e4-ee6a-4bdd-9629-34db4ef6852d','NHÀ XUẤT BẢN VĂN HỌC','nha-xuat-ban-van-hoc','Qm9HOWu7SsfN8msSwfY0KLV2l6Fgca0I3qJIiDQM.jpg','NO','ACTIVE','2025-12-11 14:27:14','2025-12-11 14:27:14'),('a091652e-4144-4790-a298-3673d3a1e801','ĐẠI HỌC KINH TẾ QUỐC DÂN','dai-hoc-kinh-te-quoc-dan','5uLFIK41wVaZFisB7mTacp7Jo9jQRQkFjIT63OhO.jpg','NO','ACTIVE','2025-12-11 14:28:02','2025-12-11 14:28:02'),('a091654f-f0ca-4f35-b215-7ecbd3816f09','NHÀ XUẤT BẢN CÔNG THƯƠNG','nha-xuat-ban-cong-thuong','Bw1pADTbAL4wqs2sB59JkXQOXw1paEbAy844cJMa.jpg','NO','ACTIVE','2025-12-11 14:28:24','2025-12-11 14:28:24');
 /*!40000 ALTER TABLE `publishers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -620,13 +744,13 @@ DROP TABLE IF EXISTS `purchase_receipt_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `purchase_receipt_items` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `purchase_receipt_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `product_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `purchase_receipt_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `import_price_vnd` bigint unsigned NOT NULL,
   `qty_doc` int unsigned NOT NULL,
   `qty_actual` int unsigned NOT NULL,
-  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `notes` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -643,7 +767,7 @@ CREATE TABLE `purchase_receipt_items` (
 
 LOCK TABLES `purchase_receipt_items` WRITE;
 /*!40000 ALTER TABLE `purchase_receipt_items` DISABLE KEYS */;
-INSERT INTO `purchase_receipt_items` VALUES ('90f69c3a-bd1f-11f0-a62c-6c24081d8924','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','a00abb28-6a82-4ed8-80b0-870a99ffeab5',90000000,1000,1000,'Seed set stock to 1000','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f69d9a-bd1f-11f0-a62c-6c24081d8924','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','a00ac32b-cb44-4f59-b37c-6cb764bf0acb',900000,1000,1000,'Seed set stock to 1000','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f69dcf-bd1f-11f0-a62c-6c24081d8924','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','a00ad142-fa6c-4cdc-85b0-16452f5153a6',900000,1000,1000,'Seed set stock to 1000','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f69df2-bd1f-11f0-a62c-6c24081d8924','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','a00ad1d5-758b-47c8-9f5b-bc33898c5af9',900000,1000,1000,'Seed set stock to 1000','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f69e12-bd1f-11f0-a62c-6c24081d8924','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','a00ad242-ccc5-43b3-90b0-b8f5d6fd9a72',9000000,1000,1000,'Seed set stock to 1000','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f69e31-bd1f-11f0-a62c-6c24081d8924','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','a00adfb5-df2d-4fe4-9bca-558173aa4c73',15000000000,1000,1000,'Seed set stock to 1000','2025-11-09 03:52:52','2025-11-09 03:52:52');
+INSERT INTO `purchase_receipt_items` VALUES ('00aa71f7-fc23-4a07-8a0a-b415b502231c','f5f5a356-6f92-4b84-ae8a-823446ce3add','a0917151-c03f-44ea-823d-73594ac322cc',20000,50,50,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('024ed6b5-2bae-49c5-8de7-60b9cdf49a88','587624cf-0e77-4099-b23c-6cb633eb5ee3','a09269d3-e6a7-4618-a001-93f8a44d2476',50000,50,50,NULL,'2025-12-12 10:34:02','2025-12-12 10:34:02'),('0c14b8bc-63cf-4fa4-ad6a-84f8f651b7b5','3413974e-b416-4885-be97-82263351274f','a091764b-d3cf-4ecf-9c9b-bb6778fd0a37',75000,80,80,NULL,'2025-12-12 10:50:00','2025-12-12 10:50:00'),('0dc92164-36bd-4d55-a960-acebf4eee34e','f5f5a356-6f92-4b84-ae8a-823446ce3add','a09170be-5855-4a23-874e-68f588a17450',20000,50,50,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('11663d61-527a-4eee-8a06-54d0ecfea017','122d5fda-533b-4f2e-ae21-8e14406c2287','a09172c3-cc01-46dc-a1d1-037a3ae0d880',55000,50,50,NULL,'2025-12-12 10:50:43','2025-12-12 10:50:43'),('146c324f-8975-41c7-87f3-b3cc3770ecf8','587624cf-0e77-4099-b23c-6cb633eb5ee3','a092558f-5526-44aa-a29e-f771de5ff21e',45000,50,50,NULL,'2025-12-12 10:34:02','2025-12-12 10:34:02'),('1485e9a1-8f73-4046-98bf-fe23b2bc8b73','f5f5a356-6f92-4b84-ae8a-823446ce3add','a0917036-443e-49c1-b73e-cb8db35925a2',75000,50,50,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('1a455863-6f96-4655-93f3-384351d5fc89','f5f5a356-6f92-4b84-ae8a-823446ce3add','a0916e0b-cf5a-46c1-9489-e6345b0c0bd5',65000,50,50,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('27c0ab34-a67f-41ae-9429-7c4e44b4d262','08d452f1-6a56-4a8e-bd78-177c073f0e28','a091786f-68b7-4c63-b714-99540e16234d',95000,100,100,NULL,'2025-12-12 10:39:41','2025-12-12 10:39:41'),('29914b26-6e9a-47ab-8bea-d978a6a74619','f5f5a356-6f92-4b84-ae8a-823446ce3add','a091734e-efca-4d23-9574-55deb6efd189',40000,50,50,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('2c5f6cba-b22f-4fe0-8093-e11b18be018b','f445de0c-863b-4540-9f49-f12171b93583','a0926bfe-ce19-49a8-be5a-14763ef2f917',120000,100,100,NULL,'2025-12-12 10:00:24','2025-12-12 10:00:24'),('3029eb70-ea06-4ad2-a0db-f09065836205','ab75033f-21ec-4767-a289-3256c8d491e8','a0925785-cfd7-4160-9a30-b44b5d3b8f10',75000,100,100,NULL,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('3479e06e-92c7-41de-9f29-05e3b85f3e5e','bef9c81e-a494-41be-9d21-b3ce6807fa02','a0916ae3-c057-45f7-affe-3b6de4ff778a',290000,10,10,NULL,'2025-12-12 10:31:42','2025-12-12 10:31:42'),('3a087ad6-6252-4d8e-8178-84aec6fdd4b1','042c481c-9a73-4265-8c20-8cdecd779087','a092693d-83a4-41ed-94cc-4fc063faa23d',140000,100,100,NULL,'2025-12-12 10:12:03','2025-12-12 10:12:03'),('3ee6ad56-2e21-4ed8-b3a3-90b2a7a8b8d6','f5f5a356-6f92-4b84-ae8a-823446ce3add','a0916dab-037c-4738-ae3a-cb92ae47850f',65000,50,50,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('44f02847-1d40-4896-ba2f-51c152692b6e','ab75033f-21ec-4767-a289-3256c8d491e8','a0917753-d035-4f5a-9b39-69b474f86989',125000,100,100,NULL,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('4e103c98-f2c3-4940-a2ca-d63f5290fe2c','c9b59a78-940d-4bd2-98df-2a3162a84272','a0926ad7-76db-4148-8623-673cfa055189',90000,100,100,NULL,'2025-12-12 10:07:37','2025-12-12 10:07:37'),('56e1bfca-158e-4a08-b95c-016d1a1ef7fc','41d06c49-aa81-431a-88d1-bd65181e8860','a09253a1-2461-43a2-8038-c808ce1e7a93',95000,80,80,NULL,'2025-12-12 10:46:19','2025-12-12 10:46:19'),('58cccc05-df3b-42b4-9500-ca297bab235c','66dc4454-e89d-44e9-9993-fc6a8070e6a9','a0916fa0-4ea3-44d9-a7b8-a93199cb8f4c',60000,80,80,NULL,'2025-12-12 10:44:35','2025-12-12 10:44:35'),('5b7163d7-e34f-4356-968d-6502b63c839d','587624cf-0e77-4099-b23c-6cb633eb5ee3','a0917550-3cbe-4e4d-9a04-19490c83f89e',60000,50,50,NULL,'2025-12-12 10:34:02','2025-12-12 10:34:02'),('5d006378-997f-4d1c-b372-9ad5459d4c8c','be8c1a8a-228f-40d8-96db-51170c84fa95','a0926dd0-549c-4a0e-a0fd-fa037408e3dc',75000,10,10,NULL,'2025-12-12 09:47:54','2025-12-12 09:47:54'),('6fe30329-3088-4003-8809-cdd725527edc','08d452f1-6a56-4a8e-bd78-177c073f0e28','a092550a-9b2d-46ae-8f56-70d25558e8ed',79000,100,100,NULL,'2025-12-12 10:39:41','2025-12-12 10:39:41'),('733afec6-5e4e-4b1b-a3f6-3fd2f93f5995','042c481c-9a73-4265-8c20-8cdecd779087','a0926ca4-9e6c-484c-9561-7de006d62e3e',85000,100,100,NULL,'2025-12-12 10:12:03','2025-12-12 10:12:03'),('76c3c1e7-d587-4ad4-b9f6-c5756e55522b','ab75033f-21ec-4767-a289-3256c8d491e8','a09175d6-7e86-40ba-8106-22489e6a1328',50000,100,100,NULL,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('8221b4fe-c218-41e2-b80a-4678d9f3f2b1','587624cf-0e77-4099-b23c-6cb633eb5ee3','a0926d18-3dea-4906-9c3e-c45fd20357ae',55000,50,50,NULL,'2025-12-12 10:34:02','2025-12-12 10:34:02'),('8a934b29-2e22-4690-8912-b2bfac5f6468','1feff02f-0500-41e6-91dc-13d51e78592b','a0926b7f-119f-4c24-a079-bca7c71fc4a5',85000,100,100,NULL,'2025-12-12 10:04:25','2025-12-12 10:04:25'),('9115c4fe-e42a-4c7b-af5b-6995f8382e3c','ab75033f-21ec-4767-a289-3256c8d491e8','a091749d-2d7f-400a-a56b-507299300406',20000,100,100,NULL,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('916d91fd-9d43-446b-b55c-4127046fe5e1','ab75033f-21ec-4767-a289-3256c8d491e8','a09176e8-e6d3-4f32-b1c3-ef892c4705eb',150000,100,100,NULL,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('aad3906b-e854-4e58-843c-72192a50369a','8985c0d9-4f93-47c8-8f73-fd6f0b855145','a0926a51-101b-4eee-8ea4-a9743cb98e88',90000,100,100,NULL,'2025-12-12 10:16:27','2025-12-12 10:16:27'),('ae164e3f-29bf-4ff2-b006-f55ea948535d','08d452f1-6a56-4a8e-bd78-177c073f0e28','a0925464-ef0a-4b58-9511-408945f4b071',114000,100,100,NULL,'2025-12-12 10:39:41','2025-12-12 10:39:41'),('aeac7158-d2d1-41d2-976b-e981b43fcae5','5daacadc-3af1-45ab-8028-19af71374f52','a0926ad7-76db-4148-8623-673cfa055189',90000,10,10,NULL,'2025-12-12 10:15:46','2025-12-12 10:15:46'),('aeadb1ed-2b02-4290-aec4-10430b3a8452','b7f027af-2eac-45e8-b91d-073cce5fe58a','a0917429-d57c-400c-b642-1a8fa6ba0d57',50000,80,80,NULL,'2025-12-12 10:47:22','2025-12-12 10:47:22'),('b001de98-eb85-410b-8025-5f22ce80ae3d','124aa284-0614-48b8-82fd-b91cb004c76c','a09269d3-e6a7-4618-a001-93f8a44d2476',40000,500,500,NULL,'2025-12-12 09:57:53','2025-12-12 09:57:53'),('b4b91fca-16b5-43ee-8371-2a1af97b9dc9','f5f5a356-6f92-4b84-ae8a-823446ce3add','a09171ee-0eac-4f42-bbf3-116fb9cb5d8a',75000,50,50,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('be174189-01f8-411a-8fdc-6b832bddd8bb','41d06c49-aa81-431a-88d1-bd65181e8860','a09256b7-db74-4250-8214-e329fe723aa0',75000,80,80,NULL,'2025-12-12 10:46:19','2025-12-12 10:46:19'),('c2c65b31-f058-435e-a34d-5741b9a3c0c7','bef9c81e-a494-41be-9d21-b3ce6807fa02','a0916cf2-0e0a-40b6-a442-27c68b5fc2aa',75000,100,100,NULL,'2025-12-12 10:31:42','2025-12-12 10:31:42'),('d929647e-47be-4bf5-b080-17e7824696c1','124aa284-0614-48b8-82fd-b91cb004c76c','a0926d18-3dea-4906-9c3e-c45fd20357ae',55000,500,500,NULL,'2025-12-12 09:57:53','2025-12-12 09:57:53'),('e8993264-25ec-43c9-9ec2-62145f24b9ba','13ba1ea6-ae65-457c-80a5-b23d490d80ee','a092531d-446b-4d4b-8f42-1ced07307806',105000,100,100,NULL,'2025-12-12 10:41:02','2025-12-12 10:41:02'),('e9fd891c-43e1-46c2-a4bd-c9e3c7b0a674','bef9c81e-a494-41be-9d21-b3ce6807fa02','a0916c61-4c53-477b-9b38-d619e79cfe36',30000,100,100,NULL,'2025-12-12 10:31:42','2025-12-12 10:31:42'),('f4469af8-5d18-45c4-b046-04e409962b73','41d06c49-aa81-431a-88d1-bd65181e8860','a0925632-7c60-4845-8e58-702ea9fcdba5',50000,80,80,NULL,'2025-12-12 10:46:19','2025-12-12 10:46:19'),('f88a7cb2-8c03-4520-8cb4-02858fed55e7','f5f5a356-6f92-4b84-ae8a-823446ce3add','a0916e60-ca1e-4796-b71b-4ee49047952b',65000,50,50,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('fd517e8b-aaac-45df-b8f3-34243f67ba48','c24851ad-efb4-4295-aac4-c55ccc46809c','a0916ef7-3d22-4ab0-b3c9-a0219d479d88',55000,80,80,NULL,'2025-12-12 10:48:25','2025-12-12 10:48:25');
 /*!40000 ALTER TABLE `purchase_receipt_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -655,17 +779,18 @@ DROP TABLE IF EXISTS `purchase_receipts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `purchase_receipts` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `publisher_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `warehouse_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `receipt_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `publisher_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `warehouse_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `received_at` timestamp NOT NULL,
-  `name_of_delivery_person` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `delivery_unit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address_of_delivery_person` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `delivery_note_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `tax_identification_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_of_delivery_person` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `delivery_unit` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address_of_delivery_person` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `delivery_note_number` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tax_identification_number` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sub_total_vnd` bigint unsigned NOT NULL DEFAULT '0',
-  `created_by` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_by` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -684,7 +809,7 @@ CREATE TABLE `purchase_receipts` (
 
 LOCK TABLES `purchase_receipts` WRITE;
 /*!40000 ALTER TABLE `purchase_receipts` DISABLE KEYS */;
-INSERT INTO `purchase_receipts` VALUES ('90f5e5b4-bd1f-11f0-a62c-6c24081d8924',NULL,'90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-11-09 03:52:52',NULL,'Internal Seed',NULL,'SEED-SET-1000-20251109035252',NULL,15101700000000,'9ffa3b13-7f5c-4535-a2e6-f42566c649c7','2025-11-09 03:52:52','2025-11-09 03:52:52');
+INSERT INTO `purchase_receipts` VALUES ('042c481c-9a73-4265-8c20-8cdecd779087','PB-23-VZTMGG27HE','a0916375-cf91-4717-a7ee-3cf7d0753413','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,22500000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:12:03','2025-12-12 10:12:03'),('08d452f1-6a56-4a8e-bd78-177c073f0e28','OT-58-ODEHXV10F3','a091654f-f0ca-4f35-b215-7ecbd3816f09','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,28800000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:39:41','2025-12-12 10:39:41'),('122d5fda-533b-4f2e-ae21-8e14406c2287','PS-99-V2WGVV4TEM','a09163b9-f356-486d-ae87-7e6a33a65d43','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,2750000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:50:43','2025-12-12 10:50:43'),('124aa284-0614-48b8-82fd-b91cb004c76c','CI-77-ALN7M3PJCM','a0916428-f872-4a30-99ae-14b725e2e67f','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-11-30 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,47500000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 09:57:53','2025-12-12 09:57:53'),('13ba1ea6-ae65-457c-80a5-b23d490d80ee','KA-37-KQH5T8M7XH','a0916375-cf91-4717-a7ee-3cf7d0753413','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,10500000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:41:02','2025-12-12 10:41:02'),('1feff02f-0500-41e6-91dc-13d51e78592b','DX-24-0V7P3E04ZB','a091654f-f0ca-4f35-b215-7ecbd3816f09','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-11-30 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,8500000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:04:25','2025-12-12 10:04:25'),('3413974e-b416-4885-be97-82263351274f','WU-74-BDZWCFJ6FG','a09164e4-ee6a-4bdd-9629-34db4ef6852d','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,6000000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:50:00','2025-12-12 10:50:00'),('41d06c49-aa81-431a-88d1-bd65181e8860','YM-51-DS3R80IRW7','a091639d-ffa5-40b2-b4dd-952c97113d2e','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,17600000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:46:19','2025-12-12 10:46:19'),('587624cf-0e77-4099-b23c-6cb633eb5ee3','OK-99-5CUG6R7IAZ','a0916428-f872-4a30-99ae-14b725e2e67f','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,10500000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:34:02','2025-12-12 10:34:02'),('5daacadc-3af1-45ab-8028-19af71374f52','DV-14-BLFXG80QFZ','a0916490-3d74-4041-9968-a7c44b7ea619','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,900000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:15:46','2025-12-12 10:15:46'),('66dc4454-e89d-44e9-9993-fc6a8070e6a9','EM-48-T2CSCSU8IO','a09164e4-ee6a-4bdd-9629-34db4ef6852d','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,4800000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:44:35','2025-12-12 10:44:35'),('8985c0d9-4f93-47c8-8f73-fd6f0b855145','CP-88-LKGWJSALO6','a0916375-cf91-4717-a7ee-3cf7d0753413','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,9000000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:16:27','2025-12-12 10:16:27'),('ab75033f-21ec-4767-a289-3256c8d491e8','GO-16-U1S51ZPZ49','a09163b9-f356-486d-ae87-7e6a33a65d43','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,42000000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:43:08','2025-12-12 10:43:08'),('b7f027af-2eac-45e8-b91d-073cce5fe58a','AD-39-4M07J572RX','a0916339-6a35-4803-b0c5-8e3f59235ee9','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,4000000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:47:22','2025-12-12 10:47:22'),('be8c1a8a-228f-40d8-96db-51170c84fa95','YO-14-NBONBB1WP7','a091652e-4144-4790-a298-3673d3a1e801','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-11 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,750000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 09:47:54','2025-12-12 09:47:54'),('bef9c81e-a494-41be-9d21-b3ce6807fa02','QA-39-3E2E2IUZQE','a09163b9-f356-486d-ae87-7e6a33a65d43','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,13400000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:31:42','2025-12-12 10:31:42'),('c24851ad-efb4-4295-aac4-c55ccc46809c','IL-65-F6XDRKL64Y','a091646f-bfaf-4954-8eaa-1ddeba18fec9','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,4400000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:48:25','2025-12-12 10:48:25'),('c9b59a78-940d-4bd2-98df-2a3162a84272','BY-73-J8ZMDEAUW6','a0916490-3d74-4041-9968-a7c44b7ea619','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,9000000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:07:37','2025-12-12 10:07:37'),('f445de0c-863b-4540-9f49-f12171b93583','HH-51-VDTCYHG2IK','a091639d-ffa5-40b2-b4dd-952c97113d2e','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-09 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,12000000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:00:24','2025-12-12 10:00:24'),('f5f5a356-6f92-4b84-ae8a-823446ce3add','AJ-73-95PXD0OFNX','a091646f-bfaf-4954-8eaa-1ddeba18fec9','90f465e7-bd1f-11f0-a62c-6c24081d8924','2025-12-10 17:00:00','Nguyễn Văn A','Công Ty ABC','Quận 12, HCM','PGN-2025-1211-05',NULL,21250000,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:37:14','2025-12-12 10:37:14');
 /*!40000 ALTER TABLE `purchase_receipts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -696,12 +821,14 @@ DROP TABLE IF EXISTS `reviews`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `reviews` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `product_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `order_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `rating` tinyint unsigned NOT NULL,
-  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `reply` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `comment` text COLLATE utf8mb4_unicode_ci,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reply` text COLLATE utf8mb4_unicode_ci,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -709,6 +836,8 @@ CREATE TABLE `reviews` (
   KEY `reviews_user_id_foreign` (`user_id`),
   KEY `reviews_product_id_is_active_index` (`product_id`,`is_active`),
   KEY `reviews_is_active_index` (`is_active`),
+  KEY `reviews_order_product_user_idx` (`order_id`,`product_id`,`user_id`),
+  CONSTRAINT `reviews_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
   CONSTRAINT `reviews_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   CONSTRAINT `reviews_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -731,8 +860,8 @@ DROP TABLE IF EXISTS `role_user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `role_user` (
-  `role_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`role_id`,`user_id`),
   KEY `role_user_user_id_foreign` (`user_id`),
   CONSTRAINT `role_user_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
@@ -746,7 +875,7 @@ CREATE TABLE `role_user` (
 
 LOCK TABLES `role_user` WRITE;
 /*!40000 ALTER TABLE `role_user` DISABLE KEYS */;
-INSERT INTO `role_user` VALUES ('9ffa3ac9-e4df-4a59-aa82-fd4de160b2a7','9ffa3b13-7f5c-4535-a2e6-f42566c649c7'),('9ffa3ac9-e696-4336-8aa0-1117d2683b7b','9ffa3b13-7f5c-4535-a2e6-f42566c649c7'),('9ffa3ac9-e4df-4a59-aa82-fd4de160b2a7','9ffb1565-f8fe-47b4-9d52-27cb054d4fb2'),('9ffa3ac9-e696-4336-8aa0-1117d2683b7b','9ffb1565-f8fe-47b4-9d52-27cb054d4fb2'),('9ffa3ac9-e4df-4a59-aa82-fd4de160b2a7','9ffb1ca9-a217-4833-bddf-7a4e335c0e4d'),('9ffa3ac9-e696-4336-8aa0-1117d2683b7b','9ffb1ca9-a217-4833-bddf-7a4e335c0e4d');
+INSERT INTO `role_user` VALUES ('a0915090-aa87-43da-a5dd-814ed9a0033b','a091512a-68fc-4118-961f-459aadeba75f'),('a0915091-8a48-42a4-a988-1f80c4beec27','a091512a-68fc-4118-961f-459aadeba75f'),('a0915091-8a50-424f-81ba-cb7f6e944484','a091512a-68fc-4118-961f-459aadeba75f'),('a0915091-8a54-41d4-afc6-48f436bef541','a091512a-68fc-4118-961f-459aadeba75f');
 /*!40000 ALTER TABLE `role_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -758,9 +887,9 @@ DROP TABLE IF EXISTS `roles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `roles` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -774,7 +903,7 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES ('9ffa3ac9-e4df-4a59-aa82-fd4de160b2a7','Admin','Full access','2025-09-27 10:59:29','2025-09-27 10:59:29'),('9ffa3ac9-e696-4336-8aa0-1117d2683b7b','Customer','Customer','2025-09-27 10:59:29','2025-09-27 10:59:29');
+INSERT INTO `roles` VALUES ('a0915090-aa87-43da-a5dd-814ed9a0033b','Admin','Full access','2025-12-11 13:30:22','2025-12-11 13:30:22'),('a0915091-8a48-42a4-a988-1f80c4beec27','Customer','Customer','2025-12-11 13:30:22','2025-12-11 13:30:22'),('a0915091-8a50-424f-81ba-cb7f6e944484','Warehouse Manager','Manage warehouse and stocks','2025-12-11 13:30:22','2025-12-11 13:30:22'),('a0915091-8a54-41d4-afc6-48f436bef541','Shipper','Deliver orders to customers','2025-12-11 13:30:22','2025-12-11 13:30:22');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -786,16 +915,16 @@ DROP TABLE IF EXISTS `shipments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `shipments` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `order_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `courier_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `carrier` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `tracking_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `order_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `courier_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `carrier` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tracking_no` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `shipping_cost_actual_vnd` bigint unsigned DEFAULT NULL,
   `assigned_at` timestamp NULL DEFAULT NULL,
   `picked_at` timestamp NULL DEFAULT NULL,
@@ -818,7 +947,6 @@ CREATE TABLE `shipments` (
 
 LOCK TABLES `shipments` WRITE;
 /*!40000 ALTER TABLE `shipments` DISABLE KEYS */;
-INSERT INTO `shipments` VALUES ('9ffa3ac9-e4df-4a59-aa82-fd4de160b2a7','9ffa3ac9-e4df-4a59-aa82-fd4de160b2a7','Thuan','0345486622','thuan@gmail.com','Địa chỉ',NULL,NULL,NULL,'PENDING',NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `shipments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -830,17 +958,17 @@ DROP TABLE IF EXISTS `stock_movements`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `stock_movements` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `product_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `warehouse_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `warehouse_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `qty` int NOT NULL,
   `unit_cost_vnd` bigint unsigned NOT NULL DEFAULT '0',
-  `related_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `related_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `created_by` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `related_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `related_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `note` text COLLATE utf8mb4_unicode_ci,
+  `created_by` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -862,7 +990,7 @@ CREATE TABLE `stock_movements` (
 
 LOCK TABLES `stock_movements` WRITE;
 /*!40000 ALTER TABLE `stock_movements` DISABLE KEYS */;
-INSERT INTO `stock_movements` VALUES ('90f89824-bd1f-11f0-a62c-6c24081d8924','a00abb28-6a82-4ed8-80b0-870a99ffeab5','90f465e7-bd1f-11f0-a62c-6c24081d8924','90f75be1-bd1f-11f0-a62c-6c24081d8924','IMPORT',1000,90000000,'purchase_receipts','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','Seed set stock to 1000','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f89b6f-bd1f-11f0-a62c-6c24081d8924','a00ac32b-cb44-4f59-b37c-6cb764bf0acb','90f465e7-bd1f-11f0-a62c-6c24081d8924','90f75d8d-bd1f-11f0-a62c-6c24081d8924','IMPORT',1000,900000,'purchase_receipts','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','Seed set stock to 1000','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f89d57-bd1f-11f0-a62c-6c24081d8924','a00ad142-fa6c-4cdc-85b0-16452f5153a6','90f465e7-bd1f-11f0-a62c-6c24081d8924','90f75dcb-bd1f-11f0-a62c-6c24081d8924','IMPORT',1000,900000,'purchase_receipts','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','Seed set stock to 1000','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f89ecf-bd1f-11f0-a62c-6c24081d8924','a00ad1d5-758b-47c8-9f5b-bc33898c5af9','90f465e7-bd1f-11f0-a62c-6c24081d8924','90f75df3-bd1f-11f0-a62c-6c24081d8924','IMPORT',1000,900000,'purchase_receipts','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','Seed set stock to 1000','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f8a03d-bd1f-11f0-a62c-6c24081d8924','a00ad242-ccc5-43b3-90b0-b8f5d6fd9a72','90f465e7-bd1f-11f0-a62c-6c24081d8924','90f75e17-bd1f-11f0-a62c-6c24081d8924','IMPORT',1000,9000000,'purchase_receipts','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','Seed set stock to 1000','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','2025-11-09 03:52:52','2025-11-09 03:52:52'),('90f8a1a7-bd1f-11f0-a62c-6c24081d8924','a00adfb5-df2d-4fe4-9bca-558173aa4c73','90f465e7-bd1f-11f0-a62c-6c24081d8924','90f75e3a-bd1f-11f0-a62c-6c24081d8924','IMPORT',1000,15000000000,'purchase_receipts','90f5e5b4-bd1f-11f0-a62c-6c24081d8924','Seed set stock to 1000','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','2025-11-09 03:52:52','2025-11-09 03:52:52');
+INSERT INTO `stock_movements` VALUES ('0152c269-c05a-4053-b4ca-ab6e56dcfa15','a091749d-2d7f-400a-a56b-507299300406','90f465e7-bd1f-11f0-a62c-6c24081d8924','aa8d1d9b-bfbb-4127-9fb8-ad5ea25c01b8','receipt',100,20000,'purchase_receipt','ab75033f-21ec-4767-a289-3256c8d491e8',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:43:08','2025-12-12 10:43:08'),('01f65d4c-9f92-4941-a6f1-6a5838a5f80b','a091734e-efca-4d23-9574-55deb6efd189','90f465e7-bd1f-11f0-a62c-6c24081d8924','b1a4b59f-8934-470f-bd0e-42e3741f1de8','receipt',50,40000,'purchase_receipt','f5f5a356-6f92-4b84-ae8a-823446ce3add',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:37:14','2025-12-12 10:37:14'),('0f387450-b490-4dca-b1e9-b962fe3bdb56','a0926a51-101b-4eee-8ea4-a9743cb98e88','90f465e7-bd1f-11f0-a62c-6c24081d8924','bf08bf25-60e3-491c-a8b9-2e8252ecdf5a','receipt',100,90000,'purchase_receipt','8985c0d9-4f93-47c8-8f73-fd6f0b855145',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:16:27','2025-12-12 10:16:27'),('18f27299-fa71-4e17-8b12-7140bba39bad','a0926d18-3dea-4906-9c3e-c45fd20357ae','90f465e7-bd1f-11f0-a62c-6c24081d8924','dfc6fe0b-18a0-4276-b6dc-1764301e2bfc','receipt',500,55000,'purchase_receipt','124aa284-0614-48b8-82fd-b91cb004c76c',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 09:57:53','2025-12-12 09:57:53'),('1f38f3a6-93a2-48e1-88d1-9c8b3c042e9c','a09172c3-cc01-46dc-a1d1-037a3ae0d880','90f465e7-bd1f-11f0-a62c-6c24081d8924','78493c25-748e-46a1-abf5-19535d70aee4','receipt',50,55000,'purchase_receipt','122d5fda-533b-4f2e-ae21-8e14406c2287',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:50:43','2025-12-12 10:50:43'),('2422020d-4b00-46f9-b52f-89fd5e6e43fc','a0917753-d035-4f5a-9b39-69b474f86989','90f465e7-bd1f-11f0-a62c-6c24081d8924','16f0e91d-824e-4ed9-a4b4-12757c1464e4','receipt',100,125000,'purchase_receipt','ab75033f-21ec-4767-a289-3256c8d491e8',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:43:08','2025-12-12 10:43:08'),('29a9b0ae-b781-494a-90c9-f7df52c79d5b','a092693d-83a4-41ed-94cc-4fc063faa23d','90f465e7-bd1f-11f0-a62c-6c24081d8924','5b4b87fa-5b5a-4bf6-b49d-954a385b6a10','receipt',100,140000,'purchase_receipt','042c481c-9a73-4265-8c20-8cdecd779087',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:12:03','2025-12-12 10:12:03'),('2ed93ef5-0210-4e85-895f-a524d15cf840','a0926ad7-76db-4148-8623-673cfa055189','90f465e7-bd1f-11f0-a62c-6c24081d8924','e881c2be-eac8-4353-a5ab-74d3540c32b1','receipt',100,90000,'purchase_receipt','c9b59a78-940d-4bd2-98df-2a3162a84272',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:07:37','2025-12-12 10:07:37'),('3fef36ab-8fff-4e1e-87a4-725a071d041a','a092550a-9b2d-46ae-8f56-70d25558e8ed','90f465e7-bd1f-11f0-a62c-6c24081d8924','04720cb6-aefd-46de-968b-9ae45e610776','receipt',100,79000,'purchase_receipt','08d452f1-6a56-4a8e-bd78-177c073f0e28',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:39:41','2025-12-12 10:39:41'),('570c733d-93b8-41b7-89bd-9bc42771cba5','a091764b-d3cf-4ecf-9c9b-bb6778fd0a37','90f465e7-bd1f-11f0-a62c-6c24081d8924','e3fc5235-d52f-49cb-8d0a-4e128314918a','receipt',80,75000,'purchase_receipt','3413974e-b416-4885-be97-82263351274f',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:50:00','2025-12-12 10:50:00'),('579b989a-a28e-4ff0-b13e-478607931284','a09170be-5855-4a23-874e-68f588a17450','90f465e7-bd1f-11f0-a62c-6c24081d8924','1c3603cf-b0c8-4522-af34-40c8bad5677c','receipt',50,20000,'purchase_receipt','f5f5a356-6f92-4b84-ae8a-823446ce3add',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:37:14','2025-12-12 10:37:14'),('61e74653-fdd9-434c-adf6-0757baab29ae','a0925785-cfd7-4160-9a30-b44b5d3b8f10','90f465e7-bd1f-11f0-a62c-6c24081d8924','d3ab4426-2779-4bf8-8bd2-0218f8bba288','receipt',100,75000,'purchase_receipt','ab75033f-21ec-4767-a289-3256c8d491e8',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:43:08','2025-12-12 10:43:08'),('65db498a-91df-4b8a-b494-15ef1b2b64d5','a09269d3-e6a7-4618-a001-93f8a44d2476','90f465e7-bd1f-11f0-a62c-6c24081d8924','02e96d33-fe44-4ebb-af1a-93341227fa71','receipt',500,40000,'purchase_receipt','124aa284-0614-48b8-82fd-b91cb004c76c',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 09:57:53','2025-12-12 09:57:53'),('6ccd6d59-805e-4217-8f87-5dab22fdb4f9','a09269d3-e6a7-4618-a001-93f8a44d2476','90f465e7-bd1f-11f0-a62c-6c24081d8924','fb62ff04-0ffe-47b9-b636-507f4ded1625','receipt',50,50000,'purchase_receipt','587624cf-0e77-4099-b23c-6cb633eb5ee3',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:34:02','2025-12-12 10:34:02'),('6d6893c4-5417-4681-ac18-3e08ad10d489','a0916cf2-0e0a-40b6-a442-27c68b5fc2aa','90f465e7-bd1f-11f0-a62c-6c24081d8924','d5efa8fb-f9e5-4873-bb8b-2d11fa624573','receipt',100,75000,'purchase_receipt','bef9c81e-a494-41be-9d21-b3ce6807fa02',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:31:42','2025-12-12 10:31:42'),('700d5db1-5bda-4f6d-ba53-dbf263d53847','a091786f-68b7-4c63-b714-99540e16234d','90f465e7-bd1f-11f0-a62c-6c24081d8924','9a92035a-8cb4-4fcd-9478-bb8e711b5059','receipt',100,95000,'purchase_receipt','08d452f1-6a56-4a8e-bd78-177c073f0e28',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:39:41','2025-12-12 10:39:41'),('7c1d70d2-88e4-49a9-9e27-f406697cbde1','a0926dd0-549c-4a0e-a0fd-fa037408e3dc','90f465e7-bd1f-11f0-a62c-6c24081d8924','a3bad70a-0446-4d22-bfd4-070b7fa8d16d','receipt',10,75000,'purchase_receipt','be8c1a8a-228f-40d8-96db-51170c84fa95',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 09:47:54','2025-12-12 09:47:54'),('7c838135-3b78-4d27-9d05-5aa0a156b6df','a0917429-d57c-400c-b642-1a8fa6ba0d57','90f465e7-bd1f-11f0-a62c-6c24081d8924','ebf0d1db-ac31-4260-ae12-72e393abbcab','receipt',80,50000,'purchase_receipt','b7f027af-2eac-45e8-b91d-073cce5fe58a',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:47:22','2025-12-12 10:47:22'),('7da01798-e5e6-4608-b618-9548057f8da0','a0926ca4-9e6c-484c-9561-7de006d62e3e','90f465e7-bd1f-11f0-a62c-6c24081d8924','9c8397d9-bbb1-46c2-81a4-362ddc7853f2','receipt',100,85000,'purchase_receipt','042c481c-9a73-4265-8c20-8cdecd779087',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:12:03','2025-12-12 10:12:03'),('826671dc-c207-4721-b8ce-14864853d5da','a09171ee-0eac-4f42-bbf3-116fb9cb5d8a','90f465e7-bd1f-11f0-a62c-6c24081d8924','5bb04990-9a5c-42ad-86b7-88469c5c7e76','receipt',50,75000,'purchase_receipt','f5f5a356-6f92-4b84-ae8a-823446ce3add',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:37:14','2025-12-12 10:37:14'),('82779250-189e-4887-8e26-78c2bafd87bc','a09176e8-e6d3-4f32-b1c3-ef892c4705eb','90f465e7-bd1f-11f0-a62c-6c24081d8924','273a917d-90b8-43dc-bd2b-3b19ce6d6aa4','receipt',100,150000,'purchase_receipt','ab75033f-21ec-4767-a289-3256c8d491e8',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:43:08','2025-12-12 10:43:08'),('83726b10-ff01-410b-a87f-9e0e7896a808','a0916c61-4c53-477b-9b38-d619e79cfe36','90f465e7-bd1f-11f0-a62c-6c24081d8924','f9ffe729-a9cf-4f90-bd52-38ba3dff197e','receipt',100,30000,'purchase_receipt','bef9c81e-a494-41be-9d21-b3ce6807fa02',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:31:42','2025-12-12 10:31:42'),('8dc79766-251f-442e-90f8-0c65910dc616','a0925632-7c60-4845-8e58-702ea9fcdba5','90f465e7-bd1f-11f0-a62c-6c24081d8924','cda7e81b-35f7-4f4d-a6fd-8f864cec71c0','receipt',80,50000,'purchase_receipt','41d06c49-aa81-431a-88d1-bd65181e8860',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:46:19','2025-12-12 10:46:19'),('969d35f0-1b26-45d8-9337-806f3c25896b','a0917036-443e-49c1-b73e-cb8db35925a2','90f465e7-bd1f-11f0-a62c-6c24081d8924','5bc42926-2053-4230-8dd6-354492d0394b','receipt',50,75000,'purchase_receipt','f5f5a356-6f92-4b84-ae8a-823446ce3add',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:37:14','2025-12-12 10:37:14'),('996edf49-1089-4388-83b9-22a24ea85561','a0916e60-ca1e-4796-b71b-4ee49047952b','90f465e7-bd1f-11f0-a62c-6c24081d8924','51a58cf8-f4ff-4ebb-a28b-5f2e0dfbab0e','receipt',50,65000,'purchase_receipt','f5f5a356-6f92-4b84-ae8a-823446ce3add',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:37:14','2025-12-12 10:37:14'),('a22744b7-283c-4cfe-a83d-a333cabd2926','a0926d18-3dea-4906-9c3e-c45fd20357ae','90f465e7-bd1f-11f0-a62c-6c24081d8924','8ce8c96f-6491-41cd-8b79-de0863021fc2','receipt',50,55000,'purchase_receipt','587624cf-0e77-4099-b23c-6cb633eb5ee3',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:34:02','2025-12-12 10:34:02'),('ac4dea52-1a60-4715-81ec-5632049572f2','a09253a1-2461-43a2-8038-c808ce1e7a93','90f465e7-bd1f-11f0-a62c-6c24081d8924','5a16e382-d786-49d1-976f-1eefe8bf3ef9','receipt',80,95000,'purchase_receipt','41d06c49-aa81-431a-88d1-bd65181e8860',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:46:19','2025-12-12 10:46:19'),('ae86c85c-506e-4af9-8bb8-84211cc76231','a0926bfe-ce19-49a8-be5a-14763ef2f917','90f465e7-bd1f-11f0-a62c-6c24081d8924','6bb16640-9c47-4ba3-9719-01298eb6d4b7','receipt',100,120000,'purchase_receipt','f445de0c-863b-4540-9f49-f12171b93583',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:00:24','2025-12-12 10:00:24'),('b4de16be-e562-4740-aca2-383e2fda5042','a0917151-c03f-44ea-823d-73594ac322cc','90f465e7-bd1f-11f0-a62c-6c24081d8924','33cfd4af-8bd0-42bc-9ada-46116ee57598','receipt',50,20000,'purchase_receipt','f5f5a356-6f92-4b84-ae8a-823446ce3add',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:37:14','2025-12-12 10:37:14'),('b5dfebdd-d5e9-4033-9c44-7f2a1c979bf2','a0916ef7-3d22-4ab0-b3c9-a0219d479d88','90f465e7-bd1f-11f0-a62c-6c24081d8924','0fee91a8-f336-41fb-8d37-043e3f8b85cd','receipt',80,55000,'purchase_receipt','c24851ad-efb4-4295-aac4-c55ccc46809c',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:48:25','2025-12-12 10:48:25'),('c1fbff15-78ee-47c1-b04d-ba5446eea7a7','a092558f-5526-44aa-a29e-f771de5ff21e','90f465e7-bd1f-11f0-a62c-6c24081d8924','1f8a5a4f-f22f-4eef-b85e-c0fafbf2cb2e','receipt',50,45000,'purchase_receipt','587624cf-0e77-4099-b23c-6cb633eb5ee3',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:34:02','2025-12-12 10:34:02'),('ce58e603-7948-485d-8860-3557a417ca11','a0925464-ef0a-4b58-9511-408945f4b071','90f465e7-bd1f-11f0-a62c-6c24081d8924','742a81b1-ac0b-4af7-9c77-50ce5756a86a','receipt',100,114000,'purchase_receipt','08d452f1-6a56-4a8e-bd78-177c073f0e28',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:39:41','2025-12-12 10:39:41'),('d5699a45-4922-45fa-8dd1-1e17a0ea6964','a0926b7f-119f-4c24-a079-bca7c71fc4a5','90f465e7-bd1f-11f0-a62c-6c24081d8924','f4ae4cf7-c5eb-45bc-972a-e043560e20a9','receipt',100,85000,'purchase_receipt','1feff02f-0500-41e6-91dc-13d51e78592b',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:04:25','2025-12-12 10:04:25'),('d8384268-441e-49e6-8ea2-91f27e78d30f','a09256b7-db74-4250-8214-e329fe723aa0','90f465e7-bd1f-11f0-a62c-6c24081d8924','c84bea34-c920-4c78-a616-a971af905755','receipt',80,75000,'purchase_receipt','41d06c49-aa81-431a-88d1-bd65181e8860',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:46:19','2025-12-12 10:46:19'),('da0d5be7-876d-4d28-b38c-6656827c2720','a0916e0b-cf5a-46c1-9489-e6345b0c0bd5','90f465e7-bd1f-11f0-a62c-6c24081d8924','7e197253-351b-422d-b0d7-8a25ec85fc02','receipt',50,65000,'purchase_receipt','f5f5a356-6f92-4b84-ae8a-823446ce3add',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:37:14','2025-12-12 10:37:14'),('dc58e895-fedc-48aa-8dd8-996ab6f5e482','a0917550-3cbe-4e4d-9a04-19490c83f89e','90f465e7-bd1f-11f0-a62c-6c24081d8924','1ac267d7-3e44-4fd9-9c8f-17bcfe316f2b','receipt',50,60000,'purchase_receipt','587624cf-0e77-4099-b23c-6cb633eb5ee3',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:34:02','2025-12-12 10:34:02'),('ebcc5978-0542-4b7d-9a4f-a5c48f55fb74','a0916dab-037c-4738-ae3a-cb92ae47850f','90f465e7-bd1f-11f0-a62c-6c24081d8924','51532d6a-6000-467a-b6fd-c1758346bed9','receipt',50,65000,'purchase_receipt','f5f5a356-6f92-4b84-ae8a-823446ce3add',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:37:14','2025-12-12 10:37:14'),('ee3dc019-b2bf-495d-ab59-34ac0eb71974','a09175d6-7e86-40ba-8106-22489e6a1328','90f465e7-bd1f-11f0-a62c-6c24081d8924','120d0183-24d2-414d-89f6-c16583a44c01','receipt',100,50000,'purchase_receipt','ab75033f-21ec-4767-a289-3256c8d491e8',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:43:08','2025-12-12 10:43:08'),('f0ee60eb-f128-4089-8273-4d140cf04b4f','a0916ae3-c057-45f7-affe-3b6de4ff778a','90f465e7-bd1f-11f0-a62c-6c24081d8924','ce24413c-b632-45ce-8700-98e9c4b9901e','receipt',10,290000,'purchase_receipt','bef9c81e-a494-41be-9d21-b3ce6807fa02',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:31:42','2025-12-12 10:31:42'),('faaf6089-fd5e-43ad-bf46-4038b8880873','a092531d-446b-4d4b-8f42-1ced07307806','90f465e7-bd1f-11f0-a62c-6c24081d8924','dcc04d95-2a76-448a-bed6-175baddaf9de','receipt',100,105000,'purchase_receipt','13ba1ea6-ae65-457c-80a5-b23d490d80ee',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:41:02','2025-12-12 10:41:02'),('facceca4-d36d-4d8f-8c3e-a552a24eb110','a0916fa0-4ea3-44d9-a7b8-a93199cb8f4c','90f465e7-bd1f-11f0-a62c-6c24081d8924','1259f4d1-ca2d-4e2f-87b2-3466f505d1aa','receipt',80,60000,'purchase_receipt','66dc4454-e89d-44e9-9993-fc6a8070e6a9',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:44:35','2025-12-12 10:44:35'),('fcf996a6-944f-4673-aaff-9a59523363c2','a0926ad7-76db-4148-8623-673cfa055189','90f465e7-bd1f-11f0-a62c-6c24081d8924','f0f6f6a0-2893-418b-8601-09e52705fca1','receipt',10,90000,'purchase_receipt','5daacadc-3af1-45ab-8028-19af71374f52',NULL,'a091512a-68fc-4118-961f-459aadeba75f','2025-12-12 10:15:46','2025-12-12 10:15:46');
 /*!40000 ALTER TABLE `stock_movements` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -874,8 +1002,8 @@ DROP TABLE IF EXISTS `stocks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `stocks` (
-  `product_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `warehouse_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `warehouse_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `on_hand` bigint NOT NULL DEFAULT '0',
   `reserved` bigint NOT NULL DEFAULT '0',
   `reorder_point` int unsigned DEFAULT NULL,
@@ -895,7 +1023,7 @@ CREATE TABLE `stocks` (
 
 LOCK TABLES `stocks` WRITE;
 /*!40000 ALTER TABLE `stocks` DISABLE KEYS */;
-INSERT INTO `stocks` VALUES ('a00abb28-6a82-4ed8-80b0-870a99ffeab5','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,NULL,NULL,'2025-11-09 03:52:52','2025-11-09 03:52:52'),('a00ac32b-cb44-4f59-b37c-6cb764bf0acb','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,NULL,NULL,'2025-11-09 03:52:52','2025-11-09 03:52:52'),('a00ad142-fa6c-4cdc-85b0-16452f5153a6','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,NULL,NULL,'2025-11-09 03:52:52','2025-11-09 03:52:52'),('a00ad1d5-758b-47c8-9f5b-bc33898c5af9','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,NULL,NULL,'2025-11-09 03:52:52','2025-11-09 03:52:52'),('a00ad242-ccc5-43b3-90b0-b8f5d6fd9a72','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,NULL,NULL,'2025-11-09 03:52:52','2025-11-09 03:52:52'),('a00adfb5-df2d-4fe4-9bca-558173aa4c73','90f465e7-bd1f-11f0-a62c-6c24081d8924',1000,0,NULL,NULL,'2025-11-09 03:52:52','2025-11-09 03:52:52');
+INSERT INTO `stocks` VALUES ('a0916ae3-c057-45f7-affe-3b6de4ff778a','90f465e7-bd1f-11f0-a62c-6c24081d8924',10,0,NULL,NULL,'2025-12-12 10:31:42','2025-12-12 10:31:42'),('a0916c61-4c53-477b-9b38-d619e79cfe36','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:31:42','2025-12-12 10:31:42'),('a0916cf2-0e0a-40b6-a442-27c68b5fc2aa','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:31:42','2025-12-12 10:31:42'),('a0916dab-037c-4738-ae3a-cb92ae47850f','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,NULL,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('a0916e0b-cf5a-46c1-9489-e6345b0c0bd5','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,NULL,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('a0916e60-ca1e-4796-b71b-4ee49047952b','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,NULL,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('a0916ef7-3d22-4ab0-b3c9-a0219d479d88','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,NULL,NULL,'2025-12-12 10:48:25','2025-12-12 10:48:25'),('a0916fa0-4ea3-44d9-a7b8-a93199cb8f4c','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,NULL,NULL,'2025-12-12 10:44:35','2025-12-12 10:44:35'),('a0917036-443e-49c1-b73e-cb8db35925a2','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,NULL,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('a09170be-5855-4a23-874e-68f588a17450','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,NULL,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('a0917151-c03f-44ea-823d-73594ac322cc','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,NULL,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('a09171ee-0eac-4f42-bbf3-116fb9cb5d8a','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,NULL,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('a09172c3-cc01-46dc-a1d1-037a3ae0d880','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,NULL,NULL,'2025-12-12 10:50:43','2025-12-12 10:50:43'),('a091734e-efca-4d23-9574-55deb6efd189','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,NULL,NULL,'2025-12-12 10:37:14','2025-12-12 10:37:14'),('a0917429-d57c-400c-b642-1a8fa6ba0d57','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,NULL,NULL,'2025-12-12 10:47:22','2025-12-12 10:47:22'),('a091749d-2d7f-400a-a56b-507299300406','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('a0917550-3cbe-4e4d-9a04-19490c83f89e','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,NULL,NULL,'2025-12-12 10:34:02','2025-12-12 10:34:02'),('a09175d6-7e86-40ba-8106-22489e6a1328','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('a091764b-d3cf-4ecf-9c9b-bb6778fd0a37','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,NULL,NULL,'2025-12-12 10:50:00','2025-12-12 10:50:00'),('a09176e8-e6d3-4f32-b1c3-ef892c4705eb','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('a0917753-d035-4f5a-9b39-69b474f86989','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('a091786f-68b7-4c63-b714-99540e16234d','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:39:41','2025-12-12 10:39:41'),('a092531d-446b-4d4b-8f42-1ced07307806','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:41:02','2025-12-12 10:41:02'),('a09253a1-2461-43a2-8038-c808ce1e7a93','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,NULL,NULL,'2025-12-12 10:46:19','2025-12-12 10:46:19'),('a0925464-ef0a-4b58-9511-408945f4b071','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:39:41','2025-12-12 10:39:41'),('a092550a-9b2d-46ae-8f56-70d25558e8ed','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:39:41','2025-12-12 10:39:41'),('a092558f-5526-44aa-a29e-f771de5ff21e','90f465e7-bd1f-11f0-a62c-6c24081d8924',50,0,NULL,NULL,'2025-12-12 10:34:02','2025-12-12 10:34:02'),('a0925632-7c60-4845-8e58-702ea9fcdba5','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,NULL,NULL,'2025-12-12 10:46:19','2025-12-12 10:46:19'),('a09256b7-db74-4250-8214-e329fe723aa0','90f465e7-bd1f-11f0-a62c-6c24081d8924',80,0,NULL,NULL,'2025-12-12 10:46:19','2025-12-12 10:46:19'),('a0925785-cfd7-4160-9a30-b44b5d3b8f10','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:43:08','2025-12-12 10:43:08'),('a092693d-83a4-41ed-94cc-4fc063faa23d','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:12:03','2025-12-12 10:12:03'),('a09269d3-e6a7-4618-a001-93f8a44d2476','90f465e7-bd1f-11f0-a62c-6c24081d8924',550,0,NULL,NULL,'2025-12-12 09:57:53','2025-12-12 10:34:02'),('a0926a51-101b-4eee-8ea4-a9743cb98e88','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:16:27','2025-12-12 10:16:27'),('a0926ad7-76db-4148-8623-673cfa055189','90f465e7-bd1f-11f0-a62c-6c24081d8924',110,0,NULL,NULL,'2025-12-12 10:07:37','2025-12-12 10:15:46'),('a0926b7f-119f-4c24-a079-bca7c71fc4a5','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:04:25','2025-12-12 10:04:25'),('a0926bfe-ce19-49a8-be5a-14763ef2f917','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:00:24','2025-12-12 10:00:24'),('a0926ca4-9e6c-484c-9561-7de006d62e3e','90f465e7-bd1f-11f0-a62c-6c24081d8924',100,0,NULL,NULL,'2025-12-12 10:12:03','2025-12-12 10:12:03'),('a0926d18-3dea-4906-9c3e-c45fd20357ae','90f465e7-bd1f-11f0-a62c-6c24081d8924',550,0,NULL,NULL,'2025-12-12 09:57:53','2025-12-12 10:34:02'),('a0926dd0-549c-4a0e-a0fd-fa037408e3dc','90f465e7-bd1f-11f0-a62c-6c24081d8924',10,0,NULL,NULL,'2025-12-12 09:47:54','2025-12-12 09:47:54');
 /*!40000 ALTER TABLE `stocks` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -927,7 +1055,6 @@ CREATE TABLE `user_addresses` (
 
 LOCK TABLES `user_addresses` WRITE;
 /*!40000 ALTER TABLE `user_addresses` DISABLE KEYS */;
-INSERT INTO `user_addresses` VALUES ('a05b3155-3b29-4e86-b3f8-46eef402e7c9','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','Ở đâu á hong có biết',2575,15,'',1,'2025-11-14 15:48:21','2025-11-14 15:48:21'),('a05b3979-bf50-42d1-9345-90ab9afe25b9','9ffa3b13-7f5c-4535-a2e6-f42566c649c7','Ở đâu á hong có biết nữa',532,20,'',0,'2025-11-14 16:11:07','2025-11-14 16:11:07');
 /*!40000 ALTER TABLE `user_addresses` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -939,17 +1066,18 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `google_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `birthday` date DEFAULT NULL,
   `gender` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
-  `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -964,7 +1092,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('9ffa3b13-7f5c-4535-a2e6-f42566c649c7','Hữu Thuận','hohuuthuan@gmail.com','0321654987','2003-11-11','male','vozvZ32VntXeWrBAkMdzA0VUSh6uTM9Fcjt1Yvcm.jpg',NULL,'$2y$12$V99NaFOi2mUrN7yqlnONd.4TTxjzBvZRrV1FdeXR66VUgql17TMfK','ACTIVE','uvTkDPEzuGmPNIj70gZw5qCvBbItKjJFC5LK9t0GSfr629hLKtiOn6teSbgz','2025-09-27 11:00:17','2025-11-13 04:18:46'),('9ffb1565-f8fe-47b4-9d52-27cb054d4fb2','dev1','dev1@gmail.com','0321654987',NULL,NULL,NULL,NULL,'$2y$12$tXuRYT6JqZMuYEsy8vFk0uaCtWw8r8HWyGA/D/WGRwy0vvNdPCUbu','ACTIVE','9SMlKn4ENPUEESqDkE5d1qEg7lDceVALyGDR3loxdCVNIjJnkwx6iZHhq5bn','2025-09-27 21:10:46','2025-10-05 14:58:00'),('9ffb1ca9-a217-4833-bddf-7a4e335c0e4d','Ho Huu Thuan','hohuuthuan1@gmail.com','0321654987',NULL,NULL,'avatars/fFvuhj2KGkBrjEw92cJSzu8UtiUGDl9RKk2519zi.png',NULL,'$2y$12$D8.fcfDZ6iO96o503M7/DuBaRtLSMkQhkwNjY4EWmo.Y6JOE0MnNW','ACTIVE',NULL,'2025-09-27 21:31:04','2025-10-05 18:35:09');
+INSERT INTO `users` VALUES ('a091512a-68fc-4118-961f-459aadeba75f',NULL,'Hữu Thuận','hohuuthuan@gmail.com','0321654987',NULL,NULL,NULL,NULL,'$2y$12$mB94RWKH0QJEBMZgQuMtjuD1GuMO3lbvQ95Mj1oC2bw4havj7ydti','ACTIVE','hMciS7fMk1wP98n74NjQh74gsW9sve8guJOIdiUqgo4EfYMvKlB40epfmIGo','2025-12-11 13:32:04','2025-12-11 13:32:04');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1001,6 +1129,33 @@ INSERT INTO `wards` VALUES (267,11,'Minh Châu','minh-chau','xa','Xã Minh Châu
 UNLOCK TABLES;
 
 --
+-- Table structure for table `warehouse_activities`
+--
+
+DROP TABLE IF EXISTS `warehouse_activities`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `warehouse_activities` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `occurred_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `warehouse_activities`
+--
+
+LOCK TABLES `warehouse_activities` WRITE;
+/*!40000 ALTER TABLE `warehouse_activities` DISABLE KEYS */;
+INSERT INTO `warehouse_activities` VALUES (1,'Tạo phiếu nhập YO-14-NBONBB1WP7','2025-12-12 09:47:55','2025-12-12 09:47:55','2025-12-12 09:47:55'),(2,'Tạo phiếu nhập CI-77-ALN7M3PJCM','2025-12-12 09:57:53','2025-12-12 09:57:53','2025-12-12 09:57:53'),(3,'Tạo phiếu nhập HH-51-VDTCYHG2IK','2025-12-12 10:00:24','2025-12-12 10:00:24','2025-12-12 10:00:24'),(4,'Tạo phiếu nhập DX-24-0V7P3E04ZB','2025-12-12 10:04:25','2025-12-12 10:04:25','2025-12-12 10:04:25'),(5,'Tạo phiếu nhập BY-73-J8ZMDEAUW6','2025-12-12 10:07:37','2025-12-12 10:07:37','2025-12-12 10:07:37'),(6,'Tạo phiếu nhập PB-23-VZTMGG27HE','2025-12-12 10:12:03','2025-12-12 10:12:03','2025-12-12 10:12:03'),(7,'Tạo phiếu nhập DV-14-BLFXG80QFZ','2025-12-12 10:15:46','2025-12-12 10:15:46','2025-12-12 10:15:46'),(8,'Tạo phiếu nhập CP-88-LKGWJSALO6','2025-12-12 10:16:27','2025-12-12 10:16:27','2025-12-12 10:16:27'),(9,'Tạo phiếu nhập QA-39-3E2E2IUZQE','2025-12-12 10:31:42','2025-12-12 10:31:42','2025-12-12 10:31:42'),(10,'Tạo phiếu nhập OK-99-5CUG6R7IAZ','2025-12-12 10:34:02','2025-12-12 10:34:02','2025-12-12 10:34:02'),(11,'Tạo phiếu nhập AJ-73-95PXD0OFNX','2025-12-12 10:37:14','2025-12-12 10:37:14','2025-12-12 10:37:14'),(12,'Tạo phiếu nhập OT-58-ODEHXV10F3','2025-12-12 10:39:41','2025-12-12 10:39:41','2025-12-12 10:39:41'),(13,'Tạo phiếu nhập KA-37-KQH5T8M7XH','2025-12-12 10:41:02','2025-12-12 10:41:02','2025-12-12 10:41:02'),(14,'Tạo phiếu nhập GO-16-U1S51ZPZ49','2025-12-12 10:43:08','2025-12-12 10:43:08','2025-12-12 10:43:08'),(15,'Tạo phiếu nhập EM-48-T2CSCSU8IO','2025-12-12 10:44:35','2025-12-12 10:44:35','2025-12-12 10:44:35'),(16,'Tạo phiếu nhập YM-51-DS3R80IRW7','2025-12-12 10:46:19','2025-12-12 10:46:19','2025-12-12 10:46:19'),(17,'Tạo phiếu nhập AD-39-4M07J572RX','2025-12-12 10:47:22','2025-12-12 10:47:22','2025-12-12 10:47:22'),(18,'Tạo phiếu nhập IL-65-F6XDRKL64Y','2025-12-12 10:48:25','2025-12-12 10:48:25','2025-12-12 10:48:25'),(19,'Tạo phiếu nhập WU-74-BDZWCFJ6FG','2025-12-12 10:50:00','2025-12-12 10:50:00','2025-12-12 10:50:00'),(20,'Tạo phiếu nhập PS-99-V2WGVV4TEM','2025-12-12 10:50:43','2025-12-12 10:50:43','2025-12-12 10:50:43');
+/*!40000 ALTER TABLE `warehouse_activities` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `warehouses`
 --
 
@@ -1008,10 +1163,10 @@ DROP TABLE IF EXISTS `warehouses`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `warehouses` (
-  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -1025,9 +1180,27 @@ CREATE TABLE `warehouses` (
 
 LOCK TABLES `warehouses` WRITE;
 /*!40000 ALTER TABLE `warehouses` DISABLE KEYS */;
-INSERT INTO `warehouses` VALUES ('90f465e7-bd1f-11f0-a62c-6c24081d8924','Kho Chính HCM','MAIN-HCM','Hồ Chí Minh','2025-11-09 03:52:52','2025-11-09 03:52:52');
+INSERT INTO `warehouses` VALUES ('90f465e7-bd1f-11f0-a62c-6c24081d8924','Kho Chính HCM','MAIN-HCM','Hồ Chí Minh','2025-11-08 20:52:52','2025-11-08 20:52:52');
 /*!40000 ALTER TABLE `warehouses` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Final view structure for view `order_profit_view`
+--
+
+/*!50001 DROP VIEW IF EXISTS `order_profit_view`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`quy`@`%` SQL SECURITY DEFINER */
+/*!50001 VIEW `order_profit_view` AS select `o`.`id` AS `id`,`o`.`code` AS `code`,`o`.`user_id` AS `user_id`,`o`.`status` AS `status`,`o`.`payment_status` AS `payment_status`,`o`.`placed_at` AS `placed_at`,`o`.`subtotal_vnd` AS `subtotal_vnd`,`o`.`discount_vnd` AS `discount_vnd`,`o`.`tax_vnd` AS `tax_vnd`,`o`.`shipping_fee_vnd` AS `shipping_fee_vnd`,`o`.`grand_total_vnd` AS `revenue_vnd`,coalesce(sum((`ob`.`quantity` * `ob`.`unit_cost_vnd`)),0) AS `cogs_vnd`,count(distinct `o`.`id`) AS `completed_orders`,((`o`.`grand_total_vnd` - coalesce(sum((`ob`.`quantity` * `ob`.`unit_cost_vnd`)),0)) - 30000) AS `profit_vnd` from ((`orders` `o` left join `order_items` `oi` on((`oi`.`order_id` = `o`.`id`))) left join `order_batches` `ob` on((`ob`.`order_item_id` = `oi`.`id`))) where (upper(`o`.`status`) = 'COMPLETED') group by `o`.`id`,`o`.`code`,`o`.`user_id`,`o`.`status`,`o`.`payment_status`,`o`.`placed_at`,`o`.`subtotal_vnd`,`o`.`discount_vnd`,`o`.`tax_vnd`,`o`.`shipping_fee_vnd`,`o`.`grand_total_vnd` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -1038,4 +1211,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-14 23:44:22
+-- Dump completed on 2025-12-12 17:57:18

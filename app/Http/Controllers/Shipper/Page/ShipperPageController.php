@@ -223,6 +223,7 @@ class ShipperPageController extends Controller
                     && strtolower((string) $order->payment_status) !== 'paid'
                 ) {
                     $order->payment_status = 'paid';
+                    $order->delivered_at = now(config('app.timezone', 'Asia/Ho_Chi_Minh'));
                 }
 
                 $order->status = $newStatus;

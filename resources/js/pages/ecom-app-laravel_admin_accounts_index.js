@@ -207,20 +207,79 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // ===== Tabs URL sync
-  function getTabFromURL(){ const u=new URL(location.href); const t=u.searchParams.get('tab'); return ['accounts','roles','stats'].includes(t)?t:'accounts'; }
-  function setTabInURL(tab, replace=false){ const u=new URL(location.href); u.searchParams.set('tab',tab); replace?history.replaceState(null,'',u):history.pushState(null,'',u); }
-  function showTab(tab){ const trigger=document.querySelector(`[data-bs-target="#${tab}-pane"]`); if(!trigger)return; new bootstrap.Tab(trigger).show(); }
-  showTab(getTabFromURL());
-  const tabs=document.getElementById('accountTabs');
-  if (tabs) {
-    tabs.addEventListener('shown.bs.tab', (e) => {
-      const pane=e.target.getAttribute('data-bs-target');
-      let tab='accounts'; if(pane.includes('roles')) tab='roles'; else if(pane.includes('stats')) tab='stats';
-      setTabInURL(tab);
+  // ===== Tabs (right navigation like report)
+  function scrollToLayout() {
+    const layout = document.querySelector('.admin-accounts-layout');
+    if (!layout) return;
+
+    const top = layout.getBoundingClientRect().top + window.scrollY - 80;
+    window.scrollTo({
+      top: top,
+      behavior: 'smooth'
     });
   }
-  window.addEventListener('popstate', () => showTab(getTabFromURL()));
+
+  function getTabFromURL() {
+    const url = new URL(window.location.href);
+    const tab = url.searchParams.get('tab');
+    return ['accounts', 'roles', 'stats'].includes(tab) ? tab : 'accounts';
+  }
+
+  function setTabInURL(tab, replace) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', tab);
+    if (replace) {
+      window.history.replaceState({}, '', url);
+      return;
+    }
+    window.history.pushState({}, '', url);
+  }
+
+  function setActiveTab(tab) {
+    const sections = document.querySelectorAll('.account-section');
+    sections.forEach(function (section) {
+      section.classList.remove('active');
+    });
+
+    const links = document.querySelectorAll('.admin-accounts-nav-link');
+    links.forEach(function (link) {
+      link.classList.remove('active');
+    });
+
+    const section = document.querySelector('[data-account-section="' + tab + '"]');
+    if (section) {
+      section.classList.add('active');
+    }
+
+    const activeLink = document.querySelector('[data-account-target="' + tab + '"]');
+    if (activeLink) {
+      activeLink.classList.add('active');
+    }
+  }
+
+  function setupTabs() {
+    const links = document.querySelectorAll('.admin-accounts-nav-link');
+    links.forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const tab = link.getAttribute('data-account-target');
+        if (!tab) return;
+
+        setActiveTab(tab);
+        setTabInURL(tab, false);
+
+        setTimeout(function () {
+          scrollToLayout();
+        }, 50);
+      });
+    });
+  }
+
+  setActiveTab(getTabFromURL());
+  setupTabs();
+  window.addEventListener('popstate', function () {
+    setActiveTab(getTabFromURL());
+  });
   setTabInURL(getTabFromURL(), true);
 
   // initial render

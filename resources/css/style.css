@@ -9,6 +9,11 @@ a {
   color: inherit;
 }
 
+.logo {
+  height: 50px;
+  width: 60px;
+}
+
 #bestsellers [data-bestseller-pagination] p.small.text-muted {
   display: none;
 }

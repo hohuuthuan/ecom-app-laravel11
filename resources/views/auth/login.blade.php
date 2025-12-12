@@ -20,7 +20,7 @@
           </div>
           <div class="text-center mt-4">
             <a href="{{ route('home') }}">
-              <img src="{{ asset('storage/logo/e-com-book-logo.png') }}"
+              <img src="{{ asset('storage/logo/logo-removebg.png') }}"
                 alt="Ecom Books" class="logo-left" width="200">
             </a>
           </div>

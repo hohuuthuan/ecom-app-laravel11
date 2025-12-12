@@ -18,7 +18,7 @@
             <p>Sách chính hãng, giao hàng tận nơi, trải nghiệm tiện lợi cho mọi đọc giả.</p>
           </div>
           <div class="text-center">
-            <img src="{{ asset('storage/logo/e-com-book-logo.png') }}"
+            <img src="{{ asset('storage/logo/logo-removebg.png') }}"
               alt="Ecom Books"
               class="logo-left"
               width="200">

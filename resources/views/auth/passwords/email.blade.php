@@ -28,7 +28,7 @@
           <div class="text-center mt-4">
             <a href="{{ route('home') }}">
               <img
-                src="{{ asset('storage/logo/e-com-book-logo.png') }}"
+                src="{{ asset('storage/logo/logo-removebg.png') }}"
                 alt="Ecom Books"
                 class="logo-left"
                 width="200">

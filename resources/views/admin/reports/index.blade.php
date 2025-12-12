@@ -2,7 +2,9 @@
 
 @section('title', 'Báo cáo & thống kê')
 
-@section('body_class', 'admin-report-page')
+@section('body_class')
+  @parent admin-report-page
+@endsection
 
 @php
   $activeTab = $activeTab ?? request('tab', 'revenue');

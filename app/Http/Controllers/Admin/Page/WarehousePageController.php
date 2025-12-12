@@ -122,10 +122,10 @@ class WarehousePageController extends Controller
     $order = Order::with(['items', 'items.product'])->findOrFail($id);
 
     $mapToOrderStatus = [
-      'RECEIVING_PROCESS'   => 'processing',
-      'PREPARING_ITEMS'     => 'picking',
-      'HANDED_OVER_CARRIER' => 'shipping',
-      'ORDER_COMPLETED'     => 'completed',
+      'RECEIVING_PROCESS'   => 'PROCESSING',
+      'PREPARING_ITEMS'     => 'PICKING',
+      'HANDED_OVER_CARRIER' => 'SHIPPING',
+      'ORDER_COMPLETED'     => 'COMPLETED',
     ];
 
     $warehouseStatusLabels = [
@@ -136,8 +136,8 @@ class WarehousePageController extends Controller
     ];
 
     $warehouseStatus = strtoupper((string) $validated['warehouse_status']);
-    $targetStatus    = $mapToOrderStatus[$warehouseStatus] ?? null;
-    $statusLabel     = $warehouseStatusLabels[$warehouseStatus] ?? $targetStatus;
+    $targetStatus = $mapToOrderStatus[$warehouseStatus] ?? null;
+    $statusLabel = $warehouseStatusLabels[$warehouseStatus] ?? $targetStatus;
 
     if ($targetStatus === null) {
       return back()->with('toast_error', 'Trạng thái kho không hợp lệ.');
@@ -146,30 +146,24 @@ class WarehousePageController extends Controller
     $shippingType = strtolower((string) $order->shipping_type);
 
     if (
-      $targetStatus === 'shipping'
+      $targetStatus === 'SHIPPING'
       && !in_array($shippingType, ['internal', 'external'], true)
     ) {
-      return back()->with(
-        'toast_error',
-        'Vui lòng chọn đơn vị vận chuyển'
-      );
+      return back()->with('toast_error', 'Vui lòng chọn đơn vị vận chuyển');
     }
 
-    if ($targetStatus === 'completed' && $shippingType !== 'external') {
-      return back()->with(
-        'toast_error',
-        'Chỉ đơn hàng giao bởi đơn vị vận chuyển khác mới được hoàn tất từ kho'
-      );
+    if ($targetStatus === 'COMPLETED' && $shippingType !== 'external') {
+      return back()->with('toast_error', 'Chỉ đơn hàng giao bởi đơn vị vận chuyển khác mới được hoàn tất từ kho');
     }
 
     $levelMap = [
-      'processing' => 1,
-      'picking'    => 2,
-      'shipping'   => 3,
-      'completed'  => 4,
+      'PROCESSING' => 1,
+      'PICKING'    => 2,
+      'SHIPPING'   => 3,
+      'COMPLETED'  => 4,
     ];
 
-    $currentStatus = strtolower((string) $order->status);
+    $currentStatus = strtoupper((string) $order->status);
 
     if (!isset($levelMap[$currentStatus])) {
       return back()->with('toast_error', 'Trạng thái đơn hiện tại không thể cập nhật từ giao diện kho.');
@@ -184,24 +178,32 @@ class WarehousePageController extends Controller
     }
 
     try {
-      DB::transaction(function () use ($order, $targetStatus, $statusLabel, $levelMap, $shippingType) {
-        $currentStatusInside = strtolower((string) $order->status);
+      DB::transaction(function () use ($order, $targetStatus, $statusLabel, $levelMap, $shippingType): void {
+        $currentStatusInside = strtoupper((string) $order->status);
 
-        $needHandleShipping = $levelMap[$targetStatus] >= $levelMap['shipping']
-          && $levelMap[$currentStatusInside] < $levelMap['shipping'];
+        $needHandleShipping = $levelMap[$targetStatus] >= $levelMap['SHIPPING']
+          && $levelMap[$currentStatusInside] < $levelMap['SHIPPING'];
 
         if ($needHandleShipping) {
           $this->allocateBatchesAndDeductStock($order);
         }
 
-        // ================== CHỈ XỬ LÝ COD KHI HOÀN TẤT (EXTERNAL) ==================
         if (
-          $targetStatus === 'completed'
+          $targetStatus === 'COMPLETED'
           && $shippingType === 'external'
-          && strtolower((string) $order->payment_method) === 'cod'
-          && strtolower((string) $order->payment_status) !== 'paid'
         ) {
-          $order->payment_status = 'paid';
+          $now = now(config('app.timezone', 'Asia/Ho_Chi_Minh'));
+
+          if (
+            strtoupper((string) $order->payment_method) === 'COD'
+            && strtolower((string) $order->payment_status) !== 'paid'
+          ) {
+            $order->payment_status = 'paid';
+          }
+
+          if ($order->delivered_at === null) {
+            $order->delivered_at = $now;
+          }
         }
 
         $order->status = $targetStatus;

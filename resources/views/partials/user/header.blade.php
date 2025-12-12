@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
   <div class="container">
-    <a class="navbar-brand" href="#" onclick="goHome()">
-      <i class="fas fa-book-open text-primary me-2"></i>BookStore
+    <a class="navbar-brand" href="/">
+      <img class="logo" src="{{asset('storage/logo/logo-removebg.png')}}" alt="logo">
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

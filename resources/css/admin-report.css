@@ -1,3 +1,17 @@
+body.admin-report-page .wrapper-content,
+body.admin-report-page #contentCol,
+body.admin-report-page .admin-report-layout {
+  overflow: visible !important;
+}
+
+body.admin-report-page .admin-report-nav {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 90px;
+  align-self: start;
+  z-index: 10;
+}
+
 .admin-report-page {
   background-color: #eef2f7;
 }

@@ -245,10 +245,49 @@ textarea#ac_address {
     border-radius: 0.5rem;
 }
 
-.select2CustomWidth .select2-container--default {
-    min-width: 247px !important;
+.select2CustomWidth .select2-container {
+    width: 100% !important;
+    max-width: 100%;
 }
 
+.select2CustomWidth .select2-container--default {
+    min-width: 0 !important;
+}
+
+.select2CustomWidth .select2-selection--single {
+    height: 38px;
+    min-height: 38px;
+}
+
+.select2CustomWidth .select2-selection__rendered {
+    line-height: 38px;
+}
+
+.select2CustomWidth .select2-selection__arrow {
+    height: 38px;
+}
+
+@media (max-width: 576px) {
+    .admin-accounts-page .card-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .admin-accounts-page .card-header form {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .admin-accounts-page .card-body .d-flex.gap-2 {
+        flex-wrap: wrap;
+    }
+
+    .admin-accounts-page .card-body .d-flex.gap-2 .select2-container {
+        flex: 1 1 220px;
+        min-width: 0;
+    }
+}
 .select2-container--default .select2-selection--single.select2-invalid {
     border-color: #dc3545 !important;
 }
@@ -1598,4 +1637,341 @@ i.icon-telephone {
 .admin-content-col .wrapper-content {
     flex: 1 1 auto;
     overflow-x: hidden;
+}
+
+/* =================== ADMIN ACCOUNTS (RIGHT NAV LIKE REPORT) =================== */
+body.admin-accounts-page .wrapper-content,
+body.admin-accounts-page #contentCol,
+body.admin-accounts-page .admin-accounts-layout {
+    overflow: visible !important;
+}
+
+.admin-accounts-page {
+    background-color: #eef2f7;
+}
+
+.admin-accounts-page .admin-accounts-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 12px 0 80px;
+}
+
+.admin-accounts-page .admin-accounts-main {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 22px 24px 30px;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+    min-height: 320px;
+}
+
+.admin-accounts-page .admin-accounts-nav {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 20px 18px;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
+    position: sticky;
+    top: 90px;
+    align-self: start;
+    z-index: 10;
+}
+
+.admin-accounts-page .admin-accounts-nav-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-accounts-page .admin-accounts-nav-title i {
+    color: #667eea;
+}
+
+.admin-accounts-page .admin-accounts-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.admin-accounts-page .admin-accounts-nav-item {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.admin-accounts-page .admin-accounts-nav-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    text-decoration: none;
+    color: #4a5568;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.admin-accounts-page .admin-accounts-nav-link i {
+    font-size: 18px;
+    color: #667eea;
+    margin-top: 2px;
+}
+
+.admin-accounts-page .admin-accounts-nav-link .nav-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.admin-accounts-page .admin-accounts-nav-link .nav-text-main {
+    font-size: 14px;
+}
+
+.admin-accounts-page .admin-accounts-nav-link .nav-text-sub {
+    font-size: 12px;
+    color: #718096;
+}
+
+.admin-accounts-page .admin-accounts-nav-link:hover {
+    background-color: #edf2ff;
+    color: #1f2933;
+    transform: translateY(-1px);
+}
+
+.admin-accounts-page .admin-accounts-nav-link:hover i {
+    color: #4f46e5;
+}
+
+.admin-accounts-page .admin-accounts-nav-link.active {
+    background-color: #667eea;
+    color: #ffffff;
+}
+
+.admin-accounts-page .admin-accounts-nav-link.active i {
+    color: #ffffff;
+}
+
+.admin-accounts-page .admin-accounts-nav-link.active .nav-text-sub {
+    color: #e5e7eb;
+}
+
+.admin-accounts-page .account-section {
+    display: none;
+    min-height: 260px;
+}
+
+.admin-accounts-page .account-section.active {
+    display: block;
+}
+
+.admin-accounts-page .account-section + .account-section {
+    margin-top: 8px;
+}
+
+.admin-accounts-page .account-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #1a202c;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admin-accounts-page .account-section-title i {
+    color: #2563eb;
+}
+
+.admin-accounts-page .account-section-subtitle {
+    font-size: 14px;
+    color: #718096;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 992px) {
+    .admin-accounts-page .admin-accounts-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-accounts-page .admin-accounts-nav {
+        position: static;
+        box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-accounts-page .admin-accounts-main {
+        padding: 18px 16px 22px;
+    }
+
+    .admin-accounts-page .admin-accounts-nav {
+        padding: 16px 14px;
+    }
+
+    .admin-accounts-page .account-section-title {
+        font-size: 16px;
+    }
+}
+
+
+/* =================== ADMIN CATALOG (RIGHT NAV LIKE REPORT) =================== */
+body.admin-catalog-page .wrapper-content,
+body.admin-catalog-page #contentCol,
+body.admin-catalog-page .admin-catalog-layout {
+    overflow: visible !important;
+}
+
+.admin-catalog-page {
+    background-color: #eef2f7;
+}
+
+.admin-catalog-page .admin-catalog-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 12px 0 80px;
+}
+
+.admin-catalog-page .admin-catalog-main {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 22px 24px 30px;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+    min-height: 320px;
+}
+
+.admin-catalog-page .admin-catalog-nav {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 20px 18px;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
+    position: sticky;
+    top: 90px;
+    align-self: start;
+    z-index: 10;
+}
+
+.admin-catalog-page .admin-catalog-nav-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-catalog-page .admin-catalog-nav-title i {
+    color: #667eea;
+}
+
+.admin-catalog-page .admin-catalog-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.admin-catalog-page .admin-catalog-nav-item {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.admin-catalog-page .admin-catalog-nav-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    text-decoration: none;
+    color: #4a5568;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.admin-catalog-page .admin-catalog-nav-link i {
+    font-size: 18px;
+    color: #667eea;
+    margin-top: 2px;
+}
+
+.admin-catalog-page .admin-catalog-nav-link .nav-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.admin-catalog-page .admin-catalog-nav-link .nav-text-main {
+    font-size: 14px;
+}
+
+.admin-catalog-page .admin-catalog-nav-link .nav-text-sub {
+    font-size: 12px;
+    color: #718096;
+}
+
+.admin-catalog-page .admin-catalog-nav-link:hover {
+    background-color: #edf2ff;
+    color: #1f2933;
+    transform: translateY(-1px);
+}
+
+.admin-catalog-page .admin-catalog-nav-link:hover i {
+    color: #4f46e5;
+}
+
+.admin-catalog-page .admin-catalog-nav-link.active {
+    background-color: #667eea;
+    color: #ffffff;
+}
+
+.admin-catalog-page .admin-catalog-nav-link.active i {
+    color: #ffffff;
+}
+
+.admin-catalog-page .admin-catalog-nav-link.active .nav-text-sub {
+    color: #e5e7eb;
+}
+
+.admin-catalog-page .catalog-section {
+    display: none;
+    min-height: 260px;
+}
+
+.admin-catalog-page .catalog-section.active {
+    display: block;
+}
+
+.admin-catalog-page .catalog-section + .catalog-section {
+    margin-top: 8px;
+}
+
+@media (max-width: 992px) {
+    .admin-catalog-page .admin-catalog-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-catalog-page .admin-catalog-nav {
+        position: static;
+        box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-catalog-page .admin-catalog-main {
+        padding: 18px 16px 22px;
+    }
+
+    .admin-catalog-page .admin-catalog-nav {
+        padding: 16px 14px;
+    }
 }

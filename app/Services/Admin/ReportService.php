@@ -24,30 +24,45 @@ class ReportService
         if (!in_array($groupBy, ['day', 'month', 'year'], true)) {
             $groupBy = 'day';
         }
+        $dateCol = 'o.delivered_at';
 
         if ($groupBy === 'month') {
-            $periodExpr = "DATE_FORMAT(placed_at, '%Y-%m-01')";
-            $labelExpr  = "DATE_FORMAT(placed_at, '%m/%Y')";
+            $periodExpr = "DATE_FORMAT({$dateCol}, '%Y-%m-01')";
+            $labelExpr  = "DATE_FORMAT({$dateCol}, '%m/%Y')";
         } elseif ($groupBy === 'year') {
-            $periodExpr = "DATE_FORMAT(placed_at, '%Y-01-01')";
-            $labelExpr  = "DATE_FORMAT(placed_at, '%Y')";
+            $periodExpr = "DATE_FORMAT({$dateCol}, '%Y-01-01')";
+            $labelExpr  = "DATE_FORMAT({$dateCol}, '%Y')";
         } else {
-            $periodExpr = "DATE(placed_at)";
-            $labelExpr  = "DATE_FORMAT(placed_at, '%d/%m/%Y')";
+            $periodExpr = "DATE({$dateCol})";
+            $labelExpr  = "DATE_FORMAT({$dateCol}, '%d/%m/%Y')";
         }
-
-        $rows = DB::table('order_profit_view')
-            ->whereRaw('UPPER(status) = ?', ['COMPLETED'])
-            ->whereRaw('UPPER(payment_status) = ?', ['PAID'])
-            ->whereBetween('placed_at', [$from, $to])
+        $perOrder = DB::table('orders as o')
+            ->whereRaw('UPPER(o.status) = ?', ['completed'])
+            ->whereRaw('UPPER(o.payment_status) = ?', ['paid'])
+            ->whereBetween($dateCol, [$from, $to])
             ->selectRaw("
-                    {$periodExpr} as period_key,
-                    {$labelExpr} as period_label,
-                    COALESCE(SUM(revenue_vnd - COALESCE(shipping_fee_vnd, 0)), 0) as revenue_vnd,
-                    COALESCE(SUM(cogs_vnd), 0) as cogs_vnd
-                ")
-            ->groupByRaw("{$periodExpr}, {$labelExpr}")
-            ->orderBy('period_key')
+            o.id as order_id,
+            {$periodExpr} as period_key,
+            {$labelExpr} as period_label,
+            (COALESCE(o.grand_total_vnd, 0) - COALESCE(o.shipping_fee_vnd, 0)) as revenue_vnd,
+            (
+                select COALESCE(SUM(ob.quantity * ob.unit_cost_vnd), 0)
+                from order_items oi
+                join order_batches ob on ob.order_item_id = oi.id
+                where oi.order_id = o.id
+            ) as cogs_vnd
+        ");
+
+        $rows = DB::query()
+            ->fromSub($perOrder, 't')
+            ->selectRaw("
+            t.period_key,
+            t.period_label,
+            COALESCE(SUM(t.revenue_vnd), 0) as revenue_vnd,
+            COALESCE(SUM(t.cogs_vnd), 0) as cogs_vnd
+        ")
+            ->groupBy('t.period_key', 't.period_label')
+            ->orderBy('t.period_key')
             ->get();
 
         $labels  = [];
@@ -87,6 +102,7 @@ class ReportService
         ];
     }
 
+
     public function getOrderReport(array $filters = []): array
     {
         $tz  = config('app.timezone', 'Asia/Ho_Chi_Minh');
@@ -107,11 +123,11 @@ class ReportService
 
         $rows = DB::table('orders as o')
             ->leftJoin('users as u', 'u.id', '=', 'o.user_id')
-            ->whereRaw('UPPER(o.payment_status) = ?', ['PAID'])
+            ->whereRaw('UPPER(o.payment_status) = ?', ['paid'])
             ->when($status, function ($q) use ($status) {
                 return $q->whereRaw('UPPER(o.status) = ?', [$status]);
             }, function ($q) {
-                return $q->whereRaw('UPPER(o.status) = ?', ['COMPLETED']);
+                return $q->whereRaw('UPPER(o.status) = ?', ['completed']);
             })
             ->when($from, function ($q) use ($from) {
                 return $q->where('o.delivered_at', '>=', $from);
@@ -200,8 +216,8 @@ class ReportService
                     COALESCE(
                         SUM(
                             CASE
-                                WHEN UPPER(o.payment_status) = 'PAID'
-                                AND UPPER(o.status) = 'COMPLETED'
+                                WHEN UPPER(o.payment_status) = 'paid'
+                                AND UPPER(o.status) = 'completed'
                                 THEN ob.quantity
                                 ELSE 0
                             END
@@ -211,8 +227,8 @@ class ReportService
                     COALESCE(
                         SUM(
                             CASE
-                                WHEN UPPER(o.payment_status) = 'PAID'
-                                AND UPPER(o.status) = 'COMPLETED'
+                                WHEN UPPER(o.payment_status) = 'paid'
+                                AND UPPER(o.status) = 'completed'
                                 THEN ob.quantity * ob.unit_cost_vnd
                                 ELSE 0
                             END
@@ -222,8 +238,8 @@ class ReportService
                     COALESCE(
                         SUM(
                             CASE
-                                WHEN UPPER(o.payment_status) = 'PAID'
-                                AND UPPER(o.status) = 'COMPLETED'
+                                WHEN UPPER(o.payment_status) = 'paid'
+                                AND UPPER(o.status) = 'completed'
                                 THEN ob.quantity * (oi.total_price_vnd / NULLIF(oi.quantity, 0))
                                     - COALESCE(o.shipping_fee_vnd * (ob.quantity * (oi.total_price_vnd / NULLIF(oi.quantity, 0)) / NULLIF(o.grand_total_vnd, 0)), 0)
                                 ELSE 0

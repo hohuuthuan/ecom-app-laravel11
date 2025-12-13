@@ -222,14 +222,14 @@
         link.classList.add("active");
 
         var url = new URL(window.location);
-        url.search = "?tab=" + target;
+        url.searchParams.set("tab", target);
         window.history.pushState({}, "", url);
 
         setTimeout(function () {
           if (target === "revenue") {
             initRevenueChart();
           }
-          
+
           var layout = document.querySelector(".admin-report-layout");
           if (!layout) return;
           var top = layout.getBoundingClientRect().top + window.scrollY - 80;

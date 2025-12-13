@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\Admin\AccountService;
-use Illuminate\Http\Request;
 use App\Http\Requests\Admin\BulkUpdateAccountRequest;
 use App\Http\Requests\Admin\UpdateAccountRequest;
+use App\Services\Admin\AccountService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Throwable;
 
 class AccountController extends Controller
@@ -22,7 +22,7 @@ class AccountController extends Controller
   public function index(Request $request)
   {
     $filters = $request->only(['keyword', 'role_id', 'status', 'per_page']);
-    $users   = $this->accountService->getList($filters);
+    $users = $this->accountService->getList($filters);
 
     $rolesForSelect = \App\Models\Role::query()
       ->select('id', 'name')
@@ -35,16 +35,20 @@ class AccountController extends Controller
       ->orderBy('name')
       ->get();
 
-    return view('admin.accounts.index', compact('users', 'rolesForSelect', 'rolesSummary'));
+    $accountStats = $this->accountService->getStats();
+
+    return view('admin.accounts.index', compact('users', 'rolesForSelect', 'rolesSummary', 'accountStats'));
   }
 
   public function updateAccount(UpdateAccountRequest $request, string $id): RedirectResponse
   {
     try {
       $ok = $this->accountService->updateAccount($id, $request->validated());
+
       if (!$ok) {
         return back()->withInput()->with('toast_error', 'Cập nhật thất bại.');
       }
+
       return back()->with('toast_success', 'Cập nhật thành công.');
     } catch (Throwable $e) {
       return back()->withInput()->with('toast_error', 'Có lỗi xảy ra.');
@@ -54,8 +58,8 @@ class AccountController extends Controller
   public function bulkUpdate(BulkUpdateAccountRequest $request)
   {
     $affected = $this->accountService->bulkUpdateStatus(
-      $request->input('ids'),          // UUID[]
-      $request->string('status')->toString() // 'ACTIVE' | 'BAN'
+      $request->input('ids'),
+      $request->string('status')->toString()
     );
 
     return redirect()

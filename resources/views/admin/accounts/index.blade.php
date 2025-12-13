@@ -50,7 +50,6 @@
             </div>
 
             <div class="card-body">
-              {{-- Filters --}}
               <form method="GET" class="row g-2 mb-3 filter-form select2CustomWidth">
                 <input type="hidden" name="tab" value="accounts">
                 <div class="col-md-3">
@@ -78,7 +77,6 @@
                 </div>
               </form>
 
-              {{-- Bulk update --}}
               <div class="d-flex justify-content-between mb-2 select2CustomWidth">
                 <div class="d-flex gap-2">
                   <select class="form-select form-select-sm w-auto setupSelect2" id="bulk_status">
@@ -90,7 +88,6 @@
                 </div>
               </div>
 
-              {{-- Table --}}
               <div class="table-responsive">
                 <table id="accountTable" class="table table-bordered table-striped align-middle">
                   <thead class="table-light">
@@ -212,11 +209,114 @@
           <i class="fas fa-chart-pie me-1"></i>
           Thống kê
         </h2>
-        <p class="account-section-subtitle">Tổng quan nhanh (bạn có thể bổ sung dữ liệu thống kê sau).</p>
 
-        <div class="card shadow-sm border-0">
-          <div class="card-body text-muted">
-            Chưa có dữ liệu thống kê cho màn này.
+        @php
+          $summary = is_array($accountStats ?? null) ? ($accountStats['summary'] ?? []) : [];
+          $topCustomers = is_array($accountStats ?? null) ? ($accountStats['top_customers'] ?? []) : [];
+          $range = is_array($accountStats ?? null) ? ($accountStats['range'] ?? []) : [];
+          $fmtVnd = fn($value) => number_format((int) $value, 0, ',', '.') . 'đ';
+        @endphp
+
+        <p class="account-section-subtitle">
+          Tổng quan tài khoản & Top khách hàng chi tiêu nhiều nhất ({{ $range['from'] ?? '-' }} → {{ $range['to'] ?? '-' }}).
+          Doanh thu trong bảng top khách chỉ tính từ hàng hoá (đã trừ phí ship).
+        </p>
+
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6 col-xl-4">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="text-muted">Tổng tài khoản</div>
+                    <div class="h4 mb-0">{{ number_format((int) ($summary['total_users'] ?? 0)) }}</div>
+                  </div>
+                  <div class="text-muted"><i class="fas fa-users fa-lg"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-xl-4">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="text-muted">Đang hoạt động</div>
+                    <div class="h4 mb-0">{{ number_format((int) ($summary['active_users'] ?? 0)) }}</div>
+                  </div>
+                  <div class="text-success"><i class="fas fa-check-circle fa-lg"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-xl-4">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="text-muted">Bị khoá</div>
+                    <div class="h4 mb-0">{{ number_format((int) ($summary['banned_users'] ?? 0)) }}</div>
+                  </div>
+                  <div class="text-danger"><i class="fas fa-ban fa-lg"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-semibold">Top khách hàng (90 ngày gần nhất)</div>
+              <div class="text-muted small">Chỉ tính đơn paid + completed, doanh thu đã trừ phí ship</div>
+            </div>
+            <span class="badge bg-light text-muted">Top {{ count($topCustomers) }}</span>
+          </div>
+
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-bordered table-striped mb-0 align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Khách hàng</th>
+                    <th class="text-end">Số đơn</th>
+                    <th class="text-end">Tổng chi</th>
+                    <th class="text-end">TB / đơn</th>
+                    <th>Lần mua gần nhất</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @forelse($topCustomers as $i => $c)
+                    <tr>
+                      <td>{{ $i + 1 }}</td>
+                      <td>
+                        <div class="fw-semibold">{{ $c['name'] ?? 'Khách' }}</div>
+                        <div class="text-muted small">
+                          {{ $c['email'] ?? '' }}{{ !empty($c['phone']) ? ' • ' . $c['phone'] : '' }}
+                        </div>
+                      </td>
+                      <td class="text-end">{{ number_format((int) ($c['orders_count'] ?? 0)) }}</td>
+                      <td class="text-end">{{ $fmtVnd($c['total_spent_vnd'] ?? 0) }}</td>
+                      <td class="text-end">{{ $fmtVnd($c['avg_order_vnd'] ?? 0) }}</td>
+                      <td>
+                        @if(!empty($c['last_order_at']))
+                          {{ \Illuminate\Support\Carbon::parse($c['last_order_at'])->format('d/m/Y H:i') }}
+                        @else
+                          <span class="text-muted">—</span>
+                        @endif
+                      </td>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="6" class="text-center text-muted py-4">Chưa có dữ liệu.</td>
+                    </tr>
+                  @endforelse
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
@@ -241,6 +341,7 @@
             </div>
           </a>
         </li>
+
         <li class="admin-accounts-nav-item">
           <a
             href="{{ route('admin.accounts.index', array_merge(request()->query(), ['tab' => 'roles'])) }}"
@@ -253,6 +354,7 @@
             </div>
           </a>
         </li>
+
         <li class="admin-accounts-nav-item">
           <a
             href="{{ route('admin.accounts.index', array_merge(request()->query(), ['tab' => 'stats'])) }}"
@@ -261,7 +363,7 @@
             <i class="fas fa-chart-pie"></i>
             <div class="nav-text">
               <span class="nav-text-main">Thống kê</span>
-              <span class="nav-text-sub">Tổng quan nhanh</span>
+              <span class="nav-text-sub">Top khách hàng</span>
             </div>
           </a>
         </li>
@@ -280,7 +382,6 @@
 @include('partials.ui.account.account-edit-modal')
 @endsection
 
-{{-- ===== Seed cho JS: roles + avatar mặc định ===== --}}
 @push('scripts')
   <script id="seed"
           type="application/json"

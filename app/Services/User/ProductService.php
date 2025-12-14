@@ -56,6 +56,7 @@ class ProductService
         'slug',
         'isbn',
         'selling_price_vnd',
+        'discount_percent',
         'status',
         'publisher_id',
         'created_at',

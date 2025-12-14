@@ -111,6 +111,7 @@
               </a>
             </div>
           </div>
+
           <div class="row searchProduct">
             <div class="col-md-2">
               <label
@@ -202,6 +203,46 @@
         </div>
       </form>
 
+      {{-- Bulk update status --}}
+      <form
+        id="orderBulkForm"
+        method="POST"
+        action="<?php echo route('admin.order.bulkChangeStatus'); ?>"
+        class="row g-2 align-items-end mb-3">
+        @csrf
+        @method('PATCH')
+
+        <div class="col-md-2">
+          <label
+            for="bulk_order_status"
+            class="form-label mb-1 label-filter-admin-product">
+            Cập nhật nhiều đơn hàng
+          </label>
+          <select
+            id="bulk_order_status"
+            name="status"
+            class="form-select setupSelect2"
+            required>
+            <option value="" selected disabled>-- Chọn trạng thái --</option>
+            <option value="PROCESSING">Tiếp nhận đơn, chuyển đơn sang  đơn vị kho</option>
+            <option value="CANCELLED">Huỷ đơn</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="d-block mb-1">&nbsp;</label>
+          <button
+            id="btnOrderBulkApply"
+            type="button"
+            class="btn-admin"
+            disabled>
+            Áp dụng
+          </button>
+        </div>
+
+        <div id="orderBulkIds"></div>
+      </form>
+
       <div class="table-responsive">
         <table
           id="orderTable"
@@ -228,7 +269,10 @@
               <?php foreach ($orders as $idx => $order): ?>
                 <tr>
                   <td>
-                    <input type="checkbox" value="<?php echo $order->id; ?>">
+                    <input
+                      type="checkbox"
+                      class="order-row-checkbox"
+                      value="<?php echo $order->id; ?>">
                   </td>
 
                   <td>
@@ -369,3 +413,185 @@
 
 @include('partials.ui.confirm-modal')
 @endsection
+
+@push('scripts')
+<script>
+  (function () {
+    'use strict';
+
+    function qs(selector, root) {
+      return (root || document).querySelector(selector);
+    }
+
+    function qsa(selector, root) {
+      return Array.from((root || document).querySelectorAll(selector));
+    }
+
+    function getRowCheckboxes() {
+      return qsa('#orderTable tbody .order-row-checkbox');
+    }
+
+    function getCheckedIds() {
+      return qsa('#orderTable tbody .order-row-checkbox:checked').map(function (cb) {
+        return cb.value;
+      });
+    }
+
+    function makeHiddenInputs(container, name, values) {
+      container.innerHTML = '';
+      values.forEach(function (v) {
+        var i = document.createElement('input');
+        i.type = 'hidden';
+        i.name = name;
+        i.value = v;
+        container.appendChild(i);
+      });
+    }
+
+    function setRowState(checkbox) {
+      var row = checkbox.closest('tr');
+      if (!row) {
+        return;
+      }
+
+      if (checkbox.checked) {
+        row.classList.add('row-checked');
+        return;
+      }
+
+      row.classList.remove('row-checked');
+    }
+
+    function syncAllRowStates(rows) {
+      rows.forEach(function (cb) {
+        setRowState(cb);
+      });
+    }
+
+    function updateMasterState(master, rows) {
+      var checked = rows.filter(function (cb) {
+        return cb.checked;
+      }).length;
+
+      if (checked === 0) {
+        master.checked = false;
+        master.indeterminate = false;
+        return;
+      }
+
+      if (checked === rows.length) {
+        master.checked = true;
+        master.indeterminate = false;
+        return;
+      }
+
+      master.checked = false;
+      master.indeterminate = true;
+    }
+
+    function updateBulkButton() {
+      var btn = qs('#btnOrderBulkApply');
+      var select = qs('#bulk_order_status');
+      if (!btn || !select) {
+        return;
+      }
+
+      btn.disabled = getCheckedIds().length === 0 || !select.value;
+    }
+
+    function normalizeConfirmText(html) {
+      return String(html || '').replace(/<[^>]*>/g, '').trim();
+    }
+
+    function confirmUI(title, messageHtml) {
+      if (typeof window.UIConfirm === 'function') {
+        return window.UIConfirm({ title: title, message: messageHtml });
+      }
+      return Promise.resolve(confirm(normalizeConfirmText(messageHtml)));
+    }
+
+    function submitBulk() {
+      var form = qs('#orderBulkForm');
+      var idsBox = qs('#orderBulkIds');
+      var select = qs('#bulk_order_status');
+
+      if (!form || !idsBox || !select) {
+        return;
+      }
+
+      var ids = getCheckedIds();
+      if (!ids.length) {
+        return;
+      }
+
+      makeHiddenInputs(idsBox, 'ids[]', ids);
+      form.submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var master = qs('#order_check_all');
+      var table = qs('#orderTable');
+      var rows = getRowCheckboxes();
+
+      if (master) {
+        master.addEventListener('change', function () {
+          rows = getRowCheckboxes();
+          rows.forEach(function (cb) {
+            cb.checked = master.checked;
+          });
+          master.indeterminate = false;
+          syncAllRowStates(rows);
+          updateBulkButton();
+        });
+      }
+
+      table?.addEventListener('change', function (e) {
+        if (!e.target || !e.target.classList || !e.target.classList.contains('order-row-checkbox')) {
+          return;
+        }
+
+        rows = getRowCheckboxes();
+        if (master) {
+          updateMasterState(master, rows);
+        }
+        setRowState(e.target);
+        updateBulkButton();
+      });
+
+      qs('#bulk_order_status')?.addEventListener('change', function () {
+        updateBulkButton();
+      });
+
+      qs('#btnOrderBulkApply')?.addEventListener('click', async function () {
+        var ids = getCheckedIds();
+        if (!ids.length) {
+          return;
+        }
+
+        var select = qs('#bulk_order_status');
+        if (!select || !select.value) {
+          alert('Vui lòng chọn trạng thái muốn cập nhật.');
+          return;
+        }
+
+        var status = String(select.value || '').toUpperCase();
+        var label = status === 'PROCESSING' ? 'Tiếp nhận đơn' : 'Huỷ đơn';
+
+        var ok = await confirmUI(
+          'Xác nhận cập nhật',
+          'Bạn sắp cập nhật <b>' + label + '</b> cho <b>' + ids.length + '</b> đơn hàng.'
+        );
+
+        if (!ok) {
+          return;
+        }
+
+        submitBulk();
+      });
+
+      syncAllRowStates(rows);
+      updateBulkButton();
+    });
+  })();
+</script>
+@endpush

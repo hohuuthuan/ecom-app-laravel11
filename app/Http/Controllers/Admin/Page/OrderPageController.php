@@ -11,6 +11,7 @@ use App\Models\OrderDeliveryIssue;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
+use Illuminate\Validation\Rule;
 
 class OrderPageController extends Controller
 {
@@ -51,33 +52,21 @@ class OrderPageController extends Controller
     return view('admin.order.detail', compact('order'));
   }
 
-  public function changeStatus(Request $request, string $id)
+  public function changeStatus(Request $request, string $id): RedirectResponse
   {
-    $request->validate([
-      'status' => ['required', 'string'],
+    $validated = $request->validate([
+      'status' => ['required', 'string', Rule::in(['PENDING', 'PROCESSING', 'CANCELLED'])],
     ]);
 
     $order = Order::findOrFail($id);
 
-    $input = strtoupper(trim($request->input('status')));
-
-    $map = [
-      'PENDING'    => 'pending',
-      'PROCESSING' => 'processing',
-      'CANCELLED'  => 'cancelled',
-    ];
-
-    if (!isset($map[$input])) {
-      return back()->with('toast_error', 'Trạng thái không hợp lệ');
-    }
-
-    $current = strtolower((string) $order->status);
-    $target  = $map[$input];
+    $target = strtoupper((string) $validated['status']);
+    $current = strtoupper((string) ($order->status ?? ''));
 
     if (!$this->canChangeStatus($current, $target)) {
       return back()->with(
         'toast_error',
-        'Không thể chuyển trạng thái từ ' . strtoupper($current) . ' sang ' . $input . '.'
+        'Không thể chuyển trạng thái từ ' . ($current !== '' ? $current : 'N/A') . ' sang ' . $target . '.'
       );
     }
 
@@ -90,21 +79,48 @@ class OrderPageController extends Controller
     return back()->with('toast_success', 'Cập nhật trạng thái thành công');
   }
 
+  public function bulkChangeStatus(Request $request): RedirectResponse
+  {
+    $validated = $request->validate([
+      'status' => ['required', 'string', Rule::in(['PROCESSING', 'CANCELLED'])],
+      'ids'    => ['required', 'array', 'min:1'],
+      'ids.*'  => ['required', 'uuid', 'distinct', 'exists:orders,id'],
+    ]);
+
+    $result = $this->orderStatusService->bulkChangeStatus($validated['ids'], $validated['status']);
+
+    if (($result['updated'] ?? 0) <= 0) {
+      return back()->with('toast_error', 'Không có đơn hàng nào đủ điều kiện để cập nhật.');
+    }
+
+    $message = 'Đã cập nhật ' . (int) $result['updated'] . ' đơn hàng.';
+    $skipped = (int) ($result['skipped'] ?? 0);
+
+    if ($skipped > 0) {
+      $message .= ' Bỏ qua ' . $skipped . ' đơn (không hợp lệ / không đủ điều kiện / đã đúng trạng thái).';
+    }
+
+    return back()->with('toast_success', $message);
+  }
+
   private function canChangeStatus(string $current, string $target): bool
   {
-    $current = strtolower($current);
-    $target = strtolower($target);
+    $current = strtoupper(trim($current));
+    $target = strtoupper(trim($target));
+
     if ($current === $target) {
       return true;
     }
-    $editable = ['pending', 'processing', 'cancelled'];
 
-    if (!in_array($current, $editable, true)) {
-      return false;
+    if ($current === 'PENDING') {
+      return in_array($target, ['PROCESSING', 'CANCELLED'], true);
     }
-    $allowedTargets = ['pending', 'processing', 'cancelled'];
 
-    return in_array($target, $allowedTargets, true);
+    if ($current === 'PROCESSING') {
+      return $target === 'CANCELLED';
+    }
+
+    return false;
   }
 
   public function issues(Request $request): View

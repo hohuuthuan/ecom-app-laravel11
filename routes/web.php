@@ -133,6 +133,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/order/{id}/change-status', [OrderPageController::class, 'changeStatus'])->name('order.changeStatus');
     Route::get('/order/issues/list', [OrderPageController::class, 'issues'])->name('order.issues.list');
     Route::patch('/order/issues/{id}/mark-refunded', [OrderPageController::class, 'markIssueRefunded'])->name('order.issues.markRefunded');
+    Route::patch('/order/bulk-change-status', [OrderPageController::class, 'bulkChangeStatus'])->name('order.bulkChangeStatus');
+
 
 
     Route::get('/discounts', [DiscountPageController::class, 'index'])->name('discount.index');

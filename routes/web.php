@@ -126,6 +126,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/product', [ProductController::class, 'store'])->name('product.store');
     Route::put('/products/{id}', [ProductController::class, 'update'])->name('product.update');
+    Route::post('/products/bulk-update', [ProductController::class, 'bulkUpdate'])->name('product.bulk-update');
 
     Route::get('/order', [OrderPageController::class, 'index'])->name('order.index');
     Route::get('/order/detail/{id}', [OrderPageController::class, 'detail'])->name('order.detail');

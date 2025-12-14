@@ -46,7 +46,7 @@ class ProductService
   public function getList(array $filters = [])
   {
     $query = Product::query()
-      ->select(['id', 'title', 'image', 'slug', 'isbn', 'selling_price_vnd', 'status', 'publisher_id', 'created_at'])
+      ->select(['id', 'title', 'image', 'slug', 'isbn', 'selling_price_vnd', 'discount_percent', 'status', 'publisher_id', 'created_at'])
       ->with([
         'categories:id,name',
         'authors:id,name',
@@ -190,5 +190,33 @@ class ProductService
       Log::error('Product update failed', ['msg' => $e->getMessage()]);
       return false;
     }
+  }
+
+  public function bulkUpdateDiscountPercent(array $ids, int $discountPercent): int
+  {
+    $discountPercent = max(0, min(100, $discountPercent));
+
+    return DB::transaction(function () use ($ids, $discountPercent) {
+      return Product::query()
+        ->whereIn('id', $ids)
+        ->update([
+          'discount_percent' => $discountPercent,
+          'updated_at' => now(),
+        ]);
+    });
+  }
+
+  public function bulkUpdateStatus(array $ids, string $status): int
+  {
+    $status = strtoupper($status);
+
+    return DB::transaction(function () use ($ids, $status) {
+      return Product::query()
+        ->whereIn('id', $ids)
+        ->update([
+          'status' => $status,
+          'updated_at' => now(),
+        ]);
+    });
   }
 }

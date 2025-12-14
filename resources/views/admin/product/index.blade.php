@@ -120,9 +120,45 @@
 
       {{-- Bulk actions --}}
       <div class="d-flex justify-content-between mb-2">
-        <div class="d-flex gap-2">
+        <form
+          id="productBulkForm"
+          method="POST"
+          action="{{ route('admin.product.bulk-update') }}"
+          class="d-flex flex-wrap align-items-end gap-2">
+          @csrf
+          <input type="hidden" name="action" id="product_bulk_action" value="">
+          <input type="hidden" name="status" id="product_bulk_status" value="">
+          <div id="productBulkIds"></div>
 
-        </div>
+          <div>
+            <label for="bulk_discount_percent" class="form-label mb-1 label-filter-admin-product">Giảm giá (%)</label>
+            <input
+              id="bulk_discount_percent"
+              type="number"
+              name="discount_percent"
+              class="form-control form-control-sm"
+              placeholder="0 - 100"
+              min="0"
+              max="100"
+              step="1">
+          </div>
+
+          <button style="height: 32px;" type="button" class="btn-admin" id="btnBulkDiscount" disabled>
+            <i class="fa fa-percent me-1"></i>Áp dụng
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary" id="btnBulkClearDiscount" disabled>
+            Bỏ giảm
+          </button>
+
+          <span class="vr mx-1 d-none d-lg-block" aria-hidden="true"></span>
+
+          <button style="height: 32px;"  type="button" class="btn-admin" id="btnBulkActive" data-bulk-status="ACTIVE" disabled>
+            <i class="fa fa-eye me-1"></i>Đang bán
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary" id="btnBulkInactive" data-bulk-status="INACTIVE" disabled>
+            <i class="fa fa-eye-slash me-1"></i>Ẩn
+          </button>
+        </form>
         <div class="d-flex gap-2">
           <a href="{{ route('admin.product.create') }}"><button type="button" class="btn-admin" data-bs-toggle="modal" data-bs-target="#uiProductModal"><i class="fa fa-plus me-1"></i>Thêm sản phẩm</button></a>
         </div>
@@ -141,6 +177,7 @@
               <th>TÁC GIẢ</th>
               <th>NHÀ XUẤT BẢN</th>
               <th>GIÁ BÁN</th>
+              <th>GIẢM GIÁ</th>
               <th class="statusWidth">TRẠNG THÁI</th>
               <th class="actionWidth text-center">THAO TÁC</th>
             </tr>
@@ -157,6 +194,15 @@
               <td>{{ $p->authors?->pluck('name')->join(', ') }}</td>
               <td>{{ $p->publisher?->name }}</td>
               <td>{{ number_format((int)$p->selling_price_vnd,0,',','.') }}₫</td>
+
+              <td>
+                @php($dp = (int)($p->discount_percent ?? 0))
+                @if($dp > 0)
+                <span class="badge bg-warning text-dark">-{{ $dp }}%</span>
+                @else
+                <span class="text-muted">0%</span>
+                @endif
+              </td>
 
               <td>
                 @if($p->status === 'ACTIVE')
@@ -190,4 +236,259 @@
 </div>
 
 @include('partials.ui.confirm-modal')
+
+@push('scripts')
+<script>
+  (function () {
+    'use strict';
+
+    function qs(selector, root) {
+      return (root || document).querySelector(selector);
+    }
+
+    function qsa(selector, root) {
+      return Array.from((root || document).querySelectorAll(selector));
+    }
+
+    function normalizeConfirmText(html) {
+      return String(html || '').replace(/<[^>]*>/g, '').trim();
+    }
+
+    function confirmUI(title, messageHtml) {
+      if (typeof window.UIConfirm === 'function') {
+        return window.UIConfirm({ title: title, message: messageHtml });
+      }
+      return Promise.resolve(confirm(normalizeConfirmText(messageHtml)));
+    }
+
+    function getRowCheckboxes() {
+      return qsa('#productTable tbody .product-row-checkbox');
+    }
+
+    function getCheckedIds() {
+      return qsa('#productTable tbody .product-row-checkbox:checked').map(function (cb) {
+        return cb.value;
+      });
+    }
+
+    function makeHiddenInputs(container, name, values) {
+      container.innerHTML = '';
+      values.forEach(function (v) {
+        const i = document.createElement('input');
+        i.type = 'hidden';
+        i.name = name;
+        i.value = v;
+        container.appendChild(i);
+      });
+    }
+
+    function setRowCheckedStyle(checkbox) {
+      const row = checkbox ? checkbox.closest('tr') : null;
+      if (!row) {
+        return;
+      }
+      row.classList.toggle('row-checked', checkbox.checked);
+    }
+
+    function syncAllRowCheckedStyles() {
+      getRowCheckboxes().forEach(function (cb) {
+        setRowCheckedStyle(cb);
+      });
+    }
+
+    function updateMasterState(master, rows) {
+      const checked = rows.filter(function (cb) {
+        return cb.checked;
+      }).length;
+
+      if (checked === 0) {
+        master.checked = false;
+        master.indeterminate = false;
+        return;
+      }
+
+      if (checked === rows.length) {
+        master.checked = true;
+        master.indeterminate = false;
+        return;
+      }
+
+      master.checked = false;
+      master.indeterminate = true;
+    }
+
+    function updateBulkButtons(enabled) {
+      const ids = getCheckedIds();
+      const on = enabled ?? ids.length > 0;
+
+      const discountBtn = qs('#btnBulkDiscount');
+      const clearDiscountBtn = qs('#btnBulkClearDiscount');
+      const activeBtn = qs('#btnBulkActive');
+      const inactiveBtn = qs('#btnBulkInactive');
+
+      if (discountBtn) {
+        discountBtn.disabled = !on;
+      }
+      if (clearDiscountBtn) {
+        clearDiscountBtn.disabled = !on;
+      }
+      if (activeBtn) {
+        activeBtn.disabled = !on;
+      }
+      if (inactiveBtn) {
+        inactiveBtn.disabled = !on;
+      }
+    }
+
+    function submitBulk(action, payload) {
+      const form = qs('#productBulkForm');
+      const idsBox = qs('#productBulkIds');
+      const actionEl = qs('#product_bulk_action');
+      const statusEl = qs('#product_bulk_status');
+
+      const ids = getCheckedIds();
+      if (!ids.length) {
+        return;
+      }
+
+      if (!form || !idsBox || !actionEl || !statusEl) {
+        return;
+      }
+
+      actionEl.value = action;
+      statusEl.value = '';
+
+      if (action === 'STATUS') {
+        statusEl.value = payload.status;
+      }
+
+      if (action === 'DISCOUNT') {
+        const input = qs('#bulk_discount_percent');
+        if (input) {
+          input.value = String(payload.discount_percent);
+        }
+      }
+
+      makeHiddenInputs(idsBox, 'ids[]', ids);
+      form.submit();
+    }
+
+    function bindBulkButtons() {
+      const bulkDiscountBtn = qs('#btnBulkDiscount');
+      if (bulkDiscountBtn) {
+        bulkDiscountBtn.addEventListener('click', async function () {
+          const ids = getCheckedIds();
+          if (!ids.length) {
+            return;
+          }
+
+          const input = qs('#bulk_discount_percent');
+          const raw = input ? input.value : '';
+          const percent = Number.parseInt(String(raw), 10);
+
+          if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
+            alert('Vui lòng nhập % giảm giá trong khoảng 0 - 100.');
+            return;
+          }
+
+          const ok = await confirmUI(
+            'Xác nhận cập nhật',
+            `Bạn sắp áp dụng giảm giá <b>${percent}%</b> cho <b>${ids.length}</b> sản phẩm.`
+          );
+          if (!ok) {
+            return;
+          }
+
+          submitBulk('DISCOUNT', { discount_percent: percent });
+        });
+      }
+
+      const bulkClearDiscountBtn = qs('#btnBulkClearDiscount');
+      if (bulkClearDiscountBtn) {
+        bulkClearDiscountBtn.addEventListener('click', async function () {
+          const ids = getCheckedIds();
+          if (!ids.length) {
+            return;
+          }
+
+          const ok = await confirmUI(
+            'Xác nhận cập nhật',
+            `Bạn sắp <b>bỏ giảm giá</b> (0%) cho <b>${ids.length}</b> sản phẩm.`
+          );
+          if (!ok) {
+            return;
+          }
+
+          submitBulk('DISCOUNT', { discount_percent: 0 });
+        });
+      }
+
+      qsa('[data-bulk-status]').forEach(function (btn) {
+        btn.addEventListener('click', async function () {
+          const ids = getCheckedIds();
+          if (!ids.length) {
+            return;
+          }
+
+          const status = String(btn.getAttribute('data-bulk-status') || '').toUpperCase();
+          if (!['ACTIVE', 'INACTIVE'].includes(status)) {
+            return;
+          }
+
+          const label = status === 'ACTIVE' ? 'Đang bán' : 'Ẩn';
+          const ok = await confirmUI(
+            'Xác nhận cập nhật',
+            `Bạn sắp cập nhật trạng thái <b>${label}</b> cho <b>${ids.length}</b> sản phẩm.`
+          );
+          if (!ok) {
+            return;
+          }
+
+          submitBulk('STATUS', { status: status });
+        });
+      });
+    }
+
+    function bindCheckboxEvents() {
+      const master = qs('#product_check_all');
+      const table = qs('#productTable');
+
+      if (master) {
+        master.addEventListener('change', function () {
+          const rows = getRowCheckboxes();
+          rows.forEach(function (cb) {
+            cb.checked = master.checked;
+            setRowCheckedStyle(cb);
+          });
+          master.indeterminate = false;
+          updateBulkButtons(master.checked);
+        });
+      }
+
+      if (table) {
+        table.addEventListener('change', function (e) {
+          const target = e.target;
+          if (!target || !target.classList || !target.classList.contains('product-row-checkbox')) {
+            return;
+          }
+
+          setRowCheckedStyle(target);
+
+          if (master) {
+            updateMasterState(master, getRowCheckboxes());
+          }
+          updateBulkButtons();
+        });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      bindCheckboxEvents();
+      bindBulkButtons();
+      syncAllRowCheckedStyles();
+      updateBulkButtons(false);
+    });
+  })();
+</script>
+@endpush
 @endsection

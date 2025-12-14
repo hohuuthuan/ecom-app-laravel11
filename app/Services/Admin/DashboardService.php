@@ -261,23 +261,35 @@ class DashboardService
 
     private function aggregateRange(Carbon $from, Carbon $to): array
     {
-        $row = DB::table('orders as o')
-            ->leftJoin('order_items as oi', 'oi.order_id', '=', 'o.id')
-            ->leftJoin('order_batches as ob', 'ob.order_item_id', '=', 'oi.id')
+        $shippingBaseVnd = 30000;
+
+        $ordersAgg = DB::table('orders as o')
             ->whereIn(DB::raw('upper(o.status)'), ['COMPLETED', 'DELIVERED'])
             ->whereRaw('upper(o.payment_status) = ?', ['PAID'])
             ->whereBetween(DB::raw('coalesce(o.placed_at, o.created_at)'), [$from, $to])
             ->selectRaw(
-                'coalesce(sum(o.grand_total_vnd - o.shipping_fee_vnd), 0) as revenue_vnd,
-                 coalesce(sum(ob.quantity * ob.unit_cost_vnd), 0) as cogs_vnd,
-                 count(distinct o.id) as completed_orders'
+                'coalesce(sum(o.grand_total_vnd - coalesce(o.shipping_fee_vnd, 0)), 0) as revenue_vnd,
+             coalesce(sum(greatest(? - coalesce(o.shipping_fee_vnd, 0), 0)), 0) as shipping_subsidy_vnd,
+             count(*) as completed_orders',
+                [$shippingBaseVnd]
             )
             ->first();
 
-        $revenue = (int) ($row->revenue_vnd ?? 0);
-        $cogs    = (int) ($row->cogs_vnd ?? 0);
-        $orders  = (int) ($row->completed_orders ?? 0);
-        $profit  = $revenue - $cogs;
+        $cogsAgg = DB::table('orders as o')
+            ->join('order_items as oi', 'oi.order_id', '=', 'o.id')
+            ->join('order_batches as ob', 'ob.order_item_id', '=', 'oi.id')
+            ->whereIn(DB::raw('upper(o.status)'), ['COMPLETED', 'DELIVERED'])
+            ->whereRaw('upper(o.payment_status) = ?', ['PAID'])
+            ->whereBetween(DB::raw('coalesce(o.placed_at, o.created_at)'), [$from, $to])
+            ->selectRaw('coalesce(sum(ob.quantity * ob.unit_cost_vnd), 0) as cogs_vnd')
+            ->first();
+
+        $revenue = (int) ($ordersAgg->revenue_vnd ?? 0);
+        $shippingSubsidy = (int) ($ordersAgg->shipping_subsidy_vnd ?? 0);
+        $cogs = (int) ($cogsAgg->cogs_vnd ?? 0);
+        $orders = (int) ($ordersAgg->completed_orders ?? 0);
+
+        $profit = $revenue - $cogs - $shippingSubsidy;
 
         return [
             'revenue_vnd'      => $revenue,

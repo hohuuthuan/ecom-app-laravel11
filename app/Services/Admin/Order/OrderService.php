@@ -46,15 +46,15 @@ class OrderService
     }
 
     if (!empty($filters['payment_method'])) {
-      $query->where('payment_method', (string)$filters['payment_method']);
+      $query->whereRaw('UPPER(payment_method) = ?', [strtoupper((string) $filters['payment_method'])]);
     }
 
     if (!empty($filters['payment_status'])) {
-      $query->where('payment_status', (string)$filters['payment_status']);
+      $query->whereRaw('UPPER(payment_status) = ?', [strtoupper((string) $filters['payment_status'])]);
     }
 
     if (!empty($filters['status'])) {
-      $query->where('status', (string)$filters['status']);
+      $query->whereRaw('UPPER(status) = ?', [strtoupper((string) $filters['status'])]);
     }
 
     if (!empty($filters['created_from'])) {
@@ -107,7 +107,7 @@ class OrderService
       ])
       // KHÔNG lấy đơn PENDING
       ->where(function ($q) {
-        $q->where('status', '!=', 'PENDING')
+        $q->whereRaw('UPPER(status) != ?', ['PENDING'])
           ->orWhereNull('status');
       });
 
@@ -119,16 +119,16 @@ class OrderService
     }
 
     if (!empty($filters['payment_method'])) {
-      $query->where('payment_method', (string)$filters['payment_method']);
+      $query->whereRaw('UPPER(payment_method) = ?', [strtoupper((string) $filters['payment_method'])]);
     }
 
     if (!empty($filters['payment_status'])) {
-      $query->where('payment_status', (string)$filters['payment_status']);
+      $query->whereRaw('UPPER(payment_status) = ?', [strtoupper((string) $filters['payment_status'])]);
     }
 
     // Nếu sau này bạn muốn cho kho lọc riêng theo status khác PENDING vẫn được
     if (!empty($filters['status'])) {
-      $query->where('status', (string)$filters['status']);
+      $query->whereRaw('UPPER(status) = ?', [strtoupper((string) $filters['status'])]);
     }
 
     if (!empty($filters['created_from'])) {
@@ -155,7 +155,7 @@ class OrderService
 
     // ƯU TIÊN: PROCESSING trước, rồi các trạng thái khác
     $query
-      ->orderByRaw("CASE WHEN status = 'PROCESSING' THEN 0 ELSE 1 END")
+      ->orderByRaw("CASE WHEN UPPER(status) = 'PROCESSING' THEN 0 ELSE 1 END")
       ->orderByDesc('placed_at');
 
     $orders = $query->paginate($perPage);

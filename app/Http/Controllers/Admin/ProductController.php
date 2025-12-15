@@ -7,6 +7,8 @@ use App\Services\Admin\Product\ProductService;
 use App\Http\Requests\Admin\Product\StoreRequest;
 use App\Http\Requests\Admin\Product\UpdateRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Author;
@@ -106,6 +108,49 @@ class ProductController extends Controller
       return back()->with('toast_success', 'Cập nhật sản phẩm thành công');
     } catch (Throwable $e) {
       return back()->with('toast_error', 'Có lỗi xảy ra');
+    }
+  }
+
+  public function bulkUpdate(Request $request): RedirectResponse
+  {
+    $action = strtoupper((string)$request->input('action'));
+
+    $rules = [
+      'action' => ['required', 'string', Rule::in(['DISCOUNT', 'STATUS'])],
+      'ids' => ['required', 'array', 'min:1'],
+      'ids.*' => ['required', 'uuid', Rule::exists('products', 'id')],
+    ];
+
+    if ($action === 'DISCOUNT') {
+      $rules['discount_percent'] = ['required', 'integer', 'min:0', 'max:100'];
+    }
+
+    if ($action === 'STATUS') {
+      $rules['status'] = ['required', 'string', Rule::in(['ACTIVE', 'INACTIVE'])];
+    }
+
+    $validated = $request->validate($rules);
+    $ids = array_values(array_unique((array)$validated['ids']));
+
+    try {
+      if ($action === 'DISCOUNT') {
+        $percent = (int)$validated['discount_percent'];
+        $affected = $this->productService->bulkUpdateDiscountPercent($ids, $percent);
+
+        return back()->with('toast_success', "Đã cập nhật giảm giá {$percent}% cho {$affected} sản phẩm.");
+      }
+
+      if ($action === 'STATUS') {
+        $status = strtoupper((string)$validated['status']);
+        $affected = $this->productService->bulkUpdateStatus($ids, $status);
+
+        $label = $status === 'ACTIVE' ? 'Đang bán' : 'Ẩn';
+        return back()->with('toast_success', "Đã cập nhật trạng thái '{$label}' cho {$affected} sản phẩm.");
+      }
+
+      return back()->with('toast_error', 'Hành động không hợp lệ.');
+    } catch (Throwable $e) {
+      return back()->with('toast_error', 'Có lỗi xảy ra.');
     }
   }
 }

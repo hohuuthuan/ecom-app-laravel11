@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <img class="logo" src="{{asset('storage/logo/logo-removebg.png')}}" alt="logo">
+      <img class="logo" src="{{ asset('storage/logo/logo-removebg.png') }}" alt="logo">
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -17,8 +17,13 @@
           <a class="nav-link active" href="{{ route('product.list') }}">Sản phẩm</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('recentlyViewed') }}">
+          <a class="nav-link active" href="{{ route('recentlyViewed') }}">
             Sản phẩm đã xem
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{{ route('vouchers.index') }}">
+            Kho vouchers
           </a>
         </li>
       </ul>
@@ -39,15 +44,23 @@
             </button>
           </div>
         </form>
+
         <div class="d-flex align-items-center">
           @php
             $wishlistCount = auth()->check()
               ? auth()->user()->favorites()->count()
               : 0;
 
-            $cart       = session('cart', ['items' => []]);
-            $cartItems  = is_array($cart['items'] ?? null) ? $cart['items'] : [];
-            $cartCount  = count($cartItems);
+            $cart = session('cart', ['items' => []]);
+            $cartItems = is_array($cart['items'] ?? null) ? $cart['items'] : [];
+            $cartCount = count($cartItems);
+
+            $voucherCount = auth()->check()
+              ? \App\Models\DiscountWalletItem::query()
+                  ->where('user_id', auth()->id())
+                  ->where('status', 'SAVED')
+                  ->count()
+              : 0;
           @endphp
 
           {{-- Wishlist --}}
@@ -73,16 +86,27 @@
             </span>
           </a>
 
+          {{-- Voucher wallet --}}
+          <a href="{{ route('vouchers.wallet') }}" class="text-decoration-none me-3 position-relative">
+            <i class="fas fa-ticket-alt" style="font-size: 1.2rem; color: #667eea"></i>
+            <span
+              class="badge text-dark position-absolute top-0 start-100 translate-middle"
+              id="voucherWalletCount"
+              style="font-size: 0.7rem; background-color: #bfc7eeff">
+              {{ $voucherCount }}
+            </span>
+          </a>
+
           @auth
           <div class="dropdown">
             @php
               /** @var \App\Models\User $user */
-              $user        = auth()->user();
+              $user = auth()->user();
               $displayName = $user->full_name ?? $user->name ?? $user->username ?? 'Admin';
-              $email       = $user->email ?? '';
-              $avatarFile  = $user && $user->avatar ? basename($user->avatar) : 'base-avatar.jpg';
-              $avatarPath  = 'avatars/' . $avatarFile;
-              $avatarUrl   = Storage::disk('public')->exists($avatarPath)
+              $email = $user->email ?? '';
+              $avatarFile = $user && $user->avatar ? basename($user->avatar) : 'base-avatar.jpg';
+              $avatarPath = 'avatars/' . $avatarFile;
+              $avatarUrl = Storage::disk('public')->exists($avatarPath)
                 ? Storage::disk('public')->url($avatarPath)
                 : asset('storage/avatars/base-avatar.jpg');
             @endphp

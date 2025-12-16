@@ -50,6 +50,9 @@
               <button type="submit" class="btn btn-primary btn-admin btn-submit-filter-admin-order">
                 <i class="fa fa-search me-1"></i> Tìm kiếm
               </button>
+              <a href="{{ route('admin.review.index') }}" class="btn btn-outline-secondary btn-submit-filter-admin-review">
+                <i class="fa fa-eraser me-1"></i> Xóa lọc
+              </a>
             </div>
           </div>
         </div>

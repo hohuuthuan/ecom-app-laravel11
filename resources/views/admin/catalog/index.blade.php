@@ -6,8 +6,8 @@
 
 @section('content')
 @php
-  $tab = request('tab');
-  $tab = in_array($tab, ['category', 'author', 'publisher'], true) ? $tab : 'category';
+$tab = request('tab');
+$tab = in_array($tab, ['category', 'author', 'publisher'], true) ? $tab : 'category';
 @endphp
 
 <nav aria-label="breadcrumb" class="mb-3">
@@ -53,6 +53,14 @@
                 </div>
                 <div class="col-md-1 d-grid">
                   <button type="submit" class="btn-admin">Lọc</button>
+                </div>
+                <div class="col-md-1 d-grid">
+                  @php($catClearQuery = \Illuminate\Support\Arr::except(request()->query(), ['cat_keyword','cat_status','page']))
+                  @php($catClearQuery['tab'] = 'category')
+                  @php($catClearQuery['per_page_cat'] = request('per_page_cat', 10))
+                  <a href="{{ url()->current() . '?' . http_build_query($catClearQuery) }}" class="btn btn-outline-secondary">
+                    <i class="fa fa-eraser me-1"></i>Xóa lọc
+                  </a>
                 </div>
                 <input type="hidden" name="tab" value="category">
                 <input type="hidden" name="per_page_cat" value="{{ request('per_page_cat') }}">
@@ -165,6 +173,14 @@
                 </div>
                 <div class="col-md-1 d-grid">
                   <button type="submit" class="btn-admin">Lọc</button>
+                </div>
+                <div class="col-md-1 d-grid">
+                  @php($authorClearQuery = \Illuminate\Support\Arr::except(request()->query(), ['author_keyword','author_status','page']))
+                  @php($authorClearQuery['tab'] = 'author')
+                  @php($authorClearQuery['per_page_author'] = request('per_page_author', 10))
+                  <a href="{{ url()->current() . '?' . http_build_query($authorClearQuery) }}" class="btn btn-outline-secondary">
+                    <i class="fa fa-eraser me-1"></i>Xóa lọc
+                  </a>
                 </div>
                 <input type="hidden" name="tab" value="author">
                 <input type="hidden" name="cat_keyword" value="{{ request('cat_keyword') }}">
@@ -284,6 +300,16 @@
                 <div class="col-md-1 d-grid">
                   <button type="submit" class="btn-admin">Lọc</button>
                 </div>
+                <div class="col-md-1 d-grid">
+                  @php($publisherClearQuery = \Illuminate\Support\Arr::except(request()->query(), ['publisher_keyword','publisher_status','page']))
+                  @php($publisherClearQuery['tab'] = 'publisher')
+                  @php($publisherClearQuery['per_page_publisher'] = request('per_page_publisher', 10))
+                  <a href="{{ url()->current() . '?' . http_build_query($publisherClearQuery) }}" class="btn btn-outline-secondary">
+                    <i class="fa fa-eraser me-1"></i>Xóa lọc
+                  </a>
+                </div>
+                <input type="hidden" name="publisher_keyword" value="{{ request('publisher_keyword') }}">
+                <input type="hidden" name="publisher_status" value="{{ request('publisher_status') }}">
                 <input type="hidden" name="tab" value="publisher">
                 <input type="hidden" name="cat_keyword" value="{{ request('cat_keyword') }}">
                 <input type="hidden" name="cat_status" value="{{ request('cat_status') }}">
@@ -383,12 +409,12 @@
     </form>
 
     <div id="__formState"
-         data-has-errors="{{ $errors->any()?1:0 }}"
-         data-which="{{ old('__form','') }}"
-         data-mode="{{ old('__mode','create') }}"
-         data-update-action="{{ old('__update_action','') }}"
-         data-image="{{ old('__image','') }}"
-         style="display:none"></div>
+      data-has-errors="{{ $errors->any()?1:0 }}"
+      data-which="{{ old('__form','') }}"
+      data-mode="{{ old('__mode','create') }}"
+      data-update-action="{{ old('__update_action','') }}"
+      data-image="{{ old('__image','') }}"
+      style="display:none"></div>
 
     @include('partials.ui.catalog.category-modal')
     @include('partials.ui.catalog.author-modal')
@@ -447,5 +473,5 @@
 @endsection
 
 @push('scripts')
-  @vite('resources/js/pages/ecom-app-laravel_admin_catalog_index.js')
+@vite('resources/js/pages/ecom-app-laravel_admin_catalog_index.js')
 @endpush

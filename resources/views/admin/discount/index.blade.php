@@ -57,6 +57,9 @@
               <button type="submit" class="btn-admin">
                 <i class="fa fa-search me-1"></i> Tìm kiếm
               </button>
+              <a href="{{ route('admin.discount.index') }}" class="btn btn-outline-secondary btn-submit-filter-admin-discount">
+                <i class="fa fa-eraser me-1"></i> Xóa lọc
+              </a>
             </div>
           </div>
 

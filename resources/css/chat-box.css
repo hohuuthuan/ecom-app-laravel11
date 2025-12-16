@@ -18,32 +18,23 @@
   border-radius: 50%;
   background-color: #ffffff;
   cursor: pointer;
-  box-shadow:
-    0 0 0 3px rgba(19, 102, 122, 0.95),
-    0 6px 18px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 0 0 3px rgba(19, 102, 122, 0.95), 0 6px 18px rgba(15, 23, 42, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background-color 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
 .ai-chat-toggle:hover {
   background-color: rgba(59, 130, 246, 0.06);
-  box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 1),
-    0 8px 22px rgba(15, 23, 42, 0.4);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 1), 0 8px 22px rgba(15, 23, 42, 0.4);
   transform: translateY(-1px);
 }
 
 .ai-chat-toggle:active {
   transform: translateY(0);
-  box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.95),
-    0 4px 12px rgba(15, 23, 42, 0.3);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.95), 0 4px 12px rgba(15, 23, 42, 0.3);
 }
 
 .ai-chat-toggle-icon {
@@ -52,6 +43,11 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* Ẩn chung */
+.ai-hidden {
+  display: none !important;
 }
 
 /* KHUNG CHAT */
@@ -68,14 +64,20 @@
   overflow: hidden;
 }
 
-/* Ẩn chung */
-.ai-hidden {
-  display: none !important;
+/* Animation mở/đóng (tránh cảm giác trượt ngang) */
+.ai-chat-window.ai-opening {
+  animation: aiWindowPopIn 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
-/* Ưu tiên ẩn khung chat khi có cả 2 class */
-.ai-chat-window.ai-hidden {
-  display: none !important;
+@keyframes aiWindowPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Header */
@@ -102,10 +104,13 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #3b82f6 0%, #64748b 100%);
+  overflow: hidden;
 }
 
 .ai-chat-avatar-icon {
-  font-size: 22px;
+  display: inline-flex;
+  width: 100%;
+  height: 100%;
 }
 
 .ai-chat-header-text {
@@ -127,6 +132,29 @@
   color: #64748b;
 }
 
+.ai-chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-chat-clear-history {
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  color: #475569;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ai-chat-clear-history:hover {
+  background-color: #fee2e2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
 /* Nút đóng X */
 .ai-chat-close {
   padding-bottom: 10px;
@@ -142,6 +170,7 @@
   color: #1e293b;
 }
 
+/* FAQ */
 .ai-chat-faq {
   padding: 8px 16px 6px;
   background-color: #f8fafc;
@@ -174,11 +203,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease,
-    box-shadow 0.15s ease,
-    transform 0.08s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
 }
 
 .ai-chat-faq-btn:hover {
@@ -194,6 +219,7 @@
   padding: 12px 16px;
   background-color: #f0f4f8;
   overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .ai-chat-message-row {
@@ -221,6 +247,7 @@
   word-wrap: break-word;
   white-space: normal;
   text-align: left;
+  transform-origin: 50% 100%;
 }
 
 .ai-chat-bubble-assistant {
@@ -238,6 +265,22 @@
 .ai-chat-bubble-text {
   margin: 0;
   text-align: left;
+}
+
+/* Animation tin nhắn: “đẩy lên” tự nhiên (không trượt ngang) */
+.message-enter {
+  animation: aiMsgPopIn 140ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes aiMsgPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Footer + form nhập */
@@ -279,9 +322,7 @@
   color: #ffffff;
   cursor: pointer;
   white-space: nowrap;
-  transition:
-    background-color 0.15s ease,
-    transform 0.1s ease;
+  transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
 .ai-chat-send:hover {
@@ -290,22 +331,6 @@
 
 .ai-chat-send:active {
   transform: scale(0.97);
-}
-
-/* Animation xuất hiện tin nhắn */
-.message-enter {
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Typing indicator (...) */
@@ -322,40 +347,19 @@
   animation: blink 1.4s infinite;
 }
 
-.typing-indicator span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing-indicator span:nth-child(3) {
-  animation-delay: 0.4s;
-}
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes blink {
-  0%, 60%, 100% {
-    opacity: 0.3;
-  }
-  30% {
-    opacity: 1;
-  }
+  0%, 60%, 100% { opacity: 0.3; }
+  30% { opacity: 1; }
 }
 
 /* Scrollbar */
-.ai-chat-messages::-webkit-scrollbar {
-  width: 6px;
-}
-
-.ai-chat-messages::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
-.ai-chat-messages::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
-  border-radius: 3px;
-}
-
-.ai-chat-messages::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
-}
+.ai-chat-messages::-webkit-scrollbar { width: 6px; }
+.ai-chat-messages::-webkit-scrollbar-track { background-color: transparent; }
+.ai-chat-messages::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+.ai-chat-messages::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
 
 /* Mobile */
 @media (max-width: 575.98px) {
@@ -371,7 +375,7 @@
   }
 }
 
-/* ========== SẢN PHẨM TRONG HỆ THỐNG (NỔI BẬT) ========== */
+/* (Giữ nguyên phần “product list” nếu bạn đang dùng AI trả về HTML) */
 .ai-chat-bubble-assistant .ai-chat-product-list {
   margin-top: 8px;
   padding-top: 6px;
@@ -390,11 +394,7 @@
   text-decoration: none;
   color: #0f172a;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
-  transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease,
-    box-shadow 0.15s ease,
-    transform 0.08s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
 }
 
 .ai-chat-bubble-assistant .ai-chat-product-item:hover {
@@ -422,7 +422,6 @@
   color: #64748b;
 }
 
-/* ========== GỢI Ý SÁCH BÊN NGOÀI (NHẠT HƠN) ========== */
 .ai-chat-bubble-assistant .ai-chat-external-book-list {
   margin: 4px 0 0 18px;
   padding: 0;
@@ -438,30 +437,4 @@
 .ai-chat-bubble-assistant .ai-chat-external-book-list li strong {
   font-weight: 600;
   color: #111827;
-}
-
-.ai-chat-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.ai-chat-clear-history {
-  border: 1px solid #e2e8f0;
-  background-color: #f8fafc;
-  color: #475569;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease;
-}
-
-.ai-chat-clear-history:hover {
-  background-color: #fee2e2;
-  border-color: #fecaca;
-  color: #b91c1c;
 }

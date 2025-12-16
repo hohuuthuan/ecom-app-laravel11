@@ -266,7 +266,8 @@ class WarehousePageController extends Controller
         ])
         ->where('bs.product_id', $pid)
         ->where('bs.warehouse_id', $wid)
-        ->orderBy('b.import_date')
+        ->orderBy('b.import_date', 'asc')
+        ->orderBy('b.id', 'asc')
         ->lockForUpdate()
         ->get();
 

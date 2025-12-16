@@ -50,6 +50,7 @@ class WarehouseImportService
         $batchStockRows = [];
         $movementRows = [];
         $stockTotalsByProduct = [];
+        $reservedBatchCodes = [];
 
         foreach ($items as $item) {
           $productId = $item['product_id'];
@@ -80,6 +81,7 @@ class WarehouseImportService
           // -------- batches --------
           $batchRows[] = [
             'id' => $batchId,
+            'code' => $this->generateUniqueBatchCode($reservedBatchCodes),
             'purchase_receipt_item_id' => $itemId,
             'product_id' => $productId,
             'warehouse_id' => $warehouseId,
@@ -311,6 +313,33 @@ class WarehouseImportService
 
     return $code;
   }
+
+  private function generateUniqueBatchCode(array &$reserved = []): string
+  {
+    $pool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+    for ($i = 0; $i < 50; $i++) {
+      $code = '';
+      for ($j = 0; $j < 4; $j++) {
+        $code .= $pool[random_int(0, 35)];
+      }
+
+      if (isset($reserved[$code])) {
+        continue;
+      }
+
+      $exists = DB::table('batches')->where('code', $code)->exists();
+      if ($exists) {
+        continue;
+      }
+
+      $reserved[$code] = true;
+      return $code;
+    }
+
+    throw new \RuntimeException('Không thể sinh mã lô (batch code) duy nhất. Vui lòng thử lại.');
+  }
+
 
   public function getInventoryOverview(array $filters = []): array
   {

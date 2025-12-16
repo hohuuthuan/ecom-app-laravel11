@@ -165,7 +165,7 @@
                 || $user->hasRole('Shipper')
               )
                 <li>
-                  <a class="dropdown-item" href="{{ route('shipper.dashboard') }}">
+                  <a class="dropdown-item" href="{{ route('shipper.dashboard') }}" target="_blank">
                     <i class="fas fa-motorcycle me-2"></i>Đơn hàng cần giao
                   </a>
                 </li>

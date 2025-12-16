@@ -10,6 +10,7 @@ use App\Http\Controllers\User\CheckoutController;
 use App\Http\Controllers\User\UserAddressController;
 use App\Http\Controllers\User\UserOrderController;
 use App\Http\Controllers\User\UserReviewController;
+use App\Http\Controllers\User\VoucherController;
 
 use App\Http\Controllers\Admin\Page\CatalogPageController;
 use App\Http\Controllers\Admin\Page\ProductPageController;
@@ -41,6 +42,7 @@ Route::get('/cart/count', [HomePageController::class, 'countProductInCart'])->na
 Route::delete('/cart/clear', [HomePageController::class, 'clearCart'])->name('cart.clear');
 Route::get('/thank-you', [HomePageController::class, 'thanks'])->name('user.thanks');
 Route::get('/recently-viewed-products', [HomePageController::class, 'recentlyViewedPage'])->name('recentlyViewed');
+Route::get('/vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
 
 // === AI CHAT BOX ===
 Route::post('/chat-ai', [AiChatController::class, 'handle'])->name('chat.ai');
@@ -80,6 +82,10 @@ Route::middleware(['auth'])->group(function () {
 
   Route::get('/orders/{id}/review', [UserReviewController::class, 'showOrderReview'])->whereUuid('id')->name('user.reviews.order');
   Route::post('/profile/orders/reviews/store-item', [UserReviewController::class, 'storeFromOrder'])->name('user.reviews.storeFromOrder');
+
+  Route::post('/vouchers/claim', [VoucherController::class, 'claim'])->name('vouchers.claim');
+  Route::get('/vouchers/wallet', [VoucherController::class, 'wallet'])->name('vouchers.wallet');
+  Route::post('/vouchers/remove', [VoucherController::class, 'remove'])->name('vouchers.remove');
 
   Route::prefix('profile')->name('user.profile.')->group(function () {
     Route::get('/', [UserAddressController::class, 'index'])->name('index');

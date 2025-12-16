@@ -111,9 +111,9 @@ class HomePageController extends Controller
       $perPageReview = 4;
     }
 
-    $perPageRelated = (int) $request->query('per_page_related', 4);
+    $perPageRelated = (int) $request->query('per_page_related', 6);
     if ($perPageRelated <= 0 || $perPageRelated > 200) {
-      $perPageRelated = 4;
+      $perPageRelated = 6;
     }
 
     if ($request->ajax() && $request->boolean('reviews_only')) {

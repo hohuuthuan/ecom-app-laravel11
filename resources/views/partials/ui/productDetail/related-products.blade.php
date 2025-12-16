@@ -12,38 +12,67 @@
       $isFav = auth()->check()
         ? in_array($product->id, $favIds, true)
         : false;
+
       $authorNames = optional($product->authors)->pluck('name')->join(', ');
+
+      $discountPercent = (int) ($product->discount_percent ?? 0);
+      $discountPercent = max(0, min(100, $discountPercent));
+
+      $sellingPrice = (int) ($product->selling_price_vnd ?? 0);
+      $finalPrice = $discountPercent > 0
+        ? (int) round($sellingPrice * (100 - $discountPercent) / 100)
+        : $sellingPrice;
+
+      $hasPercentDiscount = $discountPercent > 0 && $finalPrice > 0 && $finalPrice < $sellingPrice;
+
+      $detailUrl = route('product.detail', ['slug' => $product->slug, 'id' => $product->id]);
     @endphp
 
     <div class="col-lg-4 col-md-6">
       <div class="card book-card h-100">
-        <div class="book-cover">
+        <div class="book-cover position-relative">
           <img
             src="{{ asset('storage/products/'.$product->image) }}"
             alt="{{ $product->title }}"
             class="book-cover-img"
             loading="lazy">
+
+          @if($hasPercentDiscount)
+            <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+              -{{ $discountPercent }}%
+            </span>
+          @endif
         </div>
 
         <div class="card-body d-flex flex-column">
           <h6 class="card-title line-clamp-2 mb-1">
             <a
-              href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
+              href="{{ $detailUrl }}"
               class="text-body text-decoration-none">
               {{ $product->title }}
             </a>
           </h6>
+
           <p class="card-text text-muted mb-3">{{ $authorNames ?: 'Không rõ tác giả' }}</p>
 
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-              <span class="price">
-                {{ number_format((int)$product->selling_price_vnd, 0, ',', '.') }} VNĐ
-              </span>
-              @if(!empty($product->listed_price_vnd) && (int)$product->listed_price_vnd > (int)$product->selling_price_vnd)
+              @if($hasPercentDiscount)
+                <span class="price text-danger fw-bold">
+                  {{ number_format($finalPrice, 0, ',', '.') }} VNĐ
+                </span>
                 <small class="text-muted text-decoration-line-through ms-2">
-                  {{ number_format((int)$product->listed_price_vnd, 0, ',', '.') }} VNĐ
+                  {{ number_format($sellingPrice, 0, ',', '.') }} VNĐ
                 </small>
+              @else
+                <span class="price">
+                  {{ number_format($sellingPrice, 0, ',', '.') }} VNĐ
+                </span>
+                @if(!empty($product->listed_price_vnd) && (int)$product->listed_price_vnd > $sellingPrice)
+                  <small class="text-muted text-decoration-line-through ms-2">
+                    {{ number_format((int)$product->listed_price_vnd, 0, ',', '.') }} VNĐ
+                  </small>
+                @endif
               @endif
             </div>
 
@@ -69,9 +98,7 @@
           </div>
 
           <div class="mt-auto d-grid gap-2">
-            <a
-              href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
-              class="btn btn-outline-primary">
+            <a href="{{ $detailUrl }}" class="btn btn-outline-primary">
               <i class="fas fa-eye me-2"></i>Xem chi tiết
             </a>
 

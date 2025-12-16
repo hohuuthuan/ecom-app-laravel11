@@ -147,7 +147,7 @@ class ProductService
   public function listProduct(array $filters = [])
   {
     $query = Product::query()
-      ->select(['id', 'title', 'image', 'slug', 'isbn', 'selling_price_vnd', 'status', 'publisher_id', 'created_at'])
+      ->select(['id', 'title', 'image', 'slug', 'isbn', 'selling_price_vnd', 'discount_percent', 'status', 'publisher_id', 'created_at'])
       ->with([
         'categories:id,name',
         'authors:id,name',
@@ -364,10 +364,10 @@ class ProductService
       ->find($id);
   }
 
-  public function getRelatedProducts(Product $product, int $perPage = 8): LengthAwarePaginator
+  public function getRelatedProducts(Product $product, int $perPage = 6): LengthAwarePaginator
   {
     if ($perPage <= 0) {
-      $perPage = 4;
+      $perPage = 6;
     }
     if ($perPage > 200) {
       $perPage = 50;
@@ -381,6 +381,7 @@ class ProductService
         'slug',
         'isbn',
         'selling_price_vnd',
+        'discount_percent',
         'status',
         'publisher_id',
         'created_at',
@@ -467,6 +468,7 @@ class ProductService
         'slug',
         'isbn',
         'selling_price_vnd',
+        'discount_percent',
         'status',
         'publisher_id',
         'created_at',

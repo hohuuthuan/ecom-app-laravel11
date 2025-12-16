@@ -24,6 +24,7 @@ class HomeService
         'products.title',
         'products.image',
         'products.slug',
+        'products.discount_percent',
         'products.selling_price_vnd',
         'favorites.created_at as favored_at',
       ])

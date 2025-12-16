@@ -17,8 +17,13 @@
           <a class="nav-link active" href="{{ route('product.list') }}">Sản phẩm</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('recentlyViewed') }}">
+          <a class="nav-link active" href="{{ route('recentlyViewed') }}">
             Sản phẩm đã xem
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{{ route('vouchers.index') }}">
+            Kho vouchers
           </a>
         </li>
       </ul>

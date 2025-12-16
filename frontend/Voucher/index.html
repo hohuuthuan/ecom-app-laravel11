@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kho Voucher</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+    }
+
+    html,
+    body,
+    .main-wrapper {
+      height: 100%;
+      width: 100%;
+      overflow-auto;
+    }
+
+    .main-wrapper {
+      padding: 0;
+    }
+
+    .header-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-banner h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header-banner p {
+      font-size: 16px;
+      opacity: 0.95;
+      margin: 0;
+    }
+
+    .voucher-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title i {
+      color: #667eea;
+    }
+
+    .voucher-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+    }
+
+    .voucher-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .voucher-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+      border-color: #667eea;
+    }
+
+    .voucher-header {
+      padding: 20px;
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8ebff 100%);
+      border-bottom: 2px dashed #cbd5e1;
+      position: relative;
+    }
+
+    .voucher-type-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .badge-ship {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-order {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .voucher-code-display {
+      background: white;
+      border: 2px dashed #667eea;
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .voucher-code-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: #667eea;
+      letter-spacing: 2px;
+      margin: 0;
+    }
+
+    .discount-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #dc2626;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .voucher-body {
+      padding: 20px;
+    }
+
+    .voucher-description {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 16px;
+      min-height: 40px;
+    }
+
+    .voucher-details {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #4b5563;
+      margin-bottom: 8px;
+    }
+
+    .detail-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-item i {
+      color: #667eea;
+      width: 16px;
+    }
+
+    .detail-value {
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .save-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .save-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .save-btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .save-btn.saved {
+      background: #10b981;
+    }
+
+    .save-btn.saved:hover {
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    .expiry-badge {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      animation: slideIn 0.3s ease;
+      border-left: 4px solid #10b981;
+    }
+
+    .notification.success {
+      border-left-color: #10b981;
+    }
+
+    .notification i {
+      font-size: 24px;
+      color: #10b981;
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .notification-title {
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0 0 4px 0;
+    }
+
+    .notification-message {
+      font-size: 14px;
+      color: #6b7280;
+      margin: 0;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #9ca3af;
+    }
+
+    .empty-state i {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+
+    .empty-state p {
+      font-size: 18px;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      .voucher-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-banner h1 {
+        font-size: 24px;
+      }
+
+      .notification {
+        left: 20px;
+        right: 20px;
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="main-wrapper">
+    <header class="header-banner">
+      <h1 id="pageTitle"><i class="fas fa-ticket-alt me-2"></i>Kho Voucher</h1>
+      <p id="pageSubtitle">Săn ngay các mã giảm giá hấp dẫn</p>
+    </header>
+    <div class="voucher-container">
+      <h2 class="section-title"><i class="fas fa-fire"></i> Voucher Đang Phát Hành</h2>
+      <div class="voucher-grid" id="voucherGrid"><!-- Vouchers will be rendered here -->
+      </div>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Dữ liệu voucher
+    const vouchers = [
+      {
+        id: 1,
+        code: 'FREESHIP50',
+        type: 'ship',
+        typeName: 'Giảm Phí Ship',
+        discount: 'Miễn phí',
+        description: 'Miễn phí vận chuyển cho đơn hàng từ 200K',
+        minOrder: 200000,
+        maxDiscount: 50000,
+        expiry: '31/12/2024',
+        saved: false
+      },
+      {
+        id: 2,
+        code: 'SALE100K',
+        type: 'order',
+        typeName: 'Giảm Giá Đơn Hàng',
+        discount: '100K',
+        description: 'Giảm 100.000đ cho đơn hàng từ 500K',
+        minOrder: 500000,
+        maxDiscount: 100000,
+        expiry: '30/12/2024',
+        saved: false
+      },
+      {
+        id: 3,
+        code: 'NEWUSER15',
+        type: 'order',
+        typeName: 'Giảm Giá Đơn Hàng',
+        discount: '15%',
+        description: 'Giảm 15% cho khách hàng mới, tối đa 150K',
+        minOrder: 300000,
+        maxDiscount: 150000,
+        expiry: '31/01/2025',
+        saved: false
+      },
+      {
+        id: 4,
+        code: 'SHIP30K',
+        type: 'ship',
+        typeName: 'Giảm Phí Ship',
+        discount: '30K',
+        description: 'Giảm 30.000đ phí vận chuyển',
+        minOrder: 150000,
+        maxDiscount: 30000,
+        expiry: '28/12/2024',
+        saved: false
+      },
+      {
+        id: 5,
+        code: 'MEGA200',
+        type: 'order',
+        typeName: 'Giảm Giá Đơn Hàng',
+        discount: '200K',
+        description: 'Giảm 200.000đ cho đơn hàng từ 1 triệu',
+        minOrder: 1000000,
+        maxDiscount: 200000,
+        expiry: '31/12/2024',
+        saved: false
+      },
+      {
+        id: 6,
+        code: 'FLASH50K',
+        type: 'order',
+        typeName: 'Giảm Giá Đơn Hàng',
+        discount: '50K',
+        description: 'Flash sale - Giảm 50K cho đơn từ 250K',
+        minOrder: 250000,
+        maxDiscount: 50000,
+        expiry: '25/12/2024',
+        saved: false
+      }
+    ];
+
+    // Format số tiền
+    function formatCurrency(amount) {
+      return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + 'đ';
+    }
+
+    // Render vouchers
+    function renderVouchers() {
+      const voucherGrid = document.getElementById('voucherGrid');
+
+      if (vouchers.length === 0) {
+        voucherGrid.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-ticket-alt"></i>
+            <p>Hiện chưa có voucher nào</p>
+          </div>
+        `;
+        return;
+      }
+
+      voucherGrid.innerHTML = vouchers.map(voucher => `
+        <div class="voucher-card">
+          <div class="voucher-header">
+            <span class="voucher-type-badge ${voucher.type === 'ship' ? 'badge-ship' : 'badge-order'}">
+              <i class="fas ${voucher.type === 'ship' ? 'fa-shipping-fast' : 'fa-tag'}"></i>
+              ${voucher.typeName}
+            </span>
+            <div class="voucher-code-display">
+              <p class="voucher-code-text">${voucher.code}</p>
+            </div>
+            <p class="discount-value">${voucher.discount}</p>
+          </div>
+          <div class="voucher-body">
+            <p class="voucher-description">${voucher.description}</p>
+            <div class="voucher-details">
+              <div class="detail-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Đơn tối thiểu: <span class="detail-value">${formatCurrency(voucher.minOrder)}</span></span>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-gift"></i>
+                <span>Giảm tối đa: <span class="detail-value">${formatCurrency(voucher.maxDiscount)}</span></span>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-clock"></i>
+                <span>Hạn sử dụng: <span class="expiry-badge"><i class="fas fa-calendar-alt"></i> ${voucher.expiry}</span></span>
+              </div>
+            </div>
+            <button 
+              class="save-btn ${voucher.saved ? 'saved' : ''}" 
+              onclick="saveVoucher(${voucher.id})"
+              ${voucher.saved ? 'disabled' : ''}
+            >
+              <i class="fas ${voucher.saved ? 'fa-check-circle' : 'fa-wallet'}"></i>
+              <span id="saveButtonText${voucher.id}">${voucher.saved ? 'Đã lưu vào ví' : 'Lưu vào ví'}</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Lưu voucher vào ví
+    function saveVoucher(voucherId) {
+      const voucher = vouchers.find(v => v.id === voucherId);
+      if (!voucher || voucher.saved) return;
+
+      voucher.saved = true;
+
+      // Re-render vouchers
+      renderVouchers();
+
+      // Show notification
+      showNotification('Thành công!', `Đã lưu voucher ${voucher.code} vào ví của bạn`);
+    }
+
+    // Hiển thị thông báo
+    function showNotification(title, message) {
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = 'notification success';
+      notification.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <div class="notification-content">
+          <p class="notification-title">${title}</p>
+          <p class="notification-message">${message}</p>
+        </div>
+      `;
+
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Element SDK configuration
+    const defaultConfig = {
+      page_title: 'Kho Voucher',
+      page_subtitle: 'Săn ngay các mã giảm giá hấp dẫn',
+      save_button_text: 'Lưu vào ví'
+    };
+
+    async function onConfigChange(config) {
+      const pageTitle = document.getElementById('pageTitle');
+      const pageSubtitle = document.getElementById('pageSubtitle');
+
+      if (pageTitle) {
+        pageTitle.innerHTML = `<i class="fas fa-ticket-alt me-2"></i>${config.page_title || defaultConfig.page_title}`;
+      }
+      if (pageSubtitle) {
+        pageSubtitle.textContent = config.page_subtitle || defaultConfig.page_subtitle;
+      }
+
+      // Update all save button texts
+      vouchers.forEach(voucher => {
+        const buttonTextElement = document.getElementById(`saveButtonText${voucher.id}`);
+        if (buttonTextElement && !voucher.saved) {
+          buttonTextElement.textContent = config.save_button_text || defaultConfig.save_button_text;
+        }
+      });
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ['page_title', config.page_title || defaultConfig.page_title],
+        ['page_subtitle', config.page_subtitle || defaultConfig.page_subtitle],
+        ['save_button_text', config.save_button_text || defaultConfig.save_button_text]
+      ]);
+    }
+
+    // Khởi tạo
+    document.addEventListener('DOMContentLoaded', function () {
+      renderVouchers();
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+      }
+    });
+  </script>
+  <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'9aed89bd46eca8c1',t:'MTc2NTg4MTM2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
+</html>

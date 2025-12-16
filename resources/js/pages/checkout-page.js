@@ -10,15 +10,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  var root = document.getElementById('checkoutPage');
-  if (!root) {
-    return;
-  }
-
-  var sub = parseInt(root.getAttribute('data-subtotal') || '0', 10);
-  var ship = parseInt(root.getAttribute('data-shipping') || '0', 10);
-
-  // THAY ĐỔI: thêm tham số total (tổng tiền đã tính sẵn từ backend)
   function setTotals(currSub, currShip, discount, total) {
     var subtotalEl = document.getElementById('checkoutSubtotal');
     var shippingEl = document.getElementById('checkoutShipping');
@@ -35,8 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
       discountEl.textContent = '-' + formatVND(discount);
     }
     if (totalEl) {
-      // Nếu backend gửi total_vnd thì ưu tiên dùng,
-      // tránh double-subtract giảm phí ship.
       if (typeof total === 'number') {
         totalEl.textContent = formatVND(Math.max(0, total));
       } else {
@@ -102,6 +91,93 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  function hideWalletDiscountModal() {
+    var el = document.getElementById('walletDiscountModal');
+    if (!el || !window.bootstrap) {
+      return;
+    }
+
+    var modal = window.bootstrap.Modal.getInstance(el)
+      || window.bootstrap.Modal.getOrCreateInstance(el);
+
+    modal.hide();
+  }
+
+  function ensureNotificationStyle() {
+    if (document.getElementById('checkoutNotificationStyle')) {
+      return;
+    }
+
+    var style = document.createElement('style');
+    style.id = 'checkoutNotificationStyle';
+    style.textContent = '@keyframes checkoutSlideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}';
+    document.head.appendChild(style);
+  }
+
+  function showNotification(message) {
+    ensureNotificationStyle();
+
+    var old = document.querySelector('.checkout-notification');
+    if (old) {
+      old.remove();
+    }
+
+    var n = document.createElement('div');
+    n.className = 'checkout-notification';
+    n.textContent = message;
+
+    n.style.cssText =
+      'position:fixed;top:20px;right:20px;background:#10b981;color:#fff;' +
+      'padding:14px 18px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);' +
+      'z-index:9999;font-weight:600;animation:checkoutSlideIn 0.3s ease;';
+
+    document.body.appendChild(n);
+
+    setTimeout(function () {
+      n.style.animation = 'checkoutSlideIn 0.3s ease reverse';
+      setTimeout(function () {
+        n.remove();
+      }, 300);
+    }, 2500);
+  }
+
+  function copyText(text) {
+    if (!text) {
+      return Promise.reject(new Error('empty'));
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+
+    return new Promise(function (resolve, reject) {
+      var temp = document.createElement('textarea');
+      temp.value = text;
+      temp.style.position = 'fixed';
+      temp.style.opacity = '0';
+      document.body.appendChild(temp);
+      temp.focus();
+      temp.select();
+
+      try {
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        resolve();
+      } catch (e) {
+        document.body.removeChild(temp);
+        reject(e);
+      }
+    });
+  }
+
+  var root = document.getElementById('checkoutPage');
+  if (!root) {
+    return;
+  }
+
+  var sub = parseInt(root.getAttribute('data-subtotal') || '0', 10);
+  var ship = parseInt(root.getAttribute('data-shipping') || '0', 10);
+
   window.applyDiscount = function () {
     var inputEl = document.getElementById('discountCode');
     var msgEl = document.getElementById('discountMessage');
@@ -119,7 +195,6 @@ document.addEventListener('DOMContentLoaded', function () {
     msgEl.classList.remove('discount-message-error');
     msgEl.classList.remove('discount-message-success');
 
-    // ====== XOÁ MÃ (code rỗng) ======
     if (code === '') {
       var tokenDelete = document.querySelector('meta[name="csrf-token"]');
       var csrfDelete = tokenDelete ? tokenDelete.getAttribute('content') : '';
@@ -139,7 +214,6 @@ document.addEventListener('DOMContentLoaded', function () {
           });
         })
         .then(function (res) {
-          // Không còn mã => quay về subtotal + shipping gốc, giảm giá = 0
           setTotals(baseSubtotal, baseShipping, 0);
 
           var msg = res.ok
@@ -162,7 +236,6 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // ====== ÁP DỤNG MÃ ======
     var token = document.querySelector('meta[name="csrf-token"]');
     var csrf = token ? token.getAttribute('content') : '';
 
@@ -220,8 +293,6 @@ document.addEventListener('DOMContentLoaded', function () {
           ? data.shipping_vnd
           : baseShipping;
 
-        // THAY ĐỔI: tách rõ giá trị giảm dùng để hiển thị,
-        // còn tổng tiền thì dùng total_vnd từ backend.
         var discountDisplay = (data.discount_vnd || 0) + (data.shipping_discount_vnd || 0);
 
         setTotals(
@@ -247,7 +318,54 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   };
 
-  // Lần đầu vào trang: hiển thị lại theo subtotal + shipping gốc
+  document.addEventListener('click', function (e) {
+    var copyBtn = e.target.closest('.js-wallet-discount-copy');
+    if (copyBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      var code = copyBtn.getAttribute('data-code') || '';
+      copyText(code)
+        .then(function () {
+          showNotification('Đã copy mã: ' + code);
+        })
+        .catch(function () {
+          showNotification('Không thể copy mã. Vui lòng thử lại.');
+        });
+
+      return;
+    }
+
+    var applyBtn = e.target.closest('.js-wallet-discount-apply');
+    if (applyBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      var codeApply = applyBtn.getAttribute('data-code') || '';
+      var input = document.getElementById('discountCode');
+      if (input && codeApply) {
+        input.value = codeApply;
+        showNotification('Đã chọn mã: ' + codeApply);
+        window.applyDiscount();
+        hideWalletDiscountModal();
+      }
+
+      return;
+    }
+
+    var card = e.target.closest('.js-wallet-discount-card');
+    if (card) {
+      var codeCard = card.getAttribute('data-code') || '';
+      var inputCard = document.getElementById('discountCode');
+      if (inputCard && codeCard) {
+        inputCard.value = codeCard;
+        showNotification('Đã chọn mã: ' + codeCard);
+        window.applyDiscount();
+        hideWalletDiscountModal();
+      }
+    }
+  });
+
   setTotals(sub, ship, 0);
 });
 
@@ -258,7 +376,9 @@ document.addEventListener('DOMContentLoaded', function () {
   var submitBtn = document.getElementById('paymentSubmitButton');
 
   function updateButton(method) {
-    if (!submitBtn) { return; }
+    if (!submitBtn) {
+      return;
+    }
 
     if (method === 'momo') {
       submitBtn.innerHTML = 'Thanh toán với MOMO';
@@ -277,17 +397,27 @@ document.addEventListener('DOMContentLoaded', function () {
         o.classList.remove('selected');
         var r = o.querySelector('.radio-custom');
         var d = o.querySelector('.radio-dot');
-        if (r) { r.classList.remove('checked'); }
-        if (d) { d.classList.remove('show'); }
+        if (r) {
+          r.classList.remove('checked');
+        }
+        if (d) {
+          d.classList.remove('show');
+        }
       });
 
       opt.classList.add('selected');
       var radio = opt.querySelector('.radio-custom');
       var dot = opt.querySelector('.radio-dot');
-      if (radio) { radio.classList.add('checked'); }
-      if (dot) { dot.classList.add('show'); }
+      if (radio) {
+        radio.classList.add('checked');
+      }
+      if (dot) {
+        dot.classList.add('show');
+      }
 
-      if (methodInp) { methodInp.value = method; }
+      if (methodInp) {
+        methodInp.value = method;
+      }
       updateButton(method);
     });
   });
@@ -297,10 +427,12 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-// ================== CHỌN LẠI ĐỊA CHỈ (KHÔNG NỐI LẠI PROVINCE/WARD VÀO TITLE) ==================
+// ================== CHỌN LẠI ĐỊA CHỈ ==================
 (function () {
   var modalEl = document.getElementById('selectAddressModal');
-  if (!modalEl) { return; }
+  if (!modalEl) {
+    return;
+  }
 
   var cards = modalEl.querySelectorAll('.js-address-select-card');
   var hiddenInput = document.getElementById('shippingAddressId');
@@ -311,16 +443,15 @@ document.addEventListener('DOMContentLoaded', function () {
     : null;
 
   function updateSelectedAddress(fullText, note) {
-    if (!selectedBody) { return; }
+    if (!selectedBody) {
+      return;
+    }
 
-    // Xóa sạch nội dung cũ (tránh nhân đôi "Ghi chú")
     selectedBody.innerHTML = '';
 
-    // Nội dung chính: fullText từ data-text (thường là "địa chỉ, phường, tỉnh")
     var mainNode = document.createTextNode(fullText);
     selectedBody.appendChild(mainNode);
 
-    // Thêm note nếu có
     if (note) {
       var br = document.createElement('br');
       var small = document.createElement('small');
@@ -330,7 +461,6 @@ document.addEventListener('DOMContentLoaded', function () {
       selectedBody.appendChild(small);
     }
 
-    // TITLE (dòng trên) LUÔN CHỈ LÀ PHẦN ĐỊA CHỈ CHÍNH (phần trước dấu phẩy)
     if (selectedTitle) {
       var titleText = fullText.split(',')[0].trim();
       selectedTitle.textContent = titleText;
@@ -340,25 +470,24 @@ document.addEventListener('DOMContentLoaded', function () {
   cards.forEach(function (card) {
     card.addEventListener('click', function () {
       var id = card.getAttribute('data-id');
-      if (!id) { return; }
+      if (!id) {
+        return;
+      }
 
       if (hiddenInput) {
         hiddenInput.value = id;
       }
 
-      // Đánh dấu card đang chọn
       cards.forEach(function (c) {
         c.classList.remove('is-active');
       });
       card.classList.add('is-active');
 
-      // data-text: full string hiển thị (địa chỉ + ward + province)
       var fullText = card.getAttribute('data-text') || '';
       var note = card.getAttribute('data-note') || '';
 
       updateSelectedAddress(fullText, note);
 
-      // Đóng modal
       if (window.bootstrap) {
         var modal = window.bootstrap.Modal.getInstance(modalEl)
           || window.bootstrap.Modal.getOrCreateInstance(modalEl);

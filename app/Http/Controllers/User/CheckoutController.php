@@ -16,6 +16,7 @@ use App\Models\Address;
 use App\Models\Warehouse;
 use App\Models\Discount;
 use App\Models\DiscountUsage;
+use App\Models\DiscountWalletItem;
 use App\Services\User\CartService;
 use App\Services\User\CheckoutService;
 use Illuminate\Support\Str;
@@ -139,6 +140,16 @@ class CheckoutController extends Controller
         $email    = old('email', $user?->email ?? '');
         $provinces = Province::orderBy('name')->get();
 
+        $walletDiscounts = $user
+            ? DiscountWalletItem::query()
+            ->with(['discount:id,code,type,value,min_order_value_vnd,usage_limit,per_user_limit,start_date,end_date,status'])
+            ->where('user_id', $user->id)
+            ->where('status', 'SAVED')
+            ->orderByDesc('created_at')
+            ->get()
+            : collect();
+
+
         return view('user.checkout', compact(
             'items',
             'subtotal',
@@ -149,7 +160,8 @@ class CheckoutController extends Controller
             'fullName',
             'phone',
             'email',
-            'provinces'
+            'provinces',
+            'walletDiscounts'
         ));
     }
 

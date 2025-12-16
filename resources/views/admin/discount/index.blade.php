@@ -61,7 +61,7 @@
           </div>
 
           <div class="row searchProduct">
-            <div class="col-md-3">
+            <div class="col-md-2">
               <label for="type" class="form-label mb-1 label-filter-admin-product">Loại mã</label>
               <select id="type" name="type" class="form-select setupSelect2">
                 <option value="">-- Tất cả loại --</option>
@@ -71,16 +71,16 @@
               </select>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
               <label for="status" class="form-label mb-1 label-filter-admin-product">Trạng thái</label>
               <select id="status" name="status" class="form-select setupSelect2">
                 <option value="">-- Tất cả trạng thái --</option>
-                <option value="ACTIVE" {{ request('status') === 'ACTIVE' ? 'selected' : '' }}>Đang hoạt động</option>
-                <option value="INACTIVE" {{ request('status') === 'INACTIVE' ? 'selected' : '' }}>Không hoạt động</option>
+                <option value="ACTIVE" {{ request('status') === 'ACTIVE' ? 'selected' : '' }}>Đang phát hành</option>
+                <option value="INACTIVE" {{ request('status') === 'INACTIVE' ? 'selected' : '' }}>Ngừng phát hành</option>
               </select>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
               <label for="start_from" class="form-label mb-1 label-filter-admin-product">Bắt đầu từ</label>
               <input
                 id="start_from"
@@ -90,7 +90,7 @@
                 value="{{ request('start_from') }}">
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
               <label for="start_to" class="form-label mb-1 label-filter-admin-product">Bắt đầu đến</label>
               <input
                 id="start_to"
@@ -225,11 +225,11 @@
                     </span>
                     @elseif($status === 'ACTIVE')
                     <span class="badge rounded-pill badge-status badge-status--success">
-                      Đang hoạt động
+                      Đang phát hành
                     </span>
                     @elseif($status === 'INACTIVE')
                     <span class="badge rounded-pill badge-status badge-status--secondary">
-                      Không hoạt động
+                      Ngừng phát hành
                     </span>
                     @else
                     <span class="badge rounded-pill badge-status badge-status--primary">

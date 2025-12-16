@@ -15,17 +15,45 @@ document.addEventListener('DOMContentLoaded', function () {
     catch { return (n || 0).toLocaleString('vi-VN') + '₫'; }
   }
 
+  function getIntAttr(el, name, fallback) {
+    const v = parseInt(el.getAttribute(name) || '', 10);
+    return Number.isFinite(v) ? v : fallback;
+  }
+
+  function applyPlusState(row) {
+    const qty = getIntAttr(row, 'data-qty', 0);
+    const max = getIntAttr(row, 'data-max', 0);
+    const incForm = row.querySelector('form[data-action="inc"]');
+    const incBtn = incForm ? incForm.querySelector('button[type="submit"]') : null;
+
+    if (!incBtn) { return; }
+
+    const reachedMax = max > 0 && qty >= max;
+    incBtn.disabled = reachedMax;
+    incBtn.classList.toggle('disabled', reachedMax);
+    incBtn.setAttribute('aria-disabled', reachedMax ? 'true' : 'false');
+
+    if (reachedMax) {
+      incBtn.setAttribute('title', 'Đã đạt tối đa theo tồn kho');
+    } else {
+      incBtn.removeAttribute('title');
+    }
+  }
+
+  function applyAllPlusStates() {
+    itemsWrap.querySelectorAll('.cart-item').forEach(function (row) {
+      applyPlusState(row);
+    });
+  }
+
   function getSelectedItems() {
-    const rows = itemsWrap.querySelectorAll('.cart-item');
     const out = [];
-    rows.forEach(function (row) {
+    itemsWrap.querySelectorAll('.cart-item').forEach(function (row) {
       const cb = row.querySelector('.item-checkbox');
       if (cb && cb.checked) {
         out.push({
           key: row.getAttribute('data-key'),
-          price: parseInt(row.getAttribute('data-price') || '0', 10),
-          qty: parseInt(row.getAttribute('data-qty') || '0', 10),
-          total: parseInt(row.getAttribute('data-total') || '0', 10),
+          total: getIntAttr(row, 'data-total', 0),
           row
         });
       }
@@ -37,9 +65,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const selected = getSelectedItems();
     const count = selected.length;
     let subtotal = 0;
+
     for (let i = 0; i < selected.length; i++) {
       subtotal += selected[i].total;
     }
+
     const shipping = count > 0 ? 30000 : 0;
     const total = subtotal + shipping;
 
@@ -47,18 +77,15 @@ document.addEventListener('DOMContentLoaded', function () {
     if (elSubtotal) { elSubtotal.textContent = fmt(subtotal); }
     if (elShipping) { elShipping.textContent = fmt(shipping); }
     if (elTotal) { elTotal.textContent = fmt(total); }
-
     if (proceedBtn) { proceedBtn.disabled = count === 0; }
 
     if (keysInput) {
-      const keys = selected.map(function (x) { return x.key; });
-      keysInput.value = keys.join(',');
+      keysInput.value = selected.map(function (x) { return x.key; }).join(',');
     }
   }
 
   function refreshSelectedUI() {
-    const rows = itemsWrap.querySelectorAll('.cart-item');
-    rows.forEach(function (row) {
+    itemsWrap.querySelectorAll('.cart-item').forEach(function (row) {
       const cb = row.querySelector('.item-checkbox');
       if (cb && cb.checked) { row.classList.add('selected'); } else { row.classList.remove('selected'); }
     });
@@ -66,8 +93,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function syncSelectAllState() {
     const checks = itemsWrap.querySelectorAll('.item-checkbox');
-    let total = 0; let tick = 0;
-    checks.forEach(function (cb) { total += 1; if (cb.checked) { tick += 1; } });
+    let total = 0;
+    let tick = 0;
+
+    checks.forEach(function (cb) {
+      total += 1;
+      if (cb.checked) { tick += 1; }
+    });
+
     if (selectAll) {
       selectAll.checked = total > 0 && tick === total;
       selectAll.indeterminate = tick > 0 && tick < total;
@@ -84,17 +117,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (selectAll) {
     selectAll.addEventListener('change', function () {
-      const checks = itemsWrap.querySelectorAll('.item-checkbox');
       const val = !!selectAll.checked;
-      checks.forEach(function (cb) { cb.checked = val; });
+      itemsWrap.querySelectorAll('.item-checkbox').forEach(function (cb) { cb.checked = val; });
       refreshSelectedUI();
       syncSelectAllState();
       updateSummary();
     });
   }
 
-  // Khởi tạo lần đầu
+  itemsWrap.addEventListener('submit', function (e) {
+    const form = e.target.closest('form[data-action="inc"]');
+    if (!form) { return; }
+
+    const row = form.closest('.cart-item');
+    if (!row) { return; }
+
+    const qty = getIntAttr(row, 'data-qty', 0);
+    const max = getIntAttr(row, 'data-max', 0);
+
+    if (max > 0 && qty >= max) {
+      e.preventDefault();
+      applyPlusState(row);
+    }
+  }, true);
+
+  // Init
   refreshSelectedUI();
   syncSelectAllState();
   updateSummary();
+  applyAllPlusStates();
+
+  window.addEventListener('pageshow', function () {
+    applyAllPlusStates();
+  });
 });

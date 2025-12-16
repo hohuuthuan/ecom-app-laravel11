@@ -114,17 +114,39 @@
     var qs = rowEl.querySelector('.quantity-section');
     if (!qs) { return; }
 
+    var maxRaw = parseInt(rowEl.getAttribute('data-max') || '0', 10);
+    var max = isNaN(maxRaw) ? 0 : maxRaw;
+
     var btns = qs.querySelectorAll('.quantity-btn');
-    if (btns.length > 0) { btns[0].disabled = qty <= 1; }
+    var decBtn = btns.length > 0 ? btns[0] : null;
+    var incBtn = btns.length > 1 ? btns[1] : null;
+
+    if (decBtn) { decBtn.disabled = qty <= 1; }
+
+    var reachedMax = max > 0 && qty >= max;
+    if (incBtn) {
+      incBtn.disabled = reachedMax;
+      incBtn.classList.toggle('disabled', reachedMax);
+      incBtn.setAttribute('aria-disabled', reachedMax ? 'true' : 'false');
+      if (reachedMax) {
+        incBtn.setAttribute('title', 'Đã đạt tối đa theo tồn kho');
+      } else {
+        incBtn.removeAttribute('title');
+      }
+    }
 
     var forms = qs.querySelectorAll('form.d-inline');
     if (forms.length > 0) {
       var minusInput = forms[0].querySelector('input[name="qty"]');
       if (minusInput) { minusInput.value = String(Math.max(1, qty - 1)); }
     }
+
     if (forms.length > 1) {
       var plusInput = forms[1].querySelector('input[name="qty"]');
-      if (plusInput) { plusInput.value = String(qty + 1); }
+      if (plusInput) {
+        var nextQty = max > 0 ? Math.min(max, qty + 1) : (qty + 1);
+        plusInput.value = String(nextQty);
+      }
     }
   };
 
@@ -393,13 +415,15 @@ if (window.CartUI && typeof window.CartUI.bindSelectionEvents === 'function') { 
       console.error('Lỗi mạng khi cập nhật số lượng:', err);
 
     } finally {
-      if (submitBtn) {
-        submitBtn.innerHTML = oldHtml;
-        if (isMinus) {
-          submitBtn.disabled = (updatedQty !== null) ? (updatedQty <= 1) : false;
-        } else {
-          submitBtn.disabled = false;
-        }
+      if (submitBtn) { submitBtn.innerHTML = oldHtml; }
+
+      var q = updatedQty !== null ? updatedQty : parseInt(row.getAttribute('data-qty') || '1', 10);
+      if (isNaN(q) || q < 1) { q = 1; }
+
+      if (window.CartUI && typeof window.CartUI.refreshQtyForms === 'function') {
+        window.CartUI.refreshQtyForms(row, q);
+      } else if (submitBtn) {
+        submitBtn.disabled = false;
       }
     }
   });

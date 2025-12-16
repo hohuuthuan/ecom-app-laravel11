@@ -185,23 +185,20 @@ class CheckoutController extends Controller
         return $code;
     }
 
-    protected function hasEnoughStockForItem(string $productId, string $warehouseId, int $quantity): bool
+    protected function hasEnoughStockForItem(string $productId, int $quantity): bool
     {
+        $quantity = (int) $quantity;
+
         if ($quantity <= 0) {
             return false;
         }
 
-        $row = DB::table('batch_stocks')
+        $totalOnHand = DB::table('stocks')
             ->where('product_id', $productId)
-            ->where('warehouse_id', $warehouseId)
-            ->selectRaw('SUM(on_hand) as total_on_hand')
-            ->first();
+            ->selectRaw('COALESCE(SUM(on_hand), 0) as total_on_hand')
+            ->value('total_on_hand');
 
-        if (!$row) {
-            return false;
-        }
-
-        return (int) $row->total_on_hand >= $quantity;
+        return (int) $totalOnHand >= $quantity;
     }
 
     protected function allocateBatchesForItem(string $productId, string $warehouseId, int $quantity): ?array
@@ -218,16 +215,15 @@ class CheckoutController extends Controller
             ->select(
                 'bs.batch_id',
                 'bs.on_hand',
-                'bs.reserved',
                 'b.import_price_vnd'
             )
             ->get();
 
-        $need       = $quantity;
-        $result     = [];
+        $need = $quantity;
+        $result = [];
 
         foreach ($rows as $row) {
-            $available = (int) $row->on_hand - (int) $row->reserved;
+            $available = (int) $row->on_hand;
             if ($available <= 0) {
                 continue;
             }
@@ -247,7 +243,6 @@ class CheckoutController extends Controller
         }
 
         if ($need > 0) {
-            // Không đủ hàng trong các lô
             return null;
         }
 
@@ -312,7 +307,7 @@ class CheckoutController extends Controller
             $quantity = (int) $qty;
             $product = $products[$productId];
 
-            if (!$this->hasEnoughStockForItem((string) $productId, (string) $defaultWarehouse->id, $quantity)) {
+            if (!$this->hasEnoughStockForItem((string) $productId, (int) $quantity)) {
                 return back()
                     ->with('toast_error', 'Sản phẩm "' . $product->title . '" không đủ tồn kho.')
                     ->withInput();

@@ -29,10 +29,52 @@ document.addEventListener('DOMContentLoaded', function () {
       if (typeof total === 'number') {
         totalEl.textContent = formatVND(Math.max(0, total));
       } else {
-        var calcTotal = Math.max(0, currSub - discount + currShip);
-        totalEl.textContent = formatVND(calcTotal);
+        totalEl.textContent = formatVND(Math.max(0, currSub - discount + currShip));
       }
     }
+  }
+
+  var DISCOUNT_STATE_KEY = 'checkout_discount_state_v1';
+
+  function saveDiscountState(state) {
+    try {
+      sessionStorage.setItem(DISCOUNT_STATE_KEY, JSON.stringify(state));
+    } catch (e) {}
+  }
+
+  function readDiscountState() {
+    try {
+      var raw = sessionStorage.getItem(DISCOUNT_STATE_KEY);
+      if (!raw) {
+        return null;
+      }
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function clearDiscountState() {
+    try {
+      sessionStorage.removeItem(DISCOUNT_STATE_KEY);
+    } catch (e) {}
+  }
+
+  function setDiscountMessage(msg, isError) {
+    var msgEl = document.getElementById('discountMessage');
+    if (!msgEl) {
+      return;
+    }
+
+    msgEl.textContent = msg || '';
+    msgEl.classList.remove('discount-message-error');
+    msgEl.classList.remove('discount-message-success');
+
+    if (!msg) {
+      return;
+    }
+
+    msgEl.classList.add(isError ? 'discount-message-error' : 'discount-message-success');
   }
 
   function setApplyButtonState(state) {
@@ -91,16 +133,31 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  function hideWalletDiscountModal() {
-    var el = document.getElementById('walletDiscountModal');
-    if (!el || !window.bootstrap) {
+  function setApplyBtnTextAndMode(text, mode) {
+    var btn = document.getElementById('discountApplyButton');
+    if (!btn) {
       return;
     }
 
-    var modal = window.bootstrap.Modal.getInstance(el)
-      || window.bootstrap.Modal.getOrCreateInstance(el);
+    btn.dataset.mode = mode;
 
-    modal.hide();
+    var label = btn.querySelector('.apply-btn-label');
+    var spinner = btn.querySelector('.apply-btn-spinner');
+    var check = btn.querySelector('.apply-btn-check');
+
+    btn.disabled = false;
+    btn.classList.remove('apply-btn-success');
+
+    if (label) {
+      label.textContent = text;
+      label.classList.remove('d-none');
+    }
+    if (spinner) {
+      spinner.classList.add('d-none');
+    }
+    if (check) {
+      check.classList.add('d-none');
+    }
   }
 
   function ensureNotificationStyle() {
@@ -114,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.head.appendChild(style);
   }
 
-  function showNotification(message) {
+  function showNotification(message, isError) {
     ensureNotificationStyle();
 
     var old = document.querySelector('.checkout-notification');
@@ -127,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
     n.textContent = message;
 
     n.style.cssText =
-      'position:fixed;top:20px;right:20px;background:#10b981;color:#fff;' +
+      'position:fixed;top:20px;right:20px;background:' + (isError ? '#ef4444' : '#10b981') + ';color:#fff;' +
       'padding:14px 18px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);' +
       'z-index:9999;font-weight:600;animation:checkoutSlideIn 0.3s ease;';
 
@@ -141,33 +198,140 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 2500);
   }
 
-  function copyText(text) {
-    if (!text) {
-      return Promise.reject(new Error('empty'));
+  function getCsrf() {
+    var token = document.querySelector('meta[name="csrf-token"]');
+    return token ? token.getAttribute('content') : '';
+  }
+
+  function hideWalletDiscountModal() {
+    var el = document.getElementById('walletDiscountModal');
+    if (!el || !window.bootstrap) {
+      return;
     }
 
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text);
+    var modal = window.bootstrap.Modal.getInstance(el)
+      || window.bootstrap.Modal.getOrCreateInstance(el);
+
+    modal.hide();
+  }
+
+  function createWalletButtonController(btn) {
+    if (!btn) {
+      return null;
     }
 
-    return new Promise(function (resolve, reject) {
-      var temp = document.createElement('textarea');
-      temp.value = text;
-      temp.style.position = 'fixed';
-      temp.style.opacity = '0';
-      document.body.appendChild(temp);
-      temp.focus();
-      temp.select();
+    var labelEl = btn.querySelector('.js-wallet-btn-text')
+      || btn.querySelector('#walletDiscountBtnText')
+      || btn.querySelector('#buttonText');
 
-      try {
-        document.execCommand('copy');
-        document.body.removeChild(temp);
-        resolve();
-      } catch (e) {
-        document.body.removeChild(temp);
-        reject(e);
+    var textNode = null;
+
+    if (!labelEl) {
+      for (var i = 0; i < btn.childNodes.length; i++) {
+        var node = btn.childNodes[i];
+        if (node && node.nodeType === 3 && (node.nodeValue || '').trim() !== '') {
+          textNode = node;
+          break;
+        }
       }
-    });
+    }
+
+    if (!btn.dataset.defaultText) {
+      if (labelEl) {
+        btn.dataset.defaultText = (labelEl.textContent || '').trim();
+      } else if (textNode) {
+        btn.dataset.defaultText = (textNode.nodeValue || '').trim();
+      }
+    }
+
+    if (!btn.dataset.selectedText) {
+      btn.dataset.selectedText = 'Chọn lại';
+    }
+
+    function setSelected(isSelected) {
+      var nextText = isSelected ? btn.dataset.selectedText : btn.dataset.defaultText;
+      if (!nextText) {
+        return;
+      }
+
+      if (labelEl) {
+        labelEl.textContent = nextText;
+      } else if (textNode) {
+        textNode.nodeValue = ' ' + nextText;
+      }
+
+      btn.classList.toggle('is-selected', !!isSelected);
+    }
+
+    return { setSelected: setSelected };
+  }
+
+  function restoreDiscountState() {
+    var st = readDiscountState();
+    if (!st || !st.code || st.mode !== 'clear') {
+      return false;
+    }
+
+    var inputEl = document.getElementById('discountCode');
+    if (inputEl) {
+      inputEl.value = st.code;
+    }
+
+    setTotals(st.subtotal || 0, st.shipping || 0, st.discount || 0, st.total);
+    setApplyBtnTextAndMode('Xóa mã', 'clear');
+    setDiscountMessage('', false);
+
+    if (walletBtnCtl) {
+      walletBtnCtl.setSelected(true);
+    }
+
+    return true;
+  }
+
+  function clearDiscount() {
+    var inputEl = document.getElementById('discountCode');
+    var rootEl = document.getElementById('checkoutPage');
+
+    if (!inputEl || !rootEl) {
+      return;
+    }
+
+    var baseSubtotal = parseInt(rootEl.getAttribute('data-subtotal') || '0', 10);
+    var baseShipping = parseInt(rootEl.getAttribute('data-shipping') || '0', 10);
+
+    setDiscountMessage('', false);
+    setApplyButtonState('loading');
+
+    fetch('/checkout/discount', {
+      method: 'DELETE',
+      headers: {
+        'X-CSRF-TOKEN': getCsrf(),
+        'Accept': 'application/json'
+      }
+    })
+      .then(function (res) {
+        return res.json().catch(function () {
+          return { ok: true, message: 'Đã xóa mã giảm giá.' };
+        });
+      })
+      .then(function (res) {
+        inputEl.value = '';
+        setTotals(baseSubtotal, baseShipping, 0, baseSubtotal + baseShipping);
+
+        clearDiscountState();
+
+        if (walletBtnCtl) {
+          walletBtnCtl.setSelected(false);
+        }
+
+        showNotification((res && res.message) ? res.message : 'Đã xóa mã giảm giá.', false);
+        setApplyBtnTextAndMode('Áp Dụng', 'apply');
+      })
+      .catch(function () {
+        setApplyBtnTextAndMode('Xóa mã', 'clear');
+        setDiscountMessage('Không thể xóa mã. Vui lòng thử lại.', true);
+        showNotification('Không thể xóa mã. Vui lòng thử lại.', true);
+      });
   }
 
   var root = document.getElementById('checkoutPage');
@@ -175,15 +339,49 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
+  var walletBtn = document.querySelector('.open-modal-voucher-walet-btn')
+    || document.querySelector('[data-bs-target="#walletDiscountModal"]');
+
+  var walletBtnCtl = createWalletButtonController(walletBtn);
+
   var sub = parseInt(root.getAttribute('data-subtotal') || '0', 10);
   var ship = parseInt(root.getAttribute('data-shipping') || '0', 10);
 
+  var discountInput = document.getElementById('discountCode');
+  if (discountInput) {
+    discountInput.addEventListener('input', function () {
+      setApplyButtonState('idle');
+      setDiscountMessage('', false);
+
+      clearDiscountState();
+
+      var btn = document.getElementById('discountApplyButton');
+      if (btn && btn.dataset.mode === 'clear') {
+        setApplyBtnTextAndMode('Áp Dụng', 'apply');
+      }
+
+      if (walletBtnCtl) {
+        walletBtnCtl.setSelected(discountInput.value.trim() !== '');
+      }
+    });
+  }
+
+  var applyBtn = document.getElementById('discountApplyButton');
+  if (applyBtn && !applyBtn.dataset.mode) {
+    applyBtn.dataset.mode = 'apply';
+  }
+
   window.applyDiscount = function () {
+    var btn = document.getElementById('discountApplyButton');
+    if (btn && btn.dataset.mode === 'clear') {
+      clearDiscount();
+      return;
+    }
+
     var inputEl = document.getElementById('discountCode');
-    var msgEl = document.getElementById('discountMessage');
     var rootEl = document.getElementById('checkoutPage');
 
-    if (!inputEl || !msgEl || !rootEl) {
+    if (!inputEl || !rootEl) {
       return;
     }
 
@@ -191,53 +389,14 @@ document.addEventListener('DOMContentLoaded', function () {
     var baseShipping = parseInt(rootEl.getAttribute('data-shipping') || '0', 10);
     var code = inputEl.value.trim();
 
-    msgEl.textContent = '';
-    msgEl.classList.remove('discount-message-error');
-    msgEl.classList.remove('discount-message-success');
+    setDiscountMessage('', false);
 
     if (code === '') {
-      var tokenDelete = document.querySelector('meta[name="csrf-token"]');
-      var csrfDelete = tokenDelete ? tokenDelete.getAttribute('content') : '';
-
-      setApplyButtonState('loading');
-
-      fetch('/checkout/discount', {
-        method: 'DELETE',
-        headers: {
-          'X-CSRF-TOKEN': csrfDelete,
-          'Accept': 'application/json'
-        }
-      })
-        .then(function (res) {
-          return res.json().catch(function () {
-            return { ok: false };
-          });
-        })
-        .then(function (res) {
-          setTotals(baseSubtotal, baseShipping, 0);
-
-          var msg = res.ok
-            ? (res.message || 'Đã xoá mã giảm giá.')
-            : 'Đã xoá mã giảm giá.';
-          msgEl.textContent = msg;
-          msgEl.classList.remove('discount-message-error');
-          msgEl.classList.add('discount-message-success');
-
-          setApplyButtonState('idle');
-        })
-        .catch(function () {
-          setTotals(baseSubtotal, baseShipping, 0);
-          msgEl.textContent = 'Không thể xoá mã giảm giá. Vui lòng thử lại.';
-          msgEl.classList.remove('discount-message-success');
-          msgEl.classList.add('discount-message-error');
-          setApplyButtonState('idle');
-        });
-
+      setApplyButtonState('idle');
+      setDiscountMessage('Cần phải nhập mã giảm giá.', true);
+      inputEl.focus();
       return;
     }
-
-    var token = document.querySelector('meta[name="csrf-token"]');
-    var csrf = token ? token.getAttribute('content') : '';
 
     setApplyButtonState('loading');
 
@@ -245,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': csrf,
+        'X-CSRF-TOKEN': getCsrf(),
         'Accept': 'application/json'
       },
       body: JSON.stringify({
@@ -266,107 +425,95 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .then(function (res) {
         if (!res.body) {
-          msgEl.textContent = 'Không thể áp dụng mã giảm giá. Vui lòng thử lại.';
-          msgEl.classList.remove('discount-message-success');
-          msgEl.classList.add('discount-message-error');
-
-          setTotals(baseSubtotal, baseShipping, 0);
+          setTotals(baseSubtotal, baseShipping, 0, baseSubtotal + baseShipping);
           setApplyButtonState('idle');
+          setDiscountMessage('Không thể áp dụng mã giảm giá. Vui lòng thử lại.', true);
+          showNotification('Không thể áp dụng mã giảm giá. Vui lòng thử lại.', true);
           return;
         }
 
         if (!res.body.ok) {
-          msgEl.textContent = res.body.message || 'Mã giảm giá không hợp lệ.';
-          msgEl.classList.remove('discount-message-success');
-          msgEl.classList.add('discount-message-error');
-
-          setTotals(baseSubtotal, baseShipping, 0);
+          setTotals(baseSubtotal, baseShipping, 0, baseSubtotal + baseShipping);
           setApplyButtonState('idle');
+
+          var errMsg = res.body.message || 'Mã giảm giá không hợp lệ.';
+          setDiscountMessage(errMsg, true);
+          showNotification(errMsg, true);
           return;
         }
 
         var data = res.body.data || {};
-        var newSubtotal = typeof data.subtotal_vnd === 'number'
-          ? data.subtotal_vnd
-          : baseSubtotal;
-        var newShipping = typeof data.shipping_vnd === 'number'
-          ? data.shipping_vnd
-          : baseShipping;
-
+        var newSubtotal = typeof data.subtotal_vnd === 'number' ? data.subtotal_vnd : baseSubtotal;
+        var newShipping = typeof data.shipping_vnd === 'number' ? data.shipping_vnd : baseShipping;
         var discountDisplay = (data.discount_vnd || 0) + (data.shipping_discount_vnd || 0);
+        var finalTotal = typeof data.total_vnd === 'number'
+          ? data.total_vnd
+          : Math.max(0, newSubtotal - discountDisplay + newShipping);
 
-        setTotals(
-          newSubtotal,
-          newShipping,
-          discountDisplay,
-          data.total_vnd
-        );
+        setTotals(newSubtotal, newShipping, discountDisplay, finalTotal);
 
-        msgEl.textContent = res.body.message || 'Áp dụng mã giảm giá thành công.';
-        msgEl.classList.remove('discount-message-error');
-        msgEl.classList.add('discount-message-success');
+        if (walletBtnCtl) {
+          walletBtnCtl.setSelected(true);
+        }
+
+        var okMsg = res.body.message || 'Áp dụng mã giảm giá thành công.';
+        setDiscountMessage(okMsg, false);
+        showNotification(okMsg, false);
 
         setApplyButtonState('success');
+        setTimeout(function () {
+          setApplyBtnTextAndMode('Xóa mã', 'clear');
+
+          saveDiscountState({
+            mode: 'clear',
+            code: code,
+            subtotal: newSubtotal,
+            shipping: newShipping,
+            discount: discountDisplay,
+            total: finalTotal
+          });
+        }, 700);
       })
       .catch(function () {
-        msgEl.textContent = 'Có lỗi xảy ra khi áp dụng mã. Vui lòng thử lại.';
-        msgEl.classList.remove('discount-message-success');
-        msgEl.classList.add('discount-message-error');
-
-        setTotals(baseSubtotal, baseShipping, 0);
+        setTotals(baseSubtotal, baseShipping, 0, baseSubtotal + baseShipping);
         setApplyButtonState('idle');
+        setDiscountMessage('Có lỗi xảy ra khi áp dụng mã. Vui lòng thử lại.', true);
+        showNotification('Có lỗi xảy ra khi áp dụng mã. Vui lòng thử lại.', true);
       });
   };
 
   document.addEventListener('click', function (e) {
-    var copyBtn = e.target.closest('.js-wallet-discount-copy');
-    if (copyBtn) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      var code = copyBtn.getAttribute('data-code') || '';
-      copyText(code)
-        .then(function () {
-          showNotification('Đã copy mã: ' + code);
-        })
-        .catch(function () {
-          showNotification('Không thể copy mã. Vui lòng thử lại.');
-        });
-
+    var modalApply = e.target.closest('.js-wallet-discount-apply');
+    if (!modalApply) {
       return;
     }
 
-    var applyBtn = e.target.closest('.js-wallet-discount-apply');
-    if (applyBtn) {
-      e.preventDefault();
-      e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
 
-      var codeApply = applyBtn.getAttribute('data-code') || '';
-      var input = document.getElementById('discountCode');
-      if (input && codeApply) {
-        input.value = codeApply;
-        showNotification('Đã chọn mã: ' + codeApply);
-        window.applyDiscount();
-        hideWalletDiscountModal();
+    var codeApply = modalApply.getAttribute('data-code') || '';
+    var input = document.getElementById('discountCode');
+
+    if (input && codeApply) {
+      setApplyBtnTextAndMode('Áp Dụng', 'apply');
+      input.value = codeApply;
+
+      if (walletBtnCtl) {
+        walletBtnCtl.setSelected(true);
       }
 
-      return;
-    }
-
-    var card = e.target.closest('.js-wallet-discount-card');
-    if (card) {
-      var codeCard = card.getAttribute('data-code') || '';
-      var inputCard = document.getElementById('discountCode');
-      if (inputCard && codeCard) {
-        inputCard.value = codeCard;
-        showNotification('Đã chọn mã: ' + codeCard);
-        window.applyDiscount();
-        hideWalletDiscountModal();
-      }
+      window.applyDiscount();
+      hideWalletDiscountModal();
     }
   });
 
-  setTotals(sub, ship, 0);
+  if (!restoreDiscountState()) {
+    setTotals(sub, ship, 0, sub + ship);
+  }
+
+  window.addEventListener('pageshow', function () {
+    restoreDiscountState();
+  });
 });
 
 // ================== CHỌN PHƯƠNG THỨC THANH TOÁN ==================
@@ -448,9 +595,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     selectedBody.innerHTML = '';
-
-    var mainNode = document.createTextNode(fullText);
-    selectedBody.appendChild(mainNode);
+    selectedBody.appendChild(document.createTextNode(fullText));
 
     if (note) {
       var br = document.createElement('br');
@@ -462,8 +607,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (selectedTitle) {
-      var titleText = fullText.split(',')[0].trim();
-      selectedTitle.textContent = titleText;
+      selectedTitle.textContent = fullText.split(',')[0].trim();
     }
   }
 
@@ -483,15 +627,10 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       card.classList.add('is-active');
 
-      var fullText = card.getAttribute('data-text') || '';
-      var note = card.getAttribute('data-note') || '';
-
-      updateSelectedAddress(fullText, note);
+      updateSelectedAddress(card.getAttribute('data-text') || '', card.getAttribute('data-note') || '');
 
       if (window.bootstrap) {
-        var modal = window.bootstrap.Modal.getInstance(modalEl)
-          || window.bootstrap.Modal.getOrCreateInstance(modalEl);
-        modal.hide();
+        (window.bootstrap.Modal.getInstance(modalEl) || window.bootstrap.Modal.getOrCreateInstance(modalEl)).hide();
       }
     });
   });

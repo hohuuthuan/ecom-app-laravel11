@@ -33,7 +33,7 @@
 .checkout-page .summary-section {
   background: #fff;
   border-radius: 5px;
-  padding: 30px;
+  padding: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
   height: fit-content;
   position: sticky;
@@ -61,7 +61,7 @@
   font-size: 21px;
   font-weight: 700;
   color: #2d3748;
-  padding: 20px 0;
+  padding: 5px 0;
   border-top: 2px solid #e2e8f0;
   border-bottom: 2px solid #e2e8f0;
   margin-top: 20px;
@@ -179,7 +179,8 @@
   border-radius: 15px;
   padding: 30px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  margin-bottom: 400px; /* tạm cho cách footer */
+  margin-bottom: 400px;
+  /* tạm cho cách footer */
 }
 
 .checkout-page .checkout-item {
@@ -342,6 +343,7 @@ i.icon-selected-product {
 
 /* ============ MÃ GIẢM GIÁ ============ */
 .checkout-page .discount-input-group {
+  height: 50px;
   display: flex;
   gap: 10px;
 }
@@ -425,6 +427,7 @@ i.icon-selected-product {
     opacity: 0;
     transform: scale(0.7);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -460,4 +463,65 @@ i.icon-selected-product {
     gap: 20px;
     text-align: center;
   }
+}
+
+.open-modal-voucher-walet-btn {
+  background: #ffffff;
+  color: #667eea;
+  border: 2px solid transparent;
+  padding: 5px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.open-modal-voucher-walet-btn:hover,
+.open-modal-voucher-walet-btn:focus {
+  border-color: #667eea;
+  outline: none;
+}
+
+/*=================================== MODAL VOUCHER WALLET ===================================*/
+.wallet-coupon-row {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.wallet-coupon-left {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.wallet-coupon-right {
+  flex: 0 0 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  min-height: 100%;
+}
+
+.wallet-right-top {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.wallet-right-bottom {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.wallet-coupon-actions {
+  position: static !important;
+  margin-top: 0 !important;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
 }

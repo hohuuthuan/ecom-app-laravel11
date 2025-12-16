@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="vi">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mã Giảm Giá</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    html, body, .main-wrapper {
+      height: 100%;
+      width: 100%;
+      overflow-auto;
+    }
+
+    .main-wrapper {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .content-container {
+      text-align: center;
+    }
+
+    .open-modal-btn {
+      background: #ffffff;
+      color: #667eea;
+      border: none;
+      padding: 16px 32px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .open-modal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      background: #f8f9ff;
+    }
+
+    .modal-content {
+      border-radius: 16px;
+      border: none;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 20px 24px;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .btn-close {
+      filter: brightness(0) invert(1);
+      opacity: 1;
+    }
+
+    .modal-body {
+      padding: 24px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .coupon-card {
+      border: 2px solid #e0e7ff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      background: linear-gradient(to right, #f8f9ff 0%, #ffffff 100%);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .coupon-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+      transform: translateX(4px);
+    }
+
+    .coupon-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .coupon-code {
+      background: #667eea;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 1px;
+    }
+
+    .coupon-type {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .type-ship {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .type-order {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .coupon-details {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .coupon-details i {
+      color: #667eea;
+    }
+
+    .min-order {
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #9ca3af;
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+  </style>
+ </head>
+ <body>
+  <div class="main-wrapper">
+   <div class="content-container"><button class="open-modal-btn" data-bs-toggle="modal" data-bs-target="#couponModal" id="openModalBtn"> <i class="fas fa-ticket-alt me-2"></i><span id="buttonText">Chọn Mã Giảm Giá</span> </button>
+   </div>
+  </div><!-- Modal -->
+  <div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+     <div class="modal-header">
+      <h5 class="modal-title" id="couponModalLabel">Danh Sách Mã Giảm Giá</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+     </div>
+     <div class="modal-body" id="couponList"><!-- Danh sách mã giảm giá sẽ được thêm vào đây -->
+     </div>
+    </div>
+   </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Dữ liệu mẫu các mã giảm giá
+    const coupons = [
+      {
+        code: 'FREESHIP50',
+        type: 'ship',
+        typeName: 'Giảm Phí Ship',
+        minOrder: 200000,
+        description: 'Miễn phí vận chuyển'
+      },
+      {
+        code: 'SALE100K',
+        type: 'order',
+        typeName: 'Giảm Giá Đơn Hàng',
+        minOrder: 500000,
+        description: 'Giảm 100.000đ'
+      },
+      {
+        code: 'NEWUSER',
+        type: 'order',
+        typeName: 'Giảm Giá Đơn Hàng',
+        minOrder: 300000,
+        description: 'Giảm 15%'
+      },
+      {
+        code: 'SHIP30K',
+        type: 'ship',
+        typeName: 'Giảm Phí Ship',
+        minOrder: 150000,
+        description: 'Giảm 30.000đ phí ship'
+      },
+      {
+        code: 'MEGA200',
+        type: 'order',
+        typeName: 'Giảm Giá Đơn Hàng',
+        minOrder: 1000000,
+        description: 'Giảm 200.000đ'
+      }
+    ];
+
+    // Format số tiền
+    function formatCurrency(amount) {
+      return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + 'đ';
+    }
+
+    // Render danh sách mã giảm giá
+    function renderCoupons() {
+      const couponList = document.getElementById('couponList');
+      
+      if (coupons.length === 0) {
+        couponList.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-ticket-alt"></i>
+            <p>Không có mã giảm giá nào</p>
+          </div>
+        `;
+        return;
+      }
+
+      couponList.innerHTML = coupons.map(coupon => `
+        <div class="coupon-card" onclick="selectCoupon('${coupon.code}')">
+          <div class="coupon-header">
+            <span class="coupon-code">${coupon.code}</span>
+            <span class="coupon-type ${coupon.type === 'ship' ? 'type-ship' : 'type-order'}">
+              <i class="fas ${coupon.type === 'ship' ? 'fa-shipping-fast' : 'fa-tag'}"></i>
+              ${coupon.typeName}
+            </span>
+          </div>
+          <div class="coupon-details">
+            <i class="fas fa-info-circle"></i>
+            <span>${coupon.description}</span>
+          </div>
+          <div class="coupon-details mt-2">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Đơn tối thiểu: <span class="min-order">${formatCurrency(coupon.minOrder)}</span></span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Xử lý khi chọn mã giảm giá
+    function selectCoupon(code) {
+      const selectedCoupon = coupons.find(c => c.code === code);
+      
+      // Đóng modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('couponModal'));
+      modal.hide();
+      
+      // Hiển thị thông báo inline
+      showNotification(`Đã chọn mã: ${code}`);
+    }
+
+    // Hiển thị thông báo
+    function showNotification(message) {
+      const existingNotification = document.querySelector('.custom-notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = 'custom-notification';
+      notification.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>
+        ${message}
+      `;
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
+        font-weight: 600;
+        animation: slideIn 0.3s ease;
+      `;
+
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Element SDK configuration
+    const defaultConfig = {
+      modal_title: 'Danh Sách Mã Giảm Giá',
+      button_text: 'Chọn Mã Giảm Giá'
+    };
+
+    async function onConfigChange(config) {
+      const modalTitle = document.getElementById('couponModalLabel');
+      const buttonText = document.getElementById('buttonText');
+
+      if (modalTitle) {
+        modalTitle.textContent = config.modal_title || defaultConfig.modal_title;
+      }
+      if (buttonText) {
+        buttonText.textContent = config.button_text || defaultConfig.button_text;
+      }
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ['modal_title', config.modal_title || defaultConfig.modal_title],
+        ['button_text', config.button_text || defaultConfig.button_text]
+      ]);
+    }
+
+    // Khởi tạo
+    document.addEventListener('DOMContentLoaded', function() {
+      renderCoupons();
+      
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+      }
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9aed79eae64b3440',t:'MTc2NTg4MDcyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

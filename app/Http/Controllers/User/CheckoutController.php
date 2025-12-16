@@ -1026,7 +1026,7 @@ class CheckoutController extends Controller
 
         return response()->json([
             'ok'      => true,
-            'message' => 'Áp dụng mã giảm giá thành công.',
+            'message' => 'Áp dụng mã giảm giá thành công',
             'data'    => [
                 'code'                  => $discount->code,
                 'discount_vnd'          => $discountAmount,
@@ -1067,7 +1067,7 @@ class CheckoutController extends Controller
 
         return response()->json([
             'ok' => true,
-            'message' => 'Đã xoá mã giảm giá.',
+            // 'message' => 'Đã xoá mã giảm giá',
         ]);
     }
 

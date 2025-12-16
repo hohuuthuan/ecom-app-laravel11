@@ -4,7 +4,7 @@
 @section('content')
 <div class="container my-4 py-2 checkout-page">
   @php
-    $walletDiscounts = $walletDiscounts ?? collect();
+  $walletDiscounts = $walletDiscounts ?? collect();
   @endphp
 
   <div class="page-header">
@@ -230,6 +230,12 @@
               -0VNĐ
             </span>
           </div>
+          <div class="summary-row total">
+            <span>Tổng tiền:</span>
+            <span class="amount" id="checkoutTotal">
+              {{ number_format($subtotal + $shipping, 0, ',', '.') }}VNĐ
+            </span>
+          </div>
 
           <div class="discount-summary-block">
             <div class="discount-input-group">
@@ -258,7 +264,7 @@
 
             <button
               type="button"
-              class="btn btn-outline-secondary w-100 mt-2"
+              class="open-modal-voucher-walet-btn w-100 mt-2"
               data-bs-toggle="modal"
               data-bs-target="#walletDiscountModal">
               <i class="bi bi-ticket-perforated me-1"></i>
@@ -266,13 +272,6 @@
             </button>
 
             <div id="discountMessage" class="discount-message"></div>
-          </div>
-
-          <div class="summary-row total">
-            <span>Tổng tiền:</span>
-            <span class="amount" id="checkoutTotal">
-              {{ number_format($subtotal + $shipping, 0, ',', '.') }}VNĐ
-            </span>
           </div>
 
           {{-- PHƯƠNG THỨC THANH TOÁN --}}
@@ -372,72 +371,72 @@
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">
-          DANH SÁCH MÃ GIẢM GIÁ
-        </h5>
+        <h5 class="modal-title">DANH SÁCH MÃ GIẢM GIÁ</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
       </div>
 
       <div class="modal-body">
         <div id="walletCouponList">
           @if (($walletDiscounts ?? collect())->count() === 0)
-            <div class="wallet-empty-state">
-              <i class="bi bi-ticket-perforated"></i>
-              <p>Không có mã giảm giá nào</p>
-            </div>
+          <div class="wallet-empty-state">
+            <i class="bi bi-ticket-perforated"></i>
+            <p>Không có mã giảm giá nào</p>
+          </div>
           @else
-            @foreach ($walletDiscounts as $walletItem)
-              @php
-                $d = $walletItem->discount;
-                $type = strtoupper((string) ($d?->type ?? ''));
-                $value = (int) ($d?->value ?? 0);
-                $minOrder = (int) ($d?->min_order_value_vnd ?? 0);
-                $isShip = $type === 'SHIPPING';
-                $typeName = $isShip ? 'Giảm Phí Ship' : 'Giảm Giá Đơn Hàng';
+          @foreach ($walletDiscounts as $walletItem)
+          @php
+          $d = $walletItem->discount;
+          $type = strtoupper((string) ($d?->type ?? ''));
+          $value = (int) ($d?->value ?? 0);
+          $minOrder = (int) ($d?->min_order_value_vnd ?? 0);
+          $isShip = $type === 'SHIPPING';
+          $typeName = $isShip ? 'Giảm Phí Ship' : 'Giảm Giá Đơn Hàng';
 
-                $desc = $isShip
-                  ? ('Giảm phí ship ' . number_format($value, 0, ',', '.') . 'VNĐ')
-                  : (
-                      $type === 'PERCENT'
-                        ? ('Giảm ' . $value . '%')
-                        : ('Giảm ' . number_format($value, 0, ',', '.') . 'VNĐ')
-                    );
-              @endphp
+          $desc = $isShip
+          ? ('Giảm phí ship ' . number_format($value, 0, ',', '.') . 'VNĐ')
+          : (
+          $type === 'PERCENT'
+          ? ('Giảm ' . $value . '%')
+          : ('Giảm ' . number_format($value, 0, ',', '.') . 'VNĐ')
+          );
+          @endphp
 
-              @if ($d)
-                <div class="wallet-coupon-card js-wallet-discount-card" data-code="{{ $d->code }}">
-                  <div class="wallet-coupon-header">
-                    <span class="wallet-coupon-code">{{ $d->code }}</span>
+          @if ($d)
+          <div class="wallet-coupon-card js-wallet-discount-card" data-code="{{ $d->code }}">
+            <div class="wallet-coupon-row">
+              {{-- CỘT TRÁI --}}
+              <div class="wallet-coupon-left">
+                <div class="wallet-coupon-header">
+                  <span class="wallet-coupon-code">{{ $d->code }}</span>
+                </div>
 
-                    <span class="wallet-coupon-type {{ $isShip ? 'type-ship' : 'type-order' }}">
-                      <i class="bi {{ $isShip ? 'bi-truck' : 'bi-tag' }}"></i>
-                      {{ $typeName }}
+                <div class="wallet-coupon-details">
+                  <i class="bi bi-info-circle"></i>
+                  <span>{{ $desc }}</span>
+                </div>
+
+                <div class="wallet-coupon-details mt-2">
+                  <i class="bi bi-cart"></i>
+                  <span>
+                    Đơn tối thiểu:
+                    <span class="wallet-min-order">
+                      {{ number_format($minOrder, 0, ',', '.') }}VNĐ
                     </span>
-                  </div>
+                  </span>
+                </div>
+              </div>
 
-                  <div class="wallet-coupon-details">
-                    <i class="bi bi-info-circle"></i>
-                    <span>{{ $desc }}</span>
-                  </div>
+              {{-- CỘT PHẢI --}}
+              <div class="wallet-coupon-right">
+                <div class="wallet-right-top">
+                  <span class="wallet-coupon-type {{ $isShip ? 'type-ship' : 'type-order' }}">
+                    <i class="bi {{ $isShip ? 'bi-truck' : 'bi-tag' }}"></i>
+                    {{ $typeName }}
+                  </span>
+                </div>
 
-                  <div class="wallet-coupon-details mt-2">
-                    <i class="bi bi-cart"></i>
-                    <span>
-                      Đơn tối thiểu:
-                      <span class="wallet-min-order">
-                        {{ number_format($minOrder, 0, ',', '.') }}VNĐ
-                      </span>
-                    </span>
-                  </div>
-
+                <div class="wallet-right-bottom">
                   <div class="wallet-coupon-actions">
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-outline-secondary js-wallet-discount-copy"
-                      data-code="{{ $d->code }}">
-                      Copy mã
-                    </button>
-
                     <button
                       type="button"
                       class="btn btn-sm btn-primary js-wallet-discount-apply"
@@ -446,8 +445,12 @@
                     </button>
                   </div>
                 </div>
-              @endif
-            @endforeach
+              </div>
+            </div>
+          </div>
+          @endif
+
+          @endforeach
           @endif
         </div>
       </div>

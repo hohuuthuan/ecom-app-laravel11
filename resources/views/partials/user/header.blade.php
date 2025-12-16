@@ -11,18 +11,25 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link active" href="{{ route('home') }}">Trang chủ</a>
+          <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
+            Trang chủ
+          </a>
         </li>
+
         <li class="nav-item">
-          <a class="nav-link active" href="{{ route('product.list') }}">Sản phẩm</a>
+          <a class="nav-link {{ request()->routeIs('product.list','product.detail') ? 'active' : '' }}" href="{{ route('product.list') }}">
+            Tất cả sản phẩm
+          </a>
         </li>
+
         <li class="nav-item">
-          <a class="nav-link active" href="{{ route('recentlyViewed') }}">
+          <a class="nav-link {{ request()->routeIs('recentlyViewed') ? 'active' : '' }}" href="{{ route('recentlyViewed') }}">
             Sản phẩm đã xem
           </a>
         </li>
+
         <li class="nav-item">
-          <a class="nav-link active" href="{{ route('vouchers.index') }}">
+          <a class="nav-link {{ request()->routeIs('vouchers.index','vouchers.wallet') ? 'active' : '' }}" href="{{ route('vouchers.index') }}">
             Kho vouchers
           </a>
         </li>
@@ -47,20 +54,20 @@
 
         <div class="d-flex align-items-center">
           @php
-            $wishlistCount = auth()->check()
-              ? auth()->user()->favorites()->count()
-              : 0;
+          $wishlistCount = auth()->check()
+          ? auth()->user()->favorites()->count()
+          : 0;
 
-            $cart = session('cart', ['items' => []]);
-            $cartItems = is_array($cart['items'] ?? null) ? $cart['items'] : [];
-            $cartCount = count($cartItems);
+          $cart = session('cart', ['items' => []]);
+          $cartItems = is_array($cart['items'] ?? null) ? $cart['items'] : [];
+          $cartCount = count($cartItems);
 
-            $voucherCount = auth()->check()
-              ? \App\Models\DiscountWalletItem::query()
-                  ->where('user_id', auth()->id())
-                  ->where('status', 'SAVED')
-                  ->count()
-              : 0;
+          $voucherCount = auth()->check()
+          ? \App\Models\DiscountWalletItem::query()
+          ->where('user_id', auth()->id())
+          ->where('status', 'SAVED')
+          ->count()
+          : 0;
           @endphp
 
           {{-- Wishlist --}}
@@ -100,15 +107,15 @@
           @auth
           <div class="dropdown">
             @php
-              /** @var \App\Models\User $user */
-              $user = auth()->user();
-              $displayName = $user->full_name ?? $user->name ?? $user->username ?? 'Admin';
-              $email = $user->email ?? '';
-              $avatarFile = $user && $user->avatar ? basename($user->avatar) : 'base-avatar.jpg';
-              $avatarPath = 'avatars/' . $avatarFile;
-              $avatarUrl = Storage::disk('public')->exists($avatarPath)
-                ? Storage::disk('public')->url($avatarPath)
-                : asset('storage/avatars/base-avatar.jpg');
+            /** @var \App\Models\User $user */
+            $user = auth()->user();
+            $displayName = $user->full_name ?? $user->name ?? $user->username ?? 'Admin';
+            $email = $user->email ?? '';
+            $avatarFile = $user && $user->avatar ? basename($user->avatar) : 'base-avatar.jpg';
+            $avatarPath = 'avatars/' . $avatarFile;
+            $avatarUrl = Storage::disk('public')->exists($avatarPath)
+            ? Storage::disk('public')->url($avatarPath)
+            : asset('storage/avatars/base-avatar.jpg');
             @endphp
 
             <a
@@ -143,14 +150,16 @@
                 </div>
               </li>
 
-              <li><hr class="dropdown-divider"></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
 
               @if($user->hasRole('Admin'))
-                <li>
-                  <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
-                    <i class="fas fa-tachometer-alt me-2"></i>Trang quản trị
-                  </a>
-                </li>
+              <li>
+                <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                  <i class="fas fa-tachometer-alt me-2"></i>Trang quản trị
+                </a>
+              </li>
               @endif
 
               <li>
@@ -160,18 +169,20 @@
               </li>
 
               @if(
-                $user->hasRole('Admin')
-                || $user->hasRole('Warehouse Manager')
-                || $user->hasRole('Shipper')
+              $user->hasRole('Admin')
+              || $user->hasRole('Warehouse Manager')
+              || $user->hasRole('Shipper')
               )
-                <li>
-                  <a class="dropdown-item" href="{{ route('shipper.dashboard') }}" target="_blank">
-                    <i class="fas fa-motorcycle me-2"></i>Đơn hàng cần giao
-                  </a>
-                </li>
+              <li>
+                <a class="dropdown-item" href="{{ route('shipper.dashboard') }}" target="_blank">
+                  <i class="fas fa-motorcycle me-2"></i>Đơn hàng cần giao
+                </a>
+              </li>
               @endif
 
-              <li><hr class="dropdown-divider"></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
 
               <li class="px-3">
                 <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">

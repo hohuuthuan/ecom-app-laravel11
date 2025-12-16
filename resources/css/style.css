@@ -14,6 +14,13 @@ a {
   width: 60px;
 }
 
+.navbar .nav-link.active,
+.navbar .nav-link.active:focus,
+.navbar .nav-link.active:hover {
+  color: #667eea !important;
+  font-weight: 600;
+}
+
 #bestsellers [data-bestseller-pagination] p.small.text-muted {
   display: none;
 }
@@ -928,6 +935,33 @@ a {
   border: 2px solid #0b99c4;
   box-shadow: 0 0 0 2px rgba(11, 153, 196, .2);
 }
+
+.price-preset-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.price-preset-btn {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #0f172a;
+  border-radius: 999px;
+  padding: 6px 10px;
+  line-height: 1;
+}
+
+.price-preset-btn:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.price-preset-btn.is-active {
+  background: #667eea;
+  border-color: #667eea;
+  color: #fff;
+}
+
 
 /*  ============================================================= RECENTLY VIEWED ============================================================= */
 .recently-viewed-empty {

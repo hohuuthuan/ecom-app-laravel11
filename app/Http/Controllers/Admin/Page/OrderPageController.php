@@ -43,7 +43,9 @@ class OrderPageController extends Controller
       'user',
       'items.product',
       'shipment',
-      'discount',
+      'discount' => function ($q) {
+        $q->withTrashed();
+      },
       'statusHistories' => function ($query) {
         $query->orderBy('created_at', 'desc');
       },

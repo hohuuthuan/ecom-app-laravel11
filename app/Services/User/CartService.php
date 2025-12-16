@@ -3,167 +3,193 @@
 namespace App\Services\User;
 
 use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
 class CartService
 {
-  private const SSN_KEY = 'cart';
+    private const SSN_KEY = 'cart';
 
-  public function get(): array
-  {
-    return Session::get(self::SSN_KEY, ['items' => []]);
-  }
-
-  public function countDistinct(): int
-  {
-    $cart = $this->get();
-    if (!is_array($cart) || !isset($cart['items']) || !is_array($cart['items'])) {
-      return 0;
-    }
-    return count($cart['items']);
-  }
-
-  public function add(string $productId, ?string $variantId, int $qty = 1): array
-  {
-    if ($qty < 1) {
-      $qty = 1;
+    public function get(): array
+    {
+        return Session::get(self::SSN_KEY, ['items' => []]);
     }
 
-    $cart = $this->get();
-    $key = $this->key($productId, $variantId);
-    if (!isset($cart['items'][$key])) {
-      $cart['items'][$key] = [
-        'product_id' => $productId,
-        'variant_id' => $variantId,
-        'qty' => 0
-      ];
-    }
-    $cart['items'][$key]['qty'] += $qty;
-
-    Session::put(self::SSN_KEY, $cart);
-    return $this->recalc();
-  }
-
-  public function updateQuantityItemInCart(string $key, int $qty): array
-  {
-    $cart = $this->get();
-    if (!isset($cart['items'][$key])) {
-      return $this->recalc();
+    public function countDistinct(): int
+    {
+        $cart = $this->get();
+        if (!is_array($cart) || !isset($cart['items']) || !is_array($cart['items'])) {
+            return 0;
+        }
+        return count($cart['items']);
     }
 
-    if ($qty < 1) {
-      unset($cart['items'][$key]);
-    } else {
-      $cart['items'][$key]['qty'] = $qty;
+    public function add(string $productId, ?string $variantId, int $qty = 1): array
+    {
+        if ($qty < 1) {
+            return $this->recalc();
+        }
+
+        $cart = $this->get();
+        $key = $this->key($productId, $variantId);
+
+        if (!isset($cart['items'][$key])) {
+            $cart['items'][$key] = [
+                'product_id' => $productId,
+                'variant_id' => $variantId,
+                'qty' => 0,
+            ];
+        }
+
+        $cart['items'][$key]['qty'] += $qty;
+
+        Session::put(self::SSN_KEY, $cart);
+        return $this->recalc();
     }
 
-    Session::put(self::SSN_KEY, $cart);
-    return $this->recalc();
-  }
+    public function updateQuantityItemInCart(string $key, int $qty): array
+    {
+        $cart = $this->get();
+        if (!isset($cart['items'][$key])) {
+            return $this->recalc();
+        }
 
-  public function removeItemInCart(string $key): array
-  {
-    $cart = $this->get();
-    unset($cart['items'][$key]);
-    Session::put(self::SSN_KEY, $cart);
-    return $this->recalc();
-  }
+        if ($qty < 1) {
+            unset($cart['items'][$key]);
+        } else {
+            $cart['items'][$key]['qty'] = $qty;
+        }
 
-  public function clearCart(): void
-  {
-    Session::forget(self::SSN_KEY);
-  }
-
-  public function recalc(): array
-  {
-    $cart = $this->get();
-    if (empty($cart['items'])) {
-      $out = ['items' => [], 'subtotal' => 0, 'warnings' => []];
-      Session::put(self::SSN_KEY, $out);
-      return $out;
+        Session::put(self::SSN_KEY, $cart);
+        return $this->recalc();
     }
 
-    $ids = [];
-    foreach ($cart['items'] as $it) {
-      $ids[$it['product_id']] = true;
+    public function removeItemInCart(string $key): array
+    {
+        $cart = $this->get();
+        unset($cart['items'][$key]);
+        Session::put(self::SSN_KEY, $cart);
+        return $this->recalc();
     }
 
-    $products = Product::query()
-      ->select('id', 'title', 'image', 'selling_price_vnd')
-      ->with('stocks:product_id,on_hand,reserved')
-      ->whereIn('id', array_keys($ids))
-      ->get()
-      ->keyBy('id');
-
-    $subtotal = 0;
-    $warnings = [];
-    $normalized = [];
-
-    foreach ($cart['items'] as $key => $it) {
-      if (!$products->has($it['product_id'])) {
-        $warnings[] = 'Sản phẩm không còn tồn tại';
-        continue;
-      }
-
-      $p = $products[$it['product_id']];
-      $available = (int)$p->stocks->sum(fn($s) => (int)$s->on_hand - (int)$s->reserved);
-      if ($available <= 0) {
-        $warnings[] = 'Hết hàng: ' . $p->title;
-        continue;
-      }
-
-      $qty = $it['qty'] > $available ? $available : $it['qty'];
-      if ($qty < $it['qty']) {
-        $warnings[] = 'Giới hạn theo tồn kho: ' . $p->title;
-      }
-
-      $price = (int)$p->selling_price_vnd;
-      $lineTotal = $price * $qty;
-
-      $normalized[$key] = [
-        'key'        => $key,
-        'product_id' => $p->id,
-        'variant_id' => $it['variant_id'] ?? null,
-        'title'      => $p->title,
-        'image'      => $p->image,
-        'qty'        => $qty,
-        'price'      => $price,
-        'line_total' => $lineTotal
-      ];
-
-      $subtotal += $lineTotal;
+    public function clearCart(): void
+    {
+        Session::forget(self::SSN_KEY);
     }
 
-    $out = ['items' => $normalized, 'subtotal' => $subtotal, 'warnings' => $warnings];
-    Session::put(self::SSN_KEY, $out);
-    return $out;
-  }
+    public function recalc(): array
+    {
+        $cart = $this->get();
 
-  public function summarize(array $keys): array
-  {
-    $cart = $this->recalc();
-    if (empty($keys)) {
-      return ['items' => [], 'subtotal' => 0, 'shipping' => 0, 'total' => 0];
+        if (empty($cart['items']) || !is_array($cart['items'])) {
+            $out = ['items' => [], 'subtotal' => 0, 'warnings' => []];
+            Session::put(self::SSN_KEY, $out);
+            return $out;
+        }
+
+        $productIds = [];
+        foreach ($cart['items'] as $it) {
+            if (!empty($it['product_id'])) {
+                $productIds[(string) $it['product_id']] = true;
+            }
+        }
+
+        if (count($productIds) === 0) {
+            $out = ['items' => [], 'subtotal' => 0, 'warnings' => []];
+            Session::put(self::SSN_KEY, $out);
+            return $out;
+        }
+
+        $productIdList = array_keys($productIds);
+
+        $products = Product::query()
+            ->select('id', 'title', 'image', 'selling_price_vnd')
+            ->whereIn('id', $productIdList)
+            ->get()
+            ->keyBy('id');
+
+        $stockMap = DB::table('stocks')
+            ->whereIn('product_id', $productIdList)
+            ->groupBy('product_id')
+            ->selectRaw('product_id, COALESCE(SUM(on_hand), 0) as on_hand')
+            ->pluck('on_hand', 'product_id')
+            ->all();
+
+        $subtotal = 0;
+        $warnings = [];
+        $normalized = [];
+
+        foreach ($cart['items'] as $key => $it) {
+            $pid = (string) ($it['product_id'] ?? '');
+            if ($pid === '' || !$products->has($pid)) {
+                $warnings[] = 'Sản phẩm không còn tồn tại';
+                continue;
+            }
+
+            $p = $products[$pid];
+            $available = isset($stockMap[$pid]) ? (int) $stockMap[$pid] : 0;
+
+            if ($available <= 0) {
+                $warnings[] = 'Hết hàng: ' . $p->title;
+                continue;
+            }
+
+            $qty = (int) ($it['qty'] ?? 1);
+            if ($qty > $available) {
+                $warnings[] = 'Giới hạn theo tồn kho: ' . $p->title;
+                $qty = $available;
+            }
+
+            $price = (int) $p->selling_price_vnd;
+            $lineTotal = $price * $qty;
+
+            $normalized[$key] = [
+                'key'        => $key,
+                'product_id' => $p->id,
+                'variant_id' => $it['variant_id'] ?? null,
+                'title'      => $p->title,
+                'image'      => $p->image,
+                'qty'        => $qty,
+                'max_qty'    => $available,
+                'price'      => $price,
+                'line_total' => $lineTotal,
+            ];
+
+            $subtotal += $lineTotal;
+        }
+
+        $out = ['items' => $normalized, 'subtotal' => $subtotal, 'warnings' => $warnings];
+        Session::put(self::SSN_KEY, $out);
+        return $out;
     }
 
-    $items = [];
-    $subtotal = 0;
-    foreach ($keys as $k) {
-      if (!isset($cart['items'][$k])) {
-        continue;
-      }
-      $items[] = $cart['items'][$k];
-      $subtotal += (int)$cart['items'][$k]['line_total'];
+    public function summarize(array $keys): array
+    {
+        $cart = $this->recalc();
+
+        if (empty($keys)) {
+            return ['items' => [], 'subtotal' => 0, 'shipping' => 0, 'total' => 0];
+        }
+
+        $items = [];
+        $subtotal = 0;
+
+        foreach ($keys as $k) {
+            if (!isset($cart['items'][$k])) {
+                continue;
+            }
+            $items[] = $cart['items'][$k];
+            $subtotal += (int) $cart['items'][$k]['line_total'];
+        }
+
+        $shipping = count($items) > 0 ? 30000 : 0;
+        $total = $subtotal + $shipping;
+
+        return ['items' => $items, 'subtotal' => $subtotal, 'shipping' => $shipping, 'total' => $total];
     }
 
-    $shipping = count($items) > 0 ? 30000 : 0;
-    $total = $subtotal + $shipping;
-
-    return ['items' => $items, 'subtotal' => $subtotal, 'shipping' => $shipping, 'total' => $total];
-  }
-
-  private function key(string $productId, ?string $variantId): string
-  {
-    return $variantId ? ($productId . '_' . $variantId) : $productId;
-  }
+    private function key(string $productId, ?string $variantId): string
+    {
+        return $variantId ? ($productId . '_' . $variantId) : $productId;
+    }
 }

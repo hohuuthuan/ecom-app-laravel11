@@ -63,6 +63,7 @@
             data-key="{{ $line['key'] }}"
             data-price="{{ (int)$line['price'] }}"
             data-qty="{{ (int)$line['qty'] }}"
+            data-max="{{ (int)($line['max_qty'] ?? 0) }}"
             data-total="{{ (int)$line['line_total'] }}">
             <div class="d-flex gap-3 align-items-start">
               <div class="pt-1">
@@ -80,10 +81,10 @@
                     <span class="text-muted small quantity-label">Số lượng:</span>
 
                     {{-- Giảm --}}
-                    <form action="{{ route('cart.item.update', $line['key']) }}" method="POST" class="d-inline" data-no-loading>
+                    <form action="{{ route('cart.item.update', $line['key']) }}" method="POST" class="d-inline" data-no-loading data-action="dec">
                       @csrf @method('PATCH')
                       <input type="hidden" name="qty" value="{{ max(1, (int)$line['qty'] - 1) }}">
-                      <button type="submit" class="btn btn-sm btn-outline-secondary quantity-btn" {{ $line['qty']<=1 ? 'disabled' : '' }}>
+                      <button type="submit" class="btn btn-sm btn-outline-secondary quantity-btn" {{ (int)$line['qty']<=1 ? 'disabled' : '' }}>
                         <i class="bi bi-dash"></i>
                       </button>
                     </form>
@@ -91,10 +92,15 @@
                     <span class="fw-semibold quantity-display">{{ (int)$line['qty'] }}</span>
 
                     {{-- Tăng --}}
-                    <form action="{{ route('cart.item.update', $line['key']) }}" method="POST" class="d-inline" data-no-loading>
+                    @php
+                    $maxQty = (int)($line['max_qty'] ?? 0);
+                    $isMax = $maxQty > 0 && (int)$line['qty'] >= $maxQty;
+                    $nextQty = $maxQty > 0 ? min($maxQty, (int)$line['qty'] + 1) : ((int)$line['qty'] + 1);
+                    @endphp
+                    <form action="{{ route('cart.item.update', $line['key']) }}" method="POST" class="d-inline" data-no-loading data-action="inc">
                       @csrf @method('PATCH')
-                      <input type="hidden" name="qty" value="{{ (int)$line['qty'] + 1 }}">
-                      <button type="submit" class="btn btn-sm btn-outline-secondary quantity-btn">
+                      <input type="hidden" name="qty" value="{{ $nextQty }}">
+                      <button type="submit" class="btn btn-sm btn-outline-secondary quantity-btn" {{ $isMax ? 'disabled' : '' }} title="{{ $isMax ? 'Đã đạt tối đa theo tồn kho' : '' }}">
                         <i class="bi bi-plus"></i>
                       </button>
                     </form>

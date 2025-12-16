@@ -220,6 +220,59 @@ class HomePageController extends Controller
     return response()->json(['count' => $svc->countDistinct()]);
   }
 
+  // public function addItemToCart(Request $request, CartService $svc)
+  // {
+  //   $data = $request->validate([
+  //     'product_id' => ['required', 'exists:products,id'],
+  //     'qty'        => ['nullable', 'integer', 'min:1'],
+  //   ]);
+
+  //   $qty = (int) ($data['qty'] ?? 1);
+
+  //   $p = Product::query()
+  //     ->select('id', 'title')
+  //     ->with('stocks:product_id,on_hand')
+  //     ->find($data['product_id']);
+
+  //   if (!$p) {
+  //     if ($request->ajax() || $request->expectsJson()) {
+  //       return response()->json(['ok' => false, 'message' => 'Sản phẩm không tồn tại'], 404);
+  //     }
+  //     return back()->with('toast_error', 'Sản phẩm không tồn tại');
+  //   }
+
+  //   $available = (int) $p->stocks->sum(function ($s) {
+  //     return (int) $s->on_hand;
+  //   });
+
+  //   if ($available <= 0) {
+  //     if ($request->ajax() || $request->expectsJson()) {
+  //       return response()->json(['ok' => false, 'message' => 'Sản phẩm tạm hết hàng'], 409);
+  //     }
+  //     return back()->with('toast_error', 'Sản phẩm tạm hết hàng');
+  //   }
+
+  //   $cart = $svc->get();
+  //   $key  = $data['product_id'];
+  //   $curr = isset($cart['items'][$key]) ? (int) $cart['items'][$key]['qty'] : 0;
+  //   $need = $curr + $qty;
+
+  //   if ($need > $available) {
+  //     if ($request->ajax() || $request->expectsJson()) {
+  //       return response()->json(['ok' => false, 'message' => 'Số lượng vượt quá tồn kho'], 422);
+  //     }
+  //     return back()->with('toast_error', 'Số lượng vượt quá tồn kho (còn ' . $available . ')');
+  //   }
+
+  //   $svc->add($data['product_id'], null, $qty);
+
+  //   if ($request->ajax() || $request->expectsJson()) {
+  //     return response()->json(['ok' => true, 'count' => $svc->countDistinct()], 200);
+  //   }
+
+  //   return back()->with('toast_success', 'Đã thêm sản phẩm vào giỏ hàng');
+  // }
+
   public function addItemToCart(Request $request, CartService $svc)
   {
     $data = $request->validate([
@@ -227,12 +280,13 @@ class HomePageController extends Controller
       'qty'        => ['nullable', 'integer', 'min:1'],
     ]);
 
-    $qty = (int)($data['qty'] ?? 1);
+    $qty = (int) ($data['qty'] ?? 1);
 
     $p = Product::query()
       ->select('id', 'title')
-      ->with('stocks:product_id,on_hand,reserved')
+      ->with('stocks:product_id,on_hand')
       ->find($data['product_id']);
+
     if (!$p) {
       if ($request->ajax() || $request->expectsJson()) {
         return response()->json(['ok' => false, 'message' => 'Sản phẩm không tồn tại'], 404);
@@ -240,9 +294,10 @@ class HomePageController extends Controller
       return back()->with('toast_error', 'Sản phẩm không tồn tại');
     }
 
-    $available = (int)$p->stocks->sum(function ($s) {
-      return (int)$s->on_hand - (int)$s->reserved;
+    $available = (int) $p->stocks->sum(function ($s) {
+      return (int) $s->on_hand;
     });
+
     if ($available <= 0) {
       if ($request->ajax() || $request->expectsJson()) {
         return response()->json(['ok' => false, 'message' => 'Sản phẩm tạm hết hàng'], 409);
@@ -250,24 +305,35 @@ class HomePageController extends Controller
       return back()->with('toast_error', 'Sản phẩm tạm hết hàng');
     }
 
-    $cart  = $svc->get();
-    $key   = $data['product_id'];
-    $curr  = isset($cart['items'][$key]) ? (int)$cart['items'][$key]['qty'] : 0;
-    $need  = $curr + $qty;
-    if ($need > $available) {
-      if ($request->ajax() || $request->expectsJson()) {
-        return response()->json(['ok' => false, 'message' => 'Số lượng vượt quá tồn kho'], 422);
-      }
-      return back()->with('toast_error', 'Số lượng vượt quá tồn kho (còn ' . $available . ')');
+    $cart = $svc->get();
+    $key  = $data['product_id'];
+    $curr = isset($cart['items'][$key]) ? (int) $cart['items'][$key]['qty'] : 0;
+
+    $target = ($curr + $qty) > $available ? $available : ($curr + $qty);
+    $addQty = $target - $curr;
+
+    if ($addQty > 0) {
+      $svc->add($data['product_id'], null, $addQty);
     }
 
-    $svc->add($data['product_id'], null, $qty);
     if ($request->ajax() || $request->expectsJson()) {
-      return response()->json(['ok' => true, 'count' => $svc->countDistinct()], 200);
+      return response()->json([
+        'ok'          => true,
+        'count'       => $svc->countDistinct(),
+        'qty_in_cart' => $target,
+        'max_qty'     => $available,
+        'reached_max' => $target >= $available,
+        'message'     => $addQty > 0 ? 'Đã thêm vào giỏ' : ('Đã đạt số lượng tối đa (còn ' . $available . ')'),
+      ], 200);
     }
 
-    return back()->with('toast_success', 'Đã thêm sản phẩm vào giỏ hàng');
+    if ($addQty > 0) {
+      return back()->with('toast_success', 'Đã thêm sản phẩm vào giỏ hàng');
+    }
+
+    return back()->with('toast_info', 'Đã đạt số lượng tối đa (còn ' . $available . ')');
   }
+
 
   public function updateQuantityItemInCart(string $key, Request $request, CartService $svc)
   {

@@ -114,9 +114,9 @@ class ProductService
       $query->where('stock', '<=', (int)$filters['stock_max']);
     }
 
-    $perPage = (int)($filters['per_page'] ?? 10);
+    $perPage = (int)($filters['per_page'] ?? 9);
     if ($perPage <= 0) {
-      $perPage = 10;
+      $perPage = 9;
     }
     if ($perPage > 200) {
       $perPage = 200;

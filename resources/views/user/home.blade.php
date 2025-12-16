@@ -409,18 +409,13 @@
       if (img.complete && img.naturalWidth !== 0) {
         markLoaded();
       } else {
-        img.addEventListener('load', markLoaded, {
-          once: true
-        });
-        img.addEventListener('error', markLoaded, {
-          once: true
-        });
+        img.addEventListener('load', markLoaded, { once: true });
+        img.addEventListener('error', markLoaded, { once: true });
       }
     });
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    // Lần load đầu: cho skeleton chạy bình thường
     initBookCovers(document, false);
 
     var bestSection = document.getElementById('bestsellers');
@@ -431,6 +426,13 @@
     var booksContainer = document.getElementById('booksContainer');
     if (!booksContainer) {
       return;
+    }
+
+    function scrollToBestSectionTop() {
+      var sticky = document.querySelector('.sticky-top');
+      var offset = sticky ? (sticky.getBoundingClientRect().height + 12) : 12;
+      var y = bestSection.getBoundingClientRect().top + window.pageYOffset - offset;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
     }
 
     bestSection.addEventListener('click', function(event) {
@@ -447,13 +449,9 @@
       }
 
       fetch(url, {
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-          }
-        })
-        .then(function(res) {
-          return res.text();
-        })
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+        .then(function(res) { return res.text(); })
         .then(function(html) {
           var parser = new DOMParser();
           var doc = parser.parseFromString(html, 'text/html');
@@ -465,7 +463,6 @@
           var newBooksContainer = newSection.querySelector('#booksContainer');
           if (newBooksContainer) {
             booksContainer.innerHTML = newBooksContainer.innerHTML;
-            // Phân trang: tắt skeleton, cho ảnh hiện ngay
             initBookCovers(booksContainer, true);
           }
 
@@ -474,6 +471,9 @@
           if (pagWrapper && newPagWrapper) {
             pagWrapper.innerHTML = newPagWrapper.innerHTML;
           }
+
+          // Cuộn lên đầu section sau khi cập nhật phân trang
+          scrollToBestSectionTop();
         })
         .catch(function(error) {
           console.error(error);

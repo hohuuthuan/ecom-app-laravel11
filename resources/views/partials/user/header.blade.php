@@ -30,7 +30,7 @@
 
         <li class="nav-item">
           <a class="nav-link {{ request()->routeIs('vouchers.index','vouchers.wallet') ? 'active' : '' }}" href="{{ route('vouchers.index') }}">
-            Kho vouchers
+            Kho voucher
           </a>
         </li>
       </ul>

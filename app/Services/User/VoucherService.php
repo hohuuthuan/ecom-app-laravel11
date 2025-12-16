@@ -57,6 +57,41 @@ class VoucherService
         return [$discounts, array_fill_keys($savedIds, true), $userUsedMap, $globalUsedMap];
     }
 
+    public function getVoucherWalletData(User $user, int $perPage = 9): array
+    {
+        /** @var LengthAwarePaginator $discounts */
+        $discounts = Discount::query()
+            ->join('discount_wallet_items as w', 'w.discount_id', '=', 'discounts.id')
+            ->where('w.user_id', $user->id)
+            ->where('w.status', 'SAVED')
+            ->select('discounts.*')
+            ->orderByDesc('w.saved_at')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        $ids = $discounts->getCollection()->pluck('id')->all();
+        if (count($ids) === 0) {
+            return [$discounts, [], [], []];
+        }
+
+        $userUsedMap = DiscountUsage::query()
+            ->selectRaw('discount_id, COUNT(*) as cnt')
+            ->where('user_id', $user->id)
+            ->whereIn('discount_id', $ids)
+            ->groupBy('discount_id')
+            ->pluck('cnt', 'discount_id')
+            ->all();
+
+        $globalUsedMap = DiscountUsage::query()
+            ->selectRaw('discount_id, COUNT(*) as cnt')
+            ->whereIn('discount_id', $ids)
+            ->groupBy('discount_id')
+            ->pluck('cnt', 'discount_id')
+            ->all();
+
+        return [$discounts, array_fill_keys($ids, true), $userUsedMap, $globalUsedMap];
+    }
+
     public function claim(User $user, string $code): array
     {
         $normalized = strtoupper(trim($code));
@@ -130,5 +165,25 @@ class VoucherService
         );
 
         return ['ok' => true, 'message' => 'Đã lưu voucher vào ví.', 'saved' => true];
+    }
+
+    public function removeFromWallet(User $user, string $discountId): array
+    {
+        $wallet = DiscountWalletItem::query()
+            ->where('discount_id', $discountId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$wallet || strtoupper((string) $wallet->status) !== 'SAVED') {
+            return ['ok' => true, 'message' => 'Voucher không còn trong ví.'];
+        }
+
+        $wallet->update([
+            'status'            => 'REMOVED',
+            'reserved_order_id' => null,
+            'reserved_at'       => null,
+        ]);
+
+        return ['ok' => true, 'message' => 'Đã xóa voucher khỏi ví.'];
     }
 }

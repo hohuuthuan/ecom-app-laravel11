@@ -84,6 +84,8 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/profile/orders/reviews/store-item', [UserReviewController::class, 'storeFromOrder'])->name('user.reviews.storeFromOrder');
 
   Route::post('/vouchers/claim', [VoucherController::class, 'claim'])->name('vouchers.claim');
+  Route::get('/vouchers/wallet', [VoucherController::class, 'wallet'])->name('vouchers.wallet');
+  Route::post('/vouchers/remove', [VoucherController::class, 'remove'])->name('vouchers.remove');
 
   Route::prefix('profile')->name('user.profile.')->group(function () {
     Route::get('/', [UserAddressController::class, 'index'])->name('index');

@@ -13,7 +13,7 @@
                 Quay lại trang chủ
             </a>
         </div>
-        <h1 class="pageTitle"><i class="bi bi-cart-fill"></i> KHO VOUCHERS </h1>
+        <h1 class="pageTitle"><i class="bi bi-cart-fill"></i> KHO VOUCHER </h1>
     </div>
 
     <div class="voucher-container">

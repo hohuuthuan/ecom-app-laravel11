@@ -29,7 +29,7 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link {{ request()->routeIs('vouchers.index','vouchers.wallet') ? 'active' : '' }}" href="{{ route('vouchers.index') }}">
+          <a class="nav-link {{ request()->routeIs('vouchers.index') ? 'active' : '' }}" href="{{ route('vouchers.index') }}">
             Kho voucher
           </a>
         </li>

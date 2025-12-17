@@ -75,6 +75,11 @@
                 <div class="col-md-1 d-grid">
                   <button type="submit" class="btn-admin">Lọc</button>
                 </div>
+                <div class="col-md-1 d-grid">
+                  <a href="{{ route('admin.accounts.index') }}" class="btn btn-outline-secondary">
+                    <i class="fa fa-eraser me-1"></i>Xóa lọc
+                  </a>
+                </div>
               </form>
 
               <div class="d-flex justify-content-between mb-2 select2CustomWidth">

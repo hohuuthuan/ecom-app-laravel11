@@ -22,7 +22,7 @@ class HomePageController extends Controller
   public function index(Request $r)
   {
     $filters = [
-      'per_page'      => (int)$r->query('per_page_product', 10),
+      'per_page'      => (int)$r->query('per_page_product', 9),
       'keyword'       => $r->query('keyword'),
       'status'        => $r->query('status'),
       'category_id'   => $r->query('category_id'),
@@ -111,9 +111,9 @@ class HomePageController extends Controller
       $perPageReview = 4;
     }
 
-    $perPageRelated = (int) $request->query('per_page_related', 4);
+    $perPageRelated = (int) $request->query('per_page_related', 6);
     if ($perPageRelated <= 0 || $perPageRelated > 200) {
-      $perPageRelated = 4;
+      $perPageRelated = 6;
     }
 
     if ($request->ajax() && $request->boolean('reviews_only')) {
@@ -220,59 +220,6 @@ class HomePageController extends Controller
     return response()->json(['count' => $svc->countDistinct()]);
   }
 
-  // public function addItemToCart(Request $request, CartService $svc)
-  // {
-  //   $data = $request->validate([
-  //     'product_id' => ['required', 'exists:products,id'],
-  //     'qty'        => ['nullable', 'integer', 'min:1'],
-  //   ]);
-
-  //   $qty = (int) ($data['qty'] ?? 1);
-
-  //   $p = Product::query()
-  //     ->select('id', 'title')
-  //     ->with('stocks:product_id,on_hand')
-  //     ->find($data['product_id']);
-
-  //   if (!$p) {
-  //     if ($request->ajax() || $request->expectsJson()) {
-  //       return response()->json(['ok' => false, 'message' => 'Sản phẩm không tồn tại'], 404);
-  //     }
-  //     return back()->with('toast_error', 'Sản phẩm không tồn tại');
-  //   }
-
-  //   $available = (int) $p->stocks->sum(function ($s) {
-  //     return (int) $s->on_hand;
-  //   });
-
-  //   if ($available <= 0) {
-  //     if ($request->ajax() || $request->expectsJson()) {
-  //       return response()->json(['ok' => false, 'message' => 'Sản phẩm tạm hết hàng'], 409);
-  //     }
-  //     return back()->with('toast_error', 'Sản phẩm tạm hết hàng');
-  //   }
-
-  //   $cart = $svc->get();
-  //   $key  = $data['product_id'];
-  //   $curr = isset($cart['items'][$key]) ? (int) $cart['items'][$key]['qty'] : 0;
-  //   $need = $curr + $qty;
-
-  //   if ($need > $available) {
-  //     if ($request->ajax() || $request->expectsJson()) {
-  //       return response()->json(['ok' => false, 'message' => 'Số lượng vượt quá tồn kho'], 422);
-  //     }
-  //     return back()->with('toast_error', 'Số lượng vượt quá tồn kho (còn ' . $available . ')');
-  //   }
-
-  //   $svc->add($data['product_id'], null, $qty);
-
-  //   if ($request->ajax() || $request->expectsJson()) {
-  //     return response()->json(['ok' => true, 'count' => $svc->countDistinct()], 200);
-  //   }
-
-  //   return back()->with('toast_success', 'Đã thêm sản phẩm vào giỏ hàng');
-  // }
-
   public function addItemToCart(Request $request, CartService $svc)
   {
     $data = $request->validate([
@@ -333,7 +280,6 @@ class HomePageController extends Controller
 
     return back()->with('toast_info', 'Đã đạt số lượng tối đa (còn ' . $available . ')');
   }
-
 
   public function updateQuantityItemInCart(string $key, Request $request, CartService $svc)
   {
@@ -405,15 +351,16 @@ class HomePageController extends Controller
   public function listProduct(Request $request)
   {
     $filters = [
-      'per_page'     => (int)$request->query('per_page_product', 9),
-      'keyword'      => $request->query('keyword'),
-      'status'       => $request->query('status'),
-      'category_id'  => $request->query('category_id'),
-      'author_id'    => $request->query('author_id'),
-      'publisher_id' => $request->query('publisher_id'),
-      'price_min'    => $request->query('price_min'),
-      'price_max'    => $request->query('price_max'),
-      'sort_by'      => $request->query('sort_by'),
+      'per_page'      => (int) $request->query('per_page_product', 9),
+      'keyword'       => $request->query('keyword'),
+      'status'        => $request->query('status'),
+      'category_id'   => $request->query('category_id'),
+      'author_id'     => $request->query('author_id'),
+      'publisher_id'  => $request->query('publisher_id'),
+      'price_min'     => $request->query('price_min'),
+      'price_max'     => $request->query('price_max'),
+      'sort_by'       => $request->query('sort_by'),
+      'discount_only' => $request->boolean('discount_only'),
     ];
 
     $categories = $this->productService->getListCategory();

@@ -42,10 +42,23 @@
           <div class="row">
             <div class="col-md-6 searchProduct">
               <label for="keyword" class="form-label mb-1 label-filter-admin-product">Tìm kiếm</label>
-              <input id="keyword" type="text" name="keyword" class="form-control" placeholder="Tìm tên / ISBN / slug" value="{{ request('keyword') }}">
+              <input
+                id="keyword"
+                type="text"
+                name="keyword"
+                class="form-control"
+                placeholder="Tìm tên / ISBN / slug"
+                value="{{ request('keyword') }}">
             </div>
-            <div class="col-md-2">
-              <button type="submit" class="btn-admin btn-submit-filter-admin-product"><i class="fa fa-search me-1"></i> Tìm kiếm</button>
+
+            <div class="col-md-2 d-flex align-items-center gap-2">
+              <button type="submit" class="btn-admin btn-submit-filter-admin-product">
+                <i class="fa fa-search me-1"></i> Tìm kiếm
+              </button>
+
+              <a href="{{ route('admin.product.index') }}" class="btn btn-outline-secondary btn-submit-filter-admin-product">
+                <i class="fa fa-eraser me-1"></i> Xóa lọc
+              </a>
             </div>
           </div>
 
@@ -152,7 +165,7 @@
 
           <span class="vr mx-1 d-none d-lg-block" aria-hidden="true"></span>
 
-          <button style="height: 32px;"  type="button" class="btn-admin" id="btnBulkActive" data-bulk-status="ACTIVE" disabled>
+          <button style="height: 32px;" type="button" class="btn-admin" id="btnBulkActive" data-bulk-status="ACTIVE" disabled>
             <i class="fa fa-eye me-1"></i>Đang bán
           </button>
           <button type="button" class="btn btn-sm btn-secondary" id="btnBulkInactive" data-bulk-status="INACTIVE" disabled>
@@ -171,13 +184,12 @@
               <th class="checkAllWidth"><input type="checkbox" id="product_check_all"></th>
               <th class="STT_Width">#</th>
               <th>TÊN</th>
-              <th>SLUG</th>
+              <!-- <th>SLUG</th> -->
               <th>MÃ ĐỊNH DANH</th>
               <th>DANH MỤC</th>
               <th>TÁC GIẢ</th>
               <th>NHÀ XUẤT BẢN</th>
-              <th>GIÁ BÁN</th>
-              <th>GIẢM GIÁ</th>
+              <th>GIÁ</th>
               <th class="statusWidth">TRẠNG THÁI</th>
               <th class="actionWidth text-center">THAO TÁC</th>
             </tr>
@@ -188,20 +200,31 @@
               <td><input type="checkbox" class="product-row-checkbox" value="{{ $p->id }}"></td>
               <td>{{ $products->firstItem() + $idx }}</td>
               <td>{{ $p->title }}</td>
-              <td>{{ $p->slug }}</td>
+              <!-- <td>{{ $p->slug }}</td> -->
               <td><code>{{ $p->isbn ?? '—' }}</code></td>
               <td>{{ $p->categories?->pluck('name')->join(', ') }}</td>
               <td>{{ $p->authors?->pluck('name')->join(', ') }}</td>
               <td>{{ $p->publisher?->name }}</td>
-              <td>{{ number_format((int)$p->selling_price_vnd,0,',','.') }}₫</td>
-
               <td>
+                @php($price = (int)($p->selling_price_vnd ?? 0))
                 @php($dp = (int)($p->discount_percent ?? 0))
+                @php($dp = max(0, min(100, $dp)))
+                @php($final = $dp > 0 ? (int) floor($price * (100 - $dp) / 100) : $price)
+
                 @if($dp > 0)
-                <span class="badge bg-warning text-dark">-{{ $dp }}%</span>
+
+                <div class="fw-semibold text-success">
+                  {{ number_format($final,0,',','.') }}₫
+                  <span class="badge bg-warning text-dark ms-1">-{{ $dp }}%</span>
+                </div>
                 @else
-                <span class="text-muted">0%</span>
+                <div class="fw-semibold">
+                  {{ number_format($price,0,',','.') }}₫
+                </div>
                 @endif
+                <div class="small text-muted text-decoration-line-through">
+                  {{ number_format($price,0,',','.') }}₫
+                </div>
               </td>
 
               <td>
@@ -239,7 +262,7 @@
 
 @push('scripts')
 <script>
-  (function () {
+  (function() {
     'use strict';
 
     function qs(selector, root) {
@@ -256,7 +279,10 @@
 
     function confirmUI(title, messageHtml) {
       if (typeof window.UIConfirm === 'function') {
-        return window.UIConfirm({ title: title, message: messageHtml });
+        return window.UIConfirm({
+          title: title,
+          message: messageHtml
+        });
       }
       return Promise.resolve(confirm(normalizeConfirmText(messageHtml)));
     }
@@ -266,14 +292,14 @@
     }
 
     function getCheckedIds() {
-      return qsa('#productTable tbody .product-row-checkbox:checked').map(function (cb) {
+      return qsa('#productTable tbody .product-row-checkbox:checked').map(function(cb) {
         return cb.value;
       });
     }
 
     function makeHiddenInputs(container, name, values) {
       container.innerHTML = '';
-      values.forEach(function (v) {
+      values.forEach(function(v) {
         const i = document.createElement('input');
         i.type = 'hidden';
         i.name = name;
@@ -291,13 +317,13 @@
     }
 
     function syncAllRowCheckedStyles() {
-      getRowCheckboxes().forEach(function (cb) {
+      getRowCheckboxes().forEach(function(cb) {
         setRowCheckedStyle(cb);
       });
     }
 
     function updateMasterState(master, rows) {
-      const checked = rows.filter(function (cb) {
+      const checked = rows.filter(function(cb) {
         return cb.checked;
       }).length;
 
@@ -376,7 +402,7 @@
     function bindBulkButtons() {
       const bulkDiscountBtn = qs('#btnBulkDiscount');
       if (bulkDiscountBtn) {
-        bulkDiscountBtn.addEventListener('click', async function () {
+        bulkDiscountBtn.addEventListener('click', async function() {
           const ids = getCheckedIds();
           if (!ids.length) {
             return;
@@ -399,13 +425,15 @@
             return;
           }
 
-          submitBulk('DISCOUNT', { discount_percent: percent });
+          submitBulk('DISCOUNT', {
+            discount_percent: percent
+          });
         });
       }
 
       const bulkClearDiscountBtn = qs('#btnBulkClearDiscount');
       if (bulkClearDiscountBtn) {
-        bulkClearDiscountBtn.addEventListener('click', async function () {
+        bulkClearDiscountBtn.addEventListener('click', async function() {
           const ids = getCheckedIds();
           if (!ids.length) {
             return;
@@ -419,12 +447,14 @@
             return;
           }
 
-          submitBulk('DISCOUNT', { discount_percent: 0 });
+          submitBulk('DISCOUNT', {
+            discount_percent: 0
+          });
         });
       }
 
-      qsa('[data-bulk-status]').forEach(function (btn) {
-        btn.addEventListener('click', async function () {
+      qsa('[data-bulk-status]').forEach(function(btn) {
+        btn.addEventListener('click', async function() {
           const ids = getCheckedIds();
           if (!ids.length) {
             return;
@@ -444,7 +474,9 @@
             return;
           }
 
-          submitBulk('STATUS', { status: status });
+          submitBulk('STATUS', {
+            status: status
+          });
         });
       });
     }
@@ -454,9 +486,9 @@
       const table = qs('#productTable');
 
       if (master) {
-        master.addEventListener('change', function () {
+        master.addEventListener('change', function() {
           const rows = getRowCheckboxes();
-          rows.forEach(function (cb) {
+          rows.forEach(function(cb) {
             cb.checked = master.checked;
             setRowCheckedStyle(cb);
           });
@@ -466,7 +498,7 @@
       }
 
       if (table) {
-        table.addEventListener('change', function (e) {
+        table.addEventListener('change', function(e) {
           const target = e.target;
           if (!target || !target.classList || !target.classList.contains('product-row-checkbox')) {
             return;
@@ -482,7 +514,7 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
       bindCheckboxEvents();
       bindBulkButtons();
       syncAllRowCheckedStyles();

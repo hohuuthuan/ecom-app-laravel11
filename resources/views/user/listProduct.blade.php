@@ -27,7 +27,7 @@ $favIds = auth()->check()
         action="{{ route('product.list') }}"
         class="row g-3 align-items-end"
         id="product-filter-form" data-no-loading>
-    
+
         {{-- THỂ LOẠI --}}
         <div class="col-lg-2 col-md-6">
           <label class="form-label mb-1">Thể loại</label>
@@ -72,6 +72,21 @@ $favIds = auth()->check()
             @endforeach
           </select>
         </div>
+        <div class="col-lg-2 col-md-6">
+          <label class="form-label mb-1">Có giảm giá</label>
+          <div class="d-flex align-items-center">
+            <label class="discount-switch mb-0" for="discount_only" aria-label="Lọc sản phẩm có giảm giá">
+              <input
+                type="checkbox"
+                id="discount_only"
+                name="discount_only"
+                value="1"
+                class="discount-switch-input"
+                @checked((int) request('discount_only')===1)>
+              <span class="discount-switch-slider"></span>
+            </label>
+          </div>
+        </div>
 
         <div class="col-lg-2 col-md-6">
           <button type="submit" class="btn-submit-filter btn btn-primary w-100">
@@ -79,7 +94,7 @@ $favIds = auth()->check()
           </button>
         </div>
 
-        <div class="col-lg-4 col-md-12 text-md-end">
+        <div class="col-lg-2 col-md-12">
           <a href="{{ route('product.list') }}"
             class="btn-remove-filter btn btn-outline-secondary w-lg-auto">
             Xóa lọc
@@ -147,77 +162,139 @@ $favIds = auth()->check()
               <input type="hidden" name="price_max" value="{{ $priceMax }}">
             </div>
           </div>
-      </form>
-    </div>
-    {{-- HẾT BỘ LỌC --}}
+          @php
+          $maxPrice = (int) ($maxPrice ?? 0);
 
-    {{-- BẮT ĐẦU: THANH SẮP XẾP --}}
-    <div class="d-flex justify-content-end mb-3">
-      <div class="col-lg-3 col-md-6">
-        <label for="sort_by" class="form-label mb-1">Sắp xếp theo</label>
-        <select class="form-select" id="sort_by" name="sort_by">
-          <option value="latest" @selected(request('sort_by')=='latest' || !request('sort_by'))>Mới nhất</option>
-          <option value="price_asc" @selected(request('sort_by')=='price_asc' )>Giá: Tăng dần</option>
-          <option value="price_desc" @selected(request('sort_by')=='price_desc' )>Giá: Giảm dần</option>
-          <option value="title_asc" @selected(request('sort_by')=='title_asc' )>Tên: A-Z</option>
-          <option value="title_desc" @selected(request('sort_by')=='title_desc' )>Tên: Z-A</option>
-        </select>
-      </div>
+          $pricePresets = [
+          ['label' => 'Tất cả', 'min' => 0, 'max' => $maxPrice],
+          ['label' => '≤ 50k', 'min' => 0, 'max' => 50000],
+          ['label' => '50k - 100k', 'min' => 50000, 'max' => 100000],
+          ['label' => '100k - 200k', 'min' => 100000, 'max' => 200000],
+          ['label' => '200k - 500k', 'min' => 200000, 'max' => 500000],
+          ['label' => '≥ 500k', 'min' => 500000, 'max' => $maxPrice],
+          ];
+
+          $pricePresets = array_values(array_filter($pricePresets, function ($p) use ($maxPrice) {
+          if ($maxPrice <= 0) return false;
+            if ((int)$p['min']> $maxPrice) return false;
+            if ((int)$p['max'] <= 0) return false;
+              return true;
+              }));
+              @endphp
+
+              <div class="price-preset-wrap mt-2">
+              @foreach($pricePresets as $preset)
+              @php
+              $pMin = (int) $preset['min'];
+              $pMax = (int) $preset['max'];
+              if ($pMax > $maxPrice) $pMax = $maxPrice;
+              $isActivePreset = ($pMin === (int) request('price_min', 0)) && ($pMax === (int) request('price_max', $maxPrice));
+              @endphp
+
+              <button
+                type="button"
+                class="btn btn-sm price-preset-btn {{ $isActivePreset ? 'is-active' : '' }}"
+                data-price-min="{{ $pMin }}"
+                data-price-max="{{ $pMax }}">
+                {{ $preset['label'] }}
+              </button>
+              @endforeach
     </div>
-    {{-- KẾT THÚC: THANH SẮP XẾP --}}
+
+    </form>
+  </div>
+  {{-- HẾT BỘ LỌC --}}
+
+  {{-- BẮT ĐẦU: THANH SẮP XẾP --}}
+  <div class="d-flex justify-content-end mb-3">
+    <div class="col-lg-3 col-md-6">
+      <label for="sort_by" class="form-label mb-1">Sắp xếp theo</label>
+      <select class="form-select" id="sort_by" name="sort_by">
+        <option value="latest" @selected(request('sort_by')=='latest' || !request('sort_by'))>Mới nhất</option>
+        <option value="price_asc" @selected(request('sort_by')=='price_asc' )>Giá: Tăng dần</option>
+        <option value="price_desc" @selected(request('sort_by')=='price_desc' )>Giá: Giảm dần</option>
+        <option value="title_asc" @selected(request('sort_by')=='title_asc' )>Tên: A-Z</option>
+        <option value="title_desc" @selected(request('sort_by')=='title_desc' )>Tên: Z-A</option>
+      </select>
+    </div>
+  </div>
+  {{-- KẾT THÚC: THANH SẮP XẾP --}}
 
 
-    @if($products->isEmpty())
-    <div
-      class="text-center py-5"
-      id="product-list-wrapper"
-      data-list-url="{{ route('product.list') }}">
-      <h5 class="mb-3">Chưa có sản phẩm</h5>
-      <a href="{{ route('home') }}" class="btn btn-primary">Về trang chủ</a>
-    </div>
-    @else
-    {{-- BẮT ĐẦU: WRAPPER CHO SẢN PHẨM VÀ PHÂN TRANG (CHO AJAX) --}}
-    <div id="product-list-wrapper">
-      <div class="row g-4" id="booksContainer">
-        @forelse($products as $product)
-        @php $isFav = in_array($product->id, $favIds, true); @endphp
+  @if($products->isEmpty())
+  <div
+    class="text-center py-5"
+    id="product-list-wrapper"
+    data-list-url="{{ route('product.list') }}">
+    <h5 class="mb-3">Chưa có sản phẩm</h5>
+    <a href="{{ route('home') }}" class="btn btn-primary">Về trang chủ</a>
+  </div>
+  @else
+  <div id="product-list-wrapper">
+    <div class="row g-4" id="booksContainer">
+      @forelse($products as $product)
+      @php
+      $isFav = in_array($product->id, $favIds, true);
+
+      $authorNames = optional($product->authors)->pluck('name')->join(', ');
+
+      $discountPercent = (int) ($product->discount_percent ?? 0);
+      $discountPercent = max(0, min(100, $discountPercent));
+
+      $originalPrice = (int) ($product->selling_price_vnd ?? 0);
+
+      $finalPrice = $discountPercent > 0
+      ? (int) round($originalPrice * (100 - $discountPercent) / 100)
+      : $originalPrice;
+
+      $hasDiscount = $discountPercent > 0 && $finalPrice < $originalPrice;
+
+        $detailUrl=route('product.detail', ['slug'=> $product->slug, 'id' => $product->id]);
+        @endphp
+
         <div class="col-lg-4 col-md-6">
           <div class="card book-card h-100">
-            <div class="book-cover">
+            <div class="book-cover position-relative">
               <img
                 src="{{ asset('storage/products/'.$product->image) }}"
                 alt="{{ $product->title }}"
-                class="book-cover-img" {{-- <-- PHẢI CÓ CLASS NÀY --}}
+                class="book-cover-img"
                 loading="lazy">
+
+              @if($hasDiscount)
+              <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+                -{{ $discountPercent }}%
+              </span>
+              @endif
             </div>
 
             <div class="card-body d-flex flex-column">
               <h6 class="card-title line-clamp-2 mb-1">
-                <a
-                  href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}"
-                  class="text-body text-decoration-none">
+                <a href="{{ $detailUrl }}" class="text-body text-decoration-none">
                   {{ $product->title }}
                 </a>
               </h6>
 
-              @php
-              $authorNames = optional($product->authors)->pluck('name')->join(', ');
-              @endphp
               <p class="card-text text-muted mb-3">{{ $authorNames ?: 'Không rõ tác giả' }}</p>
 
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                  <span class="price">
-                    {{ number_format($product->selling_price_vnd, 0, ',', '.') }} VNĐ
+                  @if($hasDiscount)
+                  <span class="price text-danger fw-bold">
+                    {{ number_format($finalPrice, 0, ',', '.') }} VNĐ
                   </span>
-                  @if(!empty($product->listed_price_vnd) && $product->listed_price_vnd > $product->selling_price_vnd)
-                  <small class="text-muted text-decoration-line-through ms-2">
-                    {{ number_format($product->listed_price_vnd, 0, ',', '.') }} VNĐ
+                  <small class="text-muted text-decoration-line-through ms-2" title="Giá gốc">
+                    {{ number_format($originalPrice, 0, ',', '.') }} VNĐ
                   </small>
+                  @else
+                  <span class="price">
+                    {{ number_format($originalPrice, 0, ',', '.') }} VNĐ
+                  </span>
                   @endif
                 </div>
 
                 <button
+                  type="button"
                   class="btn btn-sm {{ $isFav ? 'btn-danger' : 'btn-outline-danger' }} js-fav-toggle"
                   data-id="{{ $product->id }}"
                   data-add-url="{{ route('addFavoriteProduct') }}"
@@ -229,7 +306,7 @@ $favIds = auth()->check()
               </div>
 
               <div class="mt-auto d-grid gap-2">
-                <a href="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}" class="btn btn-outline-primary">
+                <a href="{{ $detailUrl }}" class="btn btn-outline-primary">
                   <i class="fas fa-eye me-2"></i>Xem chi tiết
                 </a>
 
@@ -241,9 +318,7 @@ $favIds = auth()->check()
                   @csrf
                   <input type="hidden" name="product_id" value="{{ $product->id }}">
                   <input type="hidden" name="qty" value="1">
-                  <button
-                    type="submit"
-                    class="btn btn-primary btn-lg w-100">
+                  <button type="submit" class="btn btn-primary btn-lg w-100">
                     <i class="fas fa-cart-plus me-2" aria-hidden="true"></i>Thêm vào giỏ
                   </button>
                 </form>
@@ -256,14 +331,33 @@ $favIds = auth()->check()
           <p class="text-muted mb-0">Chưa có sản phẩm.</p>
         </div>
         @endforelse
-      </div>
-
-      <div class="mt-3" id="pagination-links">
-        {{ $products->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
-      </div>
     </div>
-    {{-- KẾT THÚC: WRAPPER --}}
-    @endif
+
+    <div class="mt-3" id="pagination-links">
+      {{ $products->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
+    </div>
+  </div>
+
+  @endif
   </div>
 </section>
 @endsection
+
+@push('scripts')
+@vite(['resources/js/pages/product-list.js'])
+@endpush
+@push('scripts')
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('product-filter-form');
+    var toggle = document.getElementById('discount_only');
+    if (!form || !toggle) {
+      return;
+    }
+
+    toggle.addEventListener('change', function() {
+      form.submit();
+    });
+  });
+</script>
+@endpush

@@ -2,6 +2,7 @@
   id="aiChatWidget"
   class="ai-chat-widget"
   data-chat-url="{{ route('chat.ai') }}">
+
   <button
     id="aiChatToggle"
     type="button"
@@ -13,14 +14,22 @@
       class="ai-chat-toggle-icon">
   </button>
 
-  <div id="aiChatWindow" class="ai-chat-window ai-hidden">
+  <div
+    id="aiChatWindow"
+    class="ai-chat-window ai-hidden"
+    aria-hidden="true">
+
     <header class="ai-chat-header">
       <div class="ai-chat-header-left">
         <div class="ai-chat-avatar">
           <span class="ai-chat-avatar-icon">
-            <img src="{{ asset('storage/AI/avatar-AI.avif') }}" alt="Chat AI" class="ai-chat-toggle-icon">
+            <img
+              src="{{ asset('storage/AI/avatar-AI.avif') }}"
+              alt="Chat AI"
+              class="ai-chat-toggle-icon">
           </span>
         </div>
+
         <div class="ai-chat-header-text">
           <h2 class="ai-chat-title">Trợ lý AI</h2>
           <p class="ai-chat-status text-success">Đang hoạt động</p>
@@ -49,42 +58,23 @@
     <section class="ai-chat-faq">
       <p class="ai-chat-faq-title">Câu hỏi thường gặp</p>
       <div class="ai-chat-faq-items">
-        <button
-          type="button"
-          class="ai-chat-faq-btn"
-          data-faq-key="buy_flow">
-          Cách mua hàng trên website
-        </button>
-
-        <button
-          type="button"
-          class="ai-chat-faq-btn"
-          data-faq-key="track_order">
-          Cách theo dõi tình trạng đơn hàng
-        </button>
-
-        <button
-          type="button"
-          class="ai-chat-faq-btn"
-          data-faq-key="review_product">
-          Cách đánh giá sản phẩm sau khi mua
-        </button>
-
-        <button
-          type="button"
-          class="ai-chat-faq-btn"
-          data-faq-key="update_account">
-          Cách cập nhật thông tin tài khoản
-        </button>
+        <button type="button" class="ai-chat-faq-btn" data-faq-key="buy_flow">Cách mua hàng trên website</button>
+        <button type="button" class="ai-chat-faq-btn" data-faq-key="track_order">Cách theo dõi tình trạng đơn hàng</button>
+        <button type="button" class="ai-chat-faq-btn" data-faq-key="review_product">Cách đánh giá sản phẩm sau khi mua</button>
+        <button type="button" class="ai-chat-faq-btn" data-faq-key="update_account">Cách cập nhật thông tin tài khoản</button>
       </div>
     </section>
 
-    <main id="aiChatMessages" class="ai-chat-messages">
+    <main
+      id="aiChatMessages"
+      class="ai-chat-messages"
+      role="log"
+      aria-live="polite"
+      aria-relevant="additions">
+
       <div class="ai-chat-message-row ai-chat-message-row-assistant message-enter">
         <div class="ai-chat-bubble ai-chat-bubble-assistant">
-          <p class="ai-chat-bubble-text">
-            Xin chào! Tôi có thể giúp gì cho bạn hôm nay?
-          </p>
+          <p class="ai-chat-bubble-text">Xin chào! Tôi có thể giúp gì cho bạn hôm nay?</p>
         </div>
       </div>
     </main>
@@ -97,6 +87,7 @@
           class="ai-chat-input"
           placeholder="Nhập tin nhắn của bạn..."
           aria-label="Nhập tin nhắn của bạn">
+
         <button
           type="submit"
           id="aiChatSend"

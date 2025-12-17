@@ -10,7 +10,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class VoucherService
 {
-    public function getVoucherCenterData(User $user, int $perPage = 9): array
+    public function getVoucherCenterData(?User $user, int $perPage = 9): array
     {
         $now = now();
 
@@ -32,6 +32,17 @@ class VoucherService
             return [$discounts, [], [], []];
         }
 
+        $globalUsedMap = DiscountUsage::query()
+            ->selectRaw('discount_id, COUNT(*) as cnt')
+            ->whereIn('discount_id', $ids)
+            ->groupBy('discount_id')
+            ->pluck('cnt', 'discount_id')
+            ->all();
+
+        if (!$user) {
+            return [$discounts, [], [], $globalUsedMap];
+        }
+
         $savedIds = DiscountWalletItem::query()
             ->where('user_id', $user->id)
             ->where('status', 'SAVED')
@@ -47,13 +58,6 @@ class VoucherService
             ->pluck('cnt', 'discount_id')
             ->all();
 
-        $globalUsedMap = DiscountUsage::query()
-            ->selectRaw('discount_id, COUNT(*) as cnt')
-            ->whereIn('discount_id', $ids)
-            ->groupBy('discount_id')
-            ->pluck('cnt', 'discount_id')
-            ->all();
-
         return [$discounts, array_fill_keys($savedIds, true), $userUsedMap, $globalUsedMap];
     }
 
@@ -62,6 +66,7 @@ class VoucherService
         /** @var LengthAwarePaginator $discounts */
         $discounts = Discount::query()
             ->join('discount_wallet_items as w', 'w.discount_id', '=', 'discounts.id')
+            ->whereNull('discounts.deleted_at')
             ->where('w.user_id', $user->id)
             ->where('w.status', 'SAVED')
             ->select('discounts.*')

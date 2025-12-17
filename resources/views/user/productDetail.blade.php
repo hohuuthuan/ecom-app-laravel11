@@ -17,19 +17,37 @@
     </nav>
 
     @php
-    $rating = (float)($product->rating_avg ?? 0);
-    $reviewsCount = (int)($product->reviews_count ?? 0);
-    $out = (int)($product->quantity_available ?? 0) <= 0;
-      $isFav=(bool)($product->is_favorite ?? false);
-      @endphp
+    $rating = (float) ($product->rating_avg ?? 0);
+    $reviewsCount = (int) ($product->reviews_count ?? 0);
+    $out = (int) ($product->quantity_available ?? 0) <= 0;
+      $isFav=(bool) ($product->is_favorite ?? false);
 
-      <div class="row g-5">
+      // === CHỈ THÊM PHẦN GIẢM GIÁ THEO discount_percent ===
+      $discountPercent = (int) ($product->discount_percent ?? 0);
+      $discountPercent = max(0, min(100, $discountPercent));
+
+      $sellingPrice = (int) ($product->selling_price_vnd ?? 0);
+      $finalPrice = $discountPercent > 0
+      ? (int) round($sellingPrice * (100 - $discountPercent) / 100)
+      : $sellingPrice;
+
+      $hasPercentDiscount = $discountPercent > 0 && $finalPrice > 0 && $finalPrice < $sellingPrice;
+        //===END===@endphp
+
+        <div class="row g-5">
         <div class="col-lg-6">
-          <div id="productCover" class="book-detail-cover {{ $out ? 'is-out' : '' }}">
+          <div id="productCover" class="book-detail-cover {{ $out ? 'is-out' : '' }} position-relative">
             <img
               src="{{ asset('storage/products/'.$product->image) }}"
               alt="{{ $product->title }}"
               class="w-100">
+
+            @if($hasPercentDiscount)
+            <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+              -{{ $discountPercent }}%
+            </span>
+            @endif
+
             @if($out)
             <span class="oos-badge">Tạm thời hết hàng</span>
             @endif
@@ -53,6 +71,14 @@
           </p>
 
           <div class="mb-4">
+            @if($hasPercentDiscount)
+            <span class="h2 text-danger me-3">
+              {{ number_format($finalPrice, 0, ',', '.') }} VNĐ
+            </span>
+            <span class="h5 text-muted text-decoration-line-through">
+              {{ number_format($sellingPrice, 0, ',', '.') }} VNĐ
+            </span>
+            @else
             <span class="h2 text-danger me-3">
               {{ number_format((int)($product->selling_price_vnd ?? 0), 0, ',', '.') }} VNĐ
             </span>
@@ -60,6 +86,7 @@
             <span class="h5 text-muted text-decoration-line-through">
               {{ number_format((int)$product->original_price_vnd, 0, ',', '.') }} VNĐ
             </span>
+            @endif
             @endif
           </div>
 
@@ -158,64 +185,64 @@
 
           <input type="hidden" id="productId" value="{{ $product->id }}">
         </div>
-      </div>
-
-      <hr class="my-5">
-      <section class="product-reviews" id="productReviews">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h3 class="h5 mb-0 review-title">Đánh giá của người dùng</h3>
-
-          <form class="d-flex align-items-center">
-            <label class="me-2 mb-0">Hiển thị</label>
-            <select
-              class="form-select form-select-sm w-auto"
-              name="per_page_review">
-              <option value="4" {{ ($perPageReview ?? 8) === 4  ? 'selected' : '' }}>4</option>
-              <option value="8" {{ ($perPageReview ?? 8) === 8  ? 'selected' : '' }}>8</option>
-              <option value="12" {{ ($perPageReview ?? 8) === 12 ? 'selected' : '' }}>12</option>
-            </select>
-          </form>
-        </div>
-
-        <div
-          id="reviewsContainer"
-          data-reviews-container
-          data-reviews-url="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}">
-          @include('partials.ui.productDetail.reviews-list', ['reviews' => $reviews])
-        </div>
-      </section>
-
-
-      <hr class="my-5">
-
-      <section class="product-related mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h3 class="h5 mb-0 review-title">Sản phẩm liên quan</h3>
-
-          <form class="d-flex align-items-center">
-            <label class="me-2 mb-0">Hiển thị</label>
-            <select
-              class="form-select form-select-sm w-auto"
-              name="per_page_related">
-              <option value="4" {{ ($perPageRelated ?? 8) === 4  ? 'selected' : '' }}>4</option>
-              <option value="8" {{ ($perPageRelated ?? 8) === 8  ? 'selected' : '' }}>8</option>
-              <option value="12" {{ ($perPageRelated ?? 8) === 12 ? 'selected' : '' }}>12</option>
-            </select>
-          </form>
-        </div>
-
-        <div
-          id="relatedProductsWrapper"
-          data-related-container
-          data-related-url="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}">
-          @include('partials.ui.productDetail.related-products', [
-          'products' => $relatedProducts,
-          'perPageRelated' => $perPageRelated ?? 8,
-          ])
-        </div>
-      </section>
   </div>
+
+  <hr class="my-5">
+  <section class="product-reviews" id="productReviews">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="h5 mb-0 review-title">Đánh giá của người dùng</h3>
+
+      <form class="d-flex align-items-center">
+        <label class="me-2 mb-0">Hiển thị</label>
+        <select
+          class="form-select form-select-sm w-auto"
+          name="per_page_review">
+          <option value="4" {{ ($perPageReview ?? 8) === 4  ? 'selected' : '' }}>4</option>
+          <option value="8" {{ ($perPageReview ?? 8) === 8  ? 'selected' : '' }}>8</option>
+          <option value="12" {{ ($perPageReview ?? 8) === 12 ? 'selected' : '' }}>12</option>
+        </select>
+      </form>
+    </div>
+
+    <div
+      id="reviewsContainer"
+      data-reviews-container
+      data-reviews-url="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}">
+      @include('partials.ui.productDetail.reviews-list', ['reviews' => $reviews])
+    </div>
+  </section>
+
+  <hr class="my-5">
+
+  <section class="product-related mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="h5 mb-0 review-title">Sản phẩm liên quan</h3>
+
+      <form class="d-flex align-items-center">
+        <label class="me-2 mb-0">Hiển thị</label>
+        <select
+          class="form-select form-select-sm w-auto"
+          name="per_page_related">
+          <option value="6" {{ ($perPageRelated ?? 6) === 6  ? 'selected' : '' }}>6</option>
+          <option value="8" {{ ($perPageRelated ?? 8) === 8  ? 'selected' : '' }}>8</option>
+          <option value="12" {{ ($perPageRelated ?? 8) === 12 ? 'selected' : '' }}>12</option>
+        </select>
+      </form>
+    </div>
+
+    <div
+      id="relatedProductsWrapper"
+      data-related-container
+      data-related-url="{{ route('product.detail', ['slug' => $product->slug, 'id' => $product->id]) }}">
+      @include('partials.ui.productDetail.related-products', [
+      'products' => $relatedProducts,
+      'perPageRelated' => $perPageRelated ?? 8,
+      ])
+    </div>
+  </section>
 </div>
+</div>
+
 <section class="newsletter-section">
   <div class="container">
     <div class="row justify-content-center">
@@ -412,60 +439,121 @@
 </script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    var reviewsContainer = document.querySelector('[data-reviews-container]');
-    if (!reviewsContainer) return;
+    var relatedWrapper = document.querySelector('[data-related-container]');
+    if (!relatedWrapper) {
+      return;
+    }
 
-    var perPageSelect = document.querySelector('select[name="per_page_review"]');
-    var baseUrl = reviewsContainer.getAttribute('data-reviews-url') || window.location.href;
+    var baseUrl = relatedWrapper.getAttribute('data-related-url') || window.location.href;
+    var perPageSelect = document.querySelector('select[name="per_page_related"]');
 
-    function buildReviewsUrl(rawUrl) {
+    function initRelatedImages() {
+      var covers = relatedWrapper.querySelectorAll('.book-cover');
+      covers.forEach(function(cover) {
+        var img = cover.querySelector('.book-cover-img');
+        if (!img) {
+          return;
+        }
+
+        function markLoaded() {
+          cover.classList.add('is-loaded');
+        }
+
+        if (img.complete && img.naturalWidth !== 0) {
+          markLoaded();
+        } else {
+          img.addEventListener('load', markLoaded, {
+            once: true
+          });
+          img.addEventListener('error', markLoaded, {
+            once: true
+          });
+        }
+      });
+    }
+
+    function scrollToRelated() {
+      var target = relatedWrapper.closest('section.product-related') || relatedWrapper;
+      var header = document.querySelector('header, .sticky-top, .navbar.sticky-top');
+      var offset = header ? header.offsetHeight + 12 : 12;
+      var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: top < 0 ? 0 : top,
+        behavior: 'smooth'
+      });
+    }
+
+    function buildRelatedUrl(rawUrl) {
       var url = rawUrl || baseUrl;
       var urlObj = new URL(url, window.location.origin);
 
-      urlObj.searchParams.set('reviews_only', '1');
+      urlObj.searchParams.set('related_only', '1');
 
       if (perPageSelect && perPageSelect.value) {
-        urlObj.searchParams.set('per_page_review', perPageSelect.value);
+        urlObj.searchParams.set('per_page_related', perPageSelect.value);
       }
 
       return urlObj.toString();
     }
 
-    function loadReviews(url) {
+    function loadRelated(url, shouldScroll) {
+      if (!url) {
+        return;
+      }
+
+      relatedWrapper.classList.add('is-loading');
+
       fetch(url, {
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
           }
         })
-        .then(res => res.text())
-        .then(html => {
-          reviewsContainer.innerHTML = html;
+        .then(function(res) {
+          if (!res.ok) {
+            throw new Error('Request failed');
+          }
+          return res.text();
         })
-        .catch(() => {});
+        .then(function(html) {
+          relatedWrapper.innerHTML = html;
+          relatedWrapper.classList.remove('is-loading');
+          initRelatedImages();
+
+          if (shouldScroll) {
+            scrollToRelated();
+          }
+        })
+        .catch(function() {
+          relatedWrapper.classList.remove('is-loading');
+        });
     }
 
-    // CLICK PHÂN TRANG REVIEW
-    reviewsContainer.addEventListener('click', function(e) {
-      var link = e.target.closest('.reviews-pagination a');
-      if (!link) return;
+    initRelatedImages();
 
-      e.preventDefault();
-      var url = buildReviewsUrl(link.getAttribute('href'));
-      loadReviews(url);
-    });
-
-    // (*) XỬ LÝ CHANGE PER_PAGE_REVIEW
     if (perPageSelect) {
-      perPageSelect.addEventListener('change', function() {
-        var url = buildReviewsUrl(baseUrl);
-        var urlObj = new URL(url, window.location.origin);
-        urlObj.searchParams.delete('page'); // reset về trang 1
+      perPageSelect.addEventListener('change', function(e) {
+        e.preventDefault();
 
-        loadReviews(urlObj.toString());
+        var urlObj = new URL(buildRelatedUrl(baseUrl), window.location.origin);
+        urlObj.searchParams.delete('page');
+
+        loadRelated(urlObj.toString(), true);
       });
     }
+
+    relatedWrapper.addEventListener('click', function(e) {
+      var link = e.target.closest('.related-pagination a');
+      if (!link) {
+        return;
+      }
+
+      e.preventDefault();
+      loadRelated(buildRelatedUrl(link.getAttribute('href') || ''), true);
+    });
   });
 </script>
+
 
 @endpush
 @endsection

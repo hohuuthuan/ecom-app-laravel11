@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const claimUrl = root.getAttribute('data-claim-url') || '';
   const removeUrl = root.getAttribute('data-remove-url') || '';
+  const loginUrl = root.getAttribute('data-login-url') || '';
   const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
   const showNotification = (type, message) => {
@@ -45,13 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const setBtnLoading = (btn, loading, text) => {
     if (loading) {
       if (!btn.dataset.originalHtml) btn.dataset.originalHtml = btn.innerHTML;
+      if (!btn.dataset.originalDisabled) btn.dataset.originalDisabled = btn.disabled ? '1' : '0';
+
       btn.disabled = true;
       btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><span class="js-btn-text">${text}</span>`;
       return;
     }
 
     if (btn.dataset.originalHtml) btn.innerHTML = btn.dataset.originalHtml;
-    btn.disabled = false;
+    btn.disabled = btn.dataset.originalDisabled === '1';
   };
 
   const setBtnStateSaved = (btn) => {
@@ -60,9 +63,27 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.innerHTML = `<i class="fas fa-check-circle"></i><span class="js-btn-text">Đã lưu vào ví</span>`;
   };
 
+  const redirectToLogin = () => {
+    if (loginUrl) {
+      window.location.href = loginUrl;
+      return;
+    }
+    showNotification('error', 'Vui lòng đăng nhập để thực hiện thao tác này.');
+  };
+
   root.addEventListener('click', async (e) => {
     const saveBtn = e.target.closest('.js-voucher-save');
-    if (saveBtn && claimUrl) {
+    if (saveBtn) {
+      if (saveBtn.dataset.requiresAuth === '1') {
+        redirectToLogin();
+        return;
+      }
+
+      if (!claimUrl) {
+        showNotification('error', 'Không thể lưu voucher lúc này.');
+        return;
+      }
+
       if (saveBtn.disabled) return;
 
       const code = (saveBtn.getAttribute('data-code') || saveBtn.dataset.code || '').trim();
@@ -86,6 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const data = await res.json().catch(() => null);
+
+        if (res.status === 401) {
+          setBtnLoading(saveBtn, false, '');
+          showNotification('error', (data && (data.message || data.mess)) || 'Vui lòng đăng nhập để lưu voucher.');
+          redirectToLogin();
+          return;
+        }
 
         if (res.ok && data && data.ok) {
           setBtnStateSaved(saveBtn);
@@ -139,6 +167,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const data = await res.json().catch(() => null);
+
+        if (res.status === 401) {
+          removeBtn.disabled = false;
+          showNotification('error', (data && (data.message || data.mess)) || 'Vui lòng đăng nhập.');
+          redirectToLogin();
+          return;
+        }
 
         if (res.ok && data && data.ok) {
           const card = removeBtn.closest('.voucher-card');

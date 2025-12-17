@@ -80,10 +80,10 @@ class ProductService
       $query->where('publisher_id', (string)$filters['publisher_id']);
     }
     if ($filters['price_min'] !== null && $filters['price_min'] !== '') {
-      $query->where('price', '>=', (int)$filters['price_min']);
+      $query->where('selling_price_vnd', '>=', (int)$filters['price_min']);
     }
     if ($filters['price_max'] !== null && $filters['price_max'] !== '') {
-      $query->where('price', '<=', (int)$filters['price_max']);
+      $query->where('selling_price_vnd', '<=', (int)$filters['price_max']);
     }
     if ($filters['stock_min'] !== null && $filters['stock_min'] !== '') {
       $query->where('stock', '>=', (int)$filters['stock_min']);

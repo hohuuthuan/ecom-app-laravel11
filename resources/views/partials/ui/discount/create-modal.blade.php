@@ -203,8 +203,8 @@
               name="status"
               class="form-select setupSelect2 {{ $createErrors->has('status') ? 'is-invalid' : '' }}"
               data-placeholder="Chọn trạng thái">
-              <option value="ACTIVE" {{ $st==='ACTIVE' ? 'selected' : '' }}>ACTIVE</option>
-              <option value="INACTIVE" {{ $st==='INACTIVE' ? 'selected' : '' }}>INACTIVE</option>
+              <option value="ACTIVE" {{ $st==='ACTIVE' ? 'selected' : '' }}>Phát hành</option>
+              <option value="INACTIVE" {{ $st==='INACTIVE' ? 'selected' : '' }}>Ngừng phát hành</option>
             </select>
             <div
               class="invalid-feedback {{ $createErrors->has('status') ? 'd-block' : 'd-none' }}"

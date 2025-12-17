@@ -7,22 +7,24 @@
       return;
     }
 
-    var chatUrl   = widget.getAttribute('data-chat-url');
-    var toggle    = document.getElementById('aiChatToggle');
-    var windowEl  = document.getElementById('aiChatWindow');
-    var closeBtn  = document.getElementById('aiChatClose');
-    var clearBtn  = document.getElementById('aiChatClearHistory');
-    var form      = document.getElementById('aiChatForm');
-    var input     = document.getElementById('aiChatInput');
+    var chatUrl = widget.getAttribute('data-chat-url');
+    var toggle = document.getElementById('aiChatToggle');
+    var windowEl = document.getElementById('aiChatWindow');
+    var closeBtn = document.getElementById('aiChatClose');
+    var clearBtn = document.getElementById('aiChatClearHistory');
+    var form = document.getElementById('aiChatForm');
+    var input = document.getElementById('aiChatInput');
     var messagesEl = document.getElementById('aiChatMessages');
-    var sendBtn   = document.getElementById('aiChatSend');
-    var typingEl  = null;
+    var sendBtn = document.getElementById('aiChatSend');
 
+    if (!chatUrl || !toggle || !windowEl || !closeBtn || !clearBtn || !form || !input || !messagesEl || !sendBtn) {
+      return;
+    }
+
+    var typingEl = null;
     var faqButtons = widget.querySelectorAll('[data-faq-key]');
-
     var STORAGE_KEY = 'ai_chat_history_v1';
 
-    // Câu hỏi thường gặp + câu trả lời cứng phía AI (không gọi OpenAI)
     var FAQ_CONFIG = {
       buy_flow: {
         question: 'Cách mua hàng trên website',
@@ -62,33 +64,28 @@
       }
     };
 
-    if (
-      !chatUrl ||
-      !toggle ||
-      !windowEl ||
-      !closeBtn ||
-      !clearBtn ||
-      !form ||
-      !input ||
-      !messagesEl ||
-      !sendBtn
-    ) {
-      return;
-    }
-
     function clearMessages() {
       while (messagesEl.firstChild) {
         messagesEl.removeChild(messagesEl.firstChild);
       }
     }
 
-    function scrollToBottom() {
+    function isNearBottom() {
+      var threshold = 80;
+      var distance = messagesEl.scrollHeight - (messagesEl.scrollTop + messagesEl.clientHeight);
+      return distance <= threshold;
+    }
+
+    function scrollToBottom(smooth) {
+      if (smooth) {
+        messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+        return;
+      }
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
     function saveHistory(role, content) {
       var history;
-
       try {
         var raw = localStorage.getItem(STORAGE_KEY);
         history = Array.isArray(JSON.parse(raw)) ? JSON.parse(raw) : [];
@@ -96,10 +93,7 @@
         history = [];
       }
 
-      history.push({
-        role: role,
-        content: content
-      });
+      history.push({ role: role, content: content });
 
       if (history.length > 50) {
         history = history.slice(history.length - 50);
@@ -109,6 +103,8 @@
     }
 
     function appendMessage(text, role, skipStore) {
+      var shouldStick = isNearBottom();
+
       var row = document.createElement('div');
       row.classList.add('ai-chat-message-row', 'message-enter');
 
@@ -136,7 +132,11 @@
         saveHistory(role, text);
       }
 
-      scrollToBottom();
+      if (shouldStick) {
+        requestAnimationFrame(function () {
+          scrollToBottom(true);
+        });
+      }
     }
 
     function restoreHistory() {
@@ -168,12 +168,10 @@
         return;
       }
 
+      var shouldStick = isNearBottom();
+
       var row = document.createElement('div');
-      row.classList.add(
-        'ai-chat-message-row',
-        'ai-chat-message-row-assistant',
-        'message-enter'
-      );
+      row.classList.add('ai-chat-message-row', 'ai-chat-message-row-assistant', 'message-enter');
 
       var bubble = document.createElement('div');
       bubble.classList.add('ai-chat-bubble', 'ai-chat-bubble-assistant');
@@ -194,7 +192,12 @@
 
       messagesEl.appendChild(row);
       typingEl = row;
-      scrollToBottom();
+
+      if (shouldStick) {
+        requestAnimationFrame(function () {
+          scrollToBottom(true);
+        });
+      }
     }
 
     function hideTyping() {
@@ -215,49 +218,61 @@
           'Accept': 'application/json',
           'X-CSRF-TOKEN': csrfToken
         },
-        body: JSON.stringify({
-          message: message
-        })
+        body: JSON.stringify({ message: message })
       }).then(function (res) {
         return res.json();
       });
     }
 
-    // Xử lý khi click vào 1 câu hỏi FAQ: gửi tin nhắn user + trả lời cứng từ AI (frontend)
+    function openChat() {
+      windowEl.classList.remove('ai-hidden');
+      windowEl.setAttribute('aria-hidden', 'false');
+      toggle.classList.add('ai-hidden');
+
+      windowEl.classList.remove('ai-opening');
+      windowEl.offsetHeight; // force reflow
+      windowEl.classList.add('ai-opening');
+
+      input.focus();
+      scrollToBottom(false);
+    }
+
+    function closeChat() {
+      windowEl.classList.add('ai-hidden');
+      windowEl.setAttribute('aria-hidden', 'true');
+      toggle.classList.remove('ai-hidden');
+    }
+
     function handleFaqClick(key) {
       var config = FAQ_CONFIG[key];
       if (!config) {
         return;
       }
-
-      // Đẩy câu hỏi vào khung chat như user gõ
       appendMessage(config.question, 'user', false);
-
-      // Trả lời luôn bằng nội dung cứng, không gọi API, không tốn token
       appendMessage(config.answer, 'assistant', false);
     }
 
     toggle.addEventListener('click', function () {
-      windowEl.classList.remove('ai-hidden');
-      toggle.classList.add('ai-hidden');
-      input.focus();
+      openChat();
     });
 
     closeBtn.addEventListener('click', function () {
-      windowEl.classList.add('ai-hidden');
-      toggle.classList.remove('ai-hidden');
+      closeChat();
     });
 
-    // Xóa lịch sử chat + reset lời chào
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') {
+        return;
+      }
+      if (!windowEl.classList.contains('ai-hidden')) {
+        closeChat();
+      }
+    });
+
     clearBtn.addEventListener('click', function () {
       localStorage.removeItem(STORAGE_KEY);
       clearMessages();
-
-      appendMessage(
-        'Xin chào! Tôi có thể giúp gì cho bạn hôm nay?',
-        'assistant',
-        false
-      );
+      appendMessage('Xin chào! Tôi có thể giúp gì cho bạn hôm nay?', 'assistant', false);
     });
 
     form.addEventListener('submit', function (event) {
@@ -281,19 +296,19 @@
 
           if (data && data.ok && data.reply) {
             appendMessage(data.reply, 'assistant', false);
-          } else if (data && data.message) {
-            appendMessage(data.message, 'assistant', false);
-          } else {
-            appendMessage('Xin lỗi, đã có lỗi xảy ra.', 'assistant', false);
+            return;
           }
+
+          if (data && data.message) {
+            appendMessage(data.message, 'assistant', false);
+            return;
+          }
+
+          appendMessage('Xin lỗi, đã có lỗi xảy ra.', 'assistant', false);
         })
         .catch(function () {
           hideTyping();
-          appendMessage(
-            'Xin lỗi, không kết nối được tới máy chủ.',
-            'assistant',
-            false
-          );
+          appendMessage('Xin lỗi, không kết nối được tới máy chủ.', 'assistant', false);
         })
         .finally(function () {
           input.disabled = false;
@@ -302,7 +317,6 @@
         });
     });
 
-    // Gắn event click cho các nút FAQ
     if (faqButtons && faqButtons.length > 0) {
       faqButtons.forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -316,6 +330,6 @@
     }
 
     restoreHistory();
-    scrollToBottom();
+    scrollToBottom(false);
   });
 })();

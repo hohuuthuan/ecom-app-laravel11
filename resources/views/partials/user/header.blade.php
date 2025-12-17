@@ -64,8 +64,11 @@
 
           $voucherCount = auth()->check()
           ? \App\Models\DiscountWalletItem::query()
-          ->where('user_id', auth()->id())
-          ->where('status', 'SAVED')
+          ->from('discount_wallet_items as w')
+          ->join('discounts as d', 'd.id', '=', 'w.discount_id')
+          ->whereNull('d.deleted_at')
+          ->where('w.user_id', auth()->id())
+          ->where('w.status', 'SAVED')
           ->count()
           : 0;
           @endphp

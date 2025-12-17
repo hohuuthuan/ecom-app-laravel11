@@ -66,6 +66,7 @@ class VoucherService
         /** @var LengthAwarePaginator $discounts */
         $discounts = Discount::query()
             ->join('discount_wallet_items as w', 'w.discount_id', '=', 'discounts.id')
+            ->whereNull('discounts.deleted_at')
             ->where('w.user_id', $user->id)
             ->where('w.status', 'SAVED')
             ->select('discounts.*')

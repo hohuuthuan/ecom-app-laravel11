@@ -45,7 +45,7 @@
                 placeholder="Tìm theo tên sản phẩm"
                 value="{{ request('keyword') }}">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
               <label class="d-block mb-1">&nbsp;</label>
               <button type="submit" class="btn btn-primary btn-admin btn-submit-filter-admin-order">
                 <i class="fa fa-search me-1"></i> Tìm kiếm

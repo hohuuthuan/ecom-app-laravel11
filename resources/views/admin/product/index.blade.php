@@ -51,7 +51,7 @@
                 value="{{ request('keyword') }}">
             </div>
 
-            <div class="col-md-2 d-flex align-items-center gap-2">
+            <div class="col-md-3 d-flex align-items-center gap-2">
               <button type="submit" class="btn-admin btn-submit-filter-admin-product">
                 <i class="fa fa-search me-1"></i> Tìm kiếm
               </button>

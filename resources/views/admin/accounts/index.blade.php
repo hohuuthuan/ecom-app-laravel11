@@ -65,7 +65,7 @@
                     @endforeach
                   </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                   <select name="status" class="form-select setupSelect2">
                     <option value="">-- Tất cả trạng thái --</option>
                     <option value="ACTIVE" {{ request('status')==='ACTIVE'?'selected':'' }}>Bình thường</option>
@@ -77,7 +77,7 @@
                 </div>
                 <div class="col-md-1 d-grid">
                   <a href="{{ route('admin.accounts.index') }}" class="btn btn-outline-secondary">
-                    <i class="fa fa-eraser me-1"></i>Xóa lọc
+                    <i class="fa fa-eraser me-1"></i>Xóa
                   </a>
                 </div>
               </form>

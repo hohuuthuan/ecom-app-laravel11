@@ -52,14 +52,14 @@ $tab = in_array($tab, ['category', 'author', 'publisher'], true) ? $tab : 'categ
                   </select>
                 </div>
                 <div class="col-md-1 d-grid">
-                  <button type="submit" class="btn-admin">Lọc</button>
+                  <button  type="submit" class="btn-admin">Lọc</button>
                 </div>
                 <div class="col-md-1 d-grid">
                   @php($catClearQuery = \Illuminate\Support\Arr::except(request()->query(), ['cat_keyword','cat_status','page']))
                   @php($catClearQuery['tab'] = 'category')
                   @php($catClearQuery['per_page_cat'] = request('per_page_cat', 10))
                   <a href="{{ url()->current() . '?' . http_build_query($catClearQuery) }}" class="btn btn-outline-secondary">
-                    <i class="fa fa-eraser me-1"></i>Xóa lọc
+                    <i class="fa fa-eraser me-1"></i>Xóa
                   </a>
                 </div>
                 <input type="hidden" name="tab" value="category">
@@ -179,7 +179,7 @@ $tab = in_array($tab, ['category', 'author', 'publisher'], true) ? $tab : 'categ
                   @php($authorClearQuery['tab'] = 'author')
                   @php($authorClearQuery['per_page_author'] = request('per_page_author', 10))
                   <a href="{{ url()->current() . '?' . http_build_query($authorClearQuery) }}" class="btn btn-outline-secondary">
-                    <i class="fa fa-eraser me-1"></i>Xóa lọc
+                    <i class="fa fa-eraser me-1"></i>Xóa
                   </a>
                 </div>
                 <input type="hidden" name="tab" value="author">
@@ -305,7 +305,7 @@ $tab = in_array($tab, ['category', 'author', 'publisher'], true) ? $tab : 'categ
                   @php($publisherClearQuery['tab'] = 'publisher')
                   @php($publisherClearQuery['per_page_publisher'] = request('per_page_publisher', 10))
                   <a href="{{ url()->current() . '?' . http_build_query($publisherClearQuery) }}" class="btn btn-outline-secondary">
-                    <i class="fa fa-eraser me-1"></i>Xóa lọc
+                    <i class="fa fa-eraser me-1"></i>Xóa
                   </a>
                 </div>
                 <input type="hidden" name="publisher_keyword" value="{{ request('publisher_keyword') }}">

@@ -52,7 +52,7 @@
                 placeholder="Tìm theo mã giảm giá"
                 value="{{ request('keyword') }}">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
               <label class="d-block mb-1">&nbsp;</label>
               <button type="submit" class="btn-admin">
                 <i class="fa fa-search me-1"></i> Tìm kiếm

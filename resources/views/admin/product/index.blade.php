@@ -185,7 +185,7 @@
               <th class="STT_Width">#</th>
               <th>TÊN</th>
               <!-- <th>SLUG</th> -->
-              <th>MÃ ĐỊNH DANH</th>
+              <th class="ISBN">MÃ ĐỊNH DANH</th>
               <th>DANH MỤC</th>
               <th>TÁC GIẢ</th>
               <th>NHÀ XUẤT BẢN</th>

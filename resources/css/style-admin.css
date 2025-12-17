@@ -26,6 +26,10 @@ a:hover {
 
 
 /* CUSTOM TABLE */
+.ISBN {
+    width: 157px;
+}
+
 .checkAllWidth {
     width: 42px;
 }

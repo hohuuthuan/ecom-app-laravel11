@@ -72,6 +72,21 @@ $favIds = auth()->check()
             @endforeach
           </select>
         </div>
+        <div class="col-lg-2 col-md-6">
+          <label class="form-label mb-1">Có giảm giá</label>
+          <div class="d-flex align-items-center">
+            <label class="discount-switch mb-0" for="discount_only" aria-label="Lọc sản phẩm có giảm giá">
+              <input
+                type="checkbox"
+                id="discount_only"
+                name="discount_only"
+                value="1"
+                class="discount-switch-input"
+                @checked((int) request('discount_only')===1)>
+              <span class="discount-switch-slider"></span>
+            </label>
+          </div>
+        </div>
 
         <div class="col-lg-2 col-md-6">
           <button type="submit" class="btn-submit-filter btn btn-primary w-100">
@@ -79,7 +94,7 @@ $favIds = auth()->check()
           </button>
         </div>
 
-        <div class="col-lg-4 col-md-12 text-md-end">
+        <div class="col-lg-2 col-md-12">
           <a href="{{ route('product.list') }}"
             class="btn-remove-filter btn btn-outline-secondary w-lg-auto">
             Xóa lọc
@@ -322,6 +337,7 @@ $favIds = auth()->check()
       {{ $products->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
     </div>
   </div>
+
   @endif
   </div>
 </section>
@@ -329,4 +345,19 @@ $favIds = auth()->check()
 
 @push('scripts')
 @vite(['resources/js/pages/product-list.js'])
+@endpush
+@push('scripts')
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('product-filter-form');
+    var toggle = document.getElementById('discount_only');
+    if (!form || !toggle) {
+      return;
+    }
+
+    toggle.addEventListener('change', function() {
+      form.submit();
+    });
+  });
+</script>
 @endpush

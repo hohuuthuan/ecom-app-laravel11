@@ -962,6 +962,75 @@ a {
   color: #fff;
 }
 
+.discount-switch {
+  position: relative;
+  display: inline-block;
+  width: 80px;
+  height: 40px;
+}
+
+.discount-switch-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.discount-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  transition: 0.4s;
+  border-radius: 40px;
+  background-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.discount-switch-slider::before {
+  position: absolute;
+  content: "";
+  height: 32px;
+  width: 32px;
+  left: 4px;
+  bottom: 4px;
+  background-color: #ffffff;
+  transition: 0.4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.discount-switch-slider::after {
+  content: "TẮT";
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #334155;
+  transition: 0.4s;
+  z-index: 1;
+}
+
+.discount-switch-input:checked + .discount-switch-slider {
+  background-color: #667eea;
+}
+
+.discount-switch-input:checked + .discount-switch-slider::before {
+  transform: translateX(40px);
+}
+
+.discount-switch-input:checked + .discount-switch-slider::after {
+  content: "BẬT";
+  left: 14px;
+  right: auto;
+  color: #ffffff;
+}
+
+.discount-switch-input:focus + .discount-switch-slider {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
 
 /*  ============================================================= RECENTLY VIEWED ============================================================= */
 .recently-viewed-empty {

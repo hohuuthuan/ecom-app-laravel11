@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="vi" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Toggle Switch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    .switch-container {
+      position: relative;
+      display: inline-block;
+      width: 80px;
+      height: 40px;
+    }
+    
+    .switch-input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transition: 0.4s;
+      border-radius: 40px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 32px;
+      width: 32px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .switch-input:checked + .switch-slider:before {
+      transform: translateX(40px);
+    }
+    
+    .switch-input:focus + .switch-slider {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+      transition: background-color 0.3s ease;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div class="h-full w-full flex items-center justify-center">
+   <div class="text-center space-y-8">
+    <h1 id="switch-label" class="text-4xl font-bold mb-8">Modern Toggle Switch</h1>
+    <div class="flex items-center justify-center space-x-6"><label for="main-switch" class="switch-container" aria-label="Toggle switch"> <input type="checkbox" id="main-switch" class="switch-input"> <span class="switch-slider"></span> </label>
+    </div>
+    <div class="mt-8">
+     <div class="inline-flex items-center px-6 py-3 rounded-lg text-xl font-semibold transition-all duration-300"><span class="status-indicator"></span> <span id="status-text">OFF</span>
+     </div>
+    </div>
+    <div class="mt-4 text-gray-600 text-sm">
+     <p>Click vào switch để bật/tắt</p>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      switch_label: 'Modern Toggle Switch',
+      on_text: 'ON',
+      off_text: 'OFF',
+      background_color: '#f0f4f8',
+      switch_off_color: '#cbd5e1',
+      switch_on_color: '#3b82f6',
+      text_color: '#1e293b',
+      indicator_off_color: '#ef4444',
+      indicator_on_color: '#10b981'
+    };
+
+    const switchElement = document.getElementById('main-switch');
+    const statusText = document.getElementById('status-text');
+    const statusIndicator = document.querySelector('.status-indicator');
+    const switchSlider = document.querySelector('.switch-slider');
+    const statusContainer = statusText.parentElement;
+
+    function updateUI(config) {
+      const switchLabel = document.getElementById('switch-label');
+      switchLabel.textContent = config.switch_label || defaultConfig.switch_label;
+      
+      document.body.style.backgroundColor = config.background_color || defaultConfig.background_color;
+      
+      switchLabel.style.color = config.text_color || defaultConfig.text_color;
+      
+      statusText.style.color = config.text_color || defaultConfig.text_color;
+      
+      updateSwitchState();
+    }
+
+    function updateSwitchState() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const isChecked = switchElement.checked;
+      
+      if (isChecked) {
+        statusText.textContent = config.on_text || defaultConfig.on_text;
+        switchSlider.style.backgroundColor = config.switch_on_color || defaultConfig.switch_on_color;
+        statusIndicator.style.backgroundColor = config.indicator_on_color || defaultConfig.indicator_on_color;
+        statusContainer.style.backgroundColor = `${config.switch_on_color || defaultConfig.switch_on_color}15`;
+      } else {
+        statusText.textContent = config.off_text || defaultConfig.off_text;
+        switchSlider.style.backgroundColor = config.switch_off_color || defaultConfig.switch_off_color;
+        statusIndicator.style.backgroundColor = config.indicator_off_color || defaultConfig.indicator_off_color;
+        statusContainer.style.backgroundColor = `${config.switch_off_color || defaultConfig.switch_off_color}15`;
+      }
+    }
+
+    switchElement.addEventListener('change', updateSwitchState);
+
+    async function onConfigChange(config) {
+      updateUI(config);
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.switch_off_color || defaultConfig.switch_off_color,
+            set: (value) => {
+              config.switch_off_color = value;
+              window.elementSdk.setConfig({ switch_off_color: value });
+            }
+          },
+          {
+            get: () => config.switch_on_color || defaultConfig.switch_on_color,
+            set: (value) => {
+              config.switch_on_color = value;
+              window.elementSdk.setConfig({ switch_on_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.indicator_on_color || defaultConfig.indicator_on_color,
+            set: (value) => {
+              config.indicator_on_color = value;
+              window.elementSdk.setConfig({ indicator_on_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ['switch_label', config.switch_label || defaultConfig.switch_label],
+        ['on_text', config.on_text || defaultConfig.on_text],
+        ['off_text', config.off_text || defaultConfig.off_text]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    updateUI(defaultConfig);
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9af2229a17c8fd7d',t:'MTc2NTkyOTU3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

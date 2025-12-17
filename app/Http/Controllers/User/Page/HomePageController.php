@@ -281,7 +281,6 @@ class HomePageController extends Controller
     return back()->with('toast_info', 'Đã đạt số lượng tối đa (còn ' . $available . ')');
   }
 
-
   public function updateQuantityItemInCart(string $key, Request $request, CartService $svc)
   {
     $request->validate(['qty' => 'required|integer|min:1']);
@@ -352,15 +351,16 @@ class HomePageController extends Controller
   public function listProduct(Request $request)
   {
     $filters = [
-      'per_page'     => (int)$request->query('per_page_product', 9),
-      'keyword'      => $request->query('keyword'),
-      'status'       => $request->query('status'),
-      'category_id'  => $request->query('category_id'),
-      'author_id'    => $request->query('author_id'),
-      'publisher_id' => $request->query('publisher_id'),
-      'price_min'    => $request->query('price_min'),
-      'price_max'    => $request->query('price_max'),
-      'sort_by'      => $request->query('sort_by'),
+      'per_page'      => (int) $request->query('per_page_product', 9),
+      'keyword'       => $request->query('keyword'),
+      'status'        => $request->query('status'),
+      'category_id'   => $request->query('category_id'),
+      'author_id'     => $request->query('author_id'),
+      'publisher_id'  => $request->query('publisher_id'),
+      'price_min'     => $request->query('price_min'),
+      'price_max'     => $request->query('price_max'),
+      'sort_by'       => $request->query('sort_by'),
+      'discount_only' => $request->boolean('discount_only'),
     ];
 
     $categories = $this->productService->getListCategory();

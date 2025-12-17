@@ -155,6 +155,10 @@ class ProductService
         'stocks:product_id,on_hand,reserved',
       ]);
 
+    if (!empty($filters['discount_only'])) {
+      $query->where('discount_percent', '>', 0);
+    }
+
     if (!empty($filters['keyword'])) {
       $kw = trim((string) $filters['keyword']);
       $query->where(function ($q) use ($kw) {

@@ -393,7 +393,21 @@ document.addEventListener('DOMContentLoaded', function () {
       alert('Đã xảy ra lỗi khi tải sản phẩm. Vui lòng thử lại.');
     } finally {
       productListWrapper.style.opacity = '1';
-      if (!isPagination) {
+      if (isPagination) {
+        var target = productListWrapper.querySelector('#booksContainer') || productListWrapper;
+        var rect = target.getBoundingClientRect();
+        var offset = 100;
+        var top = rect.top + window.pageYOffset - offset;
+
+        if (top < 0) {
+          top = 0;
+        }
+
+        window.scrollTo({
+          top: top,
+          behavior: 'smooth'
+        });
+      } else {
         window.scrollTo({
           top: 0,
           behavior: 'smooth'

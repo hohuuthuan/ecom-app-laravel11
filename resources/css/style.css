@@ -49,6 +49,11 @@ a {
   display: none;
 }
 
+.list-product p.small.text-muted {
+  display: none;
+}
+
+
 .breadcrumb {
   font-size: 20px;
   font-weight: 500;

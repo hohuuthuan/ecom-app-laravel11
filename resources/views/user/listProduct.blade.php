@@ -333,7 +333,7 @@ $favIds = auth()->check()
         @endforelse
     </div>
 
-    <div class="mt-3" id="pagination-links">
+    <div class="d-flex mt-3 list-product justify-content-center" id="pagination-links">
       {{ $products->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
     </div>
   </div>

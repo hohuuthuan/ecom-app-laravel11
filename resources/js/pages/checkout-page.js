@@ -516,6 +516,155 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+// ================== VALIDATE THÔNG TIN NGƯỜI NHẬN TRƯỚC KHI ĐẶT HÀNG ==================
+document.addEventListener('DOMContentLoaded', function () {
+  var form = document.getElementById('placeOrderForm');
+  if (!form) {
+    return;
+  }
+
+  function openProfileModal() {
+    var modalEl = document.getElementById('editProfileModal');
+    if (!modalEl || !window.bootstrap) {
+      return;
+    }
+
+    var modal = window.bootstrap.Modal.getInstance(modalEl)
+      || window.bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  }
+
+  function normalizePhone(raw) {
+    if (!raw) {
+      return '';
+    }
+    return String(raw).trim().replace(/[^0-9+]/g, '');
+  }
+
+  function isValidPhone(raw) {
+    var phone = normalizePhone(raw);
+    if (!phone) {
+      return false;
+    }
+
+    if (/^84\d{9,10}$/.test(phone)) {
+      phone = '+' + phone;
+    }
+
+    return /^0\d{9,10}$/.test(phone) || /^\+84\d{9,10}$/.test(phone);
+  }
+
+  form.addEventListener('submit', function (e) {
+    var nameInput = document.querySelector('input[name="receiver_name"]');
+    var phoneInput = document.querySelector('input[name="receiver_phone"]');
+
+    var name = nameInput ? (nameInput.value || '').trim() : '';
+    var phone = phoneInput ? (phoneInput.value || '').trim() : '';
+
+    if (!name || !phone) {
+      e.preventDefault();
+      if (typeof window.showToast === 'function') {
+        window.showToast('error', 'Bạn cần cập nhật đầy đủ họ tên và số điện thoại để đặt hàng.');
+      } else {
+        alert('Bạn cần cập nhật đầy đủ họ tên và số điện thoại để đặt hàng.');
+      }
+      openProfileModal();
+      return;
+    }
+
+    if (!isValidPhone(phone)) {
+      e.preventDefault();
+      if (typeof window.showToast === 'function') {
+        window.showToast('error', 'Số điện thoại chưa đúng định dạng. Vui lòng kiểm tra lại.');
+      } else {
+        alert('Số điện thoại chưa đúng định dạng. Vui lòng kiểm tra lại.');
+      }
+      openProfileModal();
+      return;
+    }
+  });
+});
+
+// ================== BEHAVIOR CHO MODAL "EDIT PROFILE" TRÊN CHECKOUT ==================
+document.addEventListener('DOMContentLoaded', function () {
+  var profileModalEl = document.getElementById('editProfileModal');
+  if (!profileModalEl) {
+    return;
+  }
+
+  profileModalEl.addEventListener('hidden.bs.modal', function () {
+    profileModalEl.querySelectorAll('.is-invalid').forEach(function (el) {
+      el.classList.remove('is-invalid');
+    });
+
+    profileModalEl.querySelectorAll('.invalid-feedback').forEach(function (el) {
+      if (!el.classList.contains('d-none')) {
+        el.classList.add('d-none');
+      }
+    });
+
+    profileModalEl.querySelectorAll('.alert').forEach(function (el) {
+      if (!el.classList.contains('d-none')) {
+        el.classList.add('d-none');
+      }
+    });
+
+    profileModalEl
+      .querySelectorAll('input[name], textarea[name], select[name]')
+      .forEach(function (field) {
+        var originalValue = field.getAttribute('data-original-value');
+        if (originalValue !== null) {
+          field.value = originalValue;
+        }
+      });
+
+    var avatarFile = profileModalEl.querySelector('#avatarFile');
+    var avatarPreview = profileModalEl.querySelector('#avatarPreview');
+    if (avatarFile && avatarPreview) {
+      avatarFile.value = '';
+      var originalSrc = avatarPreview.getAttribute('data-original-src')
+        || avatarPreview.getAttribute('data-default-src');
+
+      if (originalSrc) {
+        avatarPreview.src = originalSrc;
+      }
+    }
+  });
+
+  var avatarFile = document.getElementById('avatarFile');
+  var avatarPreview = document.getElementById('avatarPreview');
+  if (avatarFile && avatarPreview) {
+    avatarFile.addEventListener('change', function () {
+      var file = this.files[0];
+      if (!file) {
+        return;
+      }
+
+      var maxSize = 2 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert('Ảnh tối đa 2MB.');
+        this.value = '';
+        avatarPreview.src = avatarPreview.getAttribute('data-default-src') || avatarPreview.src;
+        return;
+      }
+
+      var validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        alert('Định dạng chỉ chấp nhận: jpg, jpeg, png, webp.');
+        this.value = '';
+        avatarPreview.src = avatarPreview.getAttribute('data-default-src') || avatarPreview.src;
+        return;
+      }
+
+      var reader = new FileReader();
+      reader.onload = function (event) {
+        avatarPreview.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+});
+
 // ================== CHỌN PHƯƠNG THỨC THANH TOÁN ==================
 document.addEventListener('DOMContentLoaded', function () {
   var options = document.querySelectorAll('.js-payment-option');

@@ -135,10 +135,14 @@ class CheckoutController extends Controller
 
         $selectedAddress = $addresses->first();
 
-        $fullName = old('full_name', $user?->name ?? '');
-        $phone    = $user?->phone ?? '';
+        $fullName = old('receiver_name', $user?->name ?? '');
+        $phone    = old('receiver_phone', $user?->phone ?? '');
         $email    = old('email', $user?->email ?? '');
         $provinces = Province::orderBy('name')->get();
+
+        $profileComplete = $user
+            ? (trim((string) $user->name) !== '' && trim((string) ($user->phone ?? '')) !== '')
+            : false;
 
         $walletDiscounts = $user
             ? DiscountWalletItem::query()
@@ -155,13 +159,15 @@ class CheckoutController extends Controller
             'subtotal',
             'shipping',
             'total',
+            'user',
             'addresses',
             'selectedAddress',
             'fullName',
             'phone',
             'email',
             'provinces',
-            'walletDiscounts'
+            'walletDiscounts',
+            'profileComplete'
         ));
     }
 
@@ -251,9 +257,21 @@ class CheckoutController extends Controller
 
     public function placeOrder(Request $request, CheckoutService $checkoutService, CartService $cartService)
     {
+        /** @var User|null $user */
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $buyerInfo = $checkoutService->getBuyerInfo($user);
+        if (!empty($buyerInfo['errors'])) {
+            return redirect()
+                ->route('checkout.page')
+                ->with('toast_error', 'Bạn cần cập nhật đầy đủ họ tên và số điện thoại trước khi đặt hàng.')
+                ->with('checkout_open_profile_modal', true);
+        }
+
         $data = $request->validate([
-            'receiver_name'       => ['required', 'string', 'max:255'],
-            'receiver_phone'      => ['required', 'string', 'max:20'],
             'email'               => ['nullable', 'email'],
             'shipping_address_id' => ['required', 'string', 'uuid'],
             'payment_method'      => ['required', 'in:cod,momo,vnpay'],
@@ -262,11 +280,8 @@ class CheckoutController extends Controller
             'discount_code'       => ['nullable', 'string', 'max:50'],
         ]);
 
-        /** @var User|null $user */
-        $user = Auth::user();
-        if (!$user) {
-            return redirect()->route('login');
-        }
+        $data['receiver_name'] = $buyerInfo['name'];
+        $data['receiver_phone'] = $buyerInfo['phone'];
 
         $address = Address::where('id', $data['shipping_address_id'])
             ->where('user_id', $user->id)

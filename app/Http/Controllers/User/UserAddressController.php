@@ -291,9 +291,27 @@ class UserAddressController extends Controller
       $data = $request->validated();
       $updated = $this->profileService->updateInfo($authUser->id, $data);
 
+      $redirectTo = trim((string) $request->input('redirect_to', ''));
+      $resolvedRedirectTo = null;
+
+      if ($redirectTo !== '') {
+        if (str_starts_with($redirectTo, '/')) {
+          $resolvedRedirectTo = url($redirectTo);
+        } else {
+          $host = parse_url($redirectTo, PHP_URL_HOST);
+          $currentHost = $request->getHost();
+          if (!empty($host) && $host === $currentHost) {
+            $resolvedRedirectTo = $redirectTo;
+          }
+        }
+      }
+
       if (!$updated) {
-        return redirect()
-          ->route('user.profile.index', ['tab' => 'info'])
+        $resp = $resolvedRedirectTo
+          ? redirect()->to($resolvedRedirectTo)
+          : redirect()->route('user.profile.index', ['tab' => 'info']);
+
+        return $resp
           ->withInput()
           ->withErrors(
             ['general' => 'Không tìm thấy tài khoản, vui lòng đăng nhập lại.'],
@@ -301,14 +319,33 @@ class UserAddressController extends Controller
           );
       }
 
-      return redirect()
-        ->route('user.profile.index', ['tab' => 'info'])
+      return ($resolvedRedirectTo
+        ? redirect()->to($resolvedRedirectTo)
+        : redirect()->route('user.profile.index', ['tab' => 'info']))
         ->with('toast_success', 'Cập nhật thành công');
     } catch (Throwable $e) {
       report($e);
 
-      return redirect()
-        ->route('user.profile.index', ['tab' => 'info'])
+      $redirectTo = trim((string) $request->input('redirect_to', ''));
+      $resolvedRedirectTo = null;
+
+      if ($redirectTo !== '') {
+        if (str_starts_with($redirectTo, '/')) {
+          $resolvedRedirectTo = url($redirectTo);
+        } else {
+          $host = parse_url($redirectTo, PHP_URL_HOST);
+          $currentHost = $request->getHost();
+          if (!empty($host) && $host === $currentHost) {
+            $resolvedRedirectTo = $redirectTo;
+          }
+        }
+      }
+
+      $resp = $resolvedRedirectTo
+        ? redirect()->to($resolvedRedirectTo)
+        : redirect()->route('user.profile.index', ['tab' => 'info']);
+
+      return $resp
         ->withInput()
         ->withErrors(
           ['general' => 'Có lỗi xảy ra, vui lòng thử lại sau'],

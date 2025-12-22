@@ -22,7 +22,7 @@ $favIds = auth()->check()
     </div>
 
     @if($products->isEmpty())
-    <div class="text-center py-5">
+    <div class="text-center empty-favourite-product">
       <h5 class="mb-1">Chưa có sản phẩm yêu thích</h5>
       <p class="text-muted mb-3">Hãy quay lại trang chủ và thêm vài cuốn sách.</p>
       <a href="{{ route('home') }}" class="btn btn-primary">Về trang chủ</a>
